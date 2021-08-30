@@ -1,0 +1,49 @@
+{
+	"name": "datetime",
+	"erdAbbreviation": "<dt>",
+	"dtdAbbreviation": "{dt}",
+	"parentType": "string",
+	"useSample": true,
+	"sample": "2011-02-03 04:05:00+0000",
+	"hiddenOnEntity": "view",
+	"defaultValues": {
+		"primaryKey": false,
+		"default": "",
+		"enum": [],
+		"sample":"",
+		"comments":"",
+		"pattern":"",
+		"format": "",
+		"mode": "date",
+		"scale": 7
+	},
+	"descriptor": [{
+		"schema": {
+			"mode": "date"
+		},
+		"format": "YYYY-MM-DD"
+	}, {
+		"schema": {
+			"mode": "time"
+		},
+		"format": "hh:mm:ss"
+	}, {
+		"schema": {
+			"mode": "time",
+			"fractSecPrecision": 3
+		},
+		"format": "hh:mm:ss.nnn"
+	}, {
+		"schema": {
+			"mode": "time",
+			"fractSecPrecision": 6
+		},
+		"format": "hh:mm:ss.nnnnnn"
+	}, {
+		"schema": {
+			"mode": "time",
+			"fractSecPrecision": 9
+		},
+		"format": "hh:mm:ss.nnnnnnnnn"
+	}]
+}

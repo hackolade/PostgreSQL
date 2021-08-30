@@ -1,0 +1,12 @@
+{
+	"type": "ddl",
+	"ddlType": "plugin",
+	"namePrefix": "MariaDB",
+	"level": {
+		"container": true,
+		"entity": true,
+		"view": true
+	},
+	"resolvedDefinitions": true,
+	"applyScriptToInstance": true
+}

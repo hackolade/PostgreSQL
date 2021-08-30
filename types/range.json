@@ -1,0 +1,49 @@
+{
+	"name": "range",
+	"erdAbbreviation": "<rng>",
+	"dtdAbbreviation": "{123}",
+	"parentType": "numeric",
+	"sample": 15,
+	"useSample": true,
+	"hiddenOnEntity": "view",
+	"defaultValues": {
+		"unit": "",
+		"minimum": "",
+		"exclusiveMinimum": false,
+		"maximum": "",
+		"exclusiveMaximum": false,
+		"multipleOf": "",
+		"divisibleBy": "",
+		"default": "",
+		"primaryKey": false,
+		"relationshipType": "",
+		"parentRelationship": "",
+		"childRelationships": [],
+		"foreignCollection": "",
+		"foreignField": [],
+		"enum": [],
+		"mode": "int4range",
+		"sample": ""
+	},
+	"descriptor": [
+		{
+			"schema": {
+				"mode": "int4range"
+			},
+			"capacity": 4
+		},
+		{
+			"schema": {
+				"mode": "int8range"
+			},
+			"capacity": 8
+		},
+		{
+			"schema": {
+				"mode": "numrange"
+			},
+			"capacity": 12,
+			"mode": "decimal"
+		}
+	]
+}

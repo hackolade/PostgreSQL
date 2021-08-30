@@ -1,0 +1,1024 @@
+/*
+* Copyright © 2016-2020 by IntegrIT S.A. dba Hackolade.  All rights reserved.
+*
+* The copyright to the computer software herein is the property of IntegrIT S.A.
+* The software may be used and/or copied only with the written permission of 
+* IntegrIT S.A. or in accordance with the terms and conditions stipulated in 
+* the agreement/contract under which the software has been supplied. 
+
+In order to define custom properties for any object's properties pane, you may copy/paste from the following,
+making sure that you maintain a proper JSON format.
+
+			{
+				"propertyName": "Simple text",
+				"propertyKeyword": "simpletextProp",
+				"propertyType": "text",
+				"sampleGen": "&containerName|&entityName|&random|<value>"
+			},
+			{
+				"propertyName": "Text area",
+				"propertyKeyword": "textareaProp",
+				"propertyTooltip": "Popup for multi-line text entry",
+				"propertyType": "details",
+				"template": "textarea"
+			},
+			{
+				"propertyName": "Dropdown selection",
+				"propertyKeyword": "dropdownProp",
+				"propertyTooltip": "Select from list of options",
+				"propertyType": "select",
+				"options": [
+					"Option 1",
+					"Option 2",
+					"Option 3",
+					"Option 4"
+				]
+			},
+			{
+				"propertyName": "Numeric",
+				"propertyKeyword": "numericProp",
+				"propertyValidate": true,
+				"propertyType": "numeric",
+				"valueType": "number",
+				"allowNegative": false,
+				"sampleGen": "&containerName|&entityName|&random|<value>"
+			},
+			{
+				"propertyName": "Checkbox",
+				"propertyKeyword": "checkboxProp",
+				"propertyType": "checkbox"
+			},
+			{
+				"propertyName": "Group",
+				"propertyKeyword": "grpProp",
+				"propertyType": "group",
+				"propertyTooltip": "",
+				"structure": [
+					{
+						"propertyName": "Simple Grp Text",
+						"propertyKeyword": "simpleGrpText",
+						"propertyTooltip": "",
+						"propertyType": "text"
+					},
+					{
+						"propertyName": "Group Number",
+						"propertyKeyword": "grpNumber",
+						"propertyType": "numeric",
+						"valueType": "number",
+						"allowNegative": false
+					}
+				]
+			},
+// “groupInput” can have the following states - 0 items, 1 item, and many items.
+// “blockInput” has only 2 states - 0 items or 1 item. 
+// This gives us an easy way to represent it as an object and not as an array internally which is beneficial for processing 
+// and forward-engineering in particular.
+			{
+				"propertyName": "Block",
+				"propertyKeyword": "grpProp",
+				"propertyType": "block",
+				"propertyTooltip": "",
+				"structure": [
+					{
+						"propertyName": "Simple Grp Text",
+						"propertyKeyword": "simpleGrpText",
+						"propertyTooltip": "",
+						"propertyType": "text"
+					},
+					{
+						"propertyName": "Group Number",
+						"propertyKeyword": "grpNumber",
+						"propertyType": "numeric",
+						"valueType": "number",
+						"allowNegative": false
+					}
+				]
+			},
+			{
+				"propertyName": "Field List",
+				"propertyKeyword": "keyList",
+				"propertyType": "fieldList",
+				"template": "orderedList"
+			}, 
+			{
+				"propertyName": "List with attribute",
+				"propertyKeyword": "keyListOrder",
+				"propertyType": "fieldList",
+				"template": "orderedList",
+				"attributeList": [
+					"ascending",
+					"descending"
+				]
+			}
+
+*/
+
+[
+	{
+		"lowerTab": "Details",
+		"structure": [
+			{
+				"propertyName": "Comments",
+				"propertyKeyword": "description",
+				"shouldValidate": false,
+				"propertyTooltip": "comments",
+				"addTimestampButton": false,
+				"propertyType": "details",
+				"template": "textarea"
+			},
+			{
+				"propertyName": "Temporary",
+				"propertyKeyword": "temporary",
+				"propertyType": "checkbox"
+			},
+			{
+				"propertyName": "Unlogged",
+				"propertyKeyword": "unlogged",
+				"propertyType": "checkbox"
+			},
+			{
+				"propertyName": "If not exists",
+				"propertyKeyword": "ifNotExist",
+				"propertyTooltip": "When the IF NOT EXISTS clause is used, MariaDB will return a warning instead of an error if the specified table already exists. Cannot be used together with the OR REPLACE clause.",
+				"propertyType": "checkbox"
+			},
+			{
+				"propertyName": "Inherits parent table",
+				"propertyKeyword": "inherits",
+				"propertyTooltip": "To create a table with the same definition as another table, including columns, indexes, and table options. Foreign key definitions, as well as any DATA DIRECTORY or INDEX DIRECTORY table options specified on the original table, will NOT be created.",
+				"propertyType": "selecthashed",
+				"template": "entities",
+				"withEmptyOption": true,
+				"excludeCurrent": true
+			},
+			{
+				"propertyName": "Partitioning",
+				"propertyKeyword": "partitioning",
+				"propertyType": "block",
+				"propertyTooltip": "Determines how a partitioned table's rows are distributed across partitions",
+				"structure": [
+					{
+						"propertyName": "Partition type",
+						"propertyKeyword": "partitionType",
+						"propertyTooltip": "Choose the desired partition type",
+						"propertyType": "select",
+						"defaultValue": "",
+						"options": [
+							"",
+							"RANGE",
+							"LIST",
+							"HASH"
+						]
+					},
+					{
+						"propertyName": "Partition key",
+						"propertyKeyword": "compositePartitionKey",
+						"propertyType": "primaryKeySetter",
+						"abbr": "pk,PK",
+						"dependency": {
+							"type": "or",
+							"values": [{
+								"key": "partitioning_expression",
+								"value": false
+							}, {
+								"key": "partitioning_expression",
+								"exists": false
+							}]
+						}
+					}, 
+					{
+						"propertyName": "Expression",
+						"propertyKeyword": "partitioning_expression",
+						"propertyTooltip": "A SQL expression that returns a value from each row. In the simplest cases, it is a column name. This value is used to determine which partition should contain a row.",
+						"propertyType": "details",
+						"template": "textarea",
+						"markdown": false,
+						"dependency": {
+							"type": "or",
+							"values": [{
+								"key": "compositePartitionKey",
+								"value": false
+							}, {
+								"key": "compositePartitionKey",
+								"exists": false
+							}]
+						}
+					}
+				]
+			},
+ 			{
+				"propertyName": "Using method",
+				"propertyKeyword": "method",
+				"propertyTooltip": "Optional clause to specify the table access method to use to store the contents for the new table; the method needs be an access method of type TABLE.",
+				"propertyType": "text"
+			},
+			{
+				"propertyName": "With storage parameters",
+				"propertyKeyword": "storage_parameter",
+				"propertyType": "block",
+				"propertyTooltip": "For each individual table you create, you can set some table options. ",
+				"structure": [
+					{
+						"propertyName": "Fill factor",
+						"propertyKeyword": "fillfactor",
+						"propertyType": "numeric",
+						"valueType": "number",
+						"propertyTooltip": "A percentage between 10 and 100. Complete packing (100) is the default.",
+						"minValue": 10,
+						"maxValue": 100,
+						"step": 1,
+						"defaultValue": 100
+					},
+					{
+						"propertyName": "Parallel workers",
+						"propertyKeyword": "parallel_workers",
+						"propertyType": "numeric",
+						"valueType": "number",
+						"propertyTooltip": "This sets the number of workers that should be used to assist a parallel scan of this table.",
+						"minValue": 0,
+						"step": 1
+					},
+					{
+						"propertyName": "Enable autovacuum",
+						"propertyKeyword": "autovacuum_enabled",
+						"propertyType": "checkbox",
+						"propertyTooltip": "If true, the autovacuum daemon will perform automatic VACUUM and/or ANALYZE operations on this table.",
+						"defaultValue": false
+					},
+					{
+						"propertyName": "Autovacuum parameters",
+						"propertyKeyword": "Autovacuum",
+						"propertyType": "block",
+						"propertyTooltip": "Vacuum parameters",
+						"structure": [
+							{
+								"propertyName": "Vacuum index cleanup",
+								"propertyKeyword": "vacuum_index_cleanup",
+								"propertyType": "checkbox",
+								"propertyTooltip": "Disabling index cleanup can speed up VACUUM very significantly, but may also lead to severely bloated indexes if table modifications are frequent.",
+								"defaultValue": true
+							},
+							{
+								"propertyName": "Vacuum truncate",
+								"propertyKeyword": "vacuum_truncate",
+								"propertyType": "checkbox",
+								"propertyTooltip": "If true, VACUUM and autovacuum do the truncation and the disk space for the truncated pages is returned to the operating system.",
+								"defaultValue": true
+							},
+							{
+								"propertyName": "Vacuum threshold",
+								"propertyKeyword": "autovacuum_vacuum_threshold",
+								"propertyType": "numeric",
+								"valueType": "number",
+								"propertyTooltip": "Specifies the minimum number of updated or deleted tuples needed to trigger a VACUUM in any one table.",
+								"minValue": 0,
+								"step": 1,
+								"defaultValue": 50
+							},
+							{
+								"propertyName": "Vacuum scale factor",
+								"propertyKeyword": "autovacuum_vacuum_scale_factor",
+								"propertyType": "numeric",
+								"valueType": "number",
+								"propertyTooltip": "Specifies a fraction of the table size to add to autovacuum_vacuum_threshold when deciding whether to trigger a VACUUM.",
+								"minValue": 0,
+								"defaultValue": 0.2
+							},
+							{
+								"propertyName": "Insert threshold",
+								"propertyKeyword": "autovacuum_vacuum_insert_threshold",
+								"propertyType": "numeric",
+								"valueType": "number",
+								"propertyTooltip": "Specifies the number of inserted tuples needed to trigger a VACUUM in any one table. ",
+								"minValue": -1,
+								"step": 1,
+								"defaultValue": 1000
+							},
+							{
+								"propertyName": "Insert scale factor",
+								"propertyKeyword": "autovacuum_vacuum_insert_scale_factor",
+								"propertyType": "numeric",
+								"valueType": "number",
+								"propertyTooltip": "Specifies a fraction of the table size to add to autovacuum_vacuum_insert_threshold when deciding whether to trigger a VACUUM.",
+								"minValue": 0,
+								"defaultValue": 0.2
+							},
+							{
+								"propertyName": "Analyze threshold",
+								"propertyKeyword": "autovacuum_analyze_threshold",
+								"propertyType": "numeric",
+								"valueType": "number",
+								"propertyTooltip": "Specifies the minimum number of inserted, updated or deleted tuples needed to trigger an ANALYZE in any one table. ",
+								"minValue": 0,
+								"step": 1,
+								"defaultValue": 50
+							},
+							{
+								"propertyName": "Analyze scale factor",
+								"propertyKeyword": "autovacuum_analyze_scale_factor",
+								"propertyType": "numeric",
+								"valueType": "number",
+								"propertyTooltip": "Specifies a fraction of the table size to add to autovacuum_analyze_threshold when deciding whether to trigger an ANALYZE. ",
+								"minValue": 0,
+								"defaultValue": 0.1
+							},
+							{
+								"propertyName": "Vacuum cost delay",
+								"propertyKeyword": "autovacuum_vacuum_cost_delay",
+								"propertyType": "numeric",
+								"valueType": "number",
+								"propertyTooltip": "Specifies the cost delay value that will be used in automatic VACUUM operations. If -1 is specified, the regular vacuum_cost_delay value will be used. The value is specified as milliseconds.",
+								"minValue": -1,
+								"defaultValue": 2
+							},
+							{
+								"propertyName": "Vacuum cost limit",
+								"propertyKeyword": "autovacuum_vacuum_cost_limit",
+								"propertyType": "numeric",
+								"valueType": "number",
+								"propertyTooltip": "Specifies the cost limit value that will be used in automatic VACUUM operations. If -1 is specified (which is the default), the regular vacuum_cost_limit value will be used.",
+								"minValue": -1,
+								"step": 1
+							},
+							{
+								"propertyName": "Freeze min age",
+								"propertyKeyword": "autovacuum_freeze_min_age",
+								"propertyType": "numeric",
+								"valueType": "number",
+								"propertyTooltip": "Specifies the cutoff age (in transactions) that VACUUM should use to decide whether to freeze row versions while scanning a table.",
+								"minValue": 0,
+								"step": 1,
+								"defaultValue": 50000000
+							},
+							{
+								"propertyName": "Freeze max age",
+								"propertyKeyword": "autovacuum_freeze_max_age",
+								"propertyType": "numeric",
+								"valueType": "number",
+								"propertyTooltip": "Specifies the maximum age (in transactions) that a table's pg_class.relfrozenxid field can attain before a VACUUM operation is forced to prevent transaction ID wraparound within the table.",
+								"minValue": 0,
+								"step": 1,
+								"defaultValue": 200000000
+							},
+							{
+								"propertyName": "Freeze table age",
+								"propertyKeyword": "autovacuum_freeze_table_age",
+								"propertyType": "numeric",
+								"valueType": "number",
+								"propertyTooltip": "Although users can set this value anywhere from zero to two billion, VACUUM will silently limit the effective value to 95% of autovacuum_freeze_max_age.",
+								"minValue": 0,
+								"maxValue": 2000000000,
+								"step": 1,
+								"defaultValue": 150000000
+							},
+							{
+								"propertyName": "Multixact freeze min age",
+								"propertyKeyword": "autovacuum_multixact_freeze_min_age",
+								"propertyType": "numeric",
+								"valueType": "number",
+								"propertyTooltip": "Specifies the cutoff age (in multixacts) that VACUUM should use to decide whether to replace multixact IDs with a newer transaction ID or multixact ID while scanning a table.",
+								"minValue": 0,
+								"step": 1,
+								"defaultValue": 5000000
+							},
+							{
+								"propertyName": "Multixact freeze max age",
+								"propertyKeyword": "autovacuum_multixact_freeze_max_age",
+								"propertyType": "numeric",
+								"valueType": "number",
+								"propertyTooltip": "Specifies the maximum age (in multixacts) that a table's pg_class.relminmxid field can attain before a VACUUM operation is forced to prevent multixact ID wraparound within the table.",
+								"minValue": 0,
+								"maxValue": 4000000000,
+								"step": 1,
+								"defaultValue": 5000000
+							},
+							{
+								"propertyName": "Multixact freeze table age",
+								"propertyKeyword": "autovacuum_multixact_freeze_table_age",
+								"propertyType": "numeric",
+								"valueType": "number",
+								"propertyTooltip": "Although users can set this value anywhere from zero to two billion, VACUUM will silently limit the effective value to 95% of autovacuum_multixact_freeze_max_age, so that a periodic manual VACUUM has a chance to run before an anti-wraparound is launched for the table.",
+								"minValue": 0,
+								"maxValue": 2000000000,
+								"step": 1,
+								"defaultValue": 150000000
+							},
+							{
+								"propertyName": "Log min duration",
+								"propertyKeyword": "log_autovacuum_min_duration",
+								"propertyType": "numeric",
+								"valueType": "number",
+								"propertyTooltip": "It is taken as milliseconds. Causes each action executed by autovacuum to be logged if it ran for at least the specified amount of time. Setting this to zero logs all autovacuum actions. -1 (the default) disables logging autovacuum actions.",
+								"minValue": -1,
+								"step": 1,
+								"defaultValue": -1
+							}
+						],
+						"dependency": {
+							"key": "autovacuum_enabled",
+							"value": true
+						}
+					},
+					{
+						"propertyName": "Enable TOAST autovacuum",
+						"propertyKeyword": "toast_autovacuum_enabled",
+						"propertyType": "checkbox",
+						"propertyTooltip": "If true, the autovacuum daemon will perform automatic VACUUM and/or ANALYZE operations on this table.",
+						"defaultValue": false
+					},
+					{
+						"propertyName": "TOAST parameters",
+						"propertyKeyword": "toast",
+						"propertyType": "block",
+						"propertyTooltip": "Toast parameters",
+						"structure": [
+							{
+								"propertyName": "Toast tuple target",
+								"propertyKeyword": "toast_tuple_target",
+								"propertyType": "numeric",
+								"valueType": "number",
+								"propertyTooltip": "The toast_tuple_target specifies the minimum tuple length required before we try to compress and/or move long column values into TOAST tables, and is also the target length we try to reduce the length below once toasting begins.",
+								"minValue": 0,
+								"step": 1
+							},
+							{
+								"propertyName": "Vacuum index cleanup",
+								"propertyKeyword": "toast_vacuum_index_cleanup",
+								"propertyType": "checkbox",
+								"propertyTooltip": "Disabling index cleanup can speed up VACUUM very significantly, but may also lead to severely bloated indexes if table modifications are frequent.",
+								"defaultValue": true
+							},
+							{
+								"propertyName": "Vacuum truncate",
+								"propertyKeyword": "toast_vacuum_truncate",
+								"propertyType": "checkbox",
+								"propertyTooltip": "If true, VACUUM and autovacuum do the truncation and the disk space for the truncated pages is returned to the operating system.",
+								"defaultValue": true
+							},
+							{
+								"propertyName": "Vacuum threshold",
+								"propertyKeyword": "toast_autovacuum_vacuum_threshold",
+								"propertyType": "numeric",
+								"valueType": "number",
+								"propertyTooltip": "Specifies the minimum number of updated or deleted tuples needed to trigger a VACUUM in any one table.",
+								"minValue": 0,
+								"step": 1,
+								"defaultValue": 50
+							},
+							{
+								"propertyName": "Vacuum scale factor",
+								"propertyKeyword": "toast_autovacuum_vacuum_scale_factor",
+								"propertyType": "numeric",
+								"valueType": "number",
+								"propertyTooltip": "Specifies a fraction of the table size to add to autovacuum_vacuum_threshold when deciding whether to trigger a VACUUM.",
+								"minValue": 0,
+								"defaultValue": 0.2
+							},
+							{
+								"propertyName": "Insert threshold",
+								"propertyKeyword": "toast_autovacuum_vacuum_insert_threshold",
+								"propertyType": "numeric",
+								"valueType": "number",
+								"propertyTooltip": "Specifies the number of inserted tuples needed to trigger a VACUUM in any one table. ",
+								"minValue": -1,
+								"step": 1,
+								"defaultValue": 1000
+							},
+							{
+								"propertyName": "Insert scale factor",
+								"propertyKeyword": "toast_autovacuum_vacuum_insert_scale_factor",
+								"propertyType": "numeric",
+								"valueType": "number",
+								"propertyTooltip": "Specifies a fraction of the table size to add to autovacuum_vacuum_insert_threshold when deciding whether to trigger a VACUUM.",
+								"minValue": 0,
+								"defaultValue": 0.2
+							},
+							{
+								"propertyName": "Vacuum cost delay",
+								"propertyKeyword": "toast_autovacuum_vacuum_cost_delay",
+								"propertyType": "numeric",
+								"valueType": "number",
+								"propertyTooltip": "Specifies the cost delay value that will be used in automatic VACUUM operations. If -1 is specified, the regular vacuum_cost_delay value will be used. The value is specified as milliseconds.",
+								"minValue": -1,
+								"defaultValue": 2
+							},
+							{
+								"propertyName": "Vacuum cost limit",
+								"propertyKeyword": "toast_autovacuum_vacuum_cost_limit",
+								"propertyType": "numeric",
+								"valueType": "number",
+								"propertyTooltip": "Specifies the cost limit value that will be used in automatic VACUUM operations. If -1 is specified (which is the default), the regular vacuum_cost_limit value will be used.",
+								"minValue": -1,
+								"step": 1
+							},
+							{
+								"propertyName": "Freeze min age",
+								"propertyKeyword": "toast_autovacuum_freeze_min_age",
+								"propertyType": "numeric",
+								"valueType": "number",
+								"propertyTooltip": "Specifies the cutoff age (in transactions) that VACUUM should use to decide whether to freeze row versions while scanning a table.",
+								"minValue": 0,
+								"step": 1,
+								"defaultValue": 50000000
+							},
+							{
+								"propertyName": "Freeze max age",
+								"propertyKeyword": "toast_autovacuum_freeze_max_age",
+								"propertyType": "numeric",
+								"valueType": "number",
+								"propertyTooltip": "Specifies the maximum age (in transactions) that a table's pg_class.relfrozenxid field can attain before a VACUUM operation is forced to prevent transaction ID wraparound within the table.",
+								"minValue": 0,
+								"step": 1,
+								"defaultValue": 200000000
+							},
+							{
+								"propertyName": "Freeze table age",
+								"propertyKeyword": "toast_autovacuum_freeze_table_age",
+								"propertyType": "numeric",
+								"valueType": "number",
+								"propertyTooltip": "Although users can set this value anywhere from zero to two billion, VACUUM will silently limit the effective value to 95% of autovacuum_freeze_max_age.",
+								"minValue": 0,
+								"maxValue": 2000000000,
+								"step": 1,
+								"defaultValue": 150000000
+							},
+							{
+								"propertyName": "Multixact freeze min age",
+								"propertyKeyword": "toast_autovacuum_multixact_freeze_min_age",
+								"propertyType": "numeric",
+								"valueType": "number",
+								"propertyTooltip": "Specifies the cutoff age (in multixacts) that VACUUM should use to decide whether to replace multixact IDs with a newer transaction ID or multixact ID while scanning a table.",
+								"minValue": 0,
+								"step": 1,
+								"defaultValue": 5000000
+							},
+							{
+								"propertyName": "Multixact freeze max age",
+								"propertyKeyword": "toast_autovacuum_multixact_freeze_max_age",
+								"propertyType": "numeric",
+								"valueType": "number",
+								"propertyTooltip": "Specifies the maximum age (in multixacts) that a table's pg_class.relminmxid field can attain before a VACUUM operation is forced to prevent multixact ID wraparound within the table.",
+								"minValue": 0,
+								"maxValue": 4000000000,
+								"step": 1,
+								"defaultValue": 5000000
+							},
+							{
+								"propertyName": "Multixact freeze table age",
+								"propertyKeyword": "toast_autovacuum_multixact_freeze_table_age",
+								"propertyType": "numeric",
+								"valueType": "number",
+								"propertyTooltip": "Although users can set this value anywhere from zero to two billion, VACUUM will silently limit the effective value to 95% of autovacuum_multixact_freeze_max_age, so that a periodic manual VACUUM has a chance to run before an anti-wraparound is launched for the table.",
+								"minValue": 0,
+								"maxValue": 2000000000,
+								"step": 1,
+								"defaultValue": 150000000
+							},
+							{
+								"propertyName": "Log min duration",
+								"propertyKeyword": "toast_log_autovacuum_min_duration",
+								"propertyType": "numeric",
+								"valueType": "number",
+								"propertyTooltip": "It is taken as milliseconds. Causes each action executed by autovacuum to be logged if it ran for at least the specified amount of time. Setting this to zero logs all autovacuum actions. -1 (the default) disables logging autovacuum actions.",
+								"minValue": -1,
+								"step": 1,
+								"defaultValue": -1
+							}
+						],
+						"dependency": {
+							"key": "toast_autovacuum_enabled",
+							"value": true
+						}
+					},
+					{
+						"propertyName": "User catalog table",
+						"propertyKeyword": "user_catalog_table",
+						"propertyType": "checkbox",
+						"propertyTooltip": "Declare the table as an additional catalog table for purposes of logical replication."
+					}
+				]
+			},
+			{
+				"propertyName": "On commit",
+				"propertyKeyword": "on_commit",
+				"propertyTooltip": "Controls the behavior of temporary tables at the end of a transaction block can be controlled.",
+				"propertyType": "select",
+				"defaultValue": "PRESERVE ROWS",
+				"options": [
+					"PRESERVE ROWS",
+					"DELETE ROWS",
+					"DROP"
+				],
+				"dependency": {
+					"key": "temporary",
+					"value": true
+				}
+			},
+			{
+				"propertyName": "Tablespace",
+				"propertyKeyword": "table_tablespace_name",
+				"propertyTooltip": "Enter the name of an existing tablespace location for the database, or pg_default",
+				"defaultValue": "pg_default",
+				"propertyType": "text"
+			},
+			{
+				"propertyName": "As Select statement",
+				"propertyKeyword": "selectStatement",
+				"propertyType": "details",
+				"template": "textarea",
+				"markdown": false
+			},
+			{
+				"propertyName": "Remarks",
+				"propertyKeyword": "comments",
+				"propertyTooltip": "remarks",
+				"addTimestampButton": true,
+				"propertyType": "details",
+				"template": "textarea",
+				"valueType": "string"
+			}
+		],
+		"columnsRatio": [3.7, 5]
+	},
+	{
+		"lowerTab": "Composite keys",
+		"structure": [
+			{
+				"propertyName": "Primary key",
+				"propertyType": "group",
+				"groupItemLimit": 1,
+				"propertyKeyword": "primaryKey",
+				"propertyTooltip": "",
+				"structure": [
+					{
+						"propertyName": "Constraint name",
+						"propertyKeyword": "constraintName",
+						"propertyTooltip": "",
+						"propertyType": "text"
+					},
+					{
+						"propertyName": "Key",
+						"propertyKeyword": "compositePrimaryKey",
+						"propertyType": "primaryKeySetter",
+						"abbr": "pk",
+						"attributeList": [
+							"ascending",
+							"descending"
+						]
+					},
+					{
+						"propertyName": "Category",
+						"propertyKeyword": "indexCategory",
+						"propertyTooltip": "",
+						"propertyType": "select",
+						"defaultValue": "",
+						"options": [
+							"",
+							"btree",
+							"hash",
+							"gist",
+							"spgist",
+							"gin",
+							"brin"
+						]
+					},
+					{
+						"propertyName": "Comment",
+						"propertyKeyword": "indexComment",
+						"propertyTooltip": "comment",
+						"addTimestampButton": false,
+						"propertyType": "details",
+						"template": "textarea"
+					}
+				]
+			}, 
+			{
+				"propertyName": "Unique key",
+				"propertyType": "group",
+				"propertyKeyword": "uniqueKey",
+				"propertyTooltip": "",
+				"structure": [
+					{
+						"propertyName": "Constraint name",
+						"propertyKeyword": "constraintName",
+						"propertyTooltip": "",
+						"propertyType": "text"
+					},
+					{
+						"propertyName": "Key",
+						"propertyKeyword": "compositeUniqueKey",
+						"propertyType": "primaryKeySetter",
+						"abbr": " ",
+						"attributeList": [
+							"ascending",
+							"descending"
+						]
+					},
+					{
+						"propertyName": "Category",
+						"propertyKeyword": "indexCategory",
+						"propertyTooltip": "",
+						"propertyType": "select",
+						"defaultValue": "",
+						"options": [
+							"",
+							"btree",
+							"hash",
+							"gist",
+							"spgist",
+							"gin",
+							"brin"
+						]
+					},
+					{
+						"propertyName": "Comment",
+						"propertyKeyword": "indexComment",
+						"propertyTooltip": "comment",
+						"addTimestampButton": false,
+						"propertyType": "details",
+						"template": "textarea"
+					}
+				]
+			}
+		]
+	},
+	{
+		"lowerTab": "Indexes",
+		"structure": [{
+			"propertyName": "Index",
+			"propertyType": "group",
+			"propertyKeyword": "Indxs",
+			"propertyTooltip": "In general you should only add indexes to match the queries your application uses. Any extra will waste resources.",
+			"structure": [
+				{
+					"propertyName": "Name",
+					"propertyKeyword": "indxName",
+					"propertyTooltip": "Optional, if not specified an automatic name will be assigned. Index name are needed to drop indexes and appear in error messages when a constraint is violated.",
+					"propertyType": "text"
+				},
+				{
+					"propertyName": "Activated",
+					"propertyKeyword": "isActivated",
+					"propertyTooltip": "Deactivated item will be not included in FE script",
+					"propertyType": "checkbox",
+					"defaultValue": true
+				},
+				{
+					"propertyName": "Method",
+					"propertyKeyword": "index_method",
+					"propertyTooltip": "",
+					"propertyType": "select",
+					"defaultValue": "BTREE",
+					"options": [
+						"btree",
+						"hash",
+						"gist",
+						"spgist",
+						"gin",
+						"brin"
+					]
+				},
+				{
+					"propertyName": "Unique",
+					"propertyKeyword": "unique",
+					"propertyTooltip": "Causes the system to check for duplicate values in the table when the index is created (if data already exist) and each time data is added. Attempts to insert or update data which would result in duplicate entries will generate an error.",
+					"defaultValue": false,
+					"propertyType": "checkbox",
+					"dependency": {
+						"type": "or",
+						"values": [{
+							"key": "index_method",
+							"value": "btree"
+						}]
+					}
+				},
+				{
+					"propertyName": "Concurrent build",
+					"propertyKeyword": "concurrently",
+					"propertyTooltip": "When this option is used, PostgreSQL will build the index without taking any locks that prevent concurrent inserts, updates, or deletes on the table; whereas a standard index build locks out writes (but not reads) on the table until it's done.",
+					"defaultValue": false,
+					"propertyType": "checkbox"
+				},
+				{
+					"propertyName": "If not exist",
+					"propertyKeyword": "ifNotExist",
+					"propertyTooltip": "The index will only be created if an index with the same name does not already exist. If the index already exists, then a warning will be triggered by default.",
+					"defaultValue": true,
+					"propertyType": "checkbox"
+				},
+				{
+					"propertyName": "Only",
+					"propertyKeyword": "only",
+					"propertyTooltip": "Indicates not to recurse creating indexes on partitions, if the table is partitioned.",
+					"defaultValue": true,
+					"propertyType": "checkbox"
+				},
+				{
+					"propertyName": "Columns",
+					"propertyKeyword": "columns",
+					"propertyType": "fieldList",
+					"template": "orderedList",
+					"propertyTooltip": "The name of a column of the table.",
+					"attributeList": [
+						"ASC",
+						"DESC"
+					]				
+				},
+				{
+					"propertyName": "Include non-key columns",
+					"propertyKeyword": "include",
+					"propertyType": "fieldList",
+					"template": "orderedList",
+					"propertyTooltip": "The optional INCLUDE clause specifies a list of columns which will be included in the index as non-key columns.",
+					"dependency": {
+						"type": "or",
+						"values": [{
+							"key": "index_method",
+							"value": "btree"
+						}, {
+							"key": "index_method",
+							"value": "gist"
+						}]
+					}
+				},
+				{
+					"propertyName": "With storage parameters",
+					"propertyKeyword": "index_storage_parameter",
+					"propertyType": "block",
+					"propertyTooltip": "The optional WITH clause specifies storage parameters for the index. Each index method has its own set of allowed storage parameters.",
+					"structure": [
+						{
+							"propertyName": "Fill factor",
+							"propertyKeyword": "index_fillfactor",
+							"propertyType": "numeric",
+							"valueType": "number",
+							"propertyTooltip": "A percentage between 10 and 100. The fillfactor for an index is a percentage that determines how full the index method will try to pack index pages.",
+							"minValue": 10,
+							"maxValue": 100,
+							"step": 1,
+							"defaultValue": 100
+						},
+						{
+							"propertyName": "Deduplicate items",
+							"propertyKeyword": "deduplicate_items",
+							"propertyType": "checkbox",
+							"propertyTooltip": "Declare the table as an additional catalog table for purposes of logical replication.",
+							"defaultValue": true,
+							"dependency": {
+								"type": "or",
+								"values": [{
+									"key": "index_method",
+									"value": "btree"
+								}]
+							}
+						},
+						{
+							"propertyName": "Fast update",
+							"propertyKeyword": "fastupdate",
+							"propertyType": "checkbox",
+							"propertyTooltip": "This setting controls usage of the fast update technique.",
+							"defaultValue": true,
+							"dependency": {
+								"type": "or",
+								"values": [{
+									"key": "index_method",
+									"value": "gin"
+								}]
+							}
+						},
+						{
+							"propertyName": "Gin pending list limit",
+							"propertyKeyword": "gin_pending_list_limit",
+							"propertyType": "numeric",
+							"valueType": "number",
+							"propertyTooltip": "This value is specified in kilobytes. Sets the maximum size of a GIN index's pending list, which is used when fastupdate is enabled.",
+							"minValue": 0,
+							"step": 1,
+							"defaultValue": 4000,
+							"dependency": {
+								"type": "and",
+								"values": [{
+									"key": "index_method",
+									"value": "gin"
+								}, {
+									"key": "fastupdate",
+									"value": true
+								}]
+							}
+						},
+						{
+							"propertyName": "Pages per range",
+							"propertyKeyword": "pages_per_range",
+							"propertyType": "numeric",
+							"valueType": "number",
+							"propertyTooltip": "Defines the number of table blocks that make up one block range for each entry of a BRIN index.",
+							"minValue": 0,
+							"step": 1,
+							"defaultValue": 128,
+							"dependency": {
+								"type": "or",
+								"values": [{
+									"key": "index_method",
+									"value": "brin"
+								}]
+							}
+						},
+						{
+							"propertyName": "Auto summarize",
+							"propertyKeyword": "autosummarize ",
+							"propertyType": "checkbox",
+							"propertyTooltip": "Defines whether a summarization run is invoked for the previous page range whenever an insertion is detected on the next one.",
+							"defaultValue": true,
+							"dependency": {
+								"type": "or",
+								"values": [{
+									"key": "index_method",
+									"value": "brin"
+								}]
+							}
+						}
+					],
+					"dependency": {
+						"type": "or",
+						"values": [{
+							"key": "index_method",
+							"value": "btree"
+						}, {
+							"key": "index_method",
+							"value": "hash"
+						}, {
+							"key": "index_method",
+							"value": "gist"
+						}, {
+							"key": "index_method",
+							"value": "spgist"
+						}]
+					}
+				},
+				{
+					"propertyName": "Tablespace",
+					"propertyKeyword": "index_tablespace_name",
+					"propertyTooltip": "Enter the name of an existing tablespace location for the database, or pg_default",
+					"defaultValue": "pg_default",
+					"propertyType": "text"
+				},
+				{
+					"propertyName": "Where constraint",
+					"propertyKeyword": "where",
+					"propertyTooltip": "Popup for multi-line text entry",
+					"propertyType": "details",
+					"markdown": false,
+					"template": "textarea"
+				},
+				{
+					"propertyName": "Comment",
+					"propertyKeyword": "indexComment",
+					"propertyTooltip": "comment",
+					"addTimestampButton": false,
+					"propertyType": "details",
+					"template": "textarea"
+				}
+			]
+		}]
+	},
+	{
+		"lowerTab": "Check Constraints",
+		"structure": [{
+			"propertyName": "Check Constraint",
+			"propertyType": "group",
+			"propertyKeyword": "chkConstr",
+			"propertyTooltip": "",
+			"structure": [
+				{
+					"propertyName": "Name",
+					"propertyKeyword": "chkConstrName",
+					"propertyTooltip": "",
+					"propertyType": "text"
+				},
+				{
+					"propertyName": "Description",
+					"propertyKeyword": "constrDescription",
+					"propertyTooltip": "description",
+					"propertyType": "details",
+					"template": "textarea"
+				},
+				{
+					"propertyName": "Expression",
+					"propertyKeyword": "constrExpression",
+					"propertyTooltip": "Expression",
+					"propertyType": "details",
+					"template": "textarea",
+					"markdown": false
+				},
+				{
+					"propertyName": "Comments",
+					"propertyKeyword": "constrComments",
+					"propertyTooltip": "comments",
+					"addTimestampButton": false,
+					"propertyType": "details",
+					"template": "textarea"
+				}
+			]
+		}]
+	}
+]

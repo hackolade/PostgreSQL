@@ -1,0 +1,90 @@
+{
+	"model": {
+		"modelName": "New model",
+		"dbVersion": "v13.x",
+		"dbVendor": "PostgreSQL"
+	},
+	"container": {
+		"name": "New schema",
+		"indexes": []
+	},
+	"collection": {
+		"collectionName": "New table",
+		"memory_optimized": false,
+		"collectionUsers": [],
+		"collation": {},
+		"chkConstr": {
+			"constrCheck": true,
+			"constrEnforceUpserts": true,
+			"constrEnforceReplication": true
+		},
+		"Indxs": {
+			"indxType": "Index",
+			"ALLOW_ROW_LOCKS": true,
+			"ALLOW_PAGE_LOCKS": true
+		}
+	},
+	"field": {
+		"name": "New column",
+		"signed": true,
+		"primaryKey": false,
+		"unique": false,
+		"hasMaxLength": {
+			"valueDependencies": [
+				{
+					"value": true,
+					"dependency": {
+						"type": "or",
+						"values": [{
+							"key": "subtype",
+							"value": "object"
+						}, {
+							"key": "subtype",
+							"value": "array"
+						}]
+					}
+				}
+			]
+		}
+	},
+	"patternField": {
+		"name": "^[a-zA-Z0-9_.-]+$"
+	},
+	"multipleField": {
+		"primaryKey": true
+	},
+	"subschema": {},
+	"arrayItem": {},
+	"choice": {},
+	"relationship": {
+		"parentCardinality": "1",
+		"childCardinality": "0..n"
+	},
+	"user": {},
+	"view": {
+		"viewOn": "",
+		"pipeline": ""
+	},
+	"UDFs": {
+		"name": "New UDF",
+		"udfID": "",
+		"udfDescription": "",
+		"udfFunction": "",
+		"udfComments": ""
+	},
+	"UDAs": {
+		"name": "New UDA",
+		"udfID": "",
+		"udfDescription": "",
+		"udfFunction": "",
+		"udfComments": ""
+	},
+	"SecIdxs": {
+		"name": "New Secondary Index",
+		"SecIndxKey": "",
+		"SecIndxID": "",
+		"SecIndxDescription": "",
+		"SecIndxFunction": "",
+		"SecIndxComments": ""
+	}
+}

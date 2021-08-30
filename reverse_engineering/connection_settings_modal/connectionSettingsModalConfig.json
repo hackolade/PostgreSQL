@@ -1,0 +1,221 @@
+[
+	{
+		"lowerTab": "Connection",
+		"structure": [
+			{
+				"inputLabel": "Name",
+				"inputKeyword": "name",
+				"inputType": "text",
+				"inputPlaceholder": "Name",
+				"description": "Choose a friendly connection name"
+			},
+			{
+				"inputLabel": "Host",
+				"inputKeyword": "host",
+				"description": "Specify host IP address or DNS name of PostgreSQL server",
+				"inputType": "text",
+				"regex": "([^\\s])"
+			},
+			{
+				"inputLabel": "Port",
+				"inputKeyword": "port",
+				"description": "Specify port number of PostgreSQL server",
+				"inputType": "numeric",
+				"defaultValue": 5432
+			},
+			{
+				"inputLabel": "Database name",
+				"inputKeyword": "databaseName",
+				"description": "Database name (optional)",
+				"inputType": "text",
+				"inputPlaceholder": "Database name",
+				"regex": "([^\\s])"
+			}
+		]
+	},
+	{
+		"tab": "Authentication",
+		"structure": [
+			{
+				"inputLabel": "User Name",
+				"inputKeyword": "userName",
+				"inputType": "text",
+				"inputPlaceholder": "User Name",
+				"validation": {
+					"regex": "([^\\s])"
+				}
+			},
+			{
+				"inputLabel": "Password",
+				"inputKeyword": "userPassword",
+				"inputType": "password",
+				"inputPlaceholder": "Password",
+				"isHiddenKey": true,
+				"validation": {
+					"regex": "([^\\s])"
+				}
+			}
+		]
+	},
+	{
+		"tab": "SSL",
+		"structure": [
+			{
+				"inputLabel": "SSL",
+				"inputKeyword": "sslType",
+				"inputType": "select",
+				"options": [{
+					"value": "Off", 
+					"label": "Off"
+				}, {
+					"value": "TRUST_ALL_CERTIFICATES",
+					"label": "Unvalidated"
+				},{
+					"value": "TRUST_CUSTOM_CA_SIGNED_CERTIFICATES",
+					"label": "Server validation"
+
+				},{
+					"value": "TRUST_SERVER_CLIENT_CERTIFICATES",
+					"label": "Server and client validation"
+				}]
+			},
+			{
+				"inputLabel": "Certificate Authority",
+				"inputKeyword": "certAuthority",
+				"inputType": "file",
+				"inputPlaceholder": "Certificate Authority",
+				"extensions": ["pem", "crt", "key"],
+				"dependency": {
+					"key": "sslType",
+					"value": ["TRUST_CUSTOM_CA_SIGNED_CERTIFICATES", "TRUST_SERVER_CLIENT_CERTIFICATES"]
+				}
+			},
+			{
+				"inputLabel": "Client Certificate",
+				"inputKeyword": "clientCert",
+				"inputType": "file",
+				"inputPlaceholder": "Client Certificate",
+				"extensions": ["pem", "crt", "key"],
+				"dependency": {
+					"key": "sslType",
+					"value": "TRUST_SERVER_CLIENT_CERTIFICATES"
+				}
+			},
+			{
+				"inputLabel": "Client Private Key",
+				"inputKeyword": "clientPrivateKey",
+				"inputType": "file",
+				"inputPlaceholder": "Client Private Key",
+				"extensions": ["pem", "crt", "key"],
+				"dependency": {
+					"key": "sslType",
+					"value": "TRUST_SERVER_CLIENT_CERTIFICATES"
+				}
+			}
+		]
+	},
+	{
+		"tab": "SSH",
+		"structure": [
+			{
+				"inputLabel": "Use SSH Tunnel",
+				"inputKeyword": "ssh",
+				"inputType": "checkbox",
+				"defaultValue": false
+			},
+			{
+				"inputLabel": "SSH Address",
+				"inputKeyword": "ssh_host",
+				"inputType": "text",
+				"inputPlaceholder": "SSH Address",
+				"disable": {
+					"key": "ssh",
+					"value": false
+				}
+			},
+			{
+				"inputLabel": "Port",
+				"inputKeyword": "ssh_port",
+				"inputType": "numeric",
+				"inputPlaceholder": "Port",
+				"defaultValue": 22,
+				"disable": {
+					"key": "ssh",
+					"value": false
+				}
+			},
+			{
+				"inputLabel": "SSH User Name",
+				"inputKeyword": "ssh_user",
+				"inputType": "text",
+				"inputPlaceholder": "SSH User Name",
+				"disable": {
+					"key": "ssh",
+					"value": false
+				}
+			},
+			{
+				"inputLabel": "SSH Auth Method",
+				"inputKeyword": "ssh_method",
+				"inputType": "select",
+				"options": [{
+					"value": "privateKey", 
+					"label": "Private Key"
+				}, {
+					"value": "password",
+					"label": "Password"
+				}],
+				"disable": {
+					"key": "ssh",
+					"value": false
+				},
+				"defaultValue": "privateKey"
+			},
+			{
+				"inputLabel": "Private Key",
+				"inputKeyword": "ssh_key_file",
+				"inputType": "file",
+				"inputPlaceholder": "Private Key",
+				"extensions": ["*"],
+				"dependency": {
+					"key": "ssh_method",
+					"value": ["privateKey", ""]
+				},
+				"disable": {
+					"key": "ssh",
+					"value": false
+				}
+			},
+			{
+				"inputLabel": "Passphrase",
+				"inputKeyword": "ssh_key_passphrase",
+				"inputType": "password",
+				"inputPlaceholder": "Passphrase",
+				"isHiddenKey": true,
+				"dependency": {
+					"key": "ssh_method",
+					"value": ["privateKey", ""]
+				},
+				"disable": {
+					"key": "ssh",
+					"value": false
+				}
+			},
+			{
+				"inputLabel": "Client key password",
+				"inputKeyword": "ssh_password",
+				"inputType": "password",
+				"inputPlaceholder": "Password",
+				"isHiddenKey": true,
+				"dependency": {
+					"key": "ssh_method",
+					"value": ["password", ""]
+				},
+				"disable": {
+					"key": "ssh",
+					"value": false
+				}
+			}
+		]
+	}
+]

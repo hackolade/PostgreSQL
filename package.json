@@ -1,0 +1,48 @@
+{
+    "name": "PostgreSQL",
+    "version": "0.0.1",
+    "versionDate": "2021-09-01",
+    "author": "hackolade",
+    "engines": {
+        "hackolade": "5.1.3",
+        "hackoladePlugin": "1.2.0"
+    },
+    "contributes": {
+        "target": {
+            "applicationTarget": "PostgreSQL",
+            "title": "PostgreSQL",
+            "versions": [
+                "v10.x",
+                "v11.x",
+                "v12.x",
+                "v13.x",
+                "v14.x"
+            ]
+        },
+        "features": {
+            "nestedCollections": false,
+            "disablePatternField": false,
+            "disableMultipleTypes": true,
+            "enableForwardEngineering": true,
+            "disableReverseEngineering": false,
+            "disableChoices": true,
+            "enableJsonType": true,
+            "useJsonTypesWithComplexTypes": true,
+            "reverseSchemaIntoOneColumn": true,
+			"disableDenormalization": true,
+			"enableComplexTypesNormalization": true,
+            "views": {
+                "enabled": true,
+                "viewLevel": "model",
+                "disablePipelines": true
+            },
+            "relationships": {
+                "compositeRelationships": true
+            },
+            "FEScriptCommentsSupported": true
+        }
+    },
+    "description": "Hackolade plugin for PostgreSQL",
+    "icon_url": "logo.jpg",
+    "disabled": false
+}

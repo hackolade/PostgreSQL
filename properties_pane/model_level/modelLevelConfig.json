@@ -1,0 +1,180 @@
+/*
+* Copyright © 2016-2017 by IntegrIT S.A. dba Hackolade.  All rights reserved.
+*
+* The copyright to the computer software herein is the property of IntegrIT S.A.
+* The software may be used and/or copied only with the written permission of 
+* IntegrIT S.A. or in accordance with the terms and conditions stipulated in 
+* the agreement/contract under which the software has been supplied. 
+
+In order to define custom properties for any object's properties pane, you may copy/paste from the following,
+making sure that you maintain a proper JSON format.
+
+			{
+				"propertyName": "Simple text",
+				"propertyKeyword": "simpletextProp",
+				"shouldValidate": false,
+				"propertyType": "text"
+			},
+			{
+				"propertyName": "Text area",
+				"propertyKeyword": "textareaProp",
+				"propertyValidate": false,
+				"propertyTooltip": "Popup for multi-line text entry",
+				"propertyType": "details",
+				"template": "textarea"
+			},
+			{
+				"propertyName": "Dropdown selection",
+				"propertyKeyword": "dropdownProp",
+				"shouldValidate": false,
+				"propertyTooltip": "Select from list of options",
+				"propertyType": "select",
+				"options": [
+					"Option 1",
+					"Option 2",
+					"Option 3",
+					"Option 4"
+				]
+			},
+			{
+				"propertyName": "Numeric",
+				"propertyKeyword": "numericProp",
+				"propertyValidate": true,
+				"propertyType": "text",
+				"valueType": "number"
+			},
+			{
+				"propertyName": "Checkbox",
+				"propertyKeyword": "checkboxProp",
+				"shouldValidate": false,
+				"propertyType": "checkbox"
+			}
+
+*/
+
+[
+	{
+		"lowerTab": "Details",
+		"structure": [
+			{
+				"propertyName": "DB vendor",
+				"propertyKeyword": "dbVendor",
+				"shouldValidate": false,
+				"propertyTooltip": "DB vendor",
+				"propertyType": "select",
+				"options": [
+					"PostgreSQL"
+				],
+				"disabledOption": true
+			},
+			{
+				"propertyName": "DB version",
+				"propertyKeyword": "dbVersion",
+				"shouldValidate": false,
+				"propertyTooltip": "DB version",
+				"propertyType": "select",
+				"options": [
+					"v10.x",
+					"v11.x",
+					"v12.x",
+					"v13.x",
+					"v14.x"
+				],
+				"disabledOption": false
+			},
+			{
+				"propertyName": "Database name",
+				"propertyKeyword": "database_name",
+				"propertyTooltip": "Enter the PostgreSQL database for this model",
+				"propertyType": "text"
+			},
+			{
+				"propertyName": "Tablespace",
+				"propertyKeyword": "tablespace_name",
+				"propertyTooltip": "Enter the name of an existing tablespace location for the database, or pg_default",
+				"defaultValue": "pg_default",
+				"propertyType": "text"
+			},
+			{
+				"propertyName": "Encoding",
+				"propertyKeyword": "encoding",
+				"propertyTooltip": "Select from list of options",
+				"defaultValue": "UTF8",
+				"propertyType": "select",
+				"options": [
+					"BIG5",
+					"EUC_CN",
+					"EUC_JP",
+					"EUC_JIS_2004",
+					"EUC_KR",
+					"EUC_TW",
+					"GB18030",
+					"GBK",
+					"ISO_8859_5",
+					"ISO_8859_6",
+					"ISO_8859_7",
+					"ISO_8859_8",
+					"JOHAB",
+					"KOI8R",
+					"KOI8U",
+					"LATIN1",
+					"LATIN2",
+					"LATIN3",
+					"LATIN4",
+					"LATIN5",
+					"LATIN6",
+					"LATIN7",
+					"LATIN8",
+					"LATIN9",
+					"LATIN10",
+					"MULE_INTERNAL",
+					"SJIS",
+					"SHIFT_JIS_2004",
+					"SQL_ASCII",
+					"UHC",
+					"UTF8",
+					"WIN866",
+					"WIN874",
+					"WIN1250",
+					"WIN1251",
+					"WIN1252",
+					"WIN1253",
+					"WIN1254",
+					"WIN1255",
+					"WIN1256",
+					"WIN1257",
+					"WIN1258"
+				]
+			},
+			{
+				"propertyName": "Template",
+				"propertyKeyword": "template",
+				"propertyTooltip": "Enter a database template name if applicable",
+				"propertyType": "text"
+			},
+			{
+				"propertyName": "Collation",
+				"propertyKeyword": "LC_COLLATE",
+				"propertyTooltip": "Select from list of options",
+				"defaultValue": "English_United States.1252",
+				"propertyType": "text"
+			},
+			{
+				"propertyName": "Character type",
+				"propertyKeyword": "LC_CTYPE",
+				"propertyTooltip": "Select from list of options",
+				"defaultValue": "English_United States.1252",
+				"propertyType": "text"
+			},
+			{
+				"propertyName": "Comments",
+				"propertyKeyword": "comments",
+				"shouldValidate": false,
+				"propertyTooltip": "comments",
+				"addTimestampButton": false,
+				"propertyType": "details",
+				"template": "textarea"
+			}
+		]
+	}
+]

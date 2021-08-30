@@ -1,0 +1,24 @@
+{
+	"name": "inet",
+	"erdAbbreviation": "<inet>",
+	"dtdAbbreviation": "{inet}",
+	"parentType": "string",
+	"useSample": true,
+	"sample": "2001:0db8:0000:0000:0000:ff00:0042:8329",
+	"hiddenOnEntity": "view",
+	"defaultValues": {
+		"primaryKey": false,
+		"relationshipType": "",
+		"parentRelationship": "",
+		"childRelationships": [],
+		"foreignCollection": "",
+		"foreignField": [],
+		"default": "",
+		"minLength": "",
+		"maxLength": "",
+		"enum": [],
+		"sample":"",
+		"pattern": "",
+		"comments":""
+	}
+}

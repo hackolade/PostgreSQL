@@ -1,0 +1,19 @@
+{
+	"name": "geometry",
+	"erdAbbreviation": "<geom>",
+	"dtdAbbreviation": "{...}",
+	"parentType": "string",
+	"hiddenOnEntity": "view",
+	"defaultValues": {
+		"relationshipType": "",
+		"parentRelationship": "",
+		"childRelationships": [],
+		"foreignCollection": "",
+		"foreignField": [],
+		"dependencies": [],
+		"minProperties": "",
+		"maxProperties": "",
+		"additionalProperties": false,
+		"enum": []
+	}
+}

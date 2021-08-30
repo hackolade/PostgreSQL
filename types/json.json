@@ -1,0 +1,22 @@
+{
+	"name": "json",
+	"erdAbbreviation": "<json>",
+	"dtdAbbreviation": "{...}",
+	"parentType": "document",
+	"default": true,
+	"defaultValues": {
+		"primaryKey": false,
+		"relationshipType": "",
+		"parentRelationship": "",
+		"childRelationships": [],
+		"foreignCollection": "",
+		"foreignField": [],
+		"enabled": true,
+		"properties": [],
+		"dependencies": [],
+		"minProperties": "",
+		"maxProperties": "",
+		"additionalProperties": false,
+		"enum": []
+	}
+}

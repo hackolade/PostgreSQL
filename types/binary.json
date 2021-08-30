@@ -1,0 +1,29 @@
+{
+	"name": "binary",
+	"erdAbbreviation": "<bin>",
+	"dtdAbbreviation": "{BIN}",
+	"parentType": "binary",
+	"useSample": false,
+	"hiddenOnEntity": "view",
+	"defaultValues": {
+		"primaryKey": false,
+		"mode": "binary",
+		"length": 10
+	},
+	"descriptor": [
+		{
+			"schema": {
+				"mode": "binary"
+			},
+			"size": 255,
+			"mode": "binary"
+		},
+		{
+			"schema": {
+				"mode": "varbinary"
+			},
+			"size": 21844,
+			"mode": "binary"
+		}
+	]
+}
