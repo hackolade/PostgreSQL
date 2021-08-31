@@ -768,7 +768,7 @@ making sure that you maintain a proper JSON format.
 					"propertyKeyword": "index_method",
 					"propertyTooltip": "",
 					"propertyType": "select",
-					"defaultValue": "BTREE",
+					"defaultValue": "btree",
 					"options": [
 						"btree",
 						"hash",
