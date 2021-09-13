@@ -189,26 +189,9 @@ making sure that you maintain a proper JSON format.
 				"maxValue": 10485760,
 				"step": 1,
 				"typeDecorator": true,
-/*				"dependency": {
-					"key": "mode",
-					"value": ["character","character varying", "bit", "bit varying"]
-				}
-*/
 				"dependency": {
-					"type": "or",
-					"values": [{
-						"key": "mode",
-						"value": "char"
-					}, {
-						"key": "mode",
-						"value": "varchar"
-					}, {
-						"key": "mode",
-						"value": "bit"
-					}, {
-						"key": "mode",
-						"value": "varbit"
-					}]
+					"key": "mode",
+					"value": ["char","varchar", "bit", "varbit"]
 				}
 			},
 			{
@@ -234,17 +217,8 @@ making sure that you maintain a proper JSON format.
 				"propertyTooltip": "If different than default.  For example us_EN or be_FR",
 				"propertyType": "text",
 				"dependency": {
-					"type": "or",
-					"values": [{
-						"key": "mode",
-						"value": "char"
-					}, {
-						"key": "mode",
-						"value": "varchar"
-					}, {
-						"key": "mode",
-						"value": "text"
-					}]
+					"key": "mode",
+					"value": ["char","varchar", "text"]
 				}
 			},
 			{
@@ -687,13 +661,8 @@ making sure that you maintain a proper JSON format.
 				"allowNegative": false,
 				"typeDecorator": true,
 				"dependency": {
-					"type": "or",
-					"values": [
-						{
-							"key": "mode",
-							"value": "numeric"
-						}
-					]
+					"key": "mode",
+					"value": ["numeric"]
 				}
 			},
 			{
@@ -1346,17 +1315,8 @@ making sure that you maintain a proper JSON format.
 				"step": 1,
 				"typeDecorator": true,
 				"dependency": {
-					"type": "or",
-					"values": [
-						{
-							"key": "mode",
-							"value": "time"
-						},
-						{
-							"key": "mode",
-							"value": "timestamp"
-						}
-					]
+					"key": "mode",
+					"value": ["time","timestamp"]
 				}
 			},
 			{
@@ -1364,17 +1324,8 @@ making sure that you maintain a proper JSON format.
 				"propertyKeyword": "with_timezone",
 				"propertyType": "checkbox",
 				"dependency": {
-					"type": "or",
-					"values": [
-						{
-							"key": "mode",
-							"value": "time"
-						},
-						{
-							"key": "mode",
-							"value": "timestamp"
-						}
-					]
+					"key": "mode",
+					"value": ["time","timestamp"]
 				}
 			},
 			{
