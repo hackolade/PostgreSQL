@@ -213,7 +213,7 @@ making sure that you maintain a proper JSON format.
 			},
 			{
 				"propertyName": "Collation rule",
-				"propertyKeyword": "constraintName",
+				"propertyKeyword": "collationRule",
 				"propertyTooltip": "If different than default.  For example us_EN or be_FR",
 				"propertyType": "text",
 				"dependency": {
@@ -510,7 +510,7 @@ making sure that you maintain a proper JSON format.
 					"numeric",
 					"real",
 					"double precision",
-					"small serial",
+					"smallserial",
 					"serial",
 					"bigserial",
 					"money"
@@ -678,7 +678,7 @@ making sure that you maintain a proper JSON format.
 						"propertyType": "numeric",
 						"valueType": "number",
 						"minValue": 0,
-						"step": 1,
+						"step": 1
 					}
 				]
 			},
@@ -997,7 +997,7 @@ making sure that you maintain a proper JSON format.
 						"propertyType": "numeric",
 						"valueType": "number",
 						"minValue": 0,
-						"step": 1,
+						"step": 1
 					}
 				]
 			},
@@ -1375,7 +1375,7 @@ making sure that you maintain a proper JSON format.
 						"propertyType": "numeric",
 						"valueType": "number",
 						"minValue": 0,
-						"step": 1,
+						"step": 1
 					}
 				]
 			},
@@ -1674,7 +1674,7 @@ making sure that you maintain a proper JSON format.
 						"propertyType": "numeric",
 						"valueType": "number",
 						"minValue": 0,
-						"step": 1,
+						"step": 1
 					}
 				]
 			},
@@ -1729,7 +1729,7 @@ making sure that you maintain a proper JSON format.
 						"propertyType": "numeric",
 						"valueType": "number",
 						"minValue": 0,
-						"step": 1,
+						"step": 1
 					}
 				]
 			},
@@ -2090,7 +2090,7 @@ making sure that you maintain a proper JSON format.
 						"propertyType": "numeric",
 						"valueType": "number",
 						"minValue": 0,
-						"step": 1,
+						"step": 1
 					}
 				]
 			},
@@ -2151,7 +2151,7 @@ making sure that you maintain a proper JSON format.
 						"propertyType": "numeric",
 						"valueType": "number",
 						"minValue": 0,
-						"step": 1,
+						"step": 1
 					}
 				]
 			},
@@ -2445,7 +2445,7 @@ making sure that you maintain a proper JSON format.
 						"propertyType": "numeric",
 						"valueType": "number",
 						"minValue": 0,
-						"step": 1,
+						"step": 1
 					}
 				]
 			},
@@ -2760,7 +2760,7 @@ making sure that you maintain a proper JSON format.
 						"propertyType": "numeric",
 						"valueType": "number",
 						"minValue": 0,
-						"step": 1,
+						"step": 1
 					}
 				]
 			},
@@ -3054,7 +3054,7 @@ making sure that you maintain a proper JSON format.
 						"propertyType": "numeric",
 						"valueType": "number",
 						"minValue": 0,
-						"step": 1,
+						"step": 1
 					}
 				]
 			},
@@ -3116,7 +3116,7 @@ making sure that you maintain a proper JSON format.
 						"propertyType": "numeric",
 						"valueType": "number",
 						"minValue": 0,
-						"step": 1,
+						"step": 1
 					}
 				]
 			},
