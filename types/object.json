@@ -1,0 +1,30 @@
+{
+	"name": "object",
+	"parentType": "document",
+	"structureType": true,
+	"defaultValues": {
+		"subtype": "object",
+		"properties": []
+	},
+	"subtypes": {
+		"object": {
+			"childValueType": [
+				"char",
+				"numeric",
+				"binary",
+				"datetime",
+				"boolean",
+				"range",
+				"enum",
+				"geometry",
+				"inet",
+				"uuid",
+				"oid",
+				"xml",
+				"json",
+				"reference",
+				"multiple"
+			]
+		}
+	}
+}

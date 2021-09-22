@@ -5,47 +5,18 @@
 		"dbVendor": "PostgreSQL"
 	},
 	"container": {
-		"name": "New schema",
-		"indexes": []
+		"name": "New schema"
 	},
 	"collection": {
 		"collectionName": "New table",
 		"memory_optimized": false,
 		"collectionUsers": [],
-		"collation": {},
-		"chkConstr": {
-			"constrCheck": true,
-			"constrEnforceUpserts": true,
-			"constrEnforceReplication": true
-		},
-		"Indxs": {
-			"indxType": "Index",
-			"ALLOW_ROW_LOCKS": true,
-			"ALLOW_PAGE_LOCKS": true
-		}
+		"collation": {}
 	},
 	"field": {
 		"name": "New column",
-		"signed": true,
 		"primaryKey": false,
-		"unique": false,
-		"hasMaxLength": {
-			"valueDependencies": [
-				{
-					"value": true,
-					"dependency": {
-						"type": "or",
-						"values": [{
-							"key": "subtype",
-							"value": "object"
-						}, {
-							"key": "subtype",
-							"value": "array"
-						}]
-					}
-				}
-			]
-		}
+		"unique": false
 	},
 	"patternField": {
 		"name": "^[a-zA-Z0-9_.-]+$"

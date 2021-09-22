@@ -18,5 +18,32 @@
 		"maxProperties": "",
 		"additionalProperties": false,
 		"enum": []
+	},
+	"subtypes": {
+		"object": {
+			"parentType": "jsonObject",
+			"childValueType": [
+				"jsonString",
+				"jsonNumber",
+				"jsonObject",
+				"jsonArray",
+				"jsonBoolean",
+				"jsonNull"
+			]
+		},
+		"array": {
+			"parentType": "jsonArray",
+			"childValueType": [
+				"jsonString",
+				"jsonNumber",
+				"jsonObject",
+				"jsonArray",
+				"jsonBoolean",
+				"jsonNull"
+			]
+		},
+		"string": {
+			"parentType": "string"
+		}
 	}
 }

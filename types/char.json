@@ -6,14 +6,6 @@
 	"useSample": true,
 	"default": true,
 	"hiddenOnEntity": "view",
-	"jsonType": {
-		"order": 1,
-		"jsonRoot": true,
-		"source": {
-			"key": "synonym",
-			"value": "json"
-		}
-	},
 	"defaultValues": {
 		"primaryKey": false,
 		"relationshipType": "",
@@ -21,42 +13,11 @@
 		"childRelationships": [],
 		"foreignCollection": "",
 		"foreignField": [],
-		"default": "",
-		"minLength": "",
-		"maxLength": "",
-		"pattern": "",
 		"enum": [],
 		"sample":"",
 		"comments":"",
 		"mode": "varchar",
 		"length": 10,
 		"subtype": "string"
-	},
-	"subtypes": {
-		"object": {
-			"parentType": "jsonObject",
-			"childValueType": [
-				"jsonString",
-				"jsonNumber",
-				"jsonObject",
-				"jsonArray",
-				"jsonBoolean",
-				"jsonNull"
-			]
-		},
-		"array": {
-			"parentType": "jsonArray",
-			"childValueType": [
-				"jsonString",
-				"jsonNumber",
-				"jsonObject",
-				"jsonArray",
-				"jsonBoolean",
-				"jsonNull"
-			]
-		},
-		"string": {
-			"parentType": "string"
-		}
 	}
 }
