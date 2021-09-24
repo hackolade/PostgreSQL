@@ -247,7 +247,7 @@ making sure that you maintain a proper JSON format.
 					},
 					{
 						"propertyName": "Autovacuum parameters",
-						"propertyKeyword": "Autovacuum",
+						"propertyKeyword": "autovacuum",
 						"propertyType": "block",
 						"propertyTooltip": "Vacuum parameters",
 						"structure": [

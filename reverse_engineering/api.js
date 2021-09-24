@@ -36,12 +36,12 @@ module.exports = {
             logger.log('info', connectionInfo, 'connectionInfo', connectionInfo.hiddenKeys);
 
             const postgresLogger = createLogger({
-                title: 'Test connection log',
+                title: 'Get DB collections names',
                 hiddenKeys: connectionInfo.hiddenKeys,
                 logger,
             });
 
-            await postgresService.setDependencies(app);
+            postgresService.setDependencies(app);
             await postgresService.connect(connectionInfo, postgresLogger);
             const schemasNames = await postgresService.getAllSchemasNames();
 
@@ -71,12 +71,36 @@ module.exports = {
             callback(null, collections);
         } catch (error) {
             callback(prepareError(error));
-        } finally {
             await postgresService.disconnect();
         }
     },
 
-    async getDbCollectionsData(data, logger, callback, app) {},
+    async getDbCollectionsData(data, logger, callback, app) {
+        try {
+            logger.log('info', data, 'Retrieve tables data:', data.hiddenKeys);
+
+            const postgresLogger = createLogger({
+                title: 'Get DB collections data log',
+                hiddenKeys: data.hiddenKeys,
+                logger,
+            });
+
+            postgresLogger.progress('Start reverse engineering...');
+
+            const collections = data.collectionData.collections;
+            const schemasNames = data.collectionData.dataBaseNames;
+
+            await Promise.all(
+                schemasNames.map(schemaName => postgresService.retrieveEntitiesData(schemaName, collections[schemaName]))
+            );
+
+            callback(null, collections);
+        } catch (error) {
+            callback(prepareError(error));
+        } finally {
+            await postgresService.disconnect();
+        }
+    },
 };
 
 const createLogger = ({ title, logger, hiddenKeys }) => {
