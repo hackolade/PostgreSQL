@@ -207,7 +207,7 @@ making sure that you maintain a proper JSON format.
 						"propertyType": "numeric",
 						"valueType": "number",
 						"minValue": 0,
-						"step": 1,
+						"step": 1
 					}
 				]
 			},
@@ -3094,6 +3094,26 @@ making sure that you maintain a proper JSON format.
 				],
 				"data": "options",
 				"valueType": "string"
+			},
+			{
+				"propertyName": "JSON Types",
+				"propertyKeyword": "subtype",
+				"propertyType": "select",
+				"options": [
+					{
+						"name": " ",
+						"value": "string"
+					},
+					{
+						"name": "object",
+						"value": "object"
+					},
+					{
+						"name": "array",
+						"value": "array"
+					}
+				],
+				"defaultValue": "object"
 			},
 			{
 				"propertyName": "Comments",

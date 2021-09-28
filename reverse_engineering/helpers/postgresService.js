@@ -1,5 +1,22 @@
 const { createConnectionPool } = require('./connectionHelper');
 const db = require('./db');
+const { getJsonSchema } = require('./getJsonSchema');
+const {
+    setDependencies: setDependenciesInColumnHelper,
+    mapColumnData,
+    setSubtypeFromSampledJsonValues,
+} = require('./postgresHelpers/columnHelper');
+const {
+    setDependencies: setDependenciesInCommonHelper,
+    clearEmptyPropertiesInObject,
+} = require('./postgresHelpers/common');
+const {
+    setDependencies: setDependenciesInTableHelper,
+    prepareStorageParameters,
+    prepareTablePartition,
+    checkHaveJsonTypes,
+    getLimit,
+} = require('./postgresHelpers/tableHelper');
 const queryConstants = require('./queryConstants');
 
 let currentSshTunnel = null;
@@ -11,6 +28,9 @@ const VIEW_SUFFIX = ' (v)';
 module.exports = {
     setDependencies(app) {
         _ = app.require('lodash');
+        setDependenciesInCommonHelper(app);
+        setDependenciesInTableHelper(app);
+        setDependenciesInColumnHelper(app);
     },
 
     async connect(connectionInfo, logger) {
@@ -46,7 +66,10 @@ module.exports = {
         const tableTypesToExclude = ['FOREIGN TABLE'];
 
         return result.rows
-            .filter(({ table_type }) => !_.includes(tableTypesToExclude, table_type))
+            .filter(
+                ({ table_type, is_table_partitioned }) =>
+                    !_.includes(tableTypesToExclude, table_type) && !is_table_partitioned
+            )
             .map(({ table_name, table_type }) => {
                 if (isViewByTableType(table_type)) {
                     return `${table_name}${VIEW_SUFFIX}`;
@@ -56,34 +79,73 @@ module.exports = {
             });
     },
 
-    async retrieveEntitiesData(schemaName, entitiesNames) {
+    async retrieveEntitiesData(schemaName, entitiesNames, recordSamplingSettings) {
         const schemaOidResult = await db.query(queryConstants.GET_NAMESPACE_OID, [schemaName]);
-        const schemaOid = _.first(schemaOidResult.rows).oid;
+        const schemaOid = getFirstRow(schemaOidResult).oid;
 
         const [viewsNames, tablesNames] = _.partition(entitiesNames, isViewByName);
 
-        debugger;
-        return Promise.all(_.map(tablesNames, _.partial(this._retrieveSingleTableData, schemaOid)));
+        return Promise.all(
+            _.map(
+                tablesNames,
+                _.bind(this._retrieveSingleTableData, this, recordSamplingSettings, schemaOid, schemaName)
+            )
+        );
     },
 
-    async _retrieveSingleTableData(schemaOid, tableName) {
+    async _retrieveSingleTableData(recordSamplingSettings, schemaOid, schemaName, tableName) {
         const result = await db.query(queryConstants.GET_TABLE_LEVEL_DATA, [tableName, schemaOid]);
+        const rawTableData = getFirstRow(result);
+        const tableOid = rawTableData.oid;
+        const partitionResult = getFirstRow(await db.query(queryConstants.GET_TABLE_PARTITION_DATA, [tableOid]));
+        const tableAttributes = (await db.query(queryConstants.GET_TABLE_ATTRIBUTES_WITH_POSITIONS, [tableOid])).rows;
+        const descriptionResult = await db.query(queryConstants.GET_DESCRIPTION_BY_OID, [tableOid]);
 
-        const rawTableData = _.first(result.rows);
+        const partitioning = prepareTablePartition(partitionResult, tableAttributes);
 
         const temporary = rawTableData.relpersistence === 't';
         const unlogged = rawTableData.relpersistence === 'u';
         const storage_parameter = prepareStorageParameters(rawTableData.reloptions);
         const table_tablespace_name = result.spcname;
+        const description = getFirstRow(descriptionResult);
 
-        const tableDate = {
+        const tableData = {
             temporary,
             unlogged,
             storage_parameter,
             table_tablespace_name,
+            partitioning,
+            description,
         };
 
-        return clearEmptyPropertiesInObject(tableDate);
+        const entityLevel = clearEmptyPropertiesInObject(tableData);
+
+        const columns = await db.query(queryConstants.GET_TABLE_COLUMNS, [tableName, schemaName, tableOid]);
+        let targetAttributes = columns.rows.map(mapColumnData);
+
+        const hasJsonTypes = checkHaveJsonTypes(targetAttributes);
+        let documents = [];
+
+        if (hasJsonTypes) {
+            documents = await this._getDocuments(schemaName, tableName, recordSamplingSettings);
+            targetAttributes = setSubtypeFromSampledJsonValues(targetAttributes, documents);
+        }
+
+        return {
+            name: tableName,
+            entityLevel,
+            jsonSchema: getJsonSchema(targetAttributes),
+            documents,
+        };
+    },
+
+    async _getDocuments(schemaName, tableName, recordSamplingSettings) {
+        const fullTableName = `${schemaName}.${tableName}`;
+        const quantity = await db.query(queryConstants.GET_ROWS_COUNT(fullTableName));
+        const limit = getLimit(quantity, recordSamplingSettings);
+        const sampledDocs = await db.query(queryConstants.GET_SAMPLED_DATA(fullTableName), [limit]);
+
+        return sampledDocs.rows;
     },
 };
 
@@ -102,74 +164,4 @@ const isSystemSchema = schema_name => {
     return false;
 };
 
-const prepareStorageParameters = reloptions => {
-    if (!reloptions) {
-        return null;
-    }
-
-    const options = _.fromPairs(_.map(reloptions, splitByEqualitySymbol));
-
-    const fillfactor = options.fillfactor;
-    const parallel_workers = options.parallel_workers;
-    const autovacuum_enabled = options.autovacuum_enabled;
-    const autovacuum = {
-        vacuum_index_cleanup: options.vacuum_index_cleanup,
-        vacuum_truncate: options.vacuum_truncate,
-        autovacuum_vacuum_threshold: options.autovacuum_vacuum_threshold,
-        autovacuum_vacuum_scale_factor: options.autovacuum_vacuum_scale_factor,
-        autovacuum_vacuum_insert_threshold: options.autovacuum_vacuum_insert_threshold,
-        autovacuum_vacuum_insert_scale_factor: options.autovacuum_vacuum_insert_scale_factor,
-        autovacuum_analyze_threshold: options.autovacuum_analyze_threshold,
-        autovacuum_analyze_scale_factor: options.autovacuum_analyze_scale_factor,
-        autovacuum_vacuum_cost_delay: options.autovacuum_vacuum_cost_delay,
-        autovacuum_vacuum_cost_limit: options.autovacuum_vacuum_cost_limit,
-        autovacuum_freeze_min_age: options.autovacuum_freeze_min_age,
-        autovacuum_freeze_max_age: options.autovacuum_freeze_max_age,
-        autovacuum_freeze_table_age: options.autovacuum_freeze_table_age,
-        autovacuum_multixact_freeze_min_age: options.autovacuum_multixact_freeze_min_age,
-        autovacuum_multixact_freeze_max_age: options.autovacuum_multixact_freeze_max_age,
-        autovacuum_multixact_freeze_table_age: options.autovacuum_multixact_freeze_table_age,
-        log_autovacuum_min_duration: options.log_autovacuum_min_duration,
-    };
-    const user_catalog_table = options.user_catalog_table;
-    const toast_autovacuum_enabled = options['toast.autovacuum_enabled'];
-    const toast = {
-        toast_tuple_target: options.toast_tuple_target,
-        toast_vacuum_index_cleanup: options['toast.vacuum_index_cleanup'],
-        toast_vacuum_truncate: options['toast.vacuum_truncate'],
-        toast_autovacuum_vacuum_threshold: options['toast.autovacuum_vacuum_threshold'],
-        toast_autovacuum_vacuum_scale_factor: options['toast.autovacuum_vacuum_scale_factor'],
-        toast_autovacuum_vacuum_insert_threshold: options['toast.autovacuum_vacuum_insert_threshold'],
-        toast_autovacuum_vacuum_insert_scale_factor: options['toast.autovacuum_vacuum_insert_scale_factor'],
-        toast_autovacuum_vacuum_cost_delay: options['toast.autovacuum_vacuum_cost_delay'],
-        toast_autovacuum_vacuum_cost_limit: options['toast.autovacuum_vacuum_cost_limit'],
-        toast_autovacuum_freeze_min_age: options['toast.autovacuum_freeze_min_age'],
-        toast_autovacuum_freeze_max_age: options['toast.autovacuum_freeze_max_age'],
-        toast_autovacuum_freeze_table_age: options['toast.autovacuum_freeze_table_age'],
-        toast_autovacuum_multixact_freeze_min_age: options['toast.autovacuum_multixact_freeze_min_age'],
-        toast_autovacuum_multixact_freeze_max_age: options['toast.autovacuum_multixact_freeze_max_age'],
-        toast_autovacuum_multixact_freeze_table_age: options['toast.autovacuum_multixact_freeze_table_age'],
-        toast_log_autovacuum_min_duration: options['toast.log_autovacuum_min_duration'],
-    };
-
-    const storage_parameter = {
-        fillfactor,
-        parallel_workers,
-        autovacuum_enabled,
-        autovacuum: clearEmptyPropertiesInObject(autovacuum),
-        toast_autovacuum_enabled,
-        toast: clearEmptyPropertiesInObject(toast),
-        user_catalog_table,
-    };
-
-    return clearEmptyPropertiesInObject(storage_parameter);
-};
-
-const splitByEqualitySymbol = item => _.split(item, '=');
-
-const clearEmptyPropertiesInObject = obj =>
-    _.chain(obj)
-        .toPairs()
-        .filter(([key, value]) => Boolean(value))
-        .fromPairs()
-        .value();
+const getFirstRow = result => _.first(result.rows);

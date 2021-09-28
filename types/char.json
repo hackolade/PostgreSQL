@@ -13,11 +13,7 @@
 		"childRelationships": [],
 		"foreignCollection": "",
 		"foreignField": [],
-		"enum": [],
-		"sample":"",
-		"comments":"",
 		"mode": "varchar",
-		"length": 10,
-		"subtype": "string"
+		"length": 10
 	}
 }

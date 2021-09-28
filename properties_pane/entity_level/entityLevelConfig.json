@@ -112,7 +112,6 @@ making sure that you maintain a proper JSON format.
 			}
 
 */
-
 [
 	{
 		"lowerTab": "Details",
@@ -177,15 +176,18 @@ making sure that you maintain a proper JSON format.
 						"abbr": "pk,PK",
 						"dependency": {
 							"type": "or",
-							"values": [{
-								"key": "partitioning_expression",
-								"value": false
-							}, {
-								"key": "partitioning_expression",
-								"exists": false
-							}]
+							"values": [
+								{
+									"key": "partitioning_expression",
+									"value": false
+								},
+								{
+									"key": "partitioning_expression",
+									"exists": false
+								}
+							]
 						}
-					}, 
+					},
 					{
 						"propertyName": "Expression",
 						"propertyKeyword": "partitioning_expression",
@@ -195,18 +197,21 @@ making sure that you maintain a proper JSON format.
 						"markdown": false,
 						"dependency": {
 							"type": "or",
-							"values": [{
-								"key": "compositePartitionKey",
-								"value": false
-							}, {
-								"key": "compositePartitionKey",
-								"exists": false
-							}]
+							"values": [
+								{
+									"key": "compositePartitionKey",
+									"value": false
+								},
+								{
+									"key": "compositePartitionKey",
+									"exists": false
+								}
+							]
 						}
 					}
 				]
 			},
- 			{
+			{
 				"propertyName": "Using method",
 				"propertyKeyword": "method",
 				"propertyTooltip": "Optional clause to specify the table access method to use to store the contents for the new table; the method needs be an access method of type TABLE.",
@@ -638,7 +643,10 @@ making sure that you maintain a proper JSON format.
 				"valueType": "string"
 			}
 		],
-		"columnsRatio": [3.7, 5]
+		"columnsRatio": [
+			3.7,
+			5
+		]
 	},
 	{
 		"lowerTab": "Composite keys",
@@ -691,7 +699,7 @@ making sure that you maintain a proper JSON format.
 						"template": "textarea"
 					}
 				]
-			}, 
+			},
 			{
 				"propertyName": "Unique key",
 				"propertyType": "group",
@@ -744,281 +752,327 @@ making sure that you maintain a proper JSON format.
 	},
 	{
 		"lowerTab": "Indexes",
-		"structure": [{
-			"propertyName": "Index",
-			"propertyType": "group",
-			"propertyKeyword": "Indxs",
-			"propertyTooltip": "In general you should only add indexes to match the queries your application uses. Any extra will waste resources.",
-			"structure": [
-				{
-					"propertyName": "Name",
-					"propertyKeyword": "indxName",
-					"propertyTooltip": "Optional, if not specified an automatic name will be assigned. Index name are needed to drop indexes and appear in error messages when a constraint is violated.",
-					"propertyType": "text"
-				},
-				{
-					"propertyName": "Activated",
-					"propertyKeyword": "isActivated",
-					"propertyTooltip": "Deactivated item will be not included in FE script",
-					"propertyType": "checkbox",
-					"defaultValue": true
-				},
-				{
-					"propertyName": "Method",
-					"propertyKeyword": "index_method",
-					"propertyTooltip": "",
-					"propertyType": "select",
-					"defaultValue": "btree",
-					"options": [
-						"btree",
-						"hash",
-						"gist",
-						"spgist",
-						"gin",
-						"brin"
-					]
-				},
-				{
-					"propertyName": "Unique",
-					"propertyKeyword": "unique",
-					"propertyTooltip": "Causes the system to check for duplicate values in the table when the index is created (if data already exist) and each time data is added. Attempts to insert or update data which would result in duplicate entries will generate an error.",
-					"defaultValue": false,
-					"propertyType": "checkbox",
-					"dependency": {
-						"type": "or",
-						"values": [{
-							"key": "index_method",
-							"value": "btree"
-						}]
-					}
-				},
-				{
-					"propertyName": "Concurrent build",
-					"propertyKeyword": "concurrently",
-					"propertyTooltip": "When this option is used, PostgreSQL will build the index without taking any locks that prevent concurrent inserts, updates, or deletes on the table; whereas a standard index build locks out writes (but not reads) on the table until it's done.",
-					"defaultValue": false,
-					"propertyType": "checkbox"
-				},
-				{
-					"propertyName": "If not exist",
-					"propertyKeyword": "ifNotExist",
-					"propertyTooltip": "The index will only be created if an index with the same name does not already exist. If the index already exists, then a warning will be triggered by default.",
-					"defaultValue": true,
-					"propertyType": "checkbox"
-				},
-				{
-					"propertyName": "Only",
-					"propertyKeyword": "only",
-					"propertyTooltip": "Indicates not to recurse creating indexes on partitions, if the table is partitioned.",
-					"defaultValue": true,
-					"propertyType": "checkbox"
-				},
-				{
-					"propertyName": "Columns",
-					"propertyKeyword": "columns",
-					"propertyType": "fieldList",
-					"template": "orderedList",
-					"propertyTooltip": "The name of a column of the table.",
-					"attributeList": [
-						"ASC",
-						"DESC"
-					]				
-				},
-				{
-					"propertyName": "Include non-key columns",
-					"propertyKeyword": "include",
-					"propertyType": "fieldList",
-					"template": "orderedList",
-					"propertyTooltip": "The optional INCLUDE clause specifies a list of columns which will be included in the index as non-key columns.",
-					"dependency": {
-						"type": "or",
-						"values": [{
-							"key": "index_method",
-							"value": "btree"
-						}, {
-							"key": "index_method",
-							"value": "gist"
-						}]
-					}
-				},
-				{
-					"propertyName": "With storage parameters",
-					"propertyKeyword": "index_storage_parameter",
-					"propertyType": "block",
-					"propertyTooltip": "The optional WITH clause specifies storage parameters for the index. Each index method has its own set of allowed storage parameters.",
-					"structure": [
-						{
-							"propertyName": "Fill factor",
-							"propertyKeyword": "index_fillfactor",
-							"propertyType": "numeric",
-							"valueType": "number",
-							"propertyTooltip": "A percentage between 10 and 100. The fillfactor for an index is a percentage that determines how full the index method will try to pack index pages.",
-							"minValue": 10,
-							"maxValue": 100,
-							"step": 1,
-							"defaultValue": 100
-						},
-						{
-							"propertyName": "Deduplicate items",
-							"propertyKeyword": "deduplicate_items",
-							"propertyType": "checkbox",
-							"propertyTooltip": "Declare the table as an additional catalog table for purposes of logical replication.",
-							"defaultValue": true,
-							"dependency": {
-								"type": "or",
-								"values": [{
+		"structure": [
+			{
+				"propertyName": "Index",
+				"propertyType": "group",
+				"propertyKeyword": "Indxs",
+				"propertyTooltip": "In general you should only add indexes to match the queries your application uses. Any extra will waste resources.",
+				"structure": [
+					{
+						"propertyName": "Name",
+						"propertyKeyword": "indxName",
+						"propertyTooltip": "Optional, if not specified an automatic name will be assigned. Index name are needed to drop indexes and appear in error messages when a constraint is violated.",
+						"propertyType": "text"
+					},
+					{
+						"propertyName": "Activated",
+						"propertyKeyword": "isActivated",
+						"propertyTooltip": "Deactivated item will be not included in FE script",
+						"propertyType": "checkbox",
+						"defaultValue": true
+					},
+					{
+						"propertyName": "Method",
+						"propertyKeyword": "index_method",
+						"propertyTooltip": "",
+						"propertyType": "select",
+						"defaultValue": "btree",
+						"options": [
+							"btree",
+							"hash",
+							"gist",
+							"spgist",
+							"gin",
+							"brin"
+						]
+					},
+					{
+						"propertyName": "Unique",
+						"propertyKeyword": "unique",
+						"propertyTooltip": "Causes the system to check for duplicate values in the table when the index is created (if data already exist) and each time data is added. Attempts to insert or update data which would result in duplicate entries will generate an error.",
+						"defaultValue": false,
+						"propertyType": "checkbox",
+						"dependency": {
+							"type": "or",
+							"values": [
+								{
 									"key": "index_method",
 									"value": "btree"
-								}]
-							}
-						},
-						{
-							"propertyName": "Fast update",
-							"propertyKeyword": "fastupdate",
-							"propertyType": "checkbox",
-							"propertyTooltip": "This setting controls usage of the fast update technique.",
-							"defaultValue": true,
-							"dependency": {
-								"type": "or",
-								"values": [{
-									"key": "index_method",
-									"value": "gin"
-								}]
-							}
-						},
-						{
-							"propertyName": "Gin pending list limit",
-							"propertyKeyword": "gin_pending_list_limit",
-							"propertyType": "numeric",
-							"valueType": "number",
-							"propertyTooltip": "This value is specified in kilobytes. Sets the maximum size of a GIN index's pending list, which is used when fastupdate is enabled.",
-							"minValue": 0,
-							"step": 1,
-							"defaultValue": 4000,
-							"dependency": {
-								"type": "and",
-								"values": [{
-									"key": "index_method",
-									"value": "gin"
-								}, {
-									"key": "fastupdate",
-									"value": true
-								}]
-							}
-						},
-						{
-							"propertyName": "Pages per range",
-							"propertyKeyword": "pages_per_range",
-							"propertyType": "numeric",
-							"valueType": "number",
-							"propertyTooltip": "Defines the number of table blocks that make up one block range for each entry of a BRIN index.",
-							"minValue": 0,
-							"step": 1,
-							"defaultValue": 128,
-							"dependency": {
-								"type": "or",
-								"values": [{
-									"key": "index_method",
-									"value": "brin"
-								}]
-							}
-						},
-						{
-							"propertyName": "Auto summarize",
-							"propertyKeyword": "autosummarize ",
-							"propertyType": "checkbox",
-							"propertyTooltip": "Defines whether a summarization run is invoked for the previous page range whenever an insertion is detected on the next one.",
-							"defaultValue": true,
-							"dependency": {
-								"type": "or",
-								"values": [{
-									"key": "index_method",
-									"value": "brin"
-								}]
+								}
+							]
+						}
+					},
+					{
+						"propertyName": "Concurrent build",
+						"propertyKeyword": "concurrently",
+						"propertyTooltip": "When this option is used, PostgreSQL will build the index without taking any locks that prevent concurrent inserts, updates, or deletes on the table; whereas a standard index build locks out writes (but not reads) on the table until it's done.",
+						"defaultValue": false,
+						"propertyType": "checkbox"
+					},
+					{
+						"propertyName": "If not exist",
+						"propertyKeyword": "ifNotExist",
+						"propertyTooltip": "The index will only be created if an index with the same name does not already exist. If the index already exists, then a warning will be triggered by default.",
+						"defaultValue": true,
+						"propertyType": "checkbox"
+					},
+					{
+						"propertyName": "Only",
+						"propertyKeyword": "only",
+						"propertyTooltip": "Indicates not to recurse creating indexes on partitions, if the table is partitioned.",
+						"defaultValue": true,
+						"propertyType": "checkbox"
+					},
+					{
+						"propertyName": "Columns",
+						"propertyKeyword": "columns",
+						"propertyType": "fieldList",
+						"template": "orderedList",
+						"propertyTooltip": "The name of a column of the table.",
+						"attributeList": {
+							"sortOrder": {
+								"propertyType": "select",
+								"options": [
+									"ASC",
+									"DESC"
+								]
+							},
+							"mullsOrder": {
+								"propertyType": "select",
+								"options": [
+									"",
+									"NULLS FIRST",
+									"NULLS LAST"
+								]
+							},
+							"collation": {
+								"propertyType": "text",
+								"placeholder": "Collation"
+							},
+							"opclass": {
+								"propertyType": "text",
+								"placeholder": "Opclass"
 							}
 						}
-					],
-					"dependency": {
-						"type": "or",
-						"values": [{
-							"key": "index_method",
-							"value": "btree"
-						}, {
-							"key": "index_method",
-							"value": "hash"
-						}, {
-							"key": "index_method",
-							"value": "gist"
-						}, {
-							"key": "index_method",
-							"value": "spgist"
-						}]
+					},
+					{
+						"propertyName": "Include non-key columns",
+						"propertyKeyword": "include",
+						"propertyType": "fieldList",
+						"template": "orderedList",
+						"propertyTooltip": "The optional INCLUDE clause specifies a list of columns which will be included in the index as non-key columns.",
+						"dependency": {
+							"type": "or",
+							"values": [
+								{
+									"key": "index_method",
+									"value": "btree"
+								},
+								{
+									"key": "index_method",
+									"value": "gist"
+								}
+							]
+						}
+					},
+					{
+						"propertyName": "With storage parameters",
+						"propertyKeyword": "index_storage_parameter",
+						"propertyType": "block",
+						"propertyTooltip": "The optional WITH clause specifies storage parameters for the index. Each index method has its own set of allowed storage parameters.",
+						"structure": [
+							{
+								"propertyName": "Fill factor",
+								"propertyKeyword": "index_fillfactor",
+								"propertyType": "numeric",
+								"valueType": "number",
+								"propertyTooltip": "A percentage between 10 and 100. The fillfactor for an index is a percentage that determines how full the index method will try to pack index pages.",
+								"minValue": 10,
+								"maxValue": 100,
+								"step": 1,
+								"defaultValue": 100
+							},
+							{
+								"propertyName": "Deduplicate items",
+								"propertyKeyword": "deduplicate_items",
+								"propertyType": "checkbox",
+								"propertyTooltip": "Declare the table as an additional catalog table for purposes of logical replication.",
+								"defaultValue": true,
+								"dependency": {
+									"type": "or",
+									"values": [
+										{
+											"key": "index_method",
+											"value": "btree"
+										}
+									]
+								}
+							},
+							{
+								"propertyName": "Fast update",
+								"propertyKeyword": "fastupdate",
+								"propertyType": "checkbox",
+								"propertyTooltip": "This setting controls usage of the fast update technique.",
+								"defaultValue": true,
+								"dependency": {
+									"type": "or",
+									"values": [
+										{
+											"key": "index_method",
+											"value": "gin"
+										}
+									]
+								}
+							},
+							{
+								"propertyName": "Gin pending list limit",
+								"propertyKeyword": "gin_pending_list_limit",
+								"propertyType": "numeric",
+								"valueType": "number",
+								"propertyTooltip": "This value is specified in kilobytes. Sets the maximum size of a GIN index's pending list, which is used when fastupdate is enabled.",
+								"minValue": 0,
+								"step": 1,
+								"defaultValue": 4000,
+								"dependency": {
+									"type": "and",
+									"values": [
+										{
+											"key": "index_method",
+											"value": "gin"
+										},
+										{
+											"key": "fastupdate",
+											"value": true
+										}
+									]
+								}
+							},
+							{
+								"propertyName": "Pages per range",
+								"propertyKeyword": "pages_per_range",
+								"propertyType": "numeric",
+								"valueType": "number",
+								"propertyTooltip": "Defines the number of table blocks that make up one block range for each entry of a BRIN index.",
+								"minValue": 0,
+								"step": 1,
+								"defaultValue": 128,
+								"dependency": {
+									"type": "or",
+									"values": [
+										{
+											"key": "index_method",
+											"value": "brin"
+										}
+									]
+								}
+							},
+							{
+								"propertyName": "Auto summarize",
+								"propertyKeyword": "autosummarize ",
+								"propertyType": "checkbox",
+								"propertyTooltip": "Defines whether a summarization run is invoked for the previous page range whenever an insertion is detected on the next one.",
+								"defaultValue": true,
+								"dependency": {
+									"type": "or",
+									"values": [
+										{
+											"key": "index_method",
+											"value": "brin"
+										}
+									]
+								}
+							}
+						],
+						"dependency": {
+							"type": "or",
+							"values": [
+								{
+									"key": "index_method",
+									"value": "btree"
+								},
+								{
+									"key": "index_method",
+									"value": "hash"
+								},
+								{
+									"key": "index_method",
+									"value": "gist"
+								},
+								{
+									"key": "index_method",
+									"value": "spgist"
+								}
+							]
+						}
+					},
+					{
+						"propertyName": "Tablespace",
+						"propertyKeyword": "index_tablespace_name",
+						"propertyTooltip": "Enter the name of an existing tablespace location for the database, or pg_default",
+						"defaultValue": "pg_default",
+						"propertyType": "text"
+					},
+					{
+						"propertyName": "Where constraint",
+						"propertyKeyword": "where",
+						"propertyTooltip": "Popup for multi-line text entry",
+						"propertyType": "details",
+						"markdown": false,
+						"template": "textarea"
+					},
+					{
+						"propertyName": "Comment",
+						"propertyKeyword": "indexComment",
+						"propertyTooltip": "comment",
+						"addTimestampButton": false,
+						"propertyType": "details",
+						"template": "textarea"
 					}
-				},
-				{
-					"propertyName": "Tablespace",
-					"propertyKeyword": "index_tablespace_name",
-					"propertyTooltip": "Enter the name of an existing tablespace location for the database, or pg_default",
-					"defaultValue": "pg_default",
-					"propertyType": "text"
-				},
-				{
-					"propertyName": "Where constraint",
-					"propertyKeyword": "where",
-					"propertyTooltip": "Popup for multi-line text entry",
-					"propertyType": "details",
-					"markdown": false,
-					"template": "textarea"
-				},
-				{
-					"propertyName": "Comment",
-					"propertyKeyword": "indexComment",
-					"propertyTooltip": "comment",
-					"addTimestampButton": false,
-					"propertyType": "details",
-					"template": "textarea"
-				}
-			]
-		}]
+				]
+			}
+		]
 	},
 	{
 		"lowerTab": "Check Constraints",
-		"structure": [{
-			"propertyName": "Check Constraint",
-			"propertyType": "group",
-			"propertyKeyword": "chkConstr",
-			"propertyTooltip": "",
-			"structure": [
-				{
-					"propertyName": "Name",
-					"propertyKeyword": "chkConstrName",
-					"propertyTooltip": "",
-					"propertyType": "text"
-				},
-				{
-					"propertyName": "Description",
-					"propertyKeyword": "constrDescription",
-					"propertyTooltip": "description",
-					"propertyType": "details",
-					"template": "textarea"
-				},
-				{
-					"propertyName": "Expression",
-					"propertyKeyword": "constrExpression",
-					"propertyTooltip": "Expression",
-					"propertyType": "details",
-					"template": "textarea",
-					"markdown": false
-				},
-				{
-					"propertyName": "Comments",
-					"propertyKeyword": "constrComments",
-					"propertyTooltip": "comments",
-					"addTimestampButton": false,
-					"propertyType": "details",
-					"template": "textarea"
-				}
-			]
-		}]
+		"structure": [
+			{
+				"propertyName": "Check Constraint",
+				"propertyType": "group",
+				"propertyKeyword": "chkConstr",
+				"propertyTooltip": "",
+				"structure": [
+					{
+						"propertyName": "Name",
+						"propertyKeyword": "chkConstrName",
+						"propertyTooltip": "",
+						"propertyType": "text"
+					},
+					{
+						"propertyName": "Description",
+						"propertyKeyword": "constrDescription",
+						"propertyTooltip": "description",
+						"propertyType": "details",
+						"template": "textarea"
+					},
+					{
+						"propertyName": "Expression",
+						"propertyKeyword": "constrExpression",
+						"propertyTooltip": "Expression",
+						"propertyType": "details",
+						"template": "textarea",
+						"markdown": false
+					},
+					{
+						"propertyName": "Comments",
+						"propertyKeyword": "constrComments",
+						"propertyTooltip": "comments",
+						"addTimestampButton": false,
+						"propertyType": "details",
+						"template": "textarea"
+					}
+				]
+			}
+		]
 	}
 ]

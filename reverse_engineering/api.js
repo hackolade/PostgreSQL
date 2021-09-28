@@ -24,6 +24,7 @@ module.exports = {
             await postgresService.pingDb();
             callback();
         } catch (error) {
+            logger.log('error', prepareError(error), 'Test connection instance log');
             callback(prepareError(error));
         } finally {
             await postgresService.disconnect();
@@ -70,6 +71,7 @@ module.exports = {
 
             callback(null, collections);
         } catch (error) {
+            logger.log('error', prepareError(error), 'Get DB collections names');
             callback(prepareError(error));
             await postgresService.disconnect();
         }
@@ -90,12 +92,34 @@ module.exports = {
             const collections = data.collectionData.collections;
             const schemasNames = data.collectionData.dataBaseNames;
 
-            await Promise.all(
-                schemasNames.map(schemaName => postgresService.retrieveEntitiesData(schemaName, collections[schemaName]))
-            );
+            const packages = await Promise.all(
+                schemasNames.map(async schemaName => ({
+                    schemaName,
+                    entities: await postgresService.retrieveEntitiesData(
+                        schemaName,
+                        collections[schemaName],
+                        data.recordSamplingSettings
+                    ),
+                }))
+            ).then(tablesDataPerSchema => {
+                return tablesDataPerSchema.flatMap(({ schemaName, entities }) =>
+                    entities.map(entityData => ({
+                        dbName: schemaName,
+                        collectionName: entityData.name,
+                        documents: entityData.documents,
+                        views: [],
+                        emptyBucket: false,
+                        entityLevel: entityData.entityLevel,
+                        validation: {
+                            jsonSchema: entityData.jsonSchema,
+                        },
+                    }))
+                );
+            });
 
-            callback(null, collections);
+            callback(null, packages);
         } catch (error) {
+            logger.log('error', prepareError(error), 'Retrieve tables data');
             callback(prepareError(error));
         } finally {
             await postgresService.disconnect();
