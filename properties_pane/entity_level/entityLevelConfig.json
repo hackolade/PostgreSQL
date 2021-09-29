@@ -662,27 +662,26 @@ making sure that you maintain a proper JSON format.
 						"propertyName": "Key",
 						"propertyKeyword": "compositePrimaryKey",
 						"propertyType": "primaryKeySetter",
-						"abbr": "pk",
-						"attributeList": [
-							"ascending",
-							"descending"
-						]
+						"abbr": "pk"
 					},
 					{
-						"propertyName": "Category",
-						"propertyKeyword": "indexCategory",
+						"propertyName": "Include non-key columns",
+						"propertyKeyword": "include",
+						"propertyType": "fieldList",
+						"template": "orderedList",
+						"propertyTooltip": "The optional INCLUDE clause specifies a list of columns which will be included in the constraint as non-key columns."
+					},
+					{
+						"propertyName": "With storage parameters",
+						"propertyKeyword": "indexStorageParameters",
+						"propertyType": "details",
+						"template": "textarea"
+					},
+					{
+						"propertyName": "Index tablespace",
+						"propertyKeyword": "indexTablespace",
 						"propertyTooltip": "",
-						"propertyType": "select",
-						"defaultValue": "",
-						"options": [
-							"",
-							"btree",
-							"hash",
-							"gist",
-							"spgist",
-							"gin",
-							"brin"
-						]
+						"propertyType": "text"
 					},
 					{
 						"propertyName": "Comment",
@@ -710,27 +709,26 @@ making sure that you maintain a proper JSON format.
 						"propertyName": "Key",
 						"propertyKeyword": "compositeUniqueKey",
 						"propertyType": "primaryKeySetter",
-						"abbr": " ",
-						"attributeList": [
-							"ascending",
-							"descending"
-						]
+						"abbr": " "
 					},
 					{
-						"propertyName": "Category",
-						"propertyKeyword": "indexCategory",
+						"propertyName": "Include non-key columns",
+						"propertyKeyword": "include",
+						"propertyType": "fieldList",
+						"template": "orderedList",
+						"propertyTooltip": "The optional INCLUDE clause specifies a list of columns which will be included in the constraint as non-key columns."
+					},
+					{
+						"propertyName": "With storage parameters",
+						"propertyKeyword": "indexStorageParameters",
+						"propertyType": "details",
+						"template": "textarea"
+					},
+					{
+						"propertyName": "Index tablespace",
+						"propertyKeyword": "indexTablespace",
 						"propertyTooltip": "",
-						"propertyType": "select",
-						"defaultValue": "",
-						"options": [
-							"",
-							"btree",
-							"hash",
-							"gist",
-							"spgist",
-							"gin",
-							"brin"
-						]
+						"propertyType": "text"
 					},
 					{
 						"propertyName": "Comment",
@@ -1056,6 +1054,12 @@ making sure that you maintain a proper JSON format.
 						"propertyType": "details",
 						"template": "textarea",
 						"markdown": false
+					},
+					{
+						"propertyName": "No inherit",
+						"propertyKeyword": "noInherit",
+						"propertyTooltip": "No inherit",
+						"propertyType": "checkbox"
 					},
 					{
 						"propertyName": "Comments",

@@ -15,6 +15,7 @@ const {
     prepareStorageParameters,
     prepareTablePartition,
     checkHaveJsonTypes,
+    prepareTableConstraints,
     getLimit,
 } = require('./postgresHelpers/tableHelper');
 const queryConstants = require('./queryConstants');
@@ -101,6 +102,7 @@ module.exports = {
         const tableAttributes = (await db.query(queryConstants.GET_TABLE_ATTRIBUTES_WITH_POSITIONS, [tableOid])).rows;
         const descriptionResult = await db.query(queryConstants.GET_DESCRIPTION_BY_OID, [tableOid]);
         const inheritsResult = getFirstRow(await db.query(queryConstants.GET_INHERITS_PARENT_TABLE_NAME, [tableOid]));
+        const tableConstraintsResult = (await db.query(queryConstants.GET_TABLE_CONSTRAINTS, [tableOid])).rows;
 
         const partitioning = prepareTablePartition(partitionResult, tableAttributes);
 
@@ -110,6 +112,7 @@ module.exports = {
         const table_tablespace_name = result.spcname;
         const description = getDescriptionFromResult(descriptionResult);
         const inherits = inheritsResult?.parent_table_name;
+        const tableConstraint = prepareTableConstraints(tableConstraintsResult, tableAttributes);
 
         const tableData = {
             temporary,
@@ -119,6 +122,7 @@ module.exports = {
             partitioning,
             description,
             inherits,
+            ...tableConstraint,
         };
 
         const entityLevel = clearEmptyPropertiesInObject(tableData);

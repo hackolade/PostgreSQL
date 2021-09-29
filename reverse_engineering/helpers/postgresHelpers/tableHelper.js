@@ -144,10 +144,77 @@ const getLimit = (count, recordSamplingSettings) => {
     return size;
 };
 
+const prepareTableConstraints = (constraintsResult, attributesWithPositions) => {
+    return _.reduce(
+        constraintsResult,
+        (entityConstraints, constraint) => {
+            switch (constraint.constraint_type) {
+                case 'c':
+                    return {
+                        ...entityConstraints,
+                        chkConstr: [...entityConstraints.chkConstr, getCheckConstraint(constraint)],
+                    };
+                case 'p':
+                    return {
+                        ...entityConstraints,
+                        primaryKey: [
+                            ...entityConstraints.primaryKey,
+                            getPrimaryKeyConstraint(constraint, attributesWithPositions),
+                        ],
+                    };
+                case 'u':
+                    return {
+                        ...entityConstraints,
+                        uniqueKey: [
+                            ...entityConstraints.uniqueKey,
+                            getUniqueKeyConstraint(constraint, attributesWithPositions),
+                        ],
+                    };
+                default:
+                    return entityConstraints;
+            }
+        },
+        {
+            chkConstr: [],
+            uniqueKey: [],
+            primaryKey: [],
+        }
+    );
+};
+
+const getPrimaryKeyConstraint = (constraint, attributesWithPositions) => {
+    return {
+        constraintName: constraint.constraint_name,
+        compositePrimaryKey: _.map(constraint.constraint_keys, getAttributeNameByPosition(attributesWithPositions)),
+        indexStorageParameters: _.join(constraint.storage_parameters, ','),
+        indexTablespace: constraint.tablespace,
+    };
+};
+
+const getUniqueKeyConstraint = (constraint, attributesWithPositions) => {
+    return {
+        constraintName: constraint.constraint_name,
+        compositeUniqueKey: _.map(constraint.constraint_keys, getAttributeNameByPosition(attributesWithPositions)),
+        indexStorageParameters: _.join(constraint.storage_parameters, ','),
+        indexTablespace: constraint.tablespace,
+        indexComment: constraint.description,
+    };
+};
+
+const getCheckConstraint = constraint => {
+    return {
+        chkConstrName: constraint.constraint_name,
+        constrExpression: constraint.expression,
+        noInherit: constraint.no_inherit,
+        constrDescription: constraint.description,
+    };
+};
+
 module.exports = {
     prepareStorageParameters,
     prepareTablePartition,
     setDependencies,
     checkHaveJsonTypes,
+    prepareTableConstraints,
     getLimit,
 };

@@ -41,4 +41,19 @@ module.exports = {
 	        INNER JOIN pg_class AS pc
 	        ON pc.oid = pi.inhparent
 	        WHERE pi.inhrelid = $1;`,
+    GET_TABLE_CONSTRAINTS: `
+        SELECT pcon.conname AS constraint_name, 
+	            pcon.contype AS constraint_type,
+	            pcon.connoinherit AS no_inherit,
+	            pcon.conkey AS constraint_keys,
+	            pg_get_expr(pcon.conbin, pcon.conrelid) AS expression,
+	            obj_description(pcon.oid) AS description,
+	            pc.reloptions AS storage_parameters,
+	            pt.spcname AS tablespace
+	        FROM pg_constraint AS pcon
+	        LEFT JOIN pg_class AS pc
+	        ON pcon.conindid = pc.oid
+	        LEFT JOIN pg_tablespace AS pt
+	        ON pc.reltablespace = pt.oid
+	        WHERE pcon.conrelid = $1;`,
 };
