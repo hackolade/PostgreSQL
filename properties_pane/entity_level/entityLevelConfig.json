@@ -153,13 +153,14 @@ making sure that you maintain a proper JSON format.
 			{
 				"propertyName": "Partitioning",
 				"propertyKeyword": "partitioning",
-				"propertyType": "block",
+				"propertyType": "group",
+				"groupItemLimit": 1,
 				"propertyTooltip": "Determines how a partitioned table's rows are distributed across partitions",
 				"structure": [
 					{
-						"propertyName": "Partition type",
-						"propertyKeyword": "partitionType",
-						"propertyTooltip": "Choose the desired partition type",
+						"propertyName": "Partition method",
+						"propertyKeyword": "partitionMethod",
+						"propertyTooltip": "Choose the desired partition method",
 						"propertyType": "select",
 						"defaultValue": "",
 						"options": [
@@ -170,22 +171,24 @@ making sure that you maintain a proper JSON format.
 						]
 					},
 					{
+						"propertyName": "Partition by",
+						"propertyKeyword": "partitionBy",
+						"propertyTooltip": "",
+						"propertyType": "select",
+						"defaultValue": "",
+						"options": [
+							"keys",
+							"expression"
+						]
+					},
+					{
 						"propertyName": "Partition key",
 						"propertyKeyword": "compositePartitionKey",
 						"propertyType": "primaryKeySetter",
 						"abbr": "pk,PK",
 						"dependency": {
-							"type": "or",
-							"values": [
-								{
-									"key": "partitioning_expression",
-									"value": false
-								},
-								{
-									"key": "partitioning_expression",
-									"exists": false
-								}
-							]
+							"key": "partitionBy",
+							"value": "keys"
 						}
 					},
 					{
@@ -196,17 +199,8 @@ making sure that you maintain a proper JSON format.
 						"template": "textarea",
 						"markdown": false,
 						"dependency": {
-							"type": "or",
-							"values": [
-								{
-									"key": "compositePartitionKey",
-									"value": false
-								},
-								{
-									"key": "compositePartitionKey",
-									"exists": false
-								}
-							]
+							"key": "partitionBy",
+							"value": "expression"
 						}
 					}
 				]

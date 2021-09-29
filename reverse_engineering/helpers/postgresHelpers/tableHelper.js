@@ -74,7 +74,7 @@ const prepareTablePartition = (partitionResult, tableAttributesWithPositions) =>
         return null;
     }
 
-    const partitionType = getPartitionType(partitionResult);
+    const partitionMethod = getPartitionMethod(partitionResult);
     const isExpression = _.some(partitionResult.partition_attributes_positions, position => position === 0);
     const key = isExpression ? 'partitioning_expression' : 'compositePartitionKey';
     const value = isExpression
@@ -84,14 +84,17 @@ const prepareTablePartition = (partitionResult, tableAttributesWithPositions) =>
               getAttributeNameByPosition(tableAttributesWithPositions)
           );
 
-    return {
-        partitionType,
-        [key]: value,
-    };
+    return [
+        {
+            partitionMethod,
+            partitionBy: isExpression ? 'expression' : 'keys',
+            [key]: value,
+        },
+    ];
 };
 
-const getPartitionType = partitionResult => {
-    const type = partitionResult.partition_type;
+const getPartitionMethod = partitionResult => {
+    const type = partitionResult.partition_method;
 
     switch (type) {
         case 'h':

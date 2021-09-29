@@ -18,7 +18,7 @@ module.exports = {
             ON pc.reltablespace = pt.oid
             WHERE pc.relname = $1 AND pc.relnamespace = $2;`,
     GET_TABLE_PARTITION_DATA: `
-        SELECT partstrat as partition_type,
+        SELECT partstrat as partition_method,
 	            partattrs::int2[] as partition_attributes_positions,
 	            pg_get_expr(partexprs, partrelid) AS expressions
             FROM pg_partitioned_table
