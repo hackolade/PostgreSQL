@@ -36,4 +36,9 @@ module.exports = {
     GET_DESCRIPTION_BY_OID: `SELECT obj_description($1)`,
     GET_ROWS_COUNT: fullTableName => `SELECT COUNT(*) FROM ${fullTableName};`,
     GET_SAMPLED_DATA: fullTableName => `SELECT * FROM ${fullTableName} LIMIT $1;`,
+    GET_INHERITS_PARENT_TABLE_NAME: `
+        SELECT pc.relname AS parent_table_name FROM pg_inherits AS pi
+	        INNER JOIN pg_class AS pc
+	        ON pc.oid = pi.inhparent
+	        WHERE pi.inhrelid = $1;`,
 };

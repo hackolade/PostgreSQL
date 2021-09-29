@@ -100,6 +100,7 @@ module.exports = {
         const partitionResult = getFirstRow(await db.query(queryConstants.GET_TABLE_PARTITION_DATA, [tableOid]));
         const tableAttributes = (await db.query(queryConstants.GET_TABLE_ATTRIBUTES_WITH_POSITIONS, [tableOid])).rows;
         const descriptionResult = await db.query(queryConstants.GET_DESCRIPTION_BY_OID, [tableOid]);
+        const inheritsResult = getFirstRow(await db.query(queryConstants.GET_INHERITS_PARENT_TABLE_NAME, [tableOid]));
 
         const partitioning = prepareTablePartition(partitionResult, tableAttributes);
 
@@ -107,7 +108,8 @@ module.exports = {
         const unlogged = rawTableData.relpersistence === 'u';
         const storage_parameter = prepareStorageParameters(rawTableData.reloptions);
         const table_tablespace_name = result.spcname;
-        const description = getFirstRow(descriptionResult);
+        const description = getDescriptionFromResult(descriptionResult);
+        const inherits = inheritsResult?.parent_table_name;
 
         const tableData = {
             temporary,
@@ -116,6 +118,7 @@ module.exports = {
             table_tablespace_name,
             partitioning,
             description,
+            inherits,
         };
 
         const entityLevel = clearEmptyPropertiesInObject(tableData);
@@ -165,3 +168,5 @@ const isSystemSchema = schema_name => {
 };
 
 const getFirstRow = result => _.first(result.rows);
+
+const getDescriptionFromResult = result => getFirstRow(result)?.obj_description;
