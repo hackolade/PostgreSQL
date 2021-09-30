@@ -69,7 +69,7 @@ const prepareStorageParameters = reloptions => {
     return clearEmptyPropertiesInObject(storage_parameter);
 };
 
-const prepareTablePartition = (partitionResult, tableAttributesWithPositions) => {
+const prepareTablePartition = (partitionResult, tableColumns) => {
     if (!partitionResult) {
         return null;
     }
@@ -78,10 +78,10 @@ const prepareTablePartition = (partitionResult, tableAttributesWithPositions) =>
     const isExpression = _.some(partitionResult.partition_attributes_positions, position => position === 0);
     const key = isExpression ? 'partitioning_expression' : 'compositePartitionKey';
     const value = isExpression
-        ? getPartitionExpression(partitionResult, tableAttributesWithPositions)
+        ? getPartitionExpression(partitionResult, tableColumns)
         : _.map(
               partitionResult.partition_attributes_positions,
-              getAttributeNameByPosition(tableAttributesWithPositions)
+              getAttributeNameByPosition(tableColumns)
           );
 
     return [
@@ -108,7 +108,7 @@ const getPartitionMethod = partitionResult => {
     }
 };
 
-const getPartitionExpression = (partitionResult, tableAttributesWithPositions) => {
+const getPartitionExpression = (partitionResult, tableColumns) => {
     let expressionIndex = 0;
     const expressions = _.split(partitionResult.expressions, ',');
 
@@ -121,13 +121,13 @@ const getPartitionExpression = (partitionResult, tableAttributesWithPositions) =
                 return expression;
             }
 
-            return getAttributeNameByPosition(tableAttributesWithPositions)(attributePosition);
+            return getAttributeNameByPosition(tableColumns)(attributePosition);
         })
         .join(',')
         .value();
 };
 
-const getAttributeNameByPosition = attributes => position => _.find(attributes, { position })?.name;
+const getAttributeNameByPosition = attributes => position => _.find(attributes, { ordinal_position: position })?.column_name;
 
 const splitByEqualitySymbol = item => _.split(item, '=');
 
@@ -182,19 +182,19 @@ const prepareTableConstraints = (constraintsResult, attributesWithPositions) => 
     );
 };
 
-const getPrimaryKeyConstraint = (constraint, attributesWithPositions) => {
+const getPrimaryKeyConstraint = (constraint, tableColumns) => {
     return {
         constraintName: constraint.constraint_name,
-        compositePrimaryKey: _.map(constraint.constraint_keys, getAttributeNameByPosition(attributesWithPositions)),
+        compositePrimaryKey: _.map(constraint.constraint_keys, getAttributeNameByPosition(tableColumns)),
         indexStorageParameters: _.join(constraint.storage_parameters, ','),
         indexTablespace: constraint.tablespace,
     };
 };
 
-const getUniqueKeyConstraint = (constraint, attributesWithPositions) => {
+const getUniqueKeyConstraint = (constraint, tableColumns) => {
     return {
         constraintName: constraint.constraint_name,
-        compositeUniqueKey: _.map(constraint.constraint_keys, getAttributeNameByPosition(attributesWithPositions)),
+        compositeUniqueKey: _.map(constraint.constraint_keys, getAttributeNameByPosition(tableColumns)),
         indexStorageParameters: _.join(constraint.storage_parameters, ','),
         indexTablespace: constraint.tablespace,
         indexComment: constraint.description,
@@ -210,11 +210,92 @@ const getCheckConstraint = constraint => {
     };
 };
 
+const prepareTableIndexes = (tableIndexesResult) => {
+    return _.map(tableIndexesResult, indexData => {
+        const index = {
+            indxName: indexData.indexname,
+            index_method: indexData.index_method,
+            unique: indexData.index_unique ?? false,
+            columns: mapIndexColumns(indexData),
+            index_tablespace_name: indexData.tablespace_name,
+            index_storage_parameter: getIndexStorageParameters(indexData.storage_parameters)
+        };
+
+        return clearEmptyPropertiesInObject(index)
+    });
+};
+
+const mapIndexColumns = indexData => {
+    return _.chain(indexData.columns)
+        .map((columnName, itemIndex) => {
+            if (!columnName) {
+                return;
+            }
+
+            const sortOrder = _.get(indexData, `ascending.${itemIndex}`, false) ? 'ASC' : 'DESC';
+            const nullsOrder = getNullsOrder(_.get(indexData, `nulls_first.${itemIndex}`));
+            const opclass = _.get(indexData, `opclasses.${itemIndex}`);
+
+            return {
+                name: columnName,
+                sortOrder,
+                nullsOrder,
+                opclass,
+            };
+        })
+        .compact()
+        .value();
+};
+
+const getNullsOrder = nulls_first => {
+    if (_.isNil(nulls_first)) {
+        return '';
+    }
+
+    return nulls_first ? 'NULLS FIRST' : 'NULLS LAST';
+};
+
+const getIndexStorageParameters = (storageParameters) => {
+    if(!storageParameters) {
+        return null
+    }
+
+    const params = _.fromPairs(_.map(storageParameters, param => splitByEqualitySymbol(param)));
+
+    const data = {
+        index_fillfactor: params.fillfactor,
+        deduplicate_items: params.deduplicate_items,
+        index_buffering: params.index_buffering,
+        fastupdate: params.fastupdate,
+        gin_pending_list_limit: params.gin_pending_list_limit,
+        pages_per_range: params.pages_per_range,
+        autosummarize: params.autosummarize
+    }
+
+    return clearEmptyPropertiesInObject(data)
+}
+
+const prepareTableLevelData = (tableLevelData) => {
+    const temporary = tableLevelData?.relpersistence === 't';
+    const unlogged = tableLevelData?.relpersistence === 'u';
+    const storage_parameter = prepareStorageParameters(tableLevelData?.reloptions);
+    const table_tablespace_name = tableLevelData?.spcname;
+
+    return {
+        temporary,
+        unlogged,
+        storage_parameter,
+        table_tablespace_name,
+    }
+}
+
 module.exports = {
     prepareStorageParameters,
     prepareTablePartition,
     setDependencies,
     checkHaveJsonTypes,
     prepareTableConstraints,
+    prepareTableLevelData,
+    prepareTableIndexes,
     getLimit,
 };

@@ -20,7 +20,7 @@ const columnPropertiesMapper = {
     interval_type: 'intervalOptions',
     collation_name: 'collationRule',
     column_name: 'name',
-    attndims: 'numberOfArrayDimensions',
+    number_of_array_dimensions: 'numberOfArrayDimensions',
     udt_name: 'udt_name',
     character_maximum_length: 'length',
 };
@@ -148,7 +148,7 @@ const mapType = type => {
         case 'regtype':
             return { type: 'oid', mode: type };
         default:
-            return { type };
+            return { type: 'char', mode: 'varchar' };
     }
 };
 

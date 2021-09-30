@@ -143,7 +143,8 @@ const createLogger = ({ title, logger, hiddenKeys }) => {
     };
 };
 
-const prepareError = error => ({
-    message: error.message,
-    stack: error.stack,
-});
+const prepareError = error => {
+    error = JSON.stringify(error, Object.getOwnPropertyNames(error));
+    error = JSON.parse(error);
+    return error;
+};

@@ -12,11 +12,12 @@ const {
 } = require('./postgresHelpers/common');
 const {
     setDependencies: setDependenciesInTableHelper,
-    prepareStorageParameters,
     prepareTablePartition,
     checkHaveJsonTypes,
     prepareTableConstraints,
     getLimit,
+    prepareTableLevelData,
+    prepareTableIndexes,
 } = require('./postgresHelpers/tableHelper');
 const queryConstants = require('./queryConstants');
 
@@ -56,21 +57,18 @@ module.exports = {
     },
 
     async getAllSchemasNames() {
-        const result = await db.query(queryConstants.GET_SCHEMA_NAMES);
+        const schemaNames = await db.query(queryConstants.GET_SCHEMA_NAMES);
 
-        return result.rows.map(({ schema_name }) => schema_name).filter(schemaName => !isSystemSchema(schemaName));
+        return schemaNames.map(({ schema_name }) => schema_name).filter(schemaName => !isSystemSchema(schemaName));
     },
 
     async getTablesNames(schemaName) {
-        const result = await db.query(queryConstants.GET_TABLE_NAMES, [schemaName]);
+        const tables = await db.query(queryConstants.GET_TABLE_NAMES, [schemaName]);
 
         const tableTypesToExclude = ['FOREIGN TABLE'];
 
-        return result.rows
-            .filter(
-                ({ table_type, is_table_partitioned }) =>
-                    !_.includes(tableTypesToExclude, table_type) && !is_table_partitioned
-            )
+        return tables
+            .filter(({ table_type }) => !_.includes(tableTypesToExclude, table_type))
             .map(({ table_name, table_type }) => {
                 if (isViewByTableType(table_type)) {
                     return `${table_name}${VIEW_SUFFIX}`;
@@ -81,8 +79,8 @@ module.exports = {
     },
 
     async retrieveEntitiesData(schemaName, entitiesNames, recordSamplingSettings) {
-        const schemaOidResult = await db.query(queryConstants.GET_NAMESPACE_OID, [schemaName]);
-        const schemaOid = getFirstRow(schemaOidResult).oid;
+        const schemaOidResult = await db.queryTolerant(queryConstants.GET_NAMESPACE_OID, [schemaName], true);
+        const schemaOid = schemaOidResult.oid;
 
         const [viewsNames, tablesNames] = _.partition(entitiesNames, isViewByName);
 
@@ -95,40 +93,39 @@ module.exports = {
     },
 
     async _retrieveSingleTableData(recordSamplingSettings, schemaOid, schemaName, tableName) {
-        const result = await db.query(queryConstants.GET_TABLE_LEVEL_DATA, [tableName, schemaOid]);
-        const rawTableData = getFirstRow(result);
-        const tableOid = rawTableData.oid;
-        const partitionResult = getFirstRow(await db.query(queryConstants.GET_TABLE_PARTITION_DATA, [tableOid]));
-        const tableAttributes = (await db.query(queryConstants.GET_TABLE_ATTRIBUTES_WITH_POSITIONS, [tableOid])).rows;
-        const descriptionResult = await db.query(queryConstants.GET_DESCRIPTION_BY_OID, [tableOid]);
-        const inheritsResult = getFirstRow(await db.query(queryConstants.GET_INHERITS_PARENT_TABLE_NAME, [tableOid]));
-        const tableConstraintsResult = (await db.query(queryConstants.GET_TABLE_CONSTRAINTS, [tableOid])).rows;
+        const tableLevelData = await db.queryTolerant(
+            queryConstants.GET_TABLE_LEVEL_DATA,
+            [tableName, schemaOid],
+            true
+        );
+        const tableOid = tableLevelData?.oid;
 
-        const partitioning = prepareTablePartition(partitionResult, tableAttributes);
+        const partitionResult = await db.queryTolerant(queryConstants.GET_TABLE_PARTITION_DATA, [tableOid], true);
+        const tableColumns = await this._getTableColumns(tableName, schemaName, tableOid);
+        const descriptionResult = await db.queryTolerant(queryConstants.GET_DESCRIPTION_BY_OID, [tableOid], true);
+        const inheritsResult = await db.queryTolerant(queryConstants.GET_INHERITS_PARENT_TABLE_NAME, [tableOid], true);
+        const tableConstraintsResult = await db.queryTolerant(queryConstants.GET_TABLE_CONSTRAINTS, [tableOid]);
+        const tableIndexesResult = await db.queryTolerant(queryConstants.GET_TABLE_INDEXES, [tableOid]);
 
-        const temporary = rawTableData.relpersistence === 't';
-        const unlogged = rawTableData.relpersistence === 'u';
-        const storage_parameter = prepareStorageParameters(rawTableData.reloptions);
-        const table_tablespace_name = result.spcname;
+        const partitioning = prepareTablePartition(partitionResult, tableColumns);
+        const tableLevelProperties = prepareTableLevelData(tableLevelData);
         const description = getDescriptionFromResult(descriptionResult);
         const inherits = inheritsResult?.parent_table_name;
-        const tableConstraint = prepareTableConstraints(tableConstraintsResult, tableAttributes);
+        const tableConstraint = prepareTableConstraints(tableConstraintsResult, tableColumns);
+        const tableIndexes = prepareTableIndexes(tableIndexesResult);
 
         const tableData = {
-            temporary,
-            unlogged,
-            storage_parameter,
-            table_tablespace_name,
             partitioning,
             description,
             inherits,
+            Indxs: tableIndexes,
+            ...tableLevelProperties,
             ...tableConstraint,
         };
 
         const entityLevel = clearEmptyPropertiesInObject(tableData);
 
-        const columns = await db.query(queryConstants.GET_TABLE_COLUMNS, [tableName, schemaName, tableOid]);
-        let targetAttributes = columns.rows.map(mapColumnData);
+        let targetAttributes = tableColumns.map(mapColumnData);
 
         const hasJsonTypes = checkHaveJsonTypes(targetAttributes);
         let documents = [];
@@ -146,13 +143,26 @@ module.exports = {
         };
     },
 
+    async _getTableColumns(tableName, schemaName, tableOid) {
+        const tableColumns = await db.query(queryConstants.GET_TABLE_COLUMNS, [tableName, schemaName]);
+        const tableColumnsAdditionalData = await db.queryTolerant(queryConstants.GET_TABLE_COLUMNS_ADDITIONAL_DATA, [
+            tableOid,
+        ]);
+
+        return _.map(tableColumns, (columnData, index) => {
+            return {
+                ...columnData,
+                ...(_.find(tableColumnsAdditionalData, { name: columnData.column_name }) || {}),
+            };
+        });
+    },
+
     async _getDocuments(schemaName, tableName, recordSamplingSettings) {
         const fullTableName = `${schemaName}.${tableName}`;
-        const quantity = await db.query(queryConstants.GET_ROWS_COUNT(fullTableName));
+        const quantity = (await db.queryTolerant(queryConstants.GET_ROWS_COUNT(fullTableName), [], true))?.quantity || 0;
         const limit = getLimit(quantity, recordSamplingSettings);
-        const sampledDocs = await db.query(queryConstants.GET_SAMPLED_DATA(fullTableName), [limit]);
 
-        return sampledDocs.rows;
+        return await db.queryTolerant(queryConstants.GET_SAMPLED_DATA(fullTableName), [limit]);
     },
 };
 
@@ -171,6 +181,4 @@ const isSystemSchema = schema_name => {
     return false;
 };
 
-const getFirstRow = result => _.first(result.rows);
-
-const getDescriptionFromResult = result => getFirstRow(result)?.obj_description;
+const getDescriptionFromResult = result => result?.obj_description;
