@@ -11,7 +11,11 @@ const clearEmptyPropertiesInObject = obj =>
         .fromPairs()
         .value();
 
+const getColumnNameByPosition = columns => position =>
+    _.find(columns, { ordinal_position: position })?.column_name;
+
 module.exports = {
     clearEmptyPropertiesInObject,
     setDependencies,
+    getColumnNameByPosition
 };

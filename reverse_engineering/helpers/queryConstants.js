@@ -114,6 +114,21 @@ const queryConstants = {
                  index_unique,
         		 reloptions,
         		 tablespace_name;`,
+    GET_TABLE_FOREIGN_KEYS: `
+        SELECT pcon.conname AS relationship_name, 
+                pcon.conkey AS table_columns_positions,
+                pc_foreign_table.relname AS foreign_table_name, 
+                ARRAY(
+                    SELECT column_name FROM unnest(pcon.confkey) AS column_position 
+                    JOIN information_schema.columns ON (ordinal_position = column_position)
+                    WHERE table_name = pc_foreign_table.relname AND table_schema = foreign_table_namespace.nspname)::text[] AS foreign_columns,
+                foreign_table_namespace.nspname AS foreign_table_schema
+            FROM pg_constraint AS pcon
+            LEFT JOIN pg_class AS pc ON pcon.conindid = pc.oid
+            LEFT JOIN pg_tablespace AS pt ON pc.reltablespace = pt.oid
+            LEFT JOIN pg_class AS pc_foreign_table ON (pcon.confrelid = pc_foreign_table.oid)
+            JOIN pg_namespace AS foreign_table_namespace ON (pc_foreign_table.relnamespace = foreign_table_namespace.oid)
+            WHERE pcon.conrelid = $1 AND pcon.contype = 'f';`,
 };
 
 const getQueryName = query => {

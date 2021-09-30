@@ -1,4 +1,4 @@
-const { clearEmptyPropertiesInObject } = require('./common');
+const { clearEmptyPropertiesInObject, getColumnNameByPosition } = require('./common');
 
 let _ = null;
 
@@ -81,7 +81,7 @@ const prepareTablePartition = (partitionResult, tableColumns) => {
         ? getPartitionExpression(partitionResult, tableColumns)
         : _.map(
               partitionResult.partition_attributes_positions,
-              getAttributeNameByPosition(tableColumns)
+              getColumnNameByPosition(tableColumns)
           );
 
     return [
@@ -121,13 +121,12 @@ const getPartitionExpression = (partitionResult, tableColumns) => {
                 return expression;
             }
 
-            return getAttributeNameByPosition(tableColumns)(attributePosition);
+            return getColumnNameByPosition(tableColumns)(attributePosition);
         })
         .join(',')
         .value();
 };
 
-const getAttributeNameByPosition = attributes => position => _.find(attributes, { ordinal_position: position })?.column_name;
 
 const splitByEqualitySymbol = item => _.split(item, '=');
 
@@ -185,7 +184,7 @@ const prepareTableConstraints = (constraintsResult, attributesWithPositions) => 
 const getPrimaryKeyConstraint = (constraint, tableColumns) => {
     return {
         constraintName: constraint.constraint_name,
-        compositePrimaryKey: _.map(constraint.constraint_keys, getAttributeNameByPosition(tableColumns)),
+        compositePrimaryKey: _.map(constraint.constraint_keys, getColumnNameByPosition(tableColumns)),
         indexStorageParameters: _.join(constraint.storage_parameters, ','),
         indexTablespace: constraint.tablespace,
     };
@@ -194,7 +193,7 @@ const getPrimaryKeyConstraint = (constraint, tableColumns) => {
 const getUniqueKeyConstraint = (constraint, tableColumns) => {
     return {
         constraintName: constraint.constraint_name,
-        compositeUniqueKey: _.map(constraint.constraint_keys, getAttributeNameByPosition(tableColumns)),
+        compositeUniqueKey: _.map(constraint.constraint_keys, getColumnNameByPosition(tableColumns)),
         indexStorageParameters: _.join(constraint.storage_parameters, ','),
         indexTablespace: constraint.tablespace,
         indexComment: constraint.description,

@@ -92,7 +92,7 @@ module.exports = {
             const collections = data.collectionData.collections;
             const schemasNames = data.collectionData.dataBaseNames;
 
-            const packages = await Promise.all(
+            const { packages, relationships } = await Promise.all(
                 schemasNames.map(async schemaName => ({
                     schemaName,
                     entities: await postgresService.retrieveEntitiesData(
@@ -102,7 +102,11 @@ module.exports = {
                     ),
                 }))
             ).then(tablesDataPerSchema => {
-                return tablesDataPerSchema.flatMap(({ schemaName, entities }) =>
+                const relationships = tablesDataPerSchema
+                    .flatMap(({ entities }) => entities.map(entityData => entityData.relationships))
+                    .flat();
+
+                const packages = tablesDataPerSchema.flatMap(({ schemaName, entities }) =>
                     entities.map(entityData => ({
                         dbName: schemaName,
                         collectionName: entityData.name,
@@ -115,9 +119,11 @@ module.exports = {
                         },
                     }))
                 );
+
+                return { packages, relationships };
             });
 
-            callback(null, packages);
+            callback(null, packages, null, relationships);
         } catch (error) {
             logger.log('error', prepareError(error), 'Retrieve tables data');
             callback(prepareError(error));

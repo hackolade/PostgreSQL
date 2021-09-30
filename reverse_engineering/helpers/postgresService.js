@@ -11,6 +11,10 @@ const {
     clearEmptyPropertiesInObject,
 } = require('./postgresHelpers/common');
 const {
+    setDependencies: setDependenciesInForeignKeysHelper,
+    prepareForeignKeys,
+} = require('./postgresHelpers/foreignKeysHelper');
+const {
     setDependencies: setDependenciesInTableHelper,
     prepareTablePartition,
     checkHaveJsonTypes,
@@ -33,6 +37,7 @@ module.exports = {
         setDependenciesInCommonHelper(app);
         setDependenciesInTableHelper(app);
         setDependenciesInColumnHelper(app);
+        setDependenciesInForeignKeysHelper(app);
     },
 
     async connect(connectionInfo, logger) {
@@ -106,6 +111,7 @@ module.exports = {
         const inheritsResult = await db.queryTolerant(queryConstants.GET_INHERITS_PARENT_TABLE_NAME, [tableOid], true);
         const tableConstraintsResult = await db.queryTolerant(queryConstants.GET_TABLE_CONSTRAINTS, [tableOid]);
         const tableIndexesResult = await db.queryTolerant(queryConstants.GET_TABLE_INDEXES, [tableOid]);
+        const tableForeignKeys = await db.queryTolerant(queryConstants.GET_TABLE_FOREIGN_KEYS, [tableOid]);
 
         const partitioning = prepareTablePartition(partitionResult, tableColumns);
         const tableLevelProperties = prepareTableLevelData(tableLevelData);
@@ -113,6 +119,7 @@ module.exports = {
         const inherits = inheritsResult?.parent_table_name;
         const tableConstraint = prepareTableConstraints(tableConstraintsResult, tableColumns);
         const tableIndexes = prepareTableIndexes(tableIndexesResult);
+        const relationships = prepareForeignKeys(tableForeignKeys, tableName, schemaName, tableColumns);
 
         const tableData = {
             partitioning,
@@ -140,6 +147,7 @@ module.exports = {
             entityLevel,
             jsonSchema: getJsonSchema(targetAttributes),
             documents,
+            relationships
         };
     },
 
@@ -159,7 +167,8 @@ module.exports = {
 
     async _getDocuments(schemaName, tableName, recordSamplingSettings) {
         const fullTableName = `${schemaName}.${tableName}`;
-        const quantity = (await db.queryTolerant(queryConstants.GET_ROWS_COUNT(fullTableName), [], true))?.quantity || 0;
+        const quantity =
+            (await db.queryTolerant(queryConstants.GET_ROWS_COUNT(fullTableName), [], true))?.quantity || 0;
         const limit = getLimit(quantity, recordSamplingSettings);
 
         return await db.queryTolerant(queryConstants.GET_SAMPLED_DATA(fullTableName), [limit]);
