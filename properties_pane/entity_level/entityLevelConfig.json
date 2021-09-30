@@ -709,7 +709,7 @@ making sure that you maintain a proper JSON format.
 						"propertyName": "Key",
 						"propertyKeyword": "compositeUniqueKey",
 						"propertyType": "primaryKeySetter",
-						"abbr": " "
+						"abbr": "uk"
 					},
 					{
 						"propertyName": "Include non-key columns",
@@ -830,7 +830,7 @@ making sure that you maintain a proper JSON format.
 									"DESC"
 								]
 							},
-							"mullsOrder": {
+							"nullsOrder": {
 								"propertyType": "select",
 								"options": [
 									"",
@@ -890,32 +890,87 @@ making sure that you maintain a proper JSON format.
 								"propertyKeyword": "deduplicate_items",
 								"propertyType": "checkbox",
 								"propertyTooltip": "Declare the table as an additional catalog table for purposes of logical replication.",
-								"defaultValue": true,
-								"dependency": {
-									"type": "or",
-									"values": [
-										{
-											"key": "index_method",
-											"value": "btree"
-										}
-									]
-								}
+								"defaultValue": true
+							}
+						],
+						"dependency": {
+							"key": "index_method",
+							"value": "btree"
+						}
+					},
+					{
+						"propertyName": "With storage parameters",
+						"propertyKeyword": "index_storage_parameter",
+						"propertyType": "block",
+						"propertyTooltip": "The optional WITH clause specifies storage parameters for the index. Each index method has its own set of allowed storage parameters.",
+						"structure": [
+							{
+								"propertyName": "Fill factor",
+								"propertyKeyword": "index_fillfactor",
+								"propertyType": "numeric",
+								"valueType": "number",
+								"propertyTooltip": "A percentage between 10 and 100. The fillfactor for an index is a percentage that determines how full the index method will try to pack index pages.",
+								"minValue": 10,
+								"maxValue": 100,
+								"step": 1,
+								"defaultValue": 100
+							}
+						],
+						"dependency": {
+							"key": "index_method",
+							"value": [
+								"hash",
+								"spgist"
+							]
+						}
+					},
+					{
+						"propertyName": "With storage parameters",
+						"propertyKeyword": "index_storage_parameter",
+						"propertyType": "block",
+						"propertyTooltip": "The optional WITH clause specifies storage parameters for the index. Each index method has its own set of allowed storage parameters.",
+						"structure": [
+							{
+								"propertyName": "Fill factor",
+								"propertyKeyword": "index_fillfactor",
+								"propertyType": "numeric",
+								"valueType": "number",
+								"propertyTooltip": "A percentage between 10 and 100. The fillfactor for an index is a percentage that determines how full the index method will try to pack index pages.",
+								"minValue": 10,
+								"maxValue": 100,
+								"step": 1,
+								"defaultValue": 100
 							},
+							{
+								"propertyName": "Buffering",
+								"propertyKeyword": "index_buffering",
+								"propertyType": "select",
+								"propertyTooltip": "Determines whether the buffering build technique is used to build the index.",
+								"options": [
+									"AUTO",
+									"OFF",
+									"ON"
+								],
+								"defaultValue": "AUTO"
+							}
+						],
+						"dependency": {
+							"key": "index_method",
+							"value": "gist"
+						}
+					},
+					{
+						"propertyName": "With storage parameters",
+						"propertyKeyword": "index_storage_parameter",
+						"propertyType": "block",
+						"propertyTooltip": "The optional WITH clause specifies storage parameters for the index. Each index method has its own set of allowed storage parameters.",
+						"structure": [
 							{
 								"propertyName": "Fast update",
 								"propertyKeyword": "fastupdate",
 								"propertyType": "checkbox",
 								"propertyTooltip": "This setting controls usage of the fast update technique.",
-								"defaultValue": true,
-								"dependency": {
-									"type": "or",
-									"values": [
-										{
-											"key": "index_method",
-											"value": "gin"
-										}
-									]
-								}
+								"defaultValue": true
 							},
 							{
 								"propertyName": "Gin pending list limit",
@@ -925,21 +980,20 @@ making sure that you maintain a proper JSON format.
 								"propertyTooltip": "This value is specified in kilobytes. Sets the maximum size of a GIN index's pending list, which is used when fastupdate is enabled.",
 								"minValue": 0,
 								"step": 1,
-								"defaultValue": 4000,
-								"dependency": {
-									"type": "and",
-									"values": [
-										{
-											"key": "index_method",
-											"value": "gin"
-										},
-										{
-											"key": "fastupdate",
-											"value": true
-										}
-									]
-								}
-							},
+								"defaultValue": 4000
+							}
+						],
+						"dependency": {
+							"key": "index_method",
+							"value": "gin"
+						}
+					},
+					{
+						"propertyName": "With storage parameters",
+						"propertyKeyword": "index_storage_parameter",
+						"propertyType": "block",
+						"propertyTooltip": "The optional WITH clause specifies storage parameters for the index. Each index method has its own set of allowed storage parameters.",
+						"structure": [
 							{
 								"propertyName": "Pages per range",
 								"propertyKeyword": "pages_per_range",
@@ -948,54 +1002,19 @@ making sure that you maintain a proper JSON format.
 								"propertyTooltip": "Defines the number of table blocks that make up one block range for each entry of a BRIN index.",
 								"minValue": 0,
 								"step": 1,
-								"defaultValue": 128,
-								"dependency": {
-									"type": "or",
-									"values": [
-										{
-											"key": "index_method",
-											"value": "brin"
-										}
-									]
-								}
+								"defaultValue": 128
 							},
 							{
 								"propertyName": "Auto summarize",
 								"propertyKeyword": "autosummarize ",
 								"propertyType": "checkbox",
 								"propertyTooltip": "Defines whether a summarization run is invoked for the previous page range whenever an insertion is detected on the next one.",
-								"defaultValue": true,
-								"dependency": {
-									"type": "or",
-									"values": [
-										{
-											"key": "index_method",
-											"value": "brin"
-										}
-									]
-								}
+								"defaultValue": true
 							}
 						],
 						"dependency": {
-							"type": "or",
-							"values": [
-								{
-									"key": "index_method",
-									"value": "btree"
-								},
-								{
-									"key": "index_method",
-									"value": "hash"
-								},
-								{
-									"key": "index_method",
-									"value": "gist"
-								},
-								{
-									"key": "index_method",
-									"value": "spgist"
-								}
-							]
+							"key": "index_method",
+							"value": "brin"
 						}
 					},
 					{
