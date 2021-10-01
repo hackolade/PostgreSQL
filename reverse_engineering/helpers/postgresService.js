@@ -40,12 +40,14 @@ module.exports = {
         setDependenciesInForeignKeysHelper(app);
     },
 
-    async connect(connectionInfo, logger) {
+    async connect(connectionInfo, specificLogger) {
         const { pool, sshTunnel } = await createConnectionPool(connectionInfo);
 
-        db.initializePool(pool, logger);
+        db.initializePool(pool, specificLogger);
         currentSshTunnel = sshTunnel;
-        logger = logger;
+        logger = specificLogger;
+
+        await this.logVersion();
     },
 
     async disconnect() {
@@ -59,6 +61,13 @@ module.exports = {
 
     pingDb() {
         return db.query(queryConstants.PING);
+    },
+
+    async logVersion() {
+        const versionRow = await db.queryTolerant(queryConstants.GET_VERSION, [], true);
+        const version = versionRow?.version || 'Version not retrieved';
+
+        logger.info(`PostgreSQL version: ${version}`);
     },
 
     async getAllSchemasNames() {
@@ -147,7 +156,7 @@ module.exports = {
             entityLevel,
             jsonSchema: getJsonSchema(targetAttributes),
             documents,
-            relationships
+            relationships,
         };
     },
 

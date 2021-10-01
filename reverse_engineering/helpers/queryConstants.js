@@ -1,5 +1,6 @@
 const queryConstants = {
     PING: 'SELECT schema_name FROM information_schema.schemata LIMIT 1;',
+    GET_VERSION: 'SELECT version()',
     GET_SCHEMA_NAMES: 'SELECT schema_name FROM information_schema.schemata;',
     GET_TABLE_NAMES: `
         SELECT table_name, table_type
