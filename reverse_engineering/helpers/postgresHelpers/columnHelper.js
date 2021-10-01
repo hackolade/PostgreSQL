@@ -23,6 +23,7 @@ const columnPropertiesMapper = {
     number_of_array_dimensions: 'numberOfArrayDimensions',
     udt_name: 'udt_name',
     character_maximum_length: 'length',
+    description: 'description',
 };
 
 const mapColumnData = column => {

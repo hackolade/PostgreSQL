@@ -15,6 +15,11 @@ const {
     prepareForeignKeys,
 } = require('./postgresHelpers/foreignKeysHelper');
 const {
+    setDependencies: setFunctionHelperDependencies,
+    mapFunctionData,
+    mapProcedureData,
+} = require('./postgresHelpers/functionHelper');
+const {
     setDependencies: setDependenciesInTableHelper,
     prepareTablePartition,
     checkHaveJsonTypes,
@@ -46,6 +51,7 @@ module.exports = {
         setDependenciesInColumnHelper(app);
         setDependenciesInForeignKeysHelper(app);
         setViewDependenciesInViewHelper(app);
+        setFunctionHelperDependencies(app);
     },
 
     async connect(connectionInfo, specificLogger) {
@@ -102,22 +108,50 @@ module.exports = {
 
     async retrieveEntitiesData(schemaName, entitiesNames, recordSamplingSettings) {
         const schemaOidResult = await db.queryTolerant(queryConstants.GET_NAMESPACE_OID, [schemaName], true);
-        const schemaOid = schemaOidResult.oid;
+        const schemaOid = schemaOidResult?.oid;
 
         const [viewsNames, tablesNames] = _.partition(entitiesNames, isViewByName);
 
-        const tables = await Promise.all(
-            _.map(
-                tablesNames,
-                _.bind(this._retrieveSingleTableData, this, recordSamplingSettings, schemaOid, schemaName)
-            )
+        const tables = await mapPromises(
+            tablesNames,
+            _.bind(this._retrieveSingleTableData, this, recordSamplingSettings, schemaOid, schemaName)
         );
 
-        const views = await Promise.all(
-            _.map(viewsNames, _.bind(this._retrieveSingleViewData, this, schemaOid, schemaName))
-        );
+        const views = await mapPromises(viewsNames, _.bind(this._retrieveSingleViewData, this, schemaOid, schemaName));
 
         return { views, tables };
+    },
+
+    async retrieveFunctionsWithProcedures(schemaName) {
+        const schemaOid = (await db.queryTolerant(queryConstants.GET_NAMESPACE_OID, [schemaName], true))?.oid;
+
+        const functionsWithProcedures = await db.queryTolerant(queryConstants.GET_FUNCTIONS_WITH_PROCEDURES, [
+            schemaName,
+        ]);
+        const functionAdditionalData = await db.queryTolerant(queryConstants.GET_FUNCTIONS_WITH_PROCEDURES_ADDITIONAL, [
+            schemaOid,
+        ]);
+        const [functions, procedures] = _.partition(functionsWithProcedures, { routine_type: 'FUNCTION' });
+
+        const userDefinedFunctions = await mapPromises(functions, async functionData => {
+            const functionArgs = await db.queryTolerant(queryConstants.GET_FUNCTIONS_WITH_PROCEDURES_ARGS, [
+                functionData.specific_name,
+            ]);
+            const additionalData = _.find(functionAdditionalData, { function_name: functionData.name });
+
+            return mapFunctionData(functionData, functionArgs, additionalData);
+        });
+
+        const userDefinedProcedures = await mapPromises(procedures, async functionData => {
+            const functionArgs = await db.queryTolerant(queryConstants.GET_FUNCTIONS_WITH_PROCEDURES_ARGS, [
+                functionData.specific_name,
+            ]);
+            const additionalData = _.find(functionAdditionalData, { function_name: functionData.name });
+
+            return mapProcedureData(functionData, functionArgs, additionalData);
+        });
+
+        return { functions: userDefinedFunctions, procedures: userDefinedProcedures };
     },
 
     async _retrieveSingleTableData(recordSamplingSettings, schemaOid, schemaName, tableName) {
@@ -230,3 +264,5 @@ const isSystemSchema = schema_name => {
 };
 
 const getDescriptionFromResult = result => result?.obj_description;
+
+const mapPromises = (items, asyncFunc) => Promise.all(_.map(items, asyncFunc));

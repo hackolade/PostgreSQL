@@ -7,33 +7,35 @@ const queryConstants = {
             FROM information_schema.tables
  	        WHERE table_schema = $1
 	        ORDER BY table_name;`,
-    GET_NAMESPACE_OID: 'SELECT oid FROM pg_namespace WHERE nspname = $1',
+    GET_NAMESPACE_OID: 'SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = $1',
     GET_TABLE_LEVEL_DATA: `
         SELECT pc.oid, pc.relpersistence, pc.reloptions, pt.spcname
-            FROM pg_class AS pc 
-            LEFT JOIN pg_tablespace AS pt 
+            FROM pg_catalog.pg_class AS pc 
+            LEFT JOIN pg_catalog.pg_tablespace AS pt 
             ON pc.reltablespace = pt.oid
             WHERE pc.relname = $1 AND pc.relnamespace = $2;`,
     GET_TABLE_PARTITION_DATA: `
         SELECT partstrat as partition_method,
 	            partattrs::int2[] as partition_attributes_positions,
-	            pg_get_expr(partexprs, partrelid) AS expressions
-            FROM pg_partitioned_table
+	            pg_catalog.pg_get_expr(partexprs, partrelid) AS expressions
+            FROM pg_catalog.pg_partitioned_table
             WHERE partrelid = $1;`,
     GET_TABLE_COLUMNS: `
         SELECT * FROM information_schema.columns
             WHERE table_name = $1 AND table_schema = $2
             ORDER BY ordinal_position`,
     GET_TABLE_COLUMNS_ADDITIONAL_DATA: `
-        SELECT attname AS name, attndims AS number_of_array_dimensions 
-            FROM pg_attribute
+        SELECT attname AS name, 
+                attndims AS number_of_array_dimensions,
+                obj_description(attrelid, 'pg_class') AS description
+            FROM pg_catalog.pg_attribute
 	        WHERE attrelid = $1;`,
     GET_DESCRIPTION_BY_OID: `SELECT obj_description($1)`,
     GET_ROWS_COUNT: fullTableName => `SELECT COUNT(*) AS quantity FROM ${fullTableName};`,
     GET_SAMPLED_DATA: fullTableName => `SELECT * FROM ${fullTableName} LIMIT $1;`,
     GET_INHERITS_PARENT_TABLE_NAME: `
-        SELECT pc.relname AS parent_table_name FROM pg_inherits AS pi
-	        INNER JOIN pg_class AS pc
+        SELECT pc.relname AS parent_table_name FROM pg_catalog.pg_inherits AS pi
+	        INNER JOIN pg_catalog.pg_class AS pc
 	        ON pc.oid = pi.inhparent
 	        WHERE pi.inhrelid = $1;`,
     GET_TABLE_CONSTRAINTS: `
@@ -41,14 +43,14 @@ const queryConstants = {
 	            pcon.contype AS constraint_type,
 	            pcon.connoinherit AS no_inherit,
 	            pcon.conkey AS constraint_keys,
-	            pg_get_expr(pcon.conbin, pcon.conrelid) AS expression,
-	            obj_description(pcon.oid) AS description,
+	            pg_catalog.pg_get_expr(pcon.conbin, pcon.conrelid) AS expression,
+	            obj_description(pcon.oid, 'pg_constraint') AS description,
 	            pc.reloptions AS storage_parameters,
 	            pt.spcname AS tablespace
-	        FROM pg_constraint AS pcon
-	        LEFT JOIN pg_class AS pc
+	        FROM pg_catalog.pg_constraint AS pcon
+	        LEFT JOIN pg_catalog.pg_class AS pc
 	        ON pcon.conindid = pc.oid
-	        LEFT JOIN pg_tablespace AS pt
+	        LEFT JOIN pg_catalog.pg_tablespace AS pt
 	        ON pc.reltablespace = pt.oid
 	        WHERE pcon.conrelid = $1;`,
     GET_TABLE_INDEXES: `
@@ -85,12 +87,12 @@ const queryConstants = {
                         WHEN opclass_t.opcname is not null THEN format('%I.%I',opclas_namespace.nspname,opclass_t.opcname)
                     END AS opclass,
                     CASE
-                        WHEN indexes.ord > 0 THEN pg_index_column_has_property(indexes.indexrelid, indexes.key, 'asc')
+                        WHEN indexes.ord > 0 THEN pg_catalog.pg_index_column_has_property(indexes.indexrelid, indexes.key, 'asc')
                     END AS ascending,
                     CASE
-                        WHEN indexes.ord > 0 THEN pg_index_column_has_property(indexes.indexrelid, indexes.key, 'nulls_first')
+                        WHEN indexes.ord > 0 THEN pg_catalog.pg_index_column_has_property(indexes.indexrelid, indexes.key, 'nulls_first')
                     END AS nulls_first,
-                    pg_get_indexdef(indexes.indexrelid, ord, false) AS expression
+                    pg_catalog.pg_get_indexdef(indexes.indexrelid, ord, false) AS expression
              FROM
                  (SELECT *,
                          generate_series(1,array_length(i.indkey,1)) AS ord,
@@ -98,17 +100,17 @@ const queryConstants = {
                          unnest(i.indcollation) AS coll,
                          unnest(i.indclass) AS class,
                          unnest(i.indoption) AS option
-                  FROM pg_index i) indexes
-             JOIN pg_class c ON (c.oid=indexes.indexrelid)
-             JOIN pg_class ct ON (ct.oid=indexes.indrelid)
-             JOIN pg_am m ON (m.oid=c.relam)
-             LEFT JOIN pg_attribute attribute ON (attribute.attrelid=indexes.indrelid
+                  FROM pg_catalog.pg_index i) indexes
+             JOIN pg_catalog.pg_class c ON (c.oid=indexes.indexrelid)
+             JOIN pg_catalog.pg_class ct ON (ct.oid=indexes.indrelid)
+             JOIN pg_catalog.pg_am m ON (m.oid=c.relam)
+             LEFT JOIN pg_catalog.pg_attribute attribute ON (attribute.attrelid=indexes.indrelid
                                                   AND attribute.attnum=indexes.key)
-             LEFT JOIN pg_collation collation_t ON (collation_t.oid=indexes.coll)
-             LEFT JOIN pg_namespace collation_namespace ON (collation_namespace.oid=collation_t.collnamespace)
-             LEFT JOIN pg_opclass opclass_t ON (opclass_t.oid=indexes.class)
-             LEFT JOIN pg_namespace opclas_namespace ON (opclas_namespace.oid=opclass_t.opcnamespace)
-        	 LEFT JOIN pg_tablespace tablespace_t ON (tablespace_t.oid = c.reltablespace)) s2
+             LEFT JOIN pg_catalog.pg_collation collation_t ON (collation_t.oid=indexes.coll)
+             LEFT JOIN pg_catalog.pg_namespace collation_namespace ON (collation_namespace.oid=collation_t.collnamespace)
+             LEFT JOIN pg_catalog.pg_opclass opclass_t ON (opclass_t.oid=indexes.class)
+             LEFT JOIN pg_catalog.pg_namespace opclas_namespace ON (opclas_namespace.oid=opclass_t.opcnamespace)
+        	 LEFT JOIN pg_catalog.pg_tablespace tablespace_t ON (tablespace_t.oid = c.reltablespace)) s2
         WHERE table_oid = $1
         GROUP BY indexname,
                  index_method,
@@ -124,18 +126,48 @@ const queryConstants = {
                     JOIN information_schema.columns ON (ordinal_position = column_position)
                     WHERE table_name = pc_foreign_table.relname AND table_schema = foreign_table_namespace.nspname)::text[] AS foreign_columns,
                 foreign_table_namespace.nspname AS foreign_table_schema
-            FROM pg_constraint AS pcon
-            LEFT JOIN pg_class AS pc ON pcon.conindid = pc.oid
-            LEFT JOIN pg_tablespace AS pt ON pc.reltablespace = pt.oid
-            LEFT JOIN pg_class AS pc_foreign_table ON (pcon.confrelid = pc_foreign_table.oid)
-            JOIN pg_namespace AS foreign_table_namespace ON (pc_foreign_table.relnamespace = foreign_table_namespace.oid)
+            FROM pg_catalog.pg_constraint AS pcon
+            LEFT JOIN pg_catalog.pg_class AS pc ON pcon.conindid = pc.oid
+            LEFT JOIN pg_catalog.pg_tablespace AS pt ON pc.reltablespace = pt.oid
+            LEFT JOIN pg_catalog.pg_class AS pc_foreign_table ON (pcon.confrelid = pc_foreign_table.oid)
+            JOIN pg_catalog.pg_namespace AS foreign_table_namespace ON (pc_foreign_table.relnamespace = foreign_table_namespace.oid)
             WHERE pcon.conrelid = $1 AND pcon.contype = 'f';`,
     GET_VIEW_DATA: `SELECT * FROM information_schema.views WHERE table_name = $1 AND table_schema = $2;`,
     GET_VIEW_OPTIONS: `
         SELECT reloptions AS view_options,
             relpersistence AS persistence 
-        FROM pg_class 
+        FROM pg_catalog.pg_class 
         WHERE relname = $1 AND relnamespace = $2;`,
+    GET_FUNCTIONS_WITH_PROCEDURES: `
+        SELECT specific_name,
+            routine_name AS name,
+            routine_type,
+            routine_definition,
+            external_language,
+            security_type,
+            type_udt_name AS return_data_type
+	    FROM information_schema.routines
+	    WHERE specific_schema=$1;`,
+    GET_FUNCTIONS_WITH_PROCEDURES_ARGS: `
+        SELECT parameter_name,
+            parameter_mode,
+            parameter_default,
+            data_type
+        FROM information_schema.parameters
+        WHERE specific_name = $1
+        ORDER BY ordinal_position;`,
+    GET_FUNCTIONS_WITH_PROCEDURES_ADDITIONAL: `
+        SELECT obj_description(oid, 'pg_proc') AS description,
+            proname AS function_name,
+	    	provolatile AS volatility,
+	    	proparallel AS parallel,
+	    	proisstrict AS strict,
+	    	proretset AS returns_set,
+	    	proleakproof AS leak_proof,
+	    	procost AS estimated_cost,
+	    	prorows AS estimated_rows,
+            prokind AS kind
+	    FROM pg_catalog.pg_proc WHERE pronamespace = $1;`,
 };
 
 const getQueryName = query => {

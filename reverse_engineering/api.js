@@ -95,19 +95,25 @@ module.exports = {
             const { packages, relationships } = await Promise.all(
                 schemasNames.map(async schemaName => ({
                     schemaName,
-                    entities: await postgresService.retrieveEntitiesData(
+                    ...(await postgresService.retrieveEntitiesData(
                         schemaName,
                         collections[schemaName],
                         data.recordSamplingSettings
-                    ),
+                    )),
+                    ...(await postgresService.retrieveFunctionsWithProcedures(schemaName)),
                 }))
-            ).then(tablesDataPerSchema => {
-                const relationships = tablesDataPerSchema
-                    .flatMap(({ entities }) => entities.tables.map(entityData => entityData.relationships))
+            ).then(schemaData => {
+                const relationships = schemaData
+                    .flatMap(({ tables }) => tables.map(entityData => entityData.relationships))
                     .flat();
 
-                const packages = tablesDataPerSchema.flatMap(({ schemaName, entities }) => {
-                    const tablePackages = entities.tables.map(entityData => ({
+                const packages = schemaData.flatMap(({ schemaName, tables, views, functions, procedures }) => {
+                    const bucketInfo = {
+                        UDFs: functions,
+                        Procedures: procedures,
+                    };
+
+                    const tablePackages = tables.map(entityData => ({
                         dbName: schemaName,
                         collectionName: entityData.name,
                         documents: entityData.documents,
@@ -117,11 +123,12 @@ module.exports = {
                         validation: {
                             jsonSchema: entityData.jsonSchema,
                         },
+                        bucketInfo,
                     }));
 
                     const viewPackage = {
                         dbName: schemaName,
-                        views: entities.views,
+                        views: views,
                         emptyBucket: false,
                     };
 
