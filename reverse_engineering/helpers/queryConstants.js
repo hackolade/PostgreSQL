@@ -130,6 +130,12 @@ const queryConstants = {
             LEFT JOIN pg_class AS pc_foreign_table ON (pcon.confrelid = pc_foreign_table.oid)
             JOIN pg_namespace AS foreign_table_namespace ON (pc_foreign_table.relnamespace = foreign_table_namespace.oid)
             WHERE pcon.conrelid = $1 AND pcon.contype = 'f';`,
+    GET_VIEW_DATA: `SELECT * FROM information_schema.views WHERE table_name = $1 AND table_schema = $2;`,
+    GET_VIEW_OPTIONS: `
+        SELECT reloptions AS view_options,
+            relpersistence AS persistence 
+        FROM pg_class 
+        WHERE relname = $1 AND relnamespace = $2;`,
 };
 
 const getQueryName = query => {

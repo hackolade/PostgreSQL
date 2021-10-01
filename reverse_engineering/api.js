@@ -103,11 +103,11 @@ module.exports = {
                 }))
             ).then(tablesDataPerSchema => {
                 const relationships = tablesDataPerSchema
-                    .flatMap(({ entities }) => entities.map(entityData => entityData.relationships))
+                    .flatMap(({ entities }) => entities.tables.map(entityData => entityData.relationships))
                     .flat();
 
-                const packages = tablesDataPerSchema.flatMap(({ schemaName, entities }) =>
-                    entities.map(entityData => ({
+                const packages = tablesDataPerSchema.flatMap(({ schemaName, entities }) => {
+                    const tablePackages = entities.tables.map(entityData => ({
                         dbName: schemaName,
                         collectionName: entityData.name,
                         documents: entityData.documents,
@@ -117,9 +117,16 @@ module.exports = {
                         validation: {
                             jsonSchema: entityData.jsonSchema,
                         },
-                    }))
-                );
+                    }));
 
+                    const viewPackage = {
+                        dbName: schemaName,
+                        views: entities.views,
+                        emptyBucket: false,
+                    };
+
+                    return [...tablePackages, viewPackage];
+                });
                 return { packages, relationships };
             });
 

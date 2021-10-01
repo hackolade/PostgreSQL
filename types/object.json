@@ -2,6 +2,7 @@
 	"name": "object",
 	"parentType": "document",
 	"structureType": true,
+	"hiddenOnEntity": "view",
 	"defaultValues": {
 		"subtype": "object",
 		"properties": []

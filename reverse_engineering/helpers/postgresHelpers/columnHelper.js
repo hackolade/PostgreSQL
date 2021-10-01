@@ -166,7 +166,7 @@ const setSubtypeFromSampledJsonValues = (columns, documents) => {
 
         return {
             ...column,
-            synonym: jsonType,
+            subtype: jsonType,
         };
     });
 };

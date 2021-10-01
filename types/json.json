@@ -3,7 +3,7 @@
 	"erdAbbreviation": "<json>",
 	"dtdAbbreviation": "{...}",
 	"parentType": "string",
-	"default": true,
+	"hiddenOnEntity": "view",
 	"defaultValues": {
 		"primaryKey": false,
 		"relationshipType": "",
@@ -14,7 +14,7 @@
 		"enabled": true,
 		"additionalProperties": false,
 		"mode": "json",
-		"subtype": "object"
+		"subtype": "string"
 	},
 	"subtypes": {
 		"object": {

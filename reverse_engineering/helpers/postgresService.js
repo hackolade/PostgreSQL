@@ -23,13 +23,20 @@ const {
     prepareTableLevelData,
     prepareTableIndexes,
 } = require('./postgresHelpers/tableHelper');
+const {
+    setDependencies: setViewDependenciesInViewHelper,
+    isViewByTableType,
+    isViewByName,
+    removeViewNameSuffix,
+    generateCreateViewScript,
+    setViewSuffix,
+    prepareViewData,
+} = require('./postgresHelpers/viewHelper');
 const queryConstants = require('./queryConstants');
 
 let currentSshTunnel = null;
 let _ = null;
 let logger = null;
-
-const VIEW_SUFFIX = ' (v)';
 
 module.exports = {
     setDependencies(app) {
@@ -38,6 +45,7 @@ module.exports = {
         setDependenciesInTableHelper(app);
         setDependenciesInColumnHelper(app);
         setDependenciesInForeignKeysHelper(app);
+        setViewDependenciesInViewHelper(app);
     },
 
     async connect(connectionInfo, specificLogger) {
@@ -85,7 +93,7 @@ module.exports = {
             .filter(({ table_type }) => !_.includes(tableTypesToExclude, table_type))
             .map(({ table_name, table_type }) => {
                 if (isViewByTableType(table_type)) {
-                    return `${table_name}${VIEW_SUFFIX}`;
+                    return setViewSuffix(table_name);
                 } else {
                     return table_name;
                 }
@@ -98,12 +106,18 @@ module.exports = {
 
         const [viewsNames, tablesNames] = _.partition(entitiesNames, isViewByName);
 
-        return Promise.all(
+        const tables = await Promise.all(
             _.map(
                 tablesNames,
                 _.bind(this._retrieveSingleTableData, this, recordSamplingSettings, schemaOid, schemaName)
             )
         );
+
+        const views = await Promise.all(
+            _.map(viewsNames, _.bind(this._retrieveSingleViewData, this, schemaOid, schemaName))
+        );
+
+        return { views, tables };
     },
 
     async _retrieveSingleTableData(recordSamplingSettings, schemaOid, schemaName, tableName) {
@@ -182,10 +196,26 @@ module.exports = {
 
         return await db.queryTolerant(queryConstants.GET_SAMPLED_DATA(fullTableName), [limit]);
     },
-};
 
-const isViewByTableType = table_type => table_type === 'VIEW';
-const isViewByName = name => _.endsWith(name, VIEW_SUFFIX);
+    async _retrieveSingleViewData(schemaOid, schemaName, viewName) {
+        viewName = removeViewNameSuffix(viewName);
+
+        const viewData = await db.query(queryConstants.GET_VIEW_DATA, [viewName, schemaName], true);
+        const viewOptions = await db.queryTolerant(queryConstants.GET_VIEW_OPTIONS, [viewName, schemaOid], true);
+
+        const script = generateCreateViewScript(viewName, viewData);
+        const data = prepareViewData(viewData, viewOptions);
+
+        return {
+            name: viewName,
+            data,
+            ddl: {
+                script,
+                type: 'postgres',
+            },
+        };
+    },
+};
 
 const isSystemSchema = schema_name => {
     if (_.startsWith(schema_name, 'pg_')) {

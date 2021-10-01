@@ -150,7 +150,7 @@ making sure that you maintain a proper JSON format.
 			},
 			{
 				"propertyName": "As query",
-				"propertyKeyword": "query",
+				"propertyKeyword": "selectStatement",
 				"propertyType": "details",
 				"propertyTooltip": "A SELECT or VALUES command which will provide the columns and rows of the view.",
 				"template": "textarea",

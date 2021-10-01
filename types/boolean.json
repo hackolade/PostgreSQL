@@ -5,6 +5,7 @@
 	"parentType": "boolean",
 	"sample": true,
 	"useSample": true,
+	"hiddenOnEntity": "view",
 	"defaultValues": {
 		"primaryKey": false,
 		"default": "",

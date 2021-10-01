@@ -3,6 +3,7 @@
 	"erdAbbreviation": "<enum>",
 	"dtdAbbreviation": "{enum}",
 	"parentType": "string",
+	"hiddenOnEntity": "view",
 	"defaultValues": {
 		"primaryKey": false,
 		"relationshipType": "",
