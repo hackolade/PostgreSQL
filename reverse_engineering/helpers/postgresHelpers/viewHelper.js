@@ -21,8 +21,8 @@ const prepareViewData = (viewData, viewOptions) => {
     const data = {
         withCheckOption: Boolean(viewData.check_option),
         checkTestingScope: getCheckTestingScope(viewData.check_option),
-        view_option: _.join(viewOptions.view_options, ','),
-        temporary: viewOptions.persistence === 't',
+        view_option: _.join(viewOptions?.view_options, ','),
+        temporary: viewOptions?.persistence === 't',
         recursive: isViewRecursive(viewData),
     };
 
