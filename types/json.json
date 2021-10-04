@@ -2,8 +2,13 @@
 	"name": "json",
 	"erdAbbreviation": "<json>",
 	"dtdAbbreviation": "{...}",
-	"parentType": "string",
+	"parentType": "jsonObject",
 	"hiddenOnEntity": "view",
+	"jsonType": {
+		"order": 1,
+		"name": "json",
+		"jsonRoot": true
+	},
 	"defaultValues": {
 		"primaryKey": false,
 		"relationshipType": "",
@@ -11,10 +16,10 @@
 		"childRelationships": [],
 		"foreignCollection": "",
 		"foreignField": [],
-		"enabled": true,
 		"additionalProperties": false,
 		"mode": "json",
-		"subtype": "string"
+		"subtype": "object",
+		"properties": []
 	},
 	"subtypes": {
 		"object": {
@@ -40,7 +45,16 @@
 			]
 		},
 		"string": {
-			"parentType": "string"
+			"parentType": "jsonString"
+		},
+		"number": {
+			"parentType": "jsonNumber"
+		},
+		"boolean": {
+			"parentType": "jsonBoolean"
+		},
+		"null": {
+			"parentType": "jsonNull"
 		}
 	}
 }

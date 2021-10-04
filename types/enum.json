@@ -3,20 +3,9 @@
 	"erdAbbreviation": "<enum>",
 	"dtdAbbreviation": "{enum}",
 	"parentType": "string",
-	"hiddenOnEntity": "view",
-	"defaultValues": {
-		"primaryKey": false,
-		"relationshipType": "",
-		"parentRelationship": "",
-		"childRelationships": [],
-		"foreignCollection": "",
-		"foreignField": [],
-		"default": "",
-		"minLength": "",
-		"maxLength": "",
-		"enum": [],
-		"sample":"",
-		"pattern": "",
-		"comments":""
-	}
+	"hiddenOnEntity": [
+		"collection",
+		"view"
+	],
+	"defaultValues": {}
 }

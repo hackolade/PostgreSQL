@@ -1,0 +1,11 @@
+{
+    "name": "range_type",
+    "erdAbbreviation": "<rng>",
+    "dtdAbbreviation": "{123}",
+    "parentType": "string",
+    "hiddenOnEntity": [
+        "collection",
+        "view"
+    ],
+    "defaultValues": {}
+}
