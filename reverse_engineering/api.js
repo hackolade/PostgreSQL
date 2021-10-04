@@ -136,13 +136,17 @@ module.exports = {
                             modelDefinitions,
                         }));
 
-                        const viewPackage = {
-                            dbName: schemaName,
-                            views: views,
-                            emptyBucket: false,
-                        };
+                        if (views?.length) {
+                            const viewPackage = {
+                                dbName: schemaName,
+                                views: views,
+                                emptyBucket: false,
+                            };
 
-                        return [...tablePackages, viewPackage];
+                            return [...tablePackages, viewPackage];
+                        }
+
+                        return tablePackages;
                     }
                 );
                 return { packages, relationships };
