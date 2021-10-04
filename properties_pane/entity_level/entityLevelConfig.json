@@ -828,7 +828,8 @@ making sure that you maintain a proper JSON format.
 								"options": [
 									"ASC",
 									"DESC"
-								]
+								],
+								"propertyTooltip": "Specifies sort order"
 							},
 							"nullsOrder": {
 								"propertyType": "select",
@@ -836,15 +837,18 @@ making sure that you maintain a proper JSON format.
 									"",
 									"NULLS FIRST",
 									"NULLS LAST"
-								]
+								],
+								"propertyTooltip": "Specifies that nulls sort order"
 							},
 							"collation": {
 								"propertyType": "text",
-								"placeholder": "Collation"
+								"placeholder": "Collation",
+								"propertyTooltip": "The name of the collation to use for the index."
 							},
 							"opclass": {
 								"propertyType": "text",
-								"placeholder": "Opclass"
+								"placeholder": "Opclass",
+								"propertyTooltip": "The name of an operator class."
 							}
 						}
 					},
