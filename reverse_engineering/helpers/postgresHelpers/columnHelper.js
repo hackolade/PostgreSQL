@@ -13,6 +13,7 @@ const columnPropertiesMapper = {
             NO: true,
         },
     },
+    not_null: 'required',
     data_type: 'type',
     numeric_precision: 'precision',
     numeric_scale: 'scale',
@@ -23,10 +24,9 @@ const columnPropertiesMapper = {
     number_of_array_dimensions: 'numberOfArrayDimensions',
     udt_name: 'udt_name',
     character_maximum_length: 'length',
-    description: 'description',
 };
 
-const mapColumnData = column => {
+const mapColumnData = userDefinedTypes => column => {
     return _.chain(column)
         .toPairs()
         .map(([key, value]) => [
@@ -35,22 +35,29 @@ const mapColumnData = column => {
         ])
         .filter(([key, value]) => key && !_.isNil(value))
         .fromPairs()
-        .thru(setColumnType)
+        .thru(setColumnType(userDefinedTypes))
         .value();
 };
 
-const setColumnType = column => ({
+const setColumnType = userDefinedTypes => column => ({
     ...column,
-    ...mapType(column.type),
-    ...getArrayType(column),
+    ...getType(userDefinedTypes, column),
 });
 
-const getArrayType = column => {
-    if (column.type !== 'ARRAY') {
-        return {};
+const getType = (userDefinedTypes, column) => {
+    if (column.type === 'ARRAY') {
+        return getArrayType(userDefinedTypes, column);
     }
 
-    const typeData = mapType(column.udt_name.slice(1));
+    if (column.type === 'USER-DEFINED') {
+        return mapType(userDefinedTypes, column.udt_name);
+    }
+
+    return mapType(userDefinedTypes, column.type);
+};
+
+const getArrayType = (userDefinedTypes, column) => {
+    const typeData = mapType(userDefinedTypes, column.udt_name.slice(1));
 
     return {
         ...typeData,
@@ -58,7 +65,7 @@ const getArrayType = column => {
     };
 };
 
-const mapType = type => {
+const mapType = (userDefinedTypes, type) => {
     switch (type) {
         case 'bigint':
         case 'bigserial':
@@ -116,9 +123,13 @@ const mapType = type => {
         case 'timestamptz':
         case 'timestamp with time zone':
             return { type: 'datetime', mode: 'timestamp', with_timezone: true };
+        case 'timestamp without time zone':
+            return { type: 'datetime', mode: 'timestamp' };
         case 'timetz':
         case 'time with time zone':
             return { type: 'datetime', mode: 'time', with_timezone: true };
+        case 'time without time zone':
+            return { type: 'datetime', mode: 'time' };
         case 'json':
         case 'jsonb':
             return { type: 'json', mode: type, subtype: 'object' };
@@ -148,8 +159,13 @@ const mapType = type => {
         case 'regrole':
         case 'regtype':
             return { type: 'oid', mode: type };
-        default:
+        default: {
+            if (_.some(userDefinedTypes, { name: type })) {
+                return { $ref: `#/definitions/${type}` };
+            }
+
             return { type: 'char', mode: 'varchar' };
+        }
     }
 };
 

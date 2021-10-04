@@ -26,8 +26,7 @@ const queryConstants = {
             ORDER BY ordinal_position`,
     GET_TABLE_COLUMNS_ADDITIONAL_DATA: `
         SELECT attname AS name, 
-                attndims AS number_of_array_dimensions,
-                obj_description(attrelid, 'pg_class') AS description
+                attndims AS number_of_array_dimensions
             FROM pg_catalog.pg_attribute
 	        WHERE attrelid = $1;`,
     GET_DESCRIPTION_BY_OID: `SELECT obj_description($1)`,
@@ -168,6 +167,54 @@ const queryConstants = {
 	    	prorows AS estimated_rows,
             prokind AS kind
 	    FROM pg_catalog.pg_proc WHERE pronamespace = $1;`,
+    GET_USER_DEFINED_TYPES: `
+        SELECT pg_type.typrelid AS pg_class_oid,
+            pg_type.typname AS name,
+            pg_type.typtype AS type,
+            pg_catalog.array_agg(pg_enum.enumlabel)::text[] AS enum_values,
+            range_subtype_type.typname AS range_subtype,
+            range_collation.collname AS range_collation_name,
+            range_opclass.opcname AS range_opclass_name,
+            range_canonical_proc.proname AS range_canonical_proc,
+            range_diff_proc.proname AS range_diff_proc
+        FROM pg_catalog.pg_type AS pg_type
+        LEFT JOIN pg_catalog.pg_class AS pg_class ON (pg_class.oid = pg_type.typrelid)
+        LEFT JOIN pg_catalog.pg_namespace AS pg_namespace ON (pg_namespace.oid = pg_type.typnamespace)
+        LEFT JOIN pg_catalog.pg_enum AS pg_enum ON (pg_enum.enumtypid = pg_type.oid)
+        LEFT JOIN pg_catalog.pg_range AS pg_range ON (pg_range.rngtypid = pg_type.oid)
+        LEFT JOIN pg_catalog.pg_type AS range_subtype_type ON (range_subtype_type.oid = pg_range.rngsubtype)
+        LEFT JOIN pg_catalog.pg_collation AS range_collation ON (range_collation.oid = pg_range.rngcollation)
+        LEFT JOIN pg_catalog.pg_opclass AS range_opclass ON (range_opclass.oid = pg_range.rngsubopc)
+        LEFT JOIN pg_catalog.pg_proc AS range_canonical_proc ON (range_canonical_proc.oid = pg_range.rngcanonical)
+        LEFT JOIN pg_catalog.pg_proc AS range_diff_proc ON (range_diff_proc.oid = pg_range.rngsubdiff)
+        WHERE pg_namespace.nspname = $1
+         AND ((pg_type.typtype = 'c'
+               AND pg_class.relkind = 'c')
+              OR pg_type.typtype = 'e'
+              OR pg_type.typtype = 'r')
+        GROUP BY pg_class_oid,
+              pg_type.typname,
+              pg_type.typtype,
+              pg_class.oid,
+              range_subtype,
+              range_collation_name,
+              range_opclass_name,
+              range_canonical_proc,
+              range_diff_proc;`,
+    GET_COMPOSITE_TYPE_COLUMNS: `
+        SELECT pg_attribute.attname AS column_name,
+           pg_type.typname AS data_type,
+           pg_get_expr(pg_attrdef.adbin, pg_attrdef.adrelid) AS columns_default,
+           pg_attribute.attnotnull AS not_null,
+           pg_collation.collname AS collation_name,
+           pg_attribute.attndims AS number_of_array_dimensions,
+           pg_attribute.atttypmod AS character_maximum_length
+        FROM pg_catalog.pg_attribute AS pg_attribute
+        LEFT JOIN pg_catalog.pg_type AS pg_type ON (pg_type.oid = pg_attribute.atttypid)
+        LEFT JOIN pg_catalog.pg_attrdef AS pg_attrdef ON (pg_attrdef.adrelid = pg_attribute.attrelid
+                                                          AND pg_attrdef.adnum = pg_attribute.attnum)
+        LEFT JOIN pg_catalog.pg_collation AS pg_collation ON (pg_collation.oid = pg_attribute.attcollation)
+        WHERE pg_attribute.attrelid = $1`,
 };
 
 const getQueryName = query => {

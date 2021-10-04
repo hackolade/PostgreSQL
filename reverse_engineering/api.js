@@ -93,47 +93,58 @@ module.exports = {
             const schemasNames = data.collectionData.dataBaseNames;
 
             const { packages, relationships } = await Promise.all(
-                schemasNames.map(async schemaName => ({
-                    schemaName,
-                    ...(await postgresService.retrieveEntitiesData(
+                schemasNames.map(async schemaName => {
+                    const { tables, views, modelDefinitions } = await postgresService.retrieveEntitiesData(
                         schemaName,
                         collections[schemaName],
                         data.recordSamplingSettings
-                    )),
-                    ...(await postgresService.retrieveFunctionsWithProcedures(schemaName)),
-                }))
+                    );
+                    const { functions, procedures } = await postgresService.retrieveFunctionsWithProcedures(schemaName);
+
+                    return {
+                        schemaName,
+                        tables,
+                        views,
+                        functions,
+                        procedures,
+                        modelDefinitions,
+                    };
+                })
             ).then(schemaData => {
                 const relationships = schemaData
                     .flatMap(({ tables }) => tables.map(entityData => entityData.relationships))
                     .flat();
 
-                const packages = schemaData.flatMap(({ schemaName, tables, views, functions, procedures }) => {
-                    const bucketInfo = {
-                        UDFs: functions,
-                        Procedures: procedures,
-                    };
+                const packages = schemaData.flatMap(
+                    ({ schemaName, tables, views, functions, procedures, modelDefinitions }) => {
+                        const bucketInfo = {
+                            UDFs: functions,
+                            Procedures: procedures,
+                        };
 
-                    const tablePackages = tables.map(entityData => ({
-                        dbName: schemaName,
-                        collectionName: entityData.name,
-                        documents: entityData.documents,
-                        views: [],
-                        emptyBucket: false,
-                        entityLevel: entityData.entityLevel,
-                        validation: {
-                            jsonSchema: entityData.jsonSchema,
-                        },
-                        bucketInfo,
-                    }));
+                        const tablePackages = tables.map(entityData => ({
+                            dbName: schemaName,
+                            collectionName: entityData.name,
+                            documents: entityData.documents,
+                            views: [],
+                            emptyBucket: false,
+                            entityLevel: entityData.entityLevel,
+                            validation: {
+                                jsonSchema: entityData.jsonSchema,
+                            },
+                            bucketInfo,
+                            modelDefinitions,
+                        }));
 
-                    const viewPackage = {
-                        dbName: schemaName,
-                        views: views,
-                        emptyBucket: false,
-                    };
+                        const viewPackage = {
+                            dbName: schemaName,
+                            views: views,
+                            emptyBucket: false,
+                        };
 
-                    return [...tablePackages, viewPackage];
-                });
+                        return [...tablePackages, viewPackage];
+                    }
+                );
                 return { packages, relationships };
             });
 

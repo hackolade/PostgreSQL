@@ -29,6 +29,11 @@ const {
     prepareTableIndexes,
 } = require('./postgresHelpers/tableHelper');
 const {
+    setDependencies: setDependenciesInUserDefinedTypesHelper,
+    getUserDefinedTypes,
+    isTypeComposite,
+} = require('./postgresHelpers/userDefinedTypesHelper');
+const {
     setDependencies: setViewDependenciesInViewHelper,
     isViewByTableType,
     isViewByName,
@@ -52,6 +57,7 @@ module.exports = {
         setDependenciesInForeignKeysHelper(app);
         setViewDependenciesInViewHelper(app);
         setFunctionHelperDependencies(app);
+        setDependenciesInUserDefinedTypesHelper(app);
     },
 
     async connect(connectionInfo, specificLogger) {
@@ -107,6 +113,7 @@ module.exports = {
     },
 
     async retrieveEntitiesData(schemaName, entitiesNames, recordSamplingSettings) {
+        const userDefinedTypes = await this._retrieveUserDefinedTypes(schemaName);
         const schemaOidResult = await db.queryTolerant(queryConstants.GET_NAMESPACE_OID, [schemaName], true);
         const schemaOid = schemaOidResult?.oid;
 
@@ -114,12 +121,12 @@ module.exports = {
 
         const tables = await mapPromises(
             tablesNames,
-            _.bind(this._retrieveSingleTableData, this, recordSamplingSettings, schemaOid, schemaName)
+            _.bind(this._retrieveSingleTableData, this, recordSamplingSettings, schemaOid, schemaName, userDefinedTypes)
         );
 
         const views = await mapPromises(viewsNames, _.bind(this._retrieveSingleViewData, this, schemaOid, schemaName));
 
-        return { views, tables };
+        return { views, tables, modelDefinitions: getJsonSchema(userDefinedTypes) };
     },
 
     async retrieveFunctionsWithProcedures(schemaName) {
@@ -154,7 +161,23 @@ module.exports = {
         return { functions: userDefinedFunctions, procedures: userDefinedProcedures };
     },
 
-    async _retrieveSingleTableData(recordSamplingSettings, schemaOid, schemaName, tableName) {
+    async _retrieveUserDefinedTypes(schemaName) {
+        const userDefinedTypes = await db.queryTolerant(queryConstants.GET_USER_DEFINED_TYPES, [schemaName]);
+        const udtsWithColumns = await mapPromises(userDefinedTypes, async typeData => {
+            if (isTypeComposite(typeData)) {
+                return {
+                    ...typeData,
+                    columns: await db.queryTolerant(queryConstants.GET_COMPOSITE_TYPE_COLUMNS, [typeData.pg_class_oid]),
+                };
+            }
+
+            return typeData;
+        });
+
+        return getUserDefinedTypes(udtsWithColumns);
+    },
+
+    async _retrieveSingleTableData(recordSamplingSettings, schemaOid, schemaName, userDefinedTypes, tableName) {
         const tableLevelData = await db.queryTolerant(
             queryConstants.GET_TABLE_LEVEL_DATA,
             [tableName, schemaOid],
@@ -189,7 +212,7 @@ module.exports = {
 
         const entityLevel = clearEmptyPropertiesInObject(tableData);
 
-        let targetAttributes = tableColumns.map(mapColumnData);
+        let targetAttributes = tableColumns.map(mapColumnData(userDefinedTypes));
 
         const hasJsonTypes = checkHaveJsonTypes(targetAttributes);
         let documents = [];
