@@ -185,11 +185,13 @@ const getParsedJsonValueType = value => {
         return 'array';
     }
 
-    if (typeof value === 'object') {
+    const type = typeof value;
+
+    if (type === 'undefined') {
         return 'object';
     }
 
-    return '';
+    return type;
 };
 
 module.exports = {
