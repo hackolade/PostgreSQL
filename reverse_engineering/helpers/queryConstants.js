@@ -215,6 +215,9 @@ const queryConstants = {
                                                           AND pg_attrdef.adnum = pg_attribute.attnum)
         LEFT JOIN pg_catalog.pg_collation AS pg_collation ON (pg_collation.oid = pg_attribute.attcollation)
         WHERE pg_attribute.attrelid = $1`,
+    GET_DB_NAME: 'SELECT current_database();',
+    GET_DB_ENCODING: 'SHOW SERVER_ENCODING;',
+    GET_DB_COLLATE_NAME: 'SELECT default_collate_name FROM information_schema.character_sets;'
 };
 
 const getQueryName = query => {

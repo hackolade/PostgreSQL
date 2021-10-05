@@ -112,6 +112,21 @@ module.exports = {
             });
     },
 
+    async getDbLevelData() {
+        logger.progress('Get database data');
+
+        const database_name = (await db.queryTolerant(queryConstants.GET_DB_NAME, [], true))?.current_database;
+        const encoding = (await db.queryTolerant(queryConstants.GET_DB_ENCODING, [], true))?.server_encoding;
+        const LC_COLLATE = (await db.queryTolerant(queryConstants.GET_DB_COLLATE_NAME, [], true))?.default_collate_name;
+
+        return {
+            database_name,
+            encoding,
+            LC_COLLATE,
+            LC_CTYPE: LC_COLLATE,
+        };
+    },
+
     async retrieveEntitiesData(schemaName, entitiesNames, recordSamplingSettings) {
         const userDefinedTypes = await this._retrieveUserDefinedTypes(schemaName);
         const schemaOidResult = await db.queryTolerant(queryConstants.GET_NAMESPACE_OID, [schemaName], true);

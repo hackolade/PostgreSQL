@@ -155,15 +155,13 @@ making sure that you maintain a proper JSON format.
 			{
 				"propertyName": "Collation",
 				"propertyKeyword": "LC_COLLATE",
-				"propertyTooltip": "Select from list of options",
-				"defaultValue": "English_United States.1252",
+				"propertyTooltip": "Collation order (LC_COLLATE) to use in the new database. ",
 				"propertyType": "text"
 			},
 			{
 				"propertyName": "Character type",
 				"propertyKeyword": "LC_CTYPE",
-				"propertyTooltip": "Select from list of options",
-				"defaultValue": "English_United States.1252",
+				"propertyTooltip": "Character classification (LC_CTYPE) to use in the new database. ",
 				"propertyType": "text"
 			},
 			{

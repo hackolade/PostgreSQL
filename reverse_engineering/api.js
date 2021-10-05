@@ -92,6 +92,8 @@ module.exports = {
             const collections = data.collectionData.collections;
             const schemasNames = data.collectionData.dataBaseNames;
 
+            const modelData = await postgresService.getDbLevelData();
+
             const { packages, relationships } = await Promise.all(
                 schemasNames.map(async schemaName => {
                     const { tables, views, modelDefinitions } = await postgresService.retrieveEntitiesData(
@@ -154,7 +156,7 @@ module.exports = {
                 return { packages, relationships };
             });
 
-            callback(null, packages, null, relationships);
+            callback(null, packages, modelData, relationships);
         } catch (error) {
             logger.log('error', prepareError(error), 'Retrieve tables data');
             callback(prepareError(error));
