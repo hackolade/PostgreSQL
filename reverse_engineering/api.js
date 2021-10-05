@@ -101,6 +101,8 @@ module.exports = {
                     );
                     const { functions, procedures } = await postgresService.retrieveFunctionsWithProcedures(schemaName);
 
+                    postgresLogger.progress('Schema reversed successfully', schemaName);
+
                     return {
                         schemaName,
                         tables,

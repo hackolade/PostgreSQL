@@ -130,6 +130,8 @@ module.exports = {
     },
 
     async retrieveFunctionsWithProcedures(schemaName) {
+        logger.progress('Get Functions and Procedures', schemaName);
+
         const schemaOid = (await db.queryTolerant(queryConstants.GET_NAMESPACE_OID, [schemaName], true))?.oid;
 
         const functionsWithProcedures = await db.queryTolerant(queryConstants.GET_FUNCTIONS_WITH_PROCEDURES, [
@@ -162,6 +164,8 @@ module.exports = {
     },
 
     async _retrieveUserDefinedTypes(schemaName) {
+        logger.progress('Get User-Defined Types', schemaName);
+
         const userDefinedTypes = await db.queryTolerant(queryConstants.GET_USER_DEFINED_TYPES, [schemaName]);
         const udtsWithColumns = await mapPromises(userDefinedTypes, async typeData => {
             if (isTypeComposite(typeData)) {
@@ -178,6 +182,8 @@ module.exports = {
     },
 
     async _retrieveSingleTableData(recordSamplingSettings, schemaOid, schemaName, userDefinedTypes, tableName) {
+        logger.progress('Get table data', schemaName, tableName);
+
         const tableLevelData = await db.queryTolerant(
             queryConstants.GET_TABLE_LEVEL_DATA,
             [tableName, schemaOid],
@@ -232,6 +238,8 @@ module.exports = {
     },
 
     async _getTableColumns(tableName, schemaName, tableOid) {
+        logger.progress('Get columns', schemaName, tableName);
+
         const tableColumns = await db.query(queryConstants.GET_TABLE_COLUMNS, [tableName, schemaName]);
         const tableColumnsAdditionalData = await db.queryTolerant(queryConstants.GET_TABLE_COLUMNS_ADDITIONAL_DATA, [
             tableOid,
@@ -246,6 +254,8 @@ module.exports = {
     },
 
     async _getDocuments(schemaName, tableName, recordSamplingSettings) {
+        logger.progress('Sampling table', schemaName, tableName);
+
         const fullTableName = `${schemaName}.${tableName}`;
         const quantity =
             (await db.queryTolerant(queryConstants.GET_ROWS_COUNT(fullTableName), [], true))?.quantity || 0;
@@ -255,6 +265,8 @@ module.exports = {
     },
 
     async _retrieveSingleViewData(schemaOid, schemaName, viewName) {
+        logger.progress('Get view data', schemaName, viewName);
+
         viewName = removeViewNameSuffix(viewName);
 
         const viewData = await db.query(queryConstants.GET_VIEW_DATA, [viewName, schemaName], true);
