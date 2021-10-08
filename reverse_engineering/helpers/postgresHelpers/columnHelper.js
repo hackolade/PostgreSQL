@@ -140,6 +140,13 @@ const mapType = (userDefinedTypes, type) => {
         case 'tsrange':
         case 'tstzrange':
             return { type: 'range', mode: type };
+        case 'int4multirange':
+        case 'int8multirange':
+        case 'nummultirange':
+        case 'tsmultirange':
+        case 'tstzmultirange':
+        case 'datemultirange':
+            return { type: 'multirange', mode: type };
         case 'uuid':
         case 'xml':
         case 'boolean':

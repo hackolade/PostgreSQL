@@ -2146,6 +2146,344 @@ making sure that you maintain a proper JSON format.
 				"template": "textarea"
 			}
 		],
+		"multirange": [
+			"name",
+			"code",
+			"schemaId",
+			"type",
+			{
+				"propertyName": "Subtype",
+				"propertyKeyword": "mode",
+				"propertyType": "select",
+				"options": [
+					"int4multirange",
+					"int8multirange",
+					"nummultirange",
+					"datemultirange",
+					"tsmultirange",
+					"tstzmultirange"
+				],
+				"data": "options",
+				"valueType": "string"
+			},
+			{
+				"propertyName": "Array type",
+				"propertyType": "group",
+				"propertyKeyword": "array_type",
+				"propertyTooltip": "Declaring the array number of dimensions is simply for documentation; it does not affect run-time behavior.",
+				"structure": [
+					{
+						"propertyName": "Size limit",
+						"propertyKeyword": "array_size_limit",
+						"propertyTooltip": "Declaring the array size is simply for documentation; it does not affect run-time behavior.",
+						"propertyType": "numeric",
+						"valueType": "number",
+						"minValue": 0,
+						"step": 1
+					}
+				]
+			},
+			{
+				"propertyName": "Not null",
+				"propertyKeyword": "required",
+				"enableForReference": true,
+				"propertyType": "checkbox"
+			},
+			"default",
+			{
+				"propertyName": "Comments",
+				"propertyKeyword": "description",
+				"propertyTooltip": "comments",
+				"addTimestampButton": false,
+				"propertyType": "details",
+				"template": "textarea"
+			},
+			{
+				"propertyName": "Primary key",
+				"propertyKeyword": "compositePrimaryKey",
+				"propertyType": "checkbox",
+				"dependency": {
+					"key": "compositePrimaryKey",
+					"value": true
+				},
+				"disabled": true
+			},
+			{
+				"propertyName": "Primary key",
+				"propertyKeyword": "primaryKey",
+				"enableForReference": true,
+				"propertyType": "checkbox",
+				"dependency": {
+					"type": "and",
+					"values": [
+						{
+							"type": "or",
+							"values": [
+								{
+									"key": "compositePrimaryKey",
+									"value": false
+								},
+								{
+									"key": "compositePrimaryKey",
+									"exist": false
+								}
+							]
+						},
+						{
+							"type": "or",
+							"values": [
+								{
+									"key": "compositeUniqueKey",
+									"value": false
+								},
+								{
+									"key": "compositeUniqueKey",
+									"exist": false
+								}
+							]
+						}
+					]
+				}
+			},
+			{
+				"propertyName": "Primary key options",
+				"propertyType": "block",
+				"propertyKeyword": "primaryKeyOptions",
+				"enableForReference": true,
+				"propertyTooltip": "Primary key options",
+				"dependency": {
+					"type": "and",
+					"values": [
+						{
+							"key": "primaryKey",
+							"value": true
+						},
+						{
+							"type": "or",
+							"values": [
+								{
+									"key": "compositePrimaryKey",
+									"value": false
+								},
+								{
+									"key": "compositePrimaryKey",
+									"exist": false
+								}
+							]
+						},
+						{
+							"type": "or",
+							"values": [
+								{
+									"key": "compositeUniqueKey",
+									"value": false
+								},
+								{
+									"key": "compositeUniqueKey",
+									"exist": false
+								}
+							]
+						}
+					]
+				},
+				"structure": [
+					{
+						"propertyName": "Constraint name",
+						"propertyKeyword": "constraintName",
+						"propertyTooltip": "",
+						"propertyType": "text"
+					},
+					{
+						"propertyName": "Category",
+						"propertyKeyword": "indexCategory",
+						"propertyTooltip": "",
+						"propertyType": "select",
+						"defaultValue": "",
+						"options": [
+							"",
+							"btree",
+							"hash",
+							"gist",
+							"spgist",
+							"gin",
+							"brin"
+						]
+					},
+					{
+						"propertyName": "Key order",
+						"propertyKeyword": "indexOrder",
+						"propertyTooltip": "",
+						"propertyType": "select",
+						"options": [
+							"",
+							"ASC",
+							"DESC"
+						]
+					},
+					{
+						"propertyName": "Comment",
+						"propertyKeyword": "indexComment",
+						"propertyTooltip": "comment",
+						"addTimestampButton": false,
+						"propertyType": "details",
+						"template": "textarea"
+					}
+				]
+			},
+			{
+				"propertyName": "Unique",
+				"propertyKeyword": "compositeUniqueKey",
+				"propertyType": "checkbox",
+				"dependency": {
+					"key": "compositeUniqueKey",
+					"value": true
+				},
+				"disabled": true
+			},
+			{
+				"propertyName": "Unique",
+				"propertyKeyword": "unique",
+				"enableForReference": true,
+				"propertyType": "checkbox",
+				"dependency": {
+					"type": "and",
+					"values": [
+						{
+							"type": "or",
+							"values": [
+								{
+									"key": "compositePrimaryKey",
+									"value": false
+								},
+								{
+									"key": "compositePrimaryKey",
+									"exist": false
+								}
+							]
+						},
+						{
+							"type": "or",
+							"values": [
+								{
+									"key": "compositeUniqueKey",
+									"value": false
+								},
+								{
+									"key": "compositeUniqueKey",
+									"exist": false
+								}
+							]
+						}
+					]
+				}
+			},
+			{
+				"propertyName": "Unique key options",
+				"propertyType": "group",
+				"propertyKeyword": "uniqueKeyOptions",
+				"enableForReference": true,
+				"propertyTooltip": "Unique key options",
+				"dependency": {
+					"type": "and",
+					"values": [
+						{
+							"key": "unique",
+							"value": true
+						},
+						{
+							"type": "or",
+							"values": [
+								{
+									"key": "compositePrimaryKey",
+									"value": false
+								},
+								{
+									"key": "compositePrimaryKey",
+									"exist": false
+								}
+							]
+						},
+						{
+							"type": "or",
+							"values": [
+								{
+									"key": "compositeUniqueKey",
+									"value": false
+								},
+								{
+									"key": "compositeUniqueKey",
+									"exist": false
+								}
+							]
+						}
+					]
+				},
+				"structure": [
+					{
+						"propertyName": "Constraint name",
+						"propertyKeyword": "constraintName",
+						"propertyType": "text"
+					},
+					{
+						"propertyName": "Category",
+						"propertyKeyword": "indexCategory",
+						"propertyTooltip": "",
+						"propertyType": "select",
+						"defaultValue": "",
+						"options": [
+							"",
+							"btree",
+							"hash",
+							"gist",
+							"spgist",
+							"gin",
+							"brin"
+						]
+					},
+					{
+						"propertyName": "Key order",
+						"propertyKeyword": "indexOrder",
+						"propertyTooltip": "",
+						"propertyType": "select",
+						"options": [
+							"",
+							"ASC",
+							"DESC"
+						]
+					},
+					{
+						"propertyName": "Comment",
+						"propertyKeyword": "indexComment",
+						"propertyTooltip": "comment",
+						"addTimestampButton": false,
+						"propertyType": "details",
+						"template": "textarea"
+					}
+				]
+			},
+			"foreignCollection",
+			"foreignField",
+			"relationshipType",
+			"unit",
+			"minimum",
+			"exclusiveMinimum",
+			"maximum",
+			"exclusiveMaximum",
+			"multipleOf",
+			"divisibleBy",
+			"pattern",
+			"enum",
+			"sample",
+			{
+				"propertyName": "Remarks",
+				"propertyKeyword": "comments",
+				"shouldValidate": false,
+				"propertyTooltip": "remarks",
+				"addTimestampButton": true,
+				"propertyType": "details",
+				"template": "textarea"
+			}
+		],
 		"___0": [],
 		"geometry": [
 			"name",
@@ -3447,7 +3785,7 @@ making sure that you maintain a proper JSON format.
 				"template": "textarea"
 			}
 		],
-		"range_type": [
+		"range_udt": [
 			"name",
 			"code",
 			"schemaId",

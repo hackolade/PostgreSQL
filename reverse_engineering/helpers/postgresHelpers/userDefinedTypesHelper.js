@@ -35,7 +35,7 @@ const getEnumType = typeData => {
 const getRangeType = typeData => {
     return {
         name: typeData.name,
-        type: 'range_type',
+        type: 'range_udt',
         rangeSubtype: typeData.range_subtype || '',
         operatorClass: typeData.range_opclass_name || '',
         collation: typeData.range_collation_name || '',

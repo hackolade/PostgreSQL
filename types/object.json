@@ -24,7 +24,8 @@
 				"xml",
 				"json",
 				"reference",
-				"multiple"
+				"multiple",
+				"multirange"
 			]
 		}
 	}

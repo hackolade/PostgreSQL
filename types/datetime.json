@@ -10,40 +10,43 @@
 		"primaryKey": false,
 		"default": "",
 		"enum": [],
-		"sample":"",
-		"comments":"",
-		"pattern":"",
 		"format": "",
 		"mode": "date",
 		"scale": 7
 	},
-	"descriptor": [{
-		"schema": {
-			"mode": "date"
+	"descriptor": [
+		{
+			"schema": {
+				"mode": "date"
+			},
+			"format": "YYYY-MM-DD"
 		},
-		"format": "YYYY-MM-DD"
-	}, {
-		"schema": {
-			"mode": "time"
+		{
+			"schema": {
+				"mode": "time"
+			},
+			"format": "hh:mm:ss"
 		},
-		"format": "hh:mm:ss"
-	}, {
-		"schema": {
-			"mode": "time",
-			"fractSecPrecision": 3
+		{
+			"schema": {
+				"mode": "time",
+				"fractSecPrecision": 3
+			},
+			"format": "hh:mm:ss.nnn"
 		},
-		"format": "hh:mm:ss.nnn"
-	}, {
-		"schema": {
-			"mode": "time",
-			"fractSecPrecision": 6
+		{
+			"schema": {
+				"mode": "time",
+				"fractSecPrecision": 6
+			},
+			"format": "hh:mm:ss.nnnnnn"
 		},
-		"format": "hh:mm:ss.nnnnnn"
-	}, {
-		"schema": {
-			"mode": "time",
-			"fractSecPrecision": 9
-		},
-		"format": "hh:mm:ss.nnnnnnnnn"
-	}]
+		{
+			"schema": {
+				"mode": "time",
+				"fractSecPrecision": 9
+			},
+			"format": "hh:mm:ss.nnnnnnnnn"
+		}
+	]
 }

@@ -1,5 +1,5 @@
 {
-    "name": "range_type",
+    "name": "range_udt",
     "erdAbbreviation": "<rng>",
     "dtdAbbreviation": "{123}",
     "parentType": "string",

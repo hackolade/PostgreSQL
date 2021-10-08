@@ -1,0 +1,37 @@
+{
+	"name": "multirange",
+	"erdAbbreviation": "<rng>",
+	"dtdAbbreviation": "{123}",
+	"parentType": "numeric",
+	"hiddenOnEntity": "view",
+	"defaultValues": {
+		"exclusiveMinimum": false,
+		"exclusiveMaximum": false,
+		"primaryKey": false,
+		"childRelationships": [],
+		"foreignField": [],
+		"enum": [],
+		"mode": "int4range"
+	},
+	"descriptor": [
+		{
+			"schema": {
+				"mode": "int4multirange"
+			},
+			"capacity": 4
+		},
+		{
+			"schema": {
+				"mode": "int8multirange"
+			},
+			"capacity": 8
+		},
+		{
+			"schema": {
+				"mode": "nummultirange"
+			},
+			"capacity": 12,
+			"mode": "decimal"
+		}
+	]
+}
