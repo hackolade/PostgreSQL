@@ -25,10 +25,13 @@ const queryConstants = {
             WHERE table_name = $1 AND table_schema = $2
             ORDER BY ordinal_position`,
     GET_TABLE_COLUMNS_ADDITIONAL_DATA: `
-        SELECT attname AS name, 
-                attndims AS number_of_array_dimensions
-            FROM pg_catalog.pg_attribute
-	        WHERE attrelid = $1;`,
+        SELECT pg_attribute.attname AS name,
+            pg_attribute.attndims AS number_of_array_dimensions,
+            pg_description.description
+        FROM pg_catalog.pg_attribute AS pg_attribute
+        LEFT JOIN pg_catalog.pg_description AS pg_description ON (pg_description.objsubid=pg_attribute.attnum
+                                                               AND pg_description.objoid = pg_attribute.attrelid)
+        WHERE pg_attribute.attrelid = $1;`,
     GET_DESCRIPTION_BY_OID: `SELECT obj_description($1)`,
     GET_ROWS_COUNT: fullTableName => `SELECT COUNT(*) AS quantity FROM ${fullTableName};`,
     GET_SAMPLED_DATA: fullTableName => `SELECT * FROM ${fullTableName} LIMIT $1;`,
@@ -217,7 +220,7 @@ const queryConstants = {
         WHERE pg_attribute.attrelid = $1`,
     GET_DB_NAME: 'SELECT current_database();',
     GET_DB_ENCODING: 'SHOW SERVER_ENCODING;',
-    GET_DB_COLLATE_NAME: 'SELECT default_collate_name FROM information_schema.character_sets;'
+    GET_DB_COLLATE_NAME: 'SELECT default_collate_name FROM information_schema.character_sets;',
 };
 
 const getQueryName = query => {
