@@ -9,7 +9,6 @@ const mapFunctionArgs = args => {
         argumentMode: arg.parameter_mode,
         argumentName: arg.parameter_name,
         argumentType: arg.data_type,
-        argumentTypeDefault: !Boolean(arg.parameter_default),
         defaultExpression: arg.parameter_default,
     }));
 };

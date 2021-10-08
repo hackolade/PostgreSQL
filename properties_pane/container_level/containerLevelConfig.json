@@ -192,21 +192,10 @@ making sure that you maintain a proper JSON format.
 								"propertyType": "text"
 							},
 							{
-								"propertyName": "Arg type default",
-								"propertyKeyword": "argumentTypeDefault",
-								"propertyType": "checkbox",
-								"defaultValue": true,
-								"propertyTooltip": "Uncheck if you need to specify another type"
-							},
-							{
-								"propertyName": "Arg type expression",
+								"propertyName": "Default expression",
 								"propertyKeyword": "defaultExpression",
 								"propertyTooltip": "The argument types can be base, composite, or domain types, or can reference the type of a table column.",
-								"propertyType": "text",
-								"dependency": {
-									"key": "argumentTypeDefault",
-									"value": false
-								}
+								"propertyType": "text"
 							}
 						]
 					},
@@ -222,8 +211,17 @@ making sure that you maintain a proper JSON format.
 						"propertyTooltip": "Any valid PostgreSQL data type",
 						"propertyType": "text",
 						"dependency": {
-							"key": "setOf",
-							"value": false
+							"type": "or",
+							"values": [
+								{
+									"key": "functionReturnsSetOf",
+									"value": false
+								},
+								{
+									"key": "functionReturnsSetOf",
+									"exists": false
+								}
+							]
 						}
 					},
 					{
@@ -253,7 +251,7 @@ making sure that you maintain a proper JSON format.
 						"propertyType": "checkbox",
 						"propertyTooltip": "Indicates that the function is a window function rather than a plain function. This is currently only useful for functions written in C.",
 						"dependency": {
-							"key": "lang_name",
+							"key": "functionLanguage",
 							"value": "c"
 						}
 					},
@@ -329,7 +327,7 @@ making sure that you maintain a proper JSON format.
 						"step": 1,
 						"propertyTooltip": "A positive number giving the estimated number of rows that the planner should expect the function to return.",
 						"dependency": {
-							"key": "setOf",
+							"key": "functionReturnsSetOf",
 							"value": true
 						}
 					},
@@ -433,21 +431,10 @@ making sure that you maintain a proper JSON format.
 								"propertyType": "text"
 							},
 							{
-								"propertyName": "Arg type default",
-								"propertyKeyword": "argumentTypeDefault",
-								"propertyType": "checkbox",
-								"defaultValue": true,
-								"propertyTooltip": "Uncheck if you need to specify another type"
-							},
-							{
 								"propertyName": "Arg type expression",
 								"propertyKeyword": "defaultExpression",
 								"propertyTooltip": "The argument types can be base, composite, or domain types, or can reference the type of a table column.",
-								"propertyType": "text",
-								"dependency": {
-									"key": "argumentTypeDefault",
-									"value": false
-								}
+								"propertyType": "text"
 							}
 						]
 					},
