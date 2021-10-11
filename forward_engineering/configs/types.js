@@ -1,182 +1,194 @@
 module.exports = {
-	TINYINT: {
-		capacity: 1,
-	},
-	SMALLINT: {
-		capacity: 2,
-	},
-	MEDIUMINT: {
-		capacity: 3,
-	},
-	INT: {
-		capacity: 4,
-	},
-	INTEGER: {
-		capacity: 4,
-	},
-	BIGINT: {
-		capacity: 8,
-	},
-	INT1: {
-		capacity: 1,
-	},
-	INT2: {
-		capacity: 2,
-	},
-	INT3: {
-		capacity: 3,
-	},
-	INT4: {
-		capacity: 4,
-	},
-	INT8: {
-		capacity: 8,
-	},
-	FLOAT: {
-		capacity: 4,
-		mode: 'floating',
-	},
-	DOUBLE: {
-		capacity: 8,
-		mode: 'floating',
-	},
-	'DOUBLE PRECISION': {
-		capacity: 8,
-		mode: 'floating',
-	},
-	REAL: {
-		capacity: 8,
-		mode: 'floating',
-	},
-	DECIMAL: {
-		capacity: 16,
-		mode: 'decimal',
-	},
-	DEC: {
-		capacity: 16,
-		mode: 'decimal',
-	},
-	NUMERIC: {
-		capacity: 16,
-		mode: 'decimal',
-	},
-	FIXED: {
-		capacity: 16,
-		mode: 'decimal',
-	},
-	NUMBER: {
-		capacity: 16,
-		mode: 'decimal',
-	},
-	CHAR: {
-		size: 1,
-	},
-	VARCHAR: {
-		mode: 'varying',
-	},
-	TINYTEXT: {
-		size: 255,
-		mode: 'text',
-	},
-	TEXT: {
-		size: 65535,
-		mode: 'text',
-	},
-	MEDIUMTEXT: {
-		size: 16777215,
-		mode: 'text',
-	},
-	LONGTEXT: {
-		size: 4294967295,
-		mode: 'text',
-	},
-	JSON: {
-		size: 4294967295,
-		mode: 'text',
-	},
-	BINARY: {
-		mode: 'binary',
-	},
-	'CHAR BYTE': {
-		mode: 'binary',
-	},
-	VARBINARY: {
-		size: 2147483649,
-		mode: 'binary',
-	},
-	TINYBLOB: {
-		size: 255,
-		mode: 'binary',
-	},
-	BLOB: {
-		size: 65535,
-		mode: 'binary',
-	},
-	MEDIUMBLOB: {
-		size: 16777215,
-		mode: 'binary',
-	},
-	LONGBLOB: {
-		size: 4294967295,
-		mode: 'binary',
-	},
-	BIT: {
-		mode: 'boolean',
-	},
-	DATE: {
-		format: 'YYYY-MM-DD',
-	},
-	TIME: {
-		format: 'hh:mm:ss.nnnnnn',
-	},
-	DATETIME: {
-		format: 'YYYY-MM-DD hh:mm:ss',
-	},
-	TIMESTAMP: {
-		format: 'YYYY-MM-DD hh:mm:ss',
-	},
-	YEAR: {
-		format: 'YYYY',
-	},
-	INET6: {
-		mode: 'ip',
-	},
-	ENUM: {
-		mode: 'enum',
-	},
-	SET: {
-		mode: 'enum',
-	},
-	GEOMETRY: {
-		format: 'euclidian',
-		mode: 'geospatial',
-	},
-	POINT: {
-		format: 'euclidian',
-		mode: 'geospatial',
-	},
-	LINESTRING: {
-		format: 'euclidian',
-		mode: 'geospatial',
-	},
-	POLYGON: {
-		format: 'euclidian',
-		mode: 'geospatial',
-	},
-	MULTIPOINT: {
-		format: 'euclidian',
-		mode: 'geospatial',
-	},
-	MULTILINESTRING: {
-		format: 'euclidian',
-		mode: 'geospatial',
-	},
-	MULTIPOLYGON: {
-		format: 'euclidian',
-		mode: 'geospatial',
-	},
-	GEOMETRYCOLLECTION: {
-		format: 'euclidian',
-		mode: 'geospatial',
-	},
+    char: {
+        size: 1,
+    },
+    varchar: {
+        mode: 'varying',
+    },
+    text: {
+        mode: 'text',
+    },
+    bit: {
+        size: 1,
+        mode: 'bit',
+    },
+    varbit: {
+        size: 1,
+        mode: 'varying',
+    },
+    smallint: {
+        capacity: 2,
+    },
+    integer: {
+        capacity: 4,
+    },
+    bigint: {
+        capacity: 8,
+    },
+    numeric: {
+        capacity: 12,
+        mode: 'decimal',
+    },
+    real: {
+        capacity: 4,
+        mode: 'floating',
+    },
+    'double precision': {
+        capacity: 8,
+        mode: 'floating',
+    },
+    smallserial: {
+        capacity: 2,
+    },
+    serial: {
+        capacity: 4,
+    },
+    bigserial: {
+        capacity: 8,
+    },
+    money: {
+        capacity: 8,
+        mode: 'decimal',
+    },
+    bytea: {
+        size: 4,
+        mode: 'binary',
+    },
+    date: {
+        format: 'YYYY-MM-DD',
+    },
+    time: {
+        format: 'hh:mm:ss.nnnnnn',
+    },
+    timestamp: {
+        format: 'YYYY-MM-DD hh:mm:ss',
+    },
+    interval: {},
+    boolean: {
+        mode: 'boolean',
+    },
+    int4range: {
+        capacity: 4,
+        mode: 'range',
+    },
+    int8range: {
+        capacity: 8,
+        mode: 'range',
+    },
+    numrange: {
+        capacity: 12,
+        mode: 'decimal',
+        mode: 'range',
+    },
+    daterange: {
+        format: 'YYYY-MM-DD',
+        mode: 'range',
+    },
+    tsrange: {
+        format: 'YYYY-MM-DD hh:mm:ss',
+        mode: 'range',
+    },
+    tstzrange: {
+        format: 'YYYY-MM-DD hh:mm:ss',
+        mode: 'range',
+    },
+
+    int4multirange: {
+        capacity: 4,
+        mode: 'multirange',
+    },
+    int8multirange: {
+        capacity: 12,
+        mode: 'decimal',
+        mode: 'multirange',
+    },
+    nummultirange: {
+        capacity: 12,
+        mode: 'decimal',
+        mode: 'multirange',
+    },
+    datemultirange: {
+        format: 'YYYY-MM-DD',
+        mode: 'multirange',
+    },
+    tsmultirange: {
+        format: 'YYYY-MM-DD hh:mm:ss',
+        mode: 'multirange',
+    },
+    tstzmultirange: {
+        format: 'YYYY-MM-DD hh:mm:ss',
+        mode: 'multirange',
+    },
+    point: {
+        format: 'euclidian',
+        mode: 'geospatial',
+    },
+    line: {
+        format: 'euclidian',
+        mode: 'geospatial',
+    },
+    lseg: {
+        format: 'euclidian',
+        mode: 'geospatial',
+    },
+    box: {
+        format: 'euclidian',
+        mode: 'geospatial',
+    },
+    path: {
+        format: 'euclidian',
+        mode: 'geospatial',
+    },
+    polygon: {
+        format: 'euclidian',
+        mode: 'geospatial',
+    },
+    circle: {
+        format: 'euclidian',
+        mode: 'geospatial',
+    },
+    inet: {
+        mode: 'ip',
+    },
+    cidr: {
+        mode: 'ip',
+    },
+    macaddr: {},
+    macaddr8: {},
+    uuid: {
+        mode: 'uuid',
+    },
+    oid: {
+        mode: 'uuid',
+    },
+    regclass: {},
+    regcollation: {},
+    regconfig: {},
+    regdictionary: {},
+    regnamespace: {},
+    regoper: {},
+    regoperator: {},
+    regproc: {},
+    regprocedure: {},
+    regrole: {},
+    regtype: {},
+    xml: {
+        mode: 'xml',
+    },
+    json: {
+        format: 'semi-structured',
+    },
+    jsonb: {
+        format: 'semi-structured',
+    },
+    composite: {
+        format: 'semi-structured',
+        mode: 'object',
+    },
+    enum: {
+        mode: 'enum',
+    },
+    range_udt: {
+        mode: 'range',
+    },
 };

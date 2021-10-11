@@ -3,498 +3,373 @@ const types = require('./configs/types');
 const templates = require('./configs/templates');
 
 module.exports = (baseProvider, options, app) => {
-	const {
-		tab,
-		commentIfDeactivated,
-		checkAllKeysDeactivated,
-		divideIntoActivatedAndDeactivated,
-		hasType,
-		wrap,
-		clean,
-	} = app.utils.general;
-	const assignTemplates = app.utils.assignTemplates;
-	const _ = app.require('lodash');
-	const { decorateDefault, decorateType, canBeNational, getSign } = require('./helpers/columnDefinitionHelper')(_, wrap);
-	const { getTableName, getTableOptions, getPartitions, getViewData, getCharacteristics } = require('./helpers/general')(_, wrap);
-	const {
-		generateConstraintsString,
-		foreignKeysToString,
-		foreignActiveKeysToString,
-		createKeyConstraint,
-	} = require('./helpers/constraintsHelper')({
-		_,
-		commentIfDeactivated,
-		checkAllKeysDeactivated,
-		divideIntoActivatedAndDeactivated,
-		assignTemplates,
-	});
-	const keyHelper = require('./helpers/keyHelper')(_, clean);
+    const { commentIfDeactivated, checkAllKeysDeactivated, divideIntoActivatedAndDeactivated, hasType, wrap, clean } =
+        app.utils.general;
+    const assignTemplates = app.utils.assignTemplates;
+    const _ = app.require('lodash');
+    const { decorateType, decorateDefault } = require('./helpers/columnDefinitionHelper')(_, wrap);
+    const { getFunctionArguments, wrapInQuotes, getNamePrefixedWithSchemaName, getColumnsList } =
+        require('./helpers/general')({
+            _,
+            divideIntoActivatedAndDeactivated,
+            commentIfDeactivated,
+        });
+    const { generateConstraintsString, foreignKeysToString, foreignActiveKeysToString, createKeyConstraint } =
+        require('./helpers/constraintsHelper')({
+            _,
+            commentIfDeactivated,
+            checkAllKeysDeactivated,
+            assignTemplates,
+            getColumnsList,
+            wrapInQuotes,
+        });
+    const keyHelper = require('./helpers/keyHelper')(_, clean);
 
-	return {
-		createDatabase({ databaseName, orReplace, ifNotExist, collation, characterSet, comments, udfs, procedures }) {
-			let dbOptions = '';
-			dbOptions += characterSet ? tab(`\nCHARACTER SET = '${characterSet}'`) : '';
-			dbOptions += collation ? tab(`\nCOLLATE = '${collation}'`) : '';
-			dbOptions += comments ? tab(`\nCOMMENT = '${comments}'`) : '';
+    const { getFunctionsScript } = require('./helpers/functionHelper')({
+        _,
+        templates,
+        assignTemplates,
+        getFunctionArguments,
+        getNamePrefixedWithSchemaName,
+    });
 
-			const databaseStatement = assignTemplates(templates.createDatabase, {
-				name: databaseName,
-				orReplace: orReplace && !ifNotExist ? ' OR REPLACE' : '',
-				ifNotExist: ifNotExist ? ' IF NOT EXISTS' : '',
-				dbOptions: dbOptions,
-			});
-			const udfStatements = udfs.map(udf => {
-				const characteristics = getCharacteristics(udf.characteristics);
-				let startDelimiter = udf.delimiter ? `DELIMITER ${udf.delimiter}\n` : '';
-				let endDelimiter = udf.delimiter ? `DELIMITER ;\n` : '';
+    const { getProceduresScript } = require('./helpers/procedureHelper')({
+        _,
+        templates,
+        assignTemplates,
+        getFunctionArguments,
+        getNamePrefixedWithSchemaName,
+    });
 
-				return (
-					startDelimiter +
-					assignTemplates(templates.createFunction, {
-						name: getTableName(udf.name, databaseName),
-						orReplace: udf.orReplace ? 'OR REPLACE ' : '',
-						ifNotExist: udf.ifNotExist ? 'IF NOT EXISTS ' : '',
-						aggregate: udf.aggregate ? 'AGGREGATE ' : '',
-						characteristics: characteristics.join('\n\t'),
-						type: udf.type,
-						parameters: udf.parameters,
-						body: udf.body,
-						delimiter: udf.delimiter || ';',
-					}) +
-					endDelimiter
-				);
-			});
-			const procStatements = procedures.map(procedure => {
-				const characteristics = getCharacteristics(procedure.characteristics);
-				let startDelimiter = procedure.delimiter ? `DELIMITER ${procedure.delimiter}\n` : '';
-				let endDelimiter = procedure.delimiter ? `DELIMITER ;\n` : '';
+    const { getTableTemporaryValue, getTableOptions } = require('./helpers/tableHelper')({
+        _,
+        checkAllKeysDeactivated,
+        getColumnsList,
+    });
 
-				return (
-					startDelimiter +
-					assignTemplates(templates.createProcedure, {
-						name: getTableName(procedure.name, databaseName),
-						orReplace: procedure.orReplace ? 'OR REPLACE ' : '',
-						parameters: procedure.parameters,
-						characteristics: characteristics.join('\n\t'),
-						body: procedure.body,
-						delimiter: procedure.delimiter || ';',
-					}) +
-					endDelimiter
-				);
-			});
+    const { getUserDefinedType } = require('./helpers/udtHelper')({
+        _,
+        commentIfDeactivated,
+        assignTemplates,
+        templates,
+        getNamePrefixedWithSchemaName,
+    });
 
-			return [databaseStatement, ...udfStatements, ...procStatements].join('\n');
-		},
+    return {
+        createDatabase({ databaseName, ifNotExist, comments, udfs, procedures }) {
+            const comment = assignTemplates(templates.comment, {
+                object: 'SCHEMA',
+                objectName: wrapInQuotes(databaseName),
+                comment: comments,
+            });
 
-		createTable(
-			{
-				name,
-				columns,
-				dbData,
-				temporary,
-				orReplace,
-				ifNotExist,
-				likeTableName,
-				selectStatement,
-				options,
-				partitioning,
-				checkConstraints,
-				foreignKeyConstraints,
-				keyConstraints,
-			},
-			isActivated,
-		) {
-			const tableName = getTableName(name, dbData.databaseName);
-			const orReplaceTable = orReplace ? 'OR REPLACE ' : '';
-			const temporaryTable = temporary ? 'TEMPORARY ' : '';
-			const ifNotExistTable = ifNotExist ? 'IF NOT EXISTS ' : '';
+            const schemaStatement = assignTemplates(templates.createSchema, {
+                name: wrapInQuotes(databaseName),
+                ifNotExist: ifNotExist ? ' IF NOT EXISTS' : '',
+                comment: comments ? comment : '',
+            });
 
-			if (likeTableName) {
-				return assignTemplates(templates.createLikeTable, {
-					name: tableName,
-					likeTableName: getTableName(likeTableName, dbData.databaseName),
-					orReplace: orReplaceTable,
-					temporary: temporaryTable,
-					ifNotExist: ifNotExistTable,
-				});
-			}
+            const createFunctionStatement = getFunctionsScript(databaseName, udfs);
+            const createProceduresStatement = getProceduresScript(databaseName, procedures);
 
-			const dividedKeysConstraints = divideIntoActivatedAndDeactivated(
-				keyConstraints.map(createKeyConstraint(templates, isActivated)),
-				key => key.statement,
-			);
-			const keyConstraintsString = generateConstraintsString(dividedKeysConstraints, isActivated);
+            return _.trim([schemaStatement, createFunctionStatement, createProceduresStatement].join('\n\n'));
+        },
 
-			const dividedForeignKeys = divideIntoActivatedAndDeactivated(foreignKeyConstraints, key => key.statement);
-			const foreignKeyConstraintsString = generateConstraintsString(dividedForeignKeys, isActivated);
+        createTable(
+            {
+                name,
+                columns,
+                checkConstraints,
+                foreignKeyConstraints,
+                dbData,
+                columnDefinitions,
+                relatedSchemas,
+                keyConstraints,
+                inherits,
+                description,
+                ifNotExist,
+                usingMethod,
+                on_commit,
+                partitioning,
+                storage_parameter,
+                table_tablespace_name,
+                temporary,
+                unlogged,
+                selectStatement,
+            },
+            isActivated
+        ) {
+            const comment = assignTemplates(templates.comment, {
+                object: 'TABLE',
+                objectName: getNamePrefixedWithSchemaName(name, dbData.databaseName),
+                comment: description,
+            });
 
-			const tableStatement = assignTemplates(templates.createTable, {
-				name: tableName,
-				column_definitions: columns.join(',\n\t'),
-				selectStatement: selectStatement ? ` ${selectStatement}` : '',
-				orReplace: orReplaceTable,
-				temporary: temporaryTable,
-				ifNotExist: ifNotExistTable,
-				options: getTableOptions(options),
-				partitions: getPartitions(partitioning),
-				checkConstraints: checkConstraints.length ? ',\n\t' + checkConstraints.join(',\n\t') : '',
-				foreignKeyConstraints: foreignKeyConstraintsString,
-				keyConstraints: keyConstraintsString,
-			});
+            const dividedKeysConstraints = divideIntoActivatedAndDeactivated(
+                keyConstraints.map(createKeyConstraint(templates, isActivated)),
+                key => key.statement
+            );
+            const keyConstraintsString = generateConstraintsString(dividedKeysConstraints, isActivated);
 
-			return tableStatement;
-		},
+            const dividedForeignKeys = divideIntoActivatedAndDeactivated(foreignKeyConstraints, key => key.statement);
+            const foreignKeyConstraintsString = generateConstraintsString(dividedForeignKeys, isActivated);
 
-		convertColumnDefinition(columnDefinition) {
-			const type = _.toUpper(columnDefinition.type);
-			const notNull = columnDefinition.nullable ? '' : ' NOT NULL';
-			const primaryKey = columnDefinition.primaryKey ? ' PRIMARY KEY' : '';
-			const unique = columnDefinition.unique ? ' UNIQUE' : '';
-			const zeroFill = columnDefinition.zerofill ? ' ZEROFILL' : '';
-			const autoIncrement = columnDefinition.autoIncrement ? ' AUTO_INCREMENT' : '';
-			const invisible = columnDefinition.invisible ? ' INVISIBLE' : '';
-			const national = columnDefinition.national && canBeNational(type) ? 'NATIONAL ' : '';
-			const comment = columnDefinition.comment ? ` COMMENT='${columnDefinition.comment}'` : '';
-			const charset = type !== 'JSON' && columnDefinition.charset ? ` CHARSET ${columnDefinition.charset}` : '';
-			const collate = type !== 'JSON' && columnDefinition.charset && columnDefinition.collation ? ` COLLATE ${columnDefinition.collation}` : '';
-			const defaultValue = !_.isUndefined(columnDefinition.default)
-				? ' DEFAULT ' + decorateDefault(type, columnDefinition.default)
-				: '';
-			const compressed = columnDefinition.compressionMethod
-				? ` COMPRESSED=${columnDefinition.compressionMethod}`
-				: '';
-			const signed = getSign(type, columnDefinition.signed);
+            const tableStatement = assignTemplates(templates.createTable, {
+                temporary: getTableTemporaryValue(temporary, unlogged),
+                ifNotExist,
+                name: getNamePrefixedWithSchemaName(name, dbData.databaseName),
+                columnDefinitions: '\t' + _.join(columns, ',\n\t'),
+                keyConstraints: keyConstraintsString,
+                checkConstraints: !_.isEmpty(checkConstraints) ? ',\n\t' + _.join(checkConstraints, ',\n\t') : '',
+                foreignKeyConstraints: foreignKeyConstraintsString,
+                options: getTableOptions({
+                    inherits,
+                    partitioning,
+                    usingMethod,
+                    on_commit,
+                    storage_parameter,
+                    table_tablespace_name,
+                    selectStatement,
+                }),
+                comment: description ? comment : '',
+            });
 
-			return commentIfDeactivated(
-				assignTemplates(templates.columnDefinition, {
-					name: columnDefinition.name,
-					type: decorateType(type, columnDefinition),
-					not_null: notNull,
-					primary_key: primaryKey,
-					unique_key: unique,
-					default: defaultValue,
-					autoIncrement,
-					compressed,
-					signed,
-					zeroFill,
-					invisible,
-					comment,
-					national,
-					charset,
-					collate,
-				}),
-				{
-					isActivated: columnDefinition.isActivated,
-				},
-			);
-		},
+            return tableStatement;
+        },
 
-		createIndex(tableName, index, dbData, isParentActivated = true) {
-			if (_.isEmpty(index.indxKey) || !index.indxName) {
-				return '';
-			}
+        convertColumnDefinition(columnDefinition) {
+            const notNull = columnDefinition.nullable ? '' : ' NOT NULL';
+            const primaryKey = columnDefinition.primaryKey ? ' PRIMARY KEY' : '';
+            const uniqueKey = columnDefinition.unique ? ' UNIQUE' : '';
+            const collation = columnDefinition.collationRule ? ` COLLATE "${columnDefinition.collationRule}"` : '';
+            const defaultValue = !_.isUndefined(columnDefinition.default)
+                ? ' DEFAULT ' + decorateDefault(columnDefinition.type, columnDefinition.default)
+                : '';
 
-			const allDeactivated = checkAllKeysDeactivated(index.indxKey || []);
-			const wholeStatementCommented = index.isActivated === false || !isParentActivated || allDeactivated;
-			const indexType = index.indexType ? `${_.toUpper(index.indexType)} ` : '';
-			const ifNotExist = index.ifNotExist ? 'IF NOT EXISTS ' : '';
-			const name = wrap(index.indxName || '', '`', '`');
-			const table = getTableName(tableName, dbData.databaseName);
-			const indexCategory = index.indexCategory ? ` USING ${index.indexCategory}` : '';
-			let indexOptions = [];
+            return commentIfDeactivated(
+                assignTemplates(templates.columnDefinition, {
+                    name: wrapInQuotes(columnDefinition.name),
+                    type: decorateType(columnDefinition.type, columnDefinition),
+                    notNull,
+                    primaryKey,
+                    uniqueKey,
+                    collation,
+                    defaultValue,
+                }),
+                {
+                    isActivated: columnDefinition.isActivated,
+                }
+            );
+        },
 
-			const dividedKeys = divideIntoActivatedAndDeactivated(
-				index.indxKey || [],
-				key => `\`${key.name}\`${key.type === 'DESC' ? ' DESC' : ''}`,
-			);
-			const commentedKeys = dividedKeys.deactivatedItems.length
-				? commentIfDeactivated(dividedKeys.deactivatedItems.join(', '), {
-						isActivated: wholeStatementCommented,
-						isPartOfLine: true,
-				  })
-				: '';
+        createIndex(tableName, index, dbData, isParentActivated = true) {
+            return '';
+        },
 
-			if (_.toLower(index.waitNoWait) === 'wait' && index.waitValue) {
-				indexOptions.push(`WAIT ${index.waitValue}`);
-			}
+        createCheckConstraint(checkConstraint) {
+            return assignTemplates(templates.checkConstraint, {
+                name: checkConstraint.name ? `CONSTRAINT ${wrapInQuotes(checkConstraint.name)}` : '',
+                expression: _.trim(checkConstraint.expression).replace(/^\(([\s\S]*)\)$/, '$1'),
+                noInherit: checkConstraint.noInherit ? ' NO INHERIT' : '',
+            });
+        },
 
-			if (_.toLower(index.waitNoWait) === 'nowait') {
-				indexOptions.push(`NOWAIT`);
-			}
+        createForeignKeyConstraint(
+            {
+                name,
+                foreignKey,
+                primaryTable,
+                primaryKey,
+                primaryTableActivated,
+                foreignTableActivated,
+                foreignSchemaName,
+                primarySchemaName,
+            },
+            dbData
+        ) {
+            const isAllPrimaryKeysDeactivated = checkAllKeysDeactivated(primaryKey);
+            const isAllForeignKeysDeactivated = checkAllKeysDeactivated(foreignKey);
+            const isActivated =
+                !isAllPrimaryKeysDeactivated &&
+                !isAllForeignKeysDeactivated &&
+                primaryTableActivated &&
+                foreignTableActivated;
 
-			if (index.indexComment) {
-				indexOptions.push(`COMMENT '${index.indexComment}'`);
-			}
+            const foreignKeyStatement = assignTemplates(templates.createForeignKeyConstraint, {
+                primaryTable: getNamePrefixedWithSchemaName(primaryTable, primarySchemaName || dbData.databaseName),
+                name: name ? `CONSTRAINT ${wrapInQuotes(name)}` : '',
+                foreignKey: isActivated ? foreignKeysToString(foreignKey) : foreignActiveKeysToString(foreignKey),
+                primaryKey: isActivated ? foreignKeysToString(primaryKey) : foreignActiveKeysToString(primaryKey),
+            });
 
-			if (index.indexLock) {
-				indexOptions.push(`LOCK ${index.indexLock}`);
-			} else if (index.indexAlgorithm) {
-				indexOptions.push(`ALGORITHM ${index.indexAlgorithm}`);
-			}
+            return {
+                statement: _.trim(foreignKeyStatement),
+                isActivated,
+            };
+        },
 
-			const indexStatement = assignTemplates(templates.index, {
-				keys:
-					dividedKeys.activatedItems.join(', ') +
-					(wholeStatementCommented && commentedKeys && dividedKeys.activatedItems.length
-						? ', ' + commentedKeys
-						: commentedKeys),
-				indexOptions: indexOptions.length ? '\n\t' + indexOptions.join('\n\t') : '',
-				name,
-				table,
-				indexType,
-				ifNotExist,
-				indexCategory,
-			});
+        createForeignKey(
+            {
+                name,
+                foreignTable,
+                foreignKey,
+                primaryTable,
+                primaryKey,
+                primaryTableActivated,
+                foreignTableActivated,
+                foreignSchemaName,
+                primarySchemaName,
+            },
+            dbData
+        ) {
+            const isAllPrimaryKeysDeactivated = checkAllKeysDeactivated(primaryKey);
+            const isAllForeignKeysDeactivated = checkAllKeysDeactivated(foreignKey);
+            const isActivated =
+                !isAllPrimaryKeysDeactivated &&
+                !isAllForeignKeysDeactivated &&
+                primaryTableActivated &&
+                foreignTableActivated;
 
-			if (wholeStatementCommented) {
-				return commentIfDeactivated(indexStatement, { isActivated: false });
-			} else {
-				return indexStatement;
-			}
-		},
+            const foreignKeyStatement = assignTemplates(templates.createForeignKey, {
+                primaryTable: getNamePrefixedWithSchemaName(primaryTable, primarySchemaName || dbData.databaseName),
+                foreignTable: getNamePrefixedWithSchemaName(foreignTable, foreignSchemaName || dbData.databaseName),
+                name: name ? wrapInQuotes(name) : '',
+                foreignKey: isActivated ? foreignKeysToString(foreignKey) : foreignActiveKeysToString(foreignKey),
+                primaryKey: isActivated ? foreignKeysToString(primaryKey) : foreignActiveKeysToString(primaryKey),
+            });
 
-		createCheckConstraint(checkConstraint) {
-			return assignTemplates(templates.checkConstraint, {
-				name: checkConstraint.name ? `${wrap(checkConstraint.name, '`', '`')} ` : '',
-				expression: _.trim(checkConstraint.expression).replace(/^\(([\s\S]*)\)$/, '$1'),
-			});
-		},
+            return {
+                statement: _.trim(foreignKeyStatement),
+                isActivated,
+            };
+        },
 
-		createForeignKeyConstraint(
-			{ name, foreignKey, primaryTable, primaryKey, primaryTableActivated, foreignTableActivated },
-			dbData,
-		) {
-			const isAllPrimaryKeysDeactivated = checkAllKeysDeactivated(primaryKey);
-			const isAllForeignKeysDeactivated = checkAllKeysDeactivated(foreignKey);
-			const isActivated =
-				!isAllPrimaryKeysDeactivated &&
-				!isAllForeignKeysDeactivated &&
-				primaryTableActivated &&
-				foreignTableActivated;
+        createView(viewData, dbData, isActivated) {
+            return '';
+        },
 
-			return {
-				statement: assignTemplates(templates.createForeignKeyConstraint, {
-					primaryTable: getTableName(primaryTable, dbData.databaseName),
-					name,
-					foreignKey: isActivated ? foreignKeysToString(foreignKey) : foreignActiveKeysToString(foreignKey),
-					primaryKey: isActivated ? foreignKeysToString(primaryKey) : foreignActiveKeysToString(primaryKey),
-				}),
-				isActivated,
-			};
-		},
+        createViewIndex(viewName, index, dbData, isParentActivated) {
+            return '';
+        },
 
-		createForeignKey(
-			{ name, foreignTable, foreignKey, primaryTable, primaryKey, primaryTableActivated, foreignTableActivated },
-			dbData,
-		) {
-			const isAllPrimaryKeysDeactivated = checkAllKeysDeactivated(primaryKey);
-			const isAllForeignKeysDeactivated = checkAllKeysDeactivated(foreignKey);
+        createUdt(udt, dbData) {
+            const columns = _.map(udt.properties, this.convertColumnDefinition);
 
-			return {
-				statement: assignTemplates(templates.createForeignKey, {
-					primaryTable: getTableName(primaryTable, dbData.databaseName),
-					foreignTable: getTableName(foreignTable, dbData.databaseName),
-					name,
-					foreignKey: foreignKeysToString(foreignKey),
-					primaryKey: foreignKeysToString(primaryKey),
-				}),
-				isActivated:
-					!isAllPrimaryKeysDeactivated &&
-					!isAllForeignKeysDeactivated &&
-					primaryTableActivated &&
-					foreignTableActivated,
-			};
-		},
+            return getUserDefinedType(udt, columns);
+        },
 
-		createView(viewData, dbData, isActivated) {
-			const allDeactivated = checkAllKeysDeactivated(viewData.keys || []);
-			const deactivatedWholeStatement = allDeactivated || !isActivated;
-			const { columns, tables } = getViewData(viewData.keys, dbData);
-			let columnsAsString = columns.map(column => column.statement).join(',\n\t\t');
+        getDefaultType(type) {
+            return defaultTypes[type];
+        },
 
-			if (!deactivatedWholeStatement) {
-				const dividedColumns = divideIntoActivatedAndDeactivated(columns, column => column.statement);
-				const deactivatedColumnsString = dividedColumns.deactivatedItems.length
-					? commentIfDeactivated(dividedColumns.deactivatedItems.join(',\n\t\t'), {
-							isActivated: false,
-							isPartOfLine: true,
-					  })
-					: '';
-				columnsAsString = dividedColumns.activatedItems.join(',\n\t\t') + deactivatedColumnsString;
-			}
+        getTypesDescriptors() {
+            return types;
+        },
 
-			const selectStatement = _.trim(viewData.selectStatement)
-				? _.trim(tab(viewData.selectStatement))
-				: assignTemplates(templates.viewSelectStatement, {
-						tableName: tables.join(', '),
-						keys: columnsAsString,
-				  });
+        hasType(type) {
+            return hasType(types, type);
+        },
 
-			const algorithm = viewData.algorithm && viewData.algorithm !== 'UNDEFINED' ? `ALGORITHM ${viewData.algorithm} ` : '';
+        hydrateColumn({ columnDefinition, jsonSchema, dbData }) {
+            const collationRule = _.includes(['char', 'varchar', 'text'], columnDefinition.type)
+                ? jsonSchema.collationRule
+                : '';
+            const timeTypes = ['time', 'timestamp'];
+            const timePrecision = _.includes(timeTypes, columnDefinition.type) ? jsonSchema.timePrecision : '';
+            const with_timezone = _.includes(timeTypes, columnDefinition.type) ? jsonSchema.with_timezone : '';
+            const intervalOptions = columnDefinition.type === 'interval' ? jsonSchema.intervalOptions : '';
 
-			return commentIfDeactivated(
-				assignTemplates(templates.createView, {
-					name: getTableName(viewData.name, dbData.databaseName),
-					orReplace: viewData.orReplace ? 'OR REPLACE ' : '',
-					ifNotExist: viewData.ifNotExist ? 'IF NOT EXISTS ' : '',
-					sqlSecurity: viewData.sqlSecurity ? `SQL SECURITY ${viewData.sqlSecurity} ` : '',
-					checkOption: viewData.checkOption ? `\nWITH ${viewData.checkOption} CHECK OPTION` : '',
-					selectStatement,
-					algorithm,
-				}),
-				{ isActivated: !deactivatedWholeStatement },
-			);
-		},
+            return {
+                name: columnDefinition.name,
+                type: columnDefinition.type,
+                primaryKey: keyHelper.isInlinePrimaryKey(jsonSchema),
+                unique: keyHelper.isInlineUnique(jsonSchema),
+                nullable: columnDefinition.nullable,
+                default: columnDefinition.default,
+                comment: jsonSchema.description,
+                isActivated: columnDefinition.isActivated,
+                scale: columnDefinition.scale,
+                precision: columnDefinition.precision,
+                length: columnDefinition.length,
+                enum: jsonSchema.enum,
+                array_type: jsonSchema.array_type,
+                unit: jsonSchema.unit,
+                rangeSubtype: jsonSchema.rangeSubtype,
+                operatorClass: jsonSchema.operatorClass,
+                collation: jsonSchema.collation,
+                canonicalFunction: jsonSchema.canonicalFunction,
+                subtypeDiffFunction: jsonSchema.subtypeDiffFunction,
+                multiRangeType: jsonSchema.multiRangeType,
+                databaseName: dbData.databaseName,
+                collationRule,
+                timePrecision,
+                with_timezone,
+                intervalOptions,
+            };
+        },
 
-		createViewIndex(viewName, index, dbData, isParentActivated) {
-			return '';
-		},
+        hydrateIndex(indexData, tableData) {
+            return indexData;
+        },
 
-		createUdt(udt, dbData) {
-			return '';
-		},
+        hydrateViewIndex(indexData) {
+            return {};
+        },
 
-		getDefaultType(type) {
-			return defaultTypes[type];
-		},
+        hydrateCheckConstraint(checkConstraint) {
+            return {
+                name: checkConstraint.chkConstrName,
+                expression: checkConstraint.constrExpression,
+                noInherit: checkConstraint.noInherit,
+            };
+        },
 
-		getTypesDescriptors() {
-			return types;
-		},
+        hydrateDatabase(containerData, data) {
+            return {
+                databaseName: containerData.name,
+                ifNotExist: containerData.ifNotExist,
+                comments: containerData.description,
+                udfs: data?.udfs || [],
+                procedures: data?.procedures || [],
+            };
+        },
 
-		hasType(type) {
-			return hasType(types, type);
-		},
+        hydrateTable({ tableData, entityData, jsonSchema }) {
+            const detailsTab = entityData[0];
+            const inheritsTable = _.get(tableData, `relatedSchemas[${detailsTab.inherits}]`, '');
+            const partitioning = _.first(detailsTab.partitioning) || {};
+            const compositePartitionKey = keyHelper.getKeys(partitioning.compositePartitionKey, jsonSchema);
 
-		hydrateColumn({ columnDefinition, jsonSchema, dbData }) {
-			return {
-				name: columnDefinition.name,
-				type: columnDefinition.type,
-				primaryKey: keyHelper.isInlinePrimaryKey(jsonSchema),
-				unique: keyHelper.isInlineUnique(jsonSchema),
-				nullable: columnDefinition.nullable,
-				default: columnDefinition.default,
-				comment: columnDefinition.description,
-				isActivated: columnDefinition.isActivated,
-				length: columnDefinition.enum,
-				scale: columnDefinition.scale,
-				precision: columnDefinition.precision,
-				length: columnDefinition.length,
-				national: jsonSchema.national,
-				autoIncrement: jsonSchema.autoincrement,
-				zerofill: jsonSchema.zerofill,
-				invisible: jsonSchema.invisible,
-				compressionMethod: jsonSchema.compressed ? jsonSchema.compression_method : '',
-				enum: jsonSchema.enum,
-				synonym: jsonSchema.synonym,
-				signed: jsonSchema.zerofill || jsonSchema.signed,
-				microSecPrecision: jsonSchema.microSecPrecision,
-				charset: jsonSchema.characterSet,
-				collation: jsonSchema.collation,
-			};
-		},
+            return {
+                ...tableData,
+                keyConstraints: keyHelper.getTableKeyConstraints(jsonSchema),
+                inherits: inheritsTable?.code || inheritsTable?.collectionName,
+                selectStatement: _.trim(detailsTab.selectStatement),
+                partitioning: _.assign({}, partitioning, { compositePartitionKey }),
+                ..._.pick(
+                    detailsTab,
+                    'temporary',
+                    'unlogged',
+                    'description',
+                    'ifNotExist',
+                    'usingMethod',
+                    'on_commit',
+                    'storage_parameter',
+                    'table_tablespace_name'
+                ),
+            };
+        },
 
-		hydrateIndex(indexData, tableData) {
-			return indexData;
-		},
+        hydrateViewColumn(data) {
+            return '';
+        },
 
-		hydrateViewIndex(indexData) {
-			return {};
-		},
+        hydrateView({ viewData, entityData, relatedSchemas, relatedContainers }) {
+            return '';
+        },
 
-		hydrateCheckConstraint(checkConstraint) {
-			return {
-				name: checkConstraint.chkConstrName,
-				expression: checkConstraint.constrExpression,
-			};
-		},
-
-		hydrateDatabase(containerData, data) {
-			return {
-				databaseName: containerData.name,
-				orReplace: containerData.orReplace,
-				ifNotExist: containerData.ifNotExist,
-				characterSet: containerData.characterSet,
-				collation: containerData.collation,
-				comments: containerData.description,
-				udfs: (data?.udfs || []).map(udf => ({
-					name: udf.name,
-					delimiter: udf.functionDelimiter,
-					orReplace: udf.functionOrReplace,
-					aggregate: udf.functionAggregate,
-					ifNotExist: udf.functionIfNotExist,
-					parameters: udf.functionArguments,
-					type: udf.functionReturnType,
-					characteristics: {
-						sqlSecurity: udf.functionSqlSecurity,
-						language: udf.functionLanguage,
-						contains: udf.functionContains,
-						deterministic: udf.functionDeterministic,
-						comment: udf.functionDescription,
-					},
-					body: udf.functionBody,
-				})),
-				procedures: (data?.procedures || []).map(procedure => ({
-					orReplace: procedure.orReplace,
-					delimiter: procedure.delimiter,
-					name: procedure.name,
-					parameters: procedure.inputArgs,
-					body: procedure.body,
-					characteristics: {
-						comment: procedure.comments,
-						contains: procedure.contains,
-						language: procedure.language,
-						deterministic: procedure.deterministic,
-						sqlSecurity: procedure.securityMode,
-					},
-				})),
-			};
-		},
-
-		hydrateTable({ tableData, entityData, jsonSchema }) {
-			const detailsTab = entityData[0];
-			const likeTable = _.get(tableData, `relatedSchemas[${detailsTab.like}]`, '');
-
-			return {
-				...tableData,
-				keyConstraints: keyHelper.getTableKeyConstraints({ jsonSchema }),
-				temporary: detailsTab.temporary,
-				orReplace: detailsTab.orReplace,
-				ifNotExist: !detailsTab.orReplace && detailsTab.ifNotExist,
-				likeTableName: likeTable?.code || likeTable?.collectionName,
-				selectStatement: _.trim(detailsTab.selectStatement),
-				options: detailsTab.tableOptions,
-				partitioning: detailsTab.partitioning,
-			};
-		},
-
-		hydrateViewColumn(data) {
-			return {
-				name: data.name,
-				tableName: data.entityName,
-				alias: data.alias,
-				isActivated: data.isActivated,
-			};
-		},
-
-		hydrateView({ viewData, entityData, relatedSchemas, relatedContainers }) {
-			const detailsTab = entityData[0];
-
-			return {
-				name: viewData.name,
-				tableName: viewData.tableName,
-				keys: viewData.keys,
-				orReplace: detailsTab.orReplace,
-				ifNotExist: detailsTab.ifNotExist,
-				selectStatement: detailsTab.selectStatement,
-				sqlSecurity: detailsTab.SQL_SECURITY,
-				algorithm: detailsTab.algorithm,
-				checkOption: detailsTab.withCheckOption ? detailsTab.checkTestingScope : '',
-			};
-		},
-
-		commentIfDeactivated(statement, data, isPartOfLine) {
-			return statement;
-		},
-	};
+        commentIfDeactivated(statement, data, isPartOfLine) {
+            return statement;
+        },
+    };
 };

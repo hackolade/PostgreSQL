@@ -1,12 +1,11 @@
 {
 	"type": "ddl",
 	"ddlType": "plugin",
-	"namePrefix": "MariaDB",
+	"namePrefix": "PostgreSQL",
 	"level": {
 		"container": true,
 		"entity": true,
 		"view": true
 	},
-	"resolvedDefinitions": true,
 	"applyScriptToInstance": true
 }
