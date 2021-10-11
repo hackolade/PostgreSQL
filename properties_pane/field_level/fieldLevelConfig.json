@@ -137,48 +137,6 @@ making sure that you maintain a proper JSON format.
 				"cleanDependency": true
 			},
 			{
-				"propertyName": "Synonym",
-				"propertyKeyword": "synonym",
-				"propertyTooltip": "Select from list of options",
-				"propertyType": "select",
-				"options": [
-					"",
-					"character"
-				],
-				"dependency": {
-					"key": "mode",
-					"value": "char"
-				}
-			},
-			{
-				"propertyName": "Synonym",
-				"propertyKeyword": "synonym",
-				"propertyTooltip": "Select from list of options",
-				"propertyType": "select",
-				"options": [
-					"",
-					"character varying"
-				],
-				"dependency": {
-					"key": "mode",
-					"value": "varchar"
-				}
-			},
-			{
-				"propertyName": "Synonym",
-				"propertyKeyword": "synonym",
-				"propertyTooltip": "Select from list of options",
-				"propertyType": "select",
-				"options": [
-					"",
-					"bit varying"
-				],
-				"dependency": {
-					"key": "mode",
-					"value": "varbit"
-				}
-			},
-			{
 				"propertyName": "Length",
 				"propertyKeyword": "length",
 				"propertyType": "numeric",
@@ -549,133 +507,6 @@ making sure that you maintain a proper JSON format.
 				],
 				"data": "options",
 				"valueType": "string"
-			},
-			{
-				"propertyName": "Synonym",
-				"propertyKeyword": "synonym",
-				"propertyTooltip": "Select from list of options",
-				"propertyType": "select",
-				"options": [
-					"",
-					"int8"
-				],
-				"dependency": {
-					"key": "mode",
-					"value": "bigint"
-				}
-			},
-			{
-				"propertyName": "Synonym",
-				"propertyKeyword": "synonym",
-				"propertyTooltip": "Select from list of options",
-				"propertyType": "select",
-				"options": [
-					"",
-					"serial8"
-				],
-				"dependency": {
-					"key": "mode",
-					"value": "bigserial"
-				}
-			},
-			{
-				"propertyName": "Synonym",
-				"propertyKeyword": "synonym",
-				"propertyTooltip": "Select from list of options",
-				"propertyType": "select",
-				"options": [
-					"",
-					"float8"
-				],
-				"dependency": {
-					"key": "mode",
-					"value": "double precision"
-				}
-			},
-			{
-				"propertyName": "Synonym",
-				"propertyKeyword": "synonym",
-				"propertyTooltip": "Select from list of options",
-				"propertyType": "select",
-				"options": [
-					"",
-					"int",
-					"int4"
-				],
-				"dependency": {
-					"key": "mode",
-					"value": "integer"
-				}
-			},
-			{
-				"propertyName": "Synonym",
-				"propertyKeyword": "synonym",
-				"propertyTooltip": "Select from list of options",
-				"propertyType": "select",
-				"options": [
-					"",
-					"decimal"
-				],
-				"dependency": {
-					"key": "mode",
-					"value": "numeric"
-				}
-			},
-			{
-				"propertyName": "Synonym",
-				"propertyKeyword": "synonym",
-				"propertyTooltip": "Select from list of options",
-				"propertyType": "select",
-				"options": [
-					"",
-					"float4"
-				],
-				"dependency": {
-					"key": "mode",
-					"value": "real"
-				}
-			},
-			{
-				"propertyName": "Synonym",
-				"propertyKeyword": "synonym",
-				"propertyTooltip": "Select from list of options",
-				"propertyType": "select",
-				"options": [
-					"",
-					"int2"
-				],
-				"dependency": {
-					"key": "mode",
-					"value": "smallint"
-				}
-			},
-			{
-				"propertyName": "Synonym",
-				"propertyKeyword": "synonym",
-				"propertyTooltip": "Select from list of options",
-				"propertyType": "select",
-				"options": [
-					"",
-					"serial2"
-				],
-				"dependency": {
-					"key": "mode",
-					"value": "smallserial"
-				}
-			},
-			{
-				"propertyName": "Synonym",
-				"propertyKeyword": "synonym",
-				"propertyTooltip": "Select from list of options",
-				"propertyType": "select",
-				"options": [
-					"",
-					"serial4"
-				],
-				"dependency": {
-					"key": "mode",
-					"value": "serial"
-				}
 			},
 			{
 				"propertyName": "Precision",
@@ -1359,34 +1190,6 @@ making sure that you maintain a proper JSON format.
 				"valueType": "string"
 			},
 			{
-				"propertyName": "Synonym",
-				"propertyKeyword": "synonym",
-				"propertyTooltip": "Select from list of options",
-				"propertyType": "select",
-				"options": [
-					"",
-					"timetz"
-				],
-				"dependency": {
-					"key": "mode",
-					"value": "time"
-				}
-			},
-			{
-				"propertyName": "Synonym",
-				"propertyKeyword": "synonym",
-				"propertyTooltip": "Select from list of options",
-				"propertyType": "select",
-				"options": [
-					"",
-					"timestamptz"
-				],
-				"dependency": {
-					"key": "mode",
-					"value": "timestamp"
-				}
-			},
-			{
 				"propertyName": "Precision",
 				"propertyKeyword": "timePrecision",
 				"propertyType": "numeric",
@@ -1755,16 +1558,6 @@ making sure that you maintain a proper JSON format.
 			"code",
 			"schemaId",
 			"type",
-			{
-				"propertyName": "Synonym",
-				"propertyKeyword": "synonym",
-				"propertyTooltip": "Select from list of options",
-				"propertyType": "select",
-				"options": [
-					"",
-					"bool"
-				]
-			},
 			{
 				"propertyName": "Comments",
 				"propertyKeyword": "description",

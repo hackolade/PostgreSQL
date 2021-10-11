@@ -16,7 +16,6 @@
 				"datetime",
 				"boolean",
 				"range",
-				"enum",
 				"geometry",
 				"inet",
 				"uuid",
