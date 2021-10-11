@@ -24,26 +24,5 @@
 		"enum": [],
 		"mode": "int4range",
 		"sample": ""
-	},
-	"descriptor": [
-		{
-			"schema": {
-				"mode": "int4range"
-			},
-			"capacity": 4
-		},
-		{
-			"schema": {
-				"mode": "int8range"
-			},
-			"capacity": 8
-		},
-		{
-			"schema": {
-				"mode": "numrange"
-			},
-			"capacity": 12,
-			"mode": "decimal"
-		}
-	]
+	}
 }

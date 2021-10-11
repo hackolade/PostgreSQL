@@ -225,8 +225,7 @@ making sure that you maintain a proper JSON format.
 						"propertyTooltip": "A percentage between 10 and 100. Complete packing (100) is the default.",
 						"minValue": 10,
 						"maxValue": 100,
-						"step": 1,
-						"defaultValue": 100
+						"step": 1
 					},
 					{
 						"propertyName": "Parallel workers",

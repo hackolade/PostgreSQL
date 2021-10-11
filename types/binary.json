@@ -7,22 +7,15 @@
 	"hiddenOnEntity": "view",
 	"defaultValues": {
 		"primaryKey": false,
-		"mode": "binary",
+		"mode": "bytea",
 		"length": 10
 	},
 	"descriptor": [
 		{
 			"schema": {
-				"mode": "binary"
+				"mode": "bytea"
 			},
-			"size": 255,
-			"mode": "binary"
-		},
-		{
-			"schema": {
-				"mode": "varbinary"
-			},
-			"size": 21844,
+			"size": 4,
 			"mode": "binary"
 		}
 	]

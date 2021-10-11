@@ -24,7 +24,10 @@
 				"json",
 				"reference",
 				"multiple",
-				"multirange"
+				"multirange",
+				"enum",
+				"composite",
+				"range_udt"
 			]
 		}
 	}

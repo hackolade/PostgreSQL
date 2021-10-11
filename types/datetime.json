@@ -29,24 +29,39 @@
 		},
 		{
 			"schema": {
-				"mode": "time",
-				"fractSecPrecision": 3
+				"mode": "time"
 			},
 			"format": "hh:mm:ss.nnn"
 		},
 		{
 			"schema": {
-				"mode": "time",
-				"fractSecPrecision": 6
+				"mode": "time"
 			},
 			"format": "hh:mm:ss.nnnnnn"
 		},
 		{
 			"schema": {
-				"mode": "time",
-				"fractSecPrecision": 9
+				"mode": "time"
 			},
 			"format": "hh:mm:ss.nnnnnnnnn"
+		},
+		{
+			"schema": {
+				"mode": "timestamp"
+			},
+			"format": "YYYY-MM-DD hh:mm:ss"
+		},
+		{
+			"schema": {
+				"mode": "timestamp"
+			},
+			"format": "YYYY-MM-DD hh:mm:ss.nnnZ"
+		},
+		{
+			"schema": {
+				"mode": "timestamp"
+			},
+			"format": "YYYY-MM-DD hh:mm:ss.nnnnnnZ"
 		}
 	]
 }
