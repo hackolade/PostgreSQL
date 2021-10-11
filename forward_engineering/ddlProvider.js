@@ -3,12 +3,19 @@ const types = require('./configs/types');
 const templates = require('./configs/templates');
 
 module.exports = (baseProvider, options, app) => {
-    const { commentIfDeactivated, checkAllKeysDeactivated, divideIntoActivatedAndDeactivated, hasType, wrap, clean } =
-        app.utils.general;
+    const {
+        tab,
+        commentIfDeactivated,
+        checkAllKeysDeactivated,
+        divideIntoActivatedAndDeactivated,
+        hasType,
+        wrap,
+        clean,
+    } = app.utils.general;
     const assignTemplates = app.utils.assignTemplates;
     const _ = app.require('lodash');
     const { decorateType, decorateDefault } = require('./helpers/columnDefinitionHelper')(_, wrap);
-    const { getFunctionArguments, wrapInQuotes, getNamePrefixedWithSchemaName, getColumnsList } =
+    const { getFunctionArguments, wrapInQuotes, getNamePrefixedWithSchemaName, getColumnsList, getViewData } =
         require('./helpers/general')({
             _,
             divideIntoActivatedAndDeactivated,
@@ -277,7 +284,68 @@ module.exports = (baseProvider, options, app) => {
         },
 
         createView(viewData, dbData, isActivated) {
-            return '';
+            const viewName = getNamePrefixedWithSchemaName(viewData.name, dbData.databaseName);
+
+            const comment = assignTemplates(templates.comment, {
+                object: 'VIEW',
+                objectName: viewName,
+                comment: viewData.comment,
+            });
+
+            const allDeactivated = checkAllKeysDeactivated(viewData.keys || []);
+            const deactivatedWholeStatement = allDeactivated || !isActivated;
+            const { columns, tables } = getViewData(viewData.keys, dbData);
+            let columnsAsString = columns.map(column => column.statement).join(',\n\t\t');
+
+            if (!deactivatedWholeStatement) {
+                const dividedColumns = divideIntoActivatedAndDeactivated(columns, column => column.statement);
+                const deactivatedColumnsString = dividedColumns.deactivatedItems.length
+                    ? commentIfDeactivated(dividedColumns.deactivatedItems.join(',\n\t\t'), {
+                          isActivated: false,
+                          isPartOfLine: true,
+                      })
+                    : '';
+                columnsAsString = dividedColumns.activatedItems.join(',\n\t\t') + deactivatedColumnsString;
+            }
+
+            const selectStatement = _.trim(viewData.selectStatement)
+                ? _.trim(tab(viewData.selectStatement))
+                : assignTemplates(templates.viewSelectStatement, {
+                      tableName: tables.join(', '),
+                      keys: columnsAsString,
+                  });
+
+            const check_option = viewData.viewOptions?.check_option
+                ? `check_option=${viewData.viewOptions?.check_option}`
+                : '';
+            const security_barrier = viewData.viewOptions?.security_barrier ? `security_barrier` : '';
+            const withOptions =
+                check_option || security_barrier
+                    ? `\n\tWITH (${_.compact([check_option, security_barrier]).join(',')})`
+                    : '';
+
+            const getCheckOption = viewData => {
+                if (viewData.withCheckOption && viewData.checkTestingScope) {
+                    return `\n\tWITH ${viewData.checkTestingScope} CHECK OPTION`;
+                } else if (viewData.withCheckOption) {
+                    return '\n\tWITH CHECK OPTION';
+                } else {
+                    return '';
+                }
+            };
+
+            return commentIfDeactivated(
+                assignTemplates(templates.createView, {
+                    name: viewName,
+                    orReplace: viewData.orReplace ? ' OR REPLACE' : '',
+                    temporary: viewData.temporary ? ' TEMPORARY' : '',
+                    checkOption: getCheckOption(viewData),
+                    comment: viewData.comment ? comment : '',
+                    withOptions,
+                    selectStatement,
+                }),
+                { isActivated: !deactivatedWholeStatement }
+            );
         },
 
         createViewIndex(viewName, index, dbData, isParentActivated) {
@@ -393,11 +461,29 @@ module.exports = (baseProvider, options, app) => {
         },
 
         hydrateViewColumn(data) {
-            return '';
+            return {
+                name: data.name,
+                tableName: data.entityName,
+                alias: data.alias,
+                isActivated: data.isActivated,
+            };
         },
 
         hydrateView({ viewData, entityData, relatedSchemas, relatedContainers }) {
-            return '';
+            const detailsTab = entityData[0];
+
+            return {
+                name: viewData.name,
+                keys: viewData.keys,
+                comment: detailsTab.description,
+                orReplace: detailsTab.orReplace,
+                temporary: detailsTab.temporary,
+                recursive: detailsTab.recursive,
+                viewOptions: detailsTab.viewOptions,
+                selectStatement: detailsTab.selectStatement,
+                withCheckOption: detailsTab.withCheckOption,
+                checkTestingScope: detailsTab.withCheckOption ? detailsTab.checkTestingScope : '',
+            };
         },
 
         commentIfDeactivated(statement, data, isPartOfLine) {

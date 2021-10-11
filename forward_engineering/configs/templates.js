@@ -23,8 +23,7 @@ module.exports = {
         'CREATE${unique} INDEX${concurrently}${ifNotExist} ${name}\n' +
         ' ON${only} ${tableName}${using}${keys}${options};\n',
 
-    createView:
-        'CREATE ${orReplace}${algorithm}${sqlSecurity}VIEW ${ifNotExist}${name} AS ${selectStatement}${checkOption};\n',
+    createView: 'CREATE${orReplace}${temporary} VIEW ${name}${withOptions}\nAS ${selectStatement}${checkOption};\n${comment}\n',
 
     viewSelectStatement: 'SELECT ${keys}\n\tFROM ${tableName}',
 
