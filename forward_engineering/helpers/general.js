@@ -19,8 +19,8 @@ module.exports = ({ _, divideIntoActivatedAndDeactivated, commentIfDeactivated }
 
     const columnMapToString = ({ name }) => wrapInQuotes(name);
 
-    const getColumnsList = (columns, isAllColumnsDeactivated, isParentActivated) => {
-        const dividedColumns = divideIntoActivatedAndDeactivated(columns, columnMapToString);
+    const getColumnsList = (columns, isAllColumnsDeactivated, isParentActivated, mapColumn = columnMapToString) => {
+        const dividedColumns = divideIntoActivatedAndDeactivated(columns, mapColumn);
         const deactivatedColumnsAsString = dividedColumns?.deactivatedItems?.length
             ? commentIfDeactivated(dividedColumns.deactivatedItems.join(', '), {
                   isActivated: false,
@@ -30,7 +30,7 @@ module.exports = ({ _, divideIntoActivatedAndDeactivated, commentIfDeactivated }
 
         return !isAllColumnsDeactivated && isParentActivated
             ? ' (' + dividedColumns.activatedItems.join(', ') + deactivatedColumnsAsString + ')'
-            : ' (' + columns.map(columnMapToString).join(', ') + ')';
+            : ' (' + columns.map(mapColumn).join(', ') + ')';
     };
 
     return {

@@ -55,6 +55,13 @@ module.exports = (baseProvider, options, app) => {
         getNamePrefixedWithSchemaName,
     });
 
+    const { getIndexKeys, getIndexOptions } = require('./helpers/indeexHelper')({
+        _,
+        wrapInQuotes,
+        checkAllKeysDeactivated,
+        getColumnsList,
+    });
+
     return {
         createDatabase({ databaseName, ifNotExist, comments, udfs, procedures }) {
             const comment = assignTemplates(templates.comment, {
@@ -163,7 +170,32 @@ module.exports = (baseProvider, options, app) => {
         },
 
         createIndex(tableName, index, dbData, isParentActivated = true) {
-            return '';
+            const name = wrapInQuotes(index.indxName);
+            const unique = index.unique && index.index_method === 'btree' ? ' UNIQUE' : '';
+            const concurrently = index.concurrently ? ' CONCURRENTLY' : '';
+            const ifNotExist = index.ifNotExist ? ' IF NOT EXISTS' : '';
+            const only = index.only ? ' ONLY' : '';
+            const using = index.index_method ? ` USING ${_.toUpper(index.index_method)}` : '';
+
+            const keys = getIndexKeys(index.columns, isParentActivated);
+            const options = getIndexOptions(index, isParentActivated);
+
+            return commentIfDeactivated(
+                assignTemplates(templates.index, {
+                    unique,
+                    concurrently,
+                    ifNotExist,
+                    name,
+                    only,
+                    using,
+                    keys,
+                    options,
+                    tableName: getNamePrefixedWithSchemaName(tableName, dbData.databaseName),
+                }),
+                {
+                    isActivated: index.isActivated,
+                }
+            );
         },
 
         createCheckConstraint(checkConstraint) {

@@ -20,8 +20,8 @@ module.exports = {
         'ALTER TABLE IF EXISTS ${foreignTable} ADD CONSTRAINT ${name} FOREIGN KEY (${foreignKey}) REFERENCES ${primaryTable}(${primaryKey});',
 
     index:
-        'CREATE ${indexType}INDEX ${ifNotExist}${name}${indexCategory}\n' +
-        '\tON ${table} ( ${keys} )${indexOptions};\n',
+        'CREATE${unique} INDEX${concurrently}${ifNotExist} ${name}\n' +
+        ' ON${only} ${tableName}${using}${keys}${options};\n',
 
     createView:
         'CREATE ${orReplace}${algorithm}${sqlSecurity}VIEW ${ifNotExist}${name} AS ${selectStatement}${checkOption};\n',
