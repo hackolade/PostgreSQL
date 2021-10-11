@@ -142,11 +142,28 @@ making sure that you maintain a proper JSON format.
 			},
 			{
 				"propertyName": "View option",
-				"propertyKeyword": "view_option",
-				"propertyType": "details",
+				"propertyKeyword": "viewOptions",
+				"propertyType": "block",
 				"propertyTooltip": "This clause specifies optional parameters for a view",
-				"template": "textarea",
-				"markdown": false
+				"structure": [
+					{
+						"propertyName": "Check testing scope",
+						"propertyKeyword": "check_option",
+						"propertyTooltip": "This option controls the behavior of automatically updatable views. When this option is specified, INSERT and UPDATE commands on the view will be checked to ensure that new rows satisfy the view-defining condition (that is, the new rows are checked to ensure that they are visible through the view). If they are not, the update will be rejected.",
+						"propertyType": "select",
+						"options": [
+							"",
+							"local",
+							"cascaded"
+						]
+					},
+					{
+						"propertyName": "Security barrier",
+						"propertyKeyword": "security_barrier",
+						"propertyType": "checkbox",
+						"propertyTooltip": "This should be used if the view is intended to provide row-level security."
+					}
+				]
 			},
 			{
 				"propertyName": "As query",

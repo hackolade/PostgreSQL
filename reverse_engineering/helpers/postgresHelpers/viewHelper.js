@@ -21,7 +21,7 @@ const prepareViewData = (viewData, viewOptions) => {
     const data = {
         withCheckOption: Boolean(viewData.check_option),
         checkTestingScope: getCheckTestingScope(viewData.check_option),
-        view_option: _.join(viewOptions?.view_options, ','),
+        viewOptions: _.fromPairs(_.map(viewOptions?.view_options, splitByEqualitySymbol)),
         temporary: viewOptions?.persistence === 't',
         recursive: isViewRecursive(viewData),
     };
@@ -40,6 +40,8 @@ const getCheckTestingScope = check_option => {
 const isViewRecursive = viewData => {
     return _.startsWith(_.trim(viewData.view_definition), 'WITH RECURSIVE');
 };
+
+const splitByEqualitySymbol = item => _.split(item, '=');
 
 module.exports = {
     setDependencies,
