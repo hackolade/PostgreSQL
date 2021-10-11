@@ -14,7 +14,6 @@ module.exports = (baseProvider, options, app) => {
     } = app.utils.general;
     const assignTemplates = app.utils.assignTemplates;
     const _ = app.require('lodash');
-    const { decorateType, decorateDefault } = require('./helpers/columnDefinitionHelper')(_, wrap);
     const { getFunctionArguments, wrapInQuotes, getNamePrefixedWithSchemaName, getColumnsList, getViewData } =
         require('./helpers/general')({
             _,
@@ -62,11 +61,20 @@ module.exports = (baseProvider, options, app) => {
         getNamePrefixedWithSchemaName,
     });
 
-    const { getIndexKeys, getIndexOptions } = require('./helpers/indeexHelper')({
+    const { getIndexKeys, getIndexOptions } = require('./helpers/indexHelper')({
         _,
         wrapInQuotes,
         checkAllKeysDeactivated,
         getColumnsList,
+    });
+
+    const { decorateType, decorateDefault, getColumnComments } = require('./helpers/columnDefinitionHelper')({
+        _,
+        wrap,
+        assignTemplates,
+        templates,
+        commentIfDeactivated,
+        getNamePrefixedWithSchemaName,
     });
 
     return {
@@ -113,9 +121,10 @@ module.exports = (baseProvider, options, app) => {
             },
             isActivated
         ) {
+            const tableName = getNamePrefixedWithSchemaName(name, dbData.databaseName);
             const comment = assignTemplates(templates.comment, {
                 object: 'TABLE',
-                objectName: getNamePrefixedWithSchemaName(name, dbData.databaseName),
+                objectName: tableName,
                 comment: description,
             });
 
@@ -128,10 +137,12 @@ module.exports = (baseProvider, options, app) => {
             const dividedForeignKeys = divideIntoActivatedAndDeactivated(foreignKeyConstraints, key => key.statement);
             const foreignKeyConstraintsString = generateConstraintsString(dividedForeignKeys, isActivated);
 
+            const columnDescriptions = '\n' + getColumnComments(tableName, columnDefinitions);
+
             const tableStatement = assignTemplates(templates.createTable, {
                 temporary: getTableTemporaryValue(temporary, unlogged),
                 ifNotExist,
-                name: getNamePrefixedWithSchemaName(name, dbData.databaseName),
+                name: tableName,
                 columnDefinitions: '\t' + _.join(columns, ',\n\t'),
                 keyConstraints: keyConstraintsString,
                 checkConstraints: !_.isEmpty(checkConstraints) ? ',\n\t' + _.join(checkConstraints, ',\n\t') : '',
@@ -146,6 +157,7 @@ module.exports = (baseProvider, options, app) => {
                     selectStatement,
                 }),
                 comment: description ? comment : '',
+                columnDescriptions,
             });
 
             return tableStatement;
