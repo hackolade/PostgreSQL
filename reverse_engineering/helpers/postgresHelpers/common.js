@@ -7,7 +7,7 @@ const setDependencies = app => {
 const clearEmptyPropertiesInObject = obj =>
     _.chain(obj)
         .toPairs()
-        .filter(([key, value]) => Boolean(value))
+        .reject(([key, value]) => _.isNil(value))
         .fromPairs()
         .value();
 

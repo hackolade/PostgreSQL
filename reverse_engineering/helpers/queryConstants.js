@@ -137,7 +137,8 @@ const queryConstants = {
     GET_VIEW_DATA: `SELECT * FROM information_schema.views WHERE table_name = $1 AND table_schema = $2;`,
     GET_VIEW_OPTIONS: `
         SELECT reloptions AS view_options,
-            relpersistence AS persistence 
+            relpersistence AS persistence,
+            obj_description(oid, 'pg_class') AS description
         FROM pg_catalog.pg_class 
         WHERE relname = $1 AND relnamespace = $2;`,
     GET_FUNCTIONS_WITH_PROCEDURES: `

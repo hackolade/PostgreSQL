@@ -19,11 +19,12 @@ const generateCreateViewScript = (viewName, viewData) => {
 
 const prepareViewData = (viewData, viewOptions) => {
     const data = {
-        withCheckOption: Boolean(viewData.check_option),
+        withCheckOption: viewData.check_option !== 'NONE' || _.isNil(viewData.check_option),
         checkTestingScope: getCheckTestingScope(viewData.check_option),
         viewOptions: _.fromPairs(_.map(viewOptions?.view_options, splitByEqualitySymbol)),
         temporary: viewOptions?.persistence === 't',
         recursive: isViewRecursive(viewData),
+        description: viewOptions?.description,
     };
 
     return clearEmptyPropertiesInObject(data);
