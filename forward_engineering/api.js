@@ -5,7 +5,12 @@ const applyToInstanceHelper = require('./applyToInstanceHelper');
 module.exports = {
     applyToInstance(connectionInfo, logger, callback, app) {
         logger.clear();
-        logger.log('info', connectionInfo, 'connectionInfo', connectionInfo.hiddenKeys);
+        logger.log(
+            'info',
+            app.require('lodash').omit(connectionInfo, 'script', 'containerData'),
+            'connectionInfo',
+            connectionInfo.hiddenKeys
+        );
 
         const postgresLogger = createLogger({
             title: 'Apply to instance',

@@ -27,22 +27,8 @@ module.exports = ({ _, wrap, assignTemplates, templates, commentIfDeactivated, g
         return type;
     };
 
-    const isNumeric = type =>
-        [
-            'smallint',
-            'integer',
-            'bigint',
-            'numeric',
-            'real',
-            'double precision',
-            'smallserial',
-            'serial',
-            'bigserial',
-            'money',
-        ].includes(type);
-
     const canHaveLength = type => ['char', 'varchar', 'bit', 'varbit'].includes(type);
-    const canHavePrecision = type => isNumeric(type);
+    const canHavePrecision = type => type === 'numeric';
     const canHaveTimePrecision = type => ['time', 'timestamp'].includes(type);
     const canHaveScale = type => type === 'numeric';
 
@@ -95,7 +81,6 @@ module.exports = ({ _, wrap, assignTemplates, templates, commentIfDeactivated, g
 
     return {
         decorateType,
-        isNumeric,
         decorateDefault,
         getColumnComments,
     };

@@ -16,6 +16,12 @@ module.exports = {
         size: 1,
         mode: 'varying',
     },
+    "tsvector": {
+        mode: 'text'
+    },
+    "tsquery": {
+        mode: 'text'
+    },
     smallint: {
         capacity: 2,
     },

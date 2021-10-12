@@ -34,10 +34,10 @@ module.exports = {
         '\tRETURNS ${returnType}\n' +
         '\tLANGUAGE ${language}\n' +
         '${properties}' +
-        'AS ${definition};\n',
+        'AS $BODY$\n${definition}\n$BODY$;\n',
 
     createProcedure:
-        'CREATE${orReplace} PROCEDURE ${name} (${parameters})\n' + '\tLANGUAGE ${language}\n' + 'AS ${body};\n',
+        'CREATE${orReplace} PROCEDURE ${name} (${parameters})\n' + '\tLANGUAGE ${language}\n' + 'AS $BODY$\n${body}\n$BODY$;\n',
 
     createCompositeType: 'CREATE TYPE ${name} AS (\n\t${columnDefinitions}\n);\n${comment}\n',
     createEnumType: 'CREATE TYPE ${name} AS ENUM (${values});\n${comment}\n',
