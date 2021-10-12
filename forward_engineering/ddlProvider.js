@@ -118,6 +118,7 @@ module.exports = (baseProvider, options, app) => {
             },
             isActivated
         ) {
+            const ifNotExistStr = ifNotExist ? ' IF NOT EXISTS' : '';
             const tableName = getNamePrefixedWithSchemaName(name, dbData.databaseName);
             const comment = assignTemplates(templates.comment, {
                 object: 'TABLE',
@@ -138,7 +139,7 @@ module.exports = (baseProvider, options, app) => {
 
             const tableStatement = assignTemplates(templates.createTable, {
                 temporary: getTableTemporaryValue(temporary, unlogged),
-                ifNotExist,
+                ifNotExist: ifNotExistStr,
                 name: tableName,
                 columnDefinitions: '\t' + _.join(columns, ',\n\t'),
                 keyConstraints: keyConstraintsString,

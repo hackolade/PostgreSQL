@@ -4,9 +4,9 @@ module.exports = {
     comment: "COMMENT ON ${object} ${objectName} IS '${comment}';\n",
 
     createTable:
-        'CREATE${temporary} TABLE${ifNotExist} ${name} (\n' +
+        '\nCREATE${temporary} TABLE${ifNotExist} ${name} (\n' +
         '${columnDefinitions}${keyConstraints}${checkConstraints}${foreignKeyConstraints}\n' +
-        ')${options};\n${comment}${columnDescriptions}\n',
+        ')${options};\n${comment}${columnDescriptions}',
 
     columnDefinition: '${name} ${type}${collation}${primaryKey}${uniqueKey}${defaultValue}${notNull}',
 
@@ -21,7 +21,7 @@ module.exports = {
 
     index:
         'CREATE${unique} INDEX${concurrently}${ifNotExist} ${name}\n' +
-        ' ON${only} ${tableName}${using}${keys}${options};\n',
+        ' ON${only} ${tableName}${using}${keys}${options};\n\n',
 
     createView:
         'CREATE${orReplace}${temporary} VIEW ${name}${withOptions}\nAS ${selectStatement}${checkOption};\n${comment}\n',
