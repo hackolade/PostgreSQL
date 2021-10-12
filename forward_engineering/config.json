@@ -7,5 +7,10 @@
 		"entity": true,
 		"view": true
 	},
-	"applyScriptToInstance": true
+	"applyScriptToInstance": true,
+	"combinedContainers": true,
+	"feLevelSelector": {
+		"container": true,
+		"model": true
+	}
 }

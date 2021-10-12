@@ -1,10 +1,17 @@
-module.exports = ({ _, commentIfDeactivated, assignTemplates, templates, getNamePrefixedWithSchemaName }) => {
+module.exports = ({
+    _,
+    commentIfDeactivated,
+    assignTemplates,
+    templates,
+    getNamePrefixedWithSchemaName,
+    wrapComment,
+}) => {
     const getPlainUdt = (udt, columns) => {
         const udtName = getNamePrefixedWithSchemaName(udt.name, udt.databaseName);
         const comment = assignTemplates(templates.comment, {
             object: 'TYPE',
             objectName: udtName,
-            comment: udt.comment,
+            comment: wrapComment(udt.comment),
         });
 
         switch (udt.type) {

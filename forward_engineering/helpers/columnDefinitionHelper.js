@@ -1,4 +1,12 @@
-module.exports = ({ _, wrap, assignTemplates, templates, commentIfDeactivated, getNamePrefixedWithSchemaName }) => {
+module.exports = ({
+    _,
+    wrap,
+    assignTemplates,
+    templates,
+    commentIfDeactivated,
+    getNamePrefixedWithSchemaName,
+    wrapComment,
+}) => {
     const addLength = (type, length) => {
         return `${type}(${length})`;
     };
@@ -70,7 +78,7 @@ module.exports = ({ _, wrap, assignTemplates, templates, commentIfDeactivated, g
                 const comment = assignTemplates(templates.comment, {
                     object: 'COLUMN',
                     objectName: getNamePrefixedWithSchemaName(columnData.name, tableName),
-                    comment: columnData.comment,
+                    comment: wrapComment(columnData.comment),
                 });
 
                 return commentIfDeactivated(comment, columnData);

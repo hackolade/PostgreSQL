@@ -1,3 +1,101 @@
+const POSTGRES_RESERVED_WORDS = [
+    'ALL',
+    'ANALYSE',
+    'ANALYZE',
+    'AND',
+    'ANY',
+    'ARRAY',
+    'ASC',
+    'ASYMMETRIC',
+    'AUTHORIZATION',
+    'BINARY',
+    'BOTH',
+    'CASE',
+    'CAST',
+    'CHECK',
+    'COLLATE',
+    'COLUMN',
+    'CONCURRENTLY',
+    'CONSTRAINT',
+    'CREATE',
+    'CROSS',
+    'CURRENT_CATALOG',
+    'CURRENT_DATE',
+    'CURRENT_ROLE',
+    'CURRENT_SCHEMA',
+    'CURRENT_TIME',
+    'CURRENT_TIMESTAMP',
+    'CURRENT_USER',
+    'DEFAULT',
+    'DEFERRABLE',
+    'DESC',
+    'DISTINCT',
+    'DO',
+    'ELSE',
+    'END',
+    'EXCEPT',
+    'FALSE',
+    'FOR',
+    'FOREIGN',
+    'FREEZE',
+    'FROM',
+    'FULL',
+    'GRANT',
+    'GROUP',
+    'HAVING',
+    'ILIKE',
+    'IN',
+    'INITIALLY',
+    'INTERSECT',
+    'INTO',
+    'IS',
+    'ISNULL',
+    'JOIN',
+    'LATERAL',
+    'LEADING',
+    'LEFT',
+    'LIKE',
+    'LIMIT',
+    'LOCALTIME',
+    'LOCALTIMESTAMP',
+    'NATURAL',
+    'NOT',
+    'NULL',
+    'OFFSET',
+    'ON',
+    'ONLY',
+    'OR',
+    'ORDER',
+    'OUTER',
+    'OVERLAPS',
+    'PLACING',
+    'PRIMARY',
+    'REFERENCES',
+    'RETURNING',
+    'RIGHT',
+    'SELECT',
+    'SESSION_USER',
+    'SIMILAR',
+    'SOME',
+    'SYMMETRIC',
+    'TABLE',
+    'TABLESAMPLE',
+    'THEN',
+    'TO',
+    'TRAILING',
+    'TRUE',
+    'UNION',
+    'UNIQUE',
+    'USER',
+    'USING',
+    'VARIADIC',
+    'VERBOSE',
+    'WHEN',
+    'WHERE',
+    'WINDOW',
+    'WITH',
+];
+
 module.exports = ({ _, divideIntoActivatedAndDeactivated, commentIfDeactivated }) => {
     const getFunctionArguments = functionArguments => {
         return _.map(functionArguments, arg => {
@@ -15,7 +113,8 @@ module.exports = ({ _, divideIntoActivatedAndDeactivated, commentIfDeactivated }
         return wrapInQuotes(name);
     };
 
-    const wrapInQuotes = name => (/\s/.test(name) ? `"${name}"` : name);
+    const wrapInQuotes = name =>
+        /\s/.test(name) || _.includes(POSTGRES_RESERVED_WORDS, _.toUpper(name)) ? `"${name}"` : name;
 
     const columnMapToString = ({ name }) => wrapInQuotes(name);
 
@@ -78,11 +177,20 @@ module.exports = ({ _, divideIntoActivatedAndDeactivated, commentIfDeactivated }
         );
     };
 
+    const wrapComment = comment => {
+        if (_.includes(comment, "'")) {
+            return `'${comment.replace("'", "''")}'`;
+        }
+
+        return `'${comment}'`;
+    };
+
     return {
         getFunctionArguments,
         getNamePrefixedWithSchemaName,
         wrapInQuotes,
         getColumnsList,
         getViewData,
+        wrapComment,
     };
 };

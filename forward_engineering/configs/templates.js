@@ -1,7 +1,7 @@
 module.exports = {
     createSchema: 'CREATE SCHEMA${ifNotExist} ${name};\nSET search_path TO ${name};\n${comment}\n',
 
-    comment: "COMMENT ON ${object} ${objectName} IS '${comment}';\n",
+    comment: 'COMMENT ON ${object} ${objectName} IS ${comment};\n',
 
     createTable:
         '\nCREATE${temporary} TABLE${ifNotExist} ${name} (\n' +
@@ -37,7 +37,9 @@ module.exports = {
         'AS $BODY$\n${definition}\n$BODY$;\n',
 
     createProcedure:
-        'CREATE${orReplace} PROCEDURE ${name} (${parameters})\n' + '\tLANGUAGE ${language}\n' + 'AS $BODY$\n${body}\n$BODY$;\n',
+        'CREATE${orReplace} PROCEDURE ${name} (${parameters})\n' +
+        '\tLANGUAGE ${language}\n' +
+        'AS $BODY$\n${body}\n$BODY$;\n',
 
     createCompositeType: 'CREATE TYPE ${name} AS (\n\t${columnDefinitions}\n);\n${comment}\n',
     createEnumType: 'CREATE TYPE ${name} AS ENUM (${values});\n${comment}\n',

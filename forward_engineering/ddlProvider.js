@@ -14,12 +14,18 @@ module.exports = (baseProvider, options, app) => {
     } = app.utils.general;
     const assignTemplates = app.utils.assignTemplates;
     const _ = app.require('lodash');
-    const { getFunctionArguments, wrapInQuotes, getNamePrefixedWithSchemaName, getColumnsList, getViewData } =
-        require('./helpers/general')({
-            _,
-            divideIntoActivatedAndDeactivated,
-            commentIfDeactivated,
-        });
+    const {
+        getFunctionArguments,
+        wrapInQuotes,
+        getNamePrefixedWithSchemaName,
+        getColumnsList,
+        getViewData,
+        wrapComment,
+    } = require('./helpers/general')({
+        _,
+        divideIntoActivatedAndDeactivated,
+        commentIfDeactivated,
+    });
     const { generateConstraintsString, foreignKeysToString, foreignActiveKeysToString, createKeyConstraint } =
         require('./helpers/constraintsHelper')({
             _,
@@ -59,6 +65,7 @@ module.exports = (baseProvider, options, app) => {
         assignTemplates,
         templates,
         getNamePrefixedWithSchemaName,
+        wrapComment,
     });
 
     const { getIndexKeys, getIndexOptions } = require('./helpers/indexHelper')({
@@ -75,6 +82,7 @@ module.exports = (baseProvider, options, app) => {
         templates,
         commentIfDeactivated,
         getNamePrefixedWithSchemaName,
+        wrapComment,
     });
 
     return {
@@ -82,7 +90,7 @@ module.exports = (baseProvider, options, app) => {
             const comment = assignTemplates(templates.comment, {
                 object: 'SCHEMA',
                 objectName: wrapInQuotes(databaseName),
-                comment: comments,
+                comment: wrapComment(comments),
             });
 
             const schemaStatement = assignTemplates(templates.createSchema, {
@@ -123,7 +131,7 @@ module.exports = (baseProvider, options, app) => {
             const comment = assignTemplates(templates.comment, {
                 object: 'TABLE',
                 objectName: tableName,
-                comment: description,
+                comment: wrapComment(description),
             });
 
             const dividedKeysConstraints = divideIntoActivatedAndDeactivated(
@@ -302,7 +310,7 @@ module.exports = (baseProvider, options, app) => {
             const comment = assignTemplates(templates.comment, {
                 object: 'VIEW',
                 objectName: viewName,
-                comment: viewData.comment,
+                comment: wrapComment(viewData.comment),
             });
 
             const allDeactivated = checkAllKeysDeactivated(viewData.keys || []);
