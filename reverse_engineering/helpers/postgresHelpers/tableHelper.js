@@ -79,10 +79,7 @@ const prepareTablePartition = (partitionResult, tableColumns) => {
     const key = isExpression ? 'partitioning_expression' : 'compositePartitionKey';
     const value = isExpression
         ? getPartitionExpression(partitionResult, tableColumns)
-        : _.map(
-              partitionResult.partition_attributes_positions,
-              getColumnNameByPosition(tableColumns)
-          );
+        : _.map(partitionResult.partition_attributes_positions, getColumnNameByPosition(tableColumns));
 
     return [
         {
@@ -126,7 +123,6 @@ const getPartitionExpression = (partitionResult, tableColumns) => {
         .join(',')
         .value();
 };
-
 
 const splitByEqualitySymbol = item => _.split(item, '=');
 
@@ -209,7 +205,7 @@ const getCheckConstraint = constraint => {
     };
 };
 
-const prepareTableIndexes = (tableIndexesResult) => {
+const prepareTableIndexes = tableIndexesResult => {
     return _.map(tableIndexesResult, indexData => {
         const index = {
             indxName: indexData.indexname,
@@ -217,10 +213,10 @@ const prepareTableIndexes = (tableIndexesResult) => {
             unique: indexData.index_unique ?? false,
             columns: mapIndexColumns(indexData),
             index_tablespace_name: indexData.tablespace_name,
-            index_storage_parameter: getIndexStorageParameters(indexData.storage_parameters)
+            index_storage_parameter: getIndexStorageParameters(indexData.storage_parameters),
         };
 
-        return clearEmptyPropertiesInObject(index)
+        return clearEmptyPropertiesInObject(index);
     });
 };
 
@@ -254,9 +250,9 @@ const getNullsOrder = nulls_first => {
     return nulls_first ? 'NULLS FIRST' : 'NULLS LAST';
 };
 
-const getIndexStorageParameters = (storageParameters) => {
-    if(!storageParameters) {
-        return null
+const getIndexStorageParameters = storageParameters => {
+    if (!storageParameters) {
+        return null;
     }
 
     const params = _.fromPairs(_.map(storageParameters, param => splitByEqualitySymbol(param)));
@@ -268,13 +264,13 @@ const getIndexStorageParameters = (storageParameters) => {
         fastupdate: params.fastupdate,
         gin_pending_list_limit: params.gin_pending_list_limit,
         pages_per_range: params.pages_per_range,
-        autosummarize: params.autosummarize
-    }
+        autosummarize: params.autosummarize,
+    };
 
-    return clearEmptyPropertiesInObject(data)
-}
+    return clearEmptyPropertiesInObject(data);
+};
 
-const prepareTableLevelData = (tableLevelData) => {
+const prepareTableLevelData = tableLevelData => {
     const temporary = tableLevelData?.relpersistence === 't';
     const unlogged = tableLevelData?.relpersistence === 'u';
     const storage_parameter = prepareStorageParameters(tableLevelData?.reloptions);
@@ -285,8 +281,8 @@ const prepareTableLevelData = (tableLevelData) => {
         unlogged,
         storage_parameter,
         table_tablespace_name,
-    }
-}
+    };
+};
 
 module.exports = {
     prepareStorageParameters,

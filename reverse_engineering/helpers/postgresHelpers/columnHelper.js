@@ -92,6 +92,8 @@ const mapType = (userDefinedTypes, type) => {
         case 'bit':
         case 'char':
         case 'text':
+        case 'tsvector':
+        case 'tsquery':
             return { type: 'char', mode: type };
         case 'bit varying':
             return { type: 'char', mode: 'varbit' };
@@ -167,6 +169,7 @@ const mapType = (userDefinedTypes, type) => {
         case 'regrole':
         case 'regtype':
             return { type: 'oid', mode: type };
+
         default: {
             if (_.some(userDefinedTypes, { name: type })) {
                 return { $ref: `#/definitions/${type}` };

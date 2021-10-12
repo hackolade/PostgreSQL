@@ -130,7 +130,9 @@ making sure that you maintain a proper JSON format.
 					"varchar",
 					"text",
 					"bit",
-					"varbit"
+					"varbit",
+					"tsvector",
+					"tsquery"
 				],
 				"data": "options",
 				"valueType": "string",
@@ -185,7 +187,7 @@ making sure that you maintain a proper JSON format.
 						"varchar",
 						"text"
 					]
-				}
+				},
 			},
 			{
 				"propertyName": "Not null",
@@ -514,7 +516,13 @@ making sure that you maintain a proper JSON format.
 				"propertyType": "numeric",
 				"valueType": "number",
 				"allowNegative": false,
-				"typeDecorator": true
+				"typeDecorator": true,
+				"dependency": {
+					"key": "mode",
+					"value": [
+						"numeric"
+					]
+				}
 			},
 			{
 				"propertyName": "Scale",

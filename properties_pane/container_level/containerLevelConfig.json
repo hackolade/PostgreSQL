@@ -323,7 +323,6 @@ making sure that you maintain a proper JSON format.
 						"propertyType": "numeric",
 						"valueType": "number",
 						"minValue": 0,
-						"defaultValue": 1000,
 						"step": 1,
 						"propertyTooltip": "A positive number giving the estimated number of rows that the planner should expect the function to return.",
 						"dependency": {
