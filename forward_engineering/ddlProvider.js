@@ -193,7 +193,10 @@ module.exports = (baseProvider, options, app) => {
             const only = index.only ? ' ONLY' : '';
             const using = index.index_method ? ` USING ${_.toUpper(index.index_method)}` : '';
 
-            const keys = getIndexKeys(index.columns, isParentActivated);
+            const keys = getIndexKeys(
+                index.index_method === 'btree' ? index.btree_columns : index.columns,
+                isParentActivated
+            );
             const options = getIndexOptions(index, isParentActivated);
 
             return commentIfDeactivated(

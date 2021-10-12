@@ -219,7 +219,7 @@ making sure that you maintain a proper JSON format.
 								},
 								{
 									"key": "functionReturnsSetOf",
-									"exists": false
+									"exist": false
 								}
 							]
 						}

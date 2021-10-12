@@ -822,6 +822,32 @@ making sure that you maintain a proper JSON format.
 						"template": "orderedList",
 						"propertyTooltip": "The name of a column of the table.",
 						"attributeList": {
+							"collation": {
+								"propertyType": "text",
+								"placeholder": "Collation",
+								"propertyTooltip": "The name of the collation to use for the index."
+							},
+							"opclass": {
+								"propertyType": "text",
+								"placeholder": "Opclass",
+								"propertyTooltip": "The name of an operator class."
+							}
+						},
+						"dependency": {
+							"type": "not",
+							"values": {
+								"key": "index_method",
+								"value": "btree"
+							}
+						}
+					},
+					{
+						"propertyName": "Columns",
+						"propertyKeyword": "btree_columns",
+						"propertyType": "fieldList",
+						"template": "orderedList",
+						"propertyTooltip": "The name of a column of the table.",
+						"attributeList": {
 							"sortOrder": {
 								"propertyType": "select",
 								"options": [
@@ -849,6 +875,10 @@ making sure that you maintain a proper JSON format.
 								"placeholder": "Opclass",
 								"propertyTooltip": "The name of an operator class."
 							}
+						},
+						"dependency": {
+							"key": "index_method",
+							"value": "btree"
 						}
 					},
 					{

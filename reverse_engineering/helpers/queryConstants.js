@@ -89,10 +89,10 @@ const queryConstants = {
                         WHEN opclass_t.opcname is not null THEN format('%I.%I',opclas_namespace.nspname,opclass_t.opcname)
                     END AS opclass,
                     CASE
-                        WHEN indexes.ord > 0 THEN pg_catalog.pg_index_column_has_property(indexes.indexrelid, indexes.key, 'asc')
+                        WHEN indexes.ord > 0 THEN pg_catalog.pg_index_column_has_property(indexes.indexrelid, indexes.ord, 'asc')
                     END AS ascending,
                     CASE
-                        WHEN indexes.ord > 0 THEN pg_catalog.pg_index_column_has_property(indexes.indexrelid, indexes.key, 'nulls_first')
+                        WHEN indexes.ord > 0 THEN pg_catalog.pg_index_column_has_property(indexes.indexrelid, indexes.ord, 'nulls_first')
                     END AS nulls_first,
                     pg_catalog.pg_get_indexdef(indexes.indexrelid, ord, false) AS expression
              FROM

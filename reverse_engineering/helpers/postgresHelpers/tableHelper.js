@@ -207,13 +207,17 @@ const getCheckConstraint = constraint => {
 
 const prepareTableIndexes = tableIndexesResult => {
     return _.map(tableIndexesResult, indexData => {
+        const columns = mapIndexColumns(indexData);
+
         const index = {
             indxName: indexData.indexname,
             index_method: indexData.index_method,
             unique: indexData.index_unique ?? false,
-            columns: mapIndexColumns(indexData),
             index_tablespace_name: indexData.tablespace_name,
             index_storage_parameter: getIndexStorageParameters(indexData.storage_parameters),
+            ...(indexData.index_method === 'btree'
+                ? { btree_columns: columns }
+                : { columns: _.map(columns, column => _.omit(column, 'sortOrder', 'nullsOrder')) }),
         };
 
         return clearEmptyPropertiesInObject(index);
@@ -227,15 +231,17 @@ const mapIndexColumns = indexData => {
                 return;
             }
 
-            const sortOrder = _.get(indexData, `ascending.${itemIndex}`, false) ? 'ASC' : 'DESC';
+            const sortOrder = _.get(indexData, `ascendings.${itemIndex}`, false) ? 'ASC' : 'DESC';
             const nullsOrder = getNullsOrder(_.get(indexData, `nulls_first.${itemIndex}`));
-            const opclass = _.get(indexData, `opclasses.${itemIndex}`);
+            const opclass = _.get(indexData, `opclasses.${itemIndex}`, '');
+            const collation = _.get(indexData, `collations.${itemIndex}`, '');
 
             return {
                 name: columnName,
                 sortOrder,
                 nullsOrder,
                 opclass,
+                collation,
             };
         })
         .compact()

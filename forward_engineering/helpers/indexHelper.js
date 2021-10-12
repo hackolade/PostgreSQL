@@ -1,10 +1,12 @@
 module.exports = ({ _, wrapInQuotes, checkAllKeysDeactivated, getColumnsList }) => {
     const mapIndexKey = ({ name, sortOrder, nullsOrder, collation, opclass }) => {
+        const sortOrderStr = sortOrder ? ` ${sortOrder}` : '';
         const nullsOrderStr = nullsOrder ? ` ${nullsOrder}` : '';
-        const collationStr = collation ? ` COLLATE "${collation}"` : '';
+        const collate = _.includes(collation, '"') ? collation : `"${collation}"`;
+        const collationStr = collation ? ` COLLATE ${collate}` : '';
         const opclassStr = opclass ? ` ${opclass}` : '';
 
-        return `${wrapInQuotes(name)}${collationStr}${opclassStr} ${sortOrder}${nullsOrderStr}`;
+        return `${wrapInQuotes(name)}${collationStr}${opclassStr}${sortOrderStr}${nullsOrderStr}`;
     };
 
     const getIndexKeys = (columns = [], isParentActivated) => {
