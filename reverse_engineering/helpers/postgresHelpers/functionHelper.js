@@ -8,9 +8,21 @@ const mapFunctionArgs = args => {
     return _.map(args, arg => ({
         argumentMode: arg.parameter_mode,
         argumentName: arg.parameter_name,
-        argumentType: arg.data_type,
+        argumentType: getArgType(arg.data_type, arg.udt_name),
         defaultExpression: arg.parameter_default,
     }));
+};
+
+const getArgType = (argType, argUdt) => {
+    if (argType === 'USER-DEFINED') {
+        return argUdt;
+    }
+
+    if(argType === 'ARRAY') {
+        return argUdt.slice(1) + '[]'
+    }
+
+    return argType;
 };
 
 const getVolatility = volatility => {

@@ -155,7 +155,8 @@ const queryConstants = {
         SELECT parameter_name,
             parameter_mode,
             parameter_default,
-            data_type
+            data_type,
+            udt_name
         FROM information_schema.parameters
         WHERE specific_name = $1
         ORDER BY ordinal_position;`,
