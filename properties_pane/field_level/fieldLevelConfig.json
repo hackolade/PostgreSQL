@@ -187,7 +187,7 @@ making sure that you maintain a proper JSON format.
 						"varchar",
 						"text"
 					]
-				},
+				}
 			},
 			{
 				"propertyName": "Not null",
