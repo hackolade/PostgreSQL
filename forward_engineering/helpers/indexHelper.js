@@ -19,7 +19,7 @@ module.exports = ({ _, wrapInQuotes, checkAllKeysDeactivated, getColumnsList }) 
             checkAllKeysDeactivated(index.include || []),
             isParentActivated
         );
-        const include = _.trim(includeKeys) ? ` INCLUDE ${includeKeys}` : '';
+        const include = index.include?.length ? ` INCLUDE ${_.trim(includeKeys)}` : '';
         const withOptionsString = getWithOptions(index);
         const withOptions = withOptionsString ? ` WITH (\n\t${withOptionsString})` : '';
         const tableSpace = index.index_tablespace_name ? ` TABLESPACE ${index.index_tablespace_name}` : '';
