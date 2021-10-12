@@ -83,6 +83,10 @@ module.exports = {
         return db.query(queryConstants.PING);
     },
 
+    applyScript(script) {
+        return db.query(script);
+    },
+
     async logVersion() {
         const versionRow = await db.queryTolerant(queryConstants.GET_VERSION, [], true);
         const version = versionRow?.version || 'Version not retrieved';

@@ -1,5 +1,6 @@
 'use strict';
 
+const { createLogger } = require('./helpers/loggerHelper');
 const postgresService = require('./helpers/postgresService');
 
 module.exports = {
@@ -164,22 +165,6 @@ module.exports = {
             await postgresService.disconnect();
         }
     },
-};
-
-const createLogger = ({ title, logger, hiddenKeys }) => {
-    return {
-        info(message, additionalData = {}) {
-            logger.log('info', { message, ...additionalData }, title, hiddenKeys);
-        },
-
-        progress(message, dbName = '', tableName = '') {
-            logger.progress({ message, containerName: dbName, entityName: tableName });
-        },
-
-        error(error) {
-            logger.log('error', prepareError(error), title);
-        },
-    };
 };
 
 const prepareError = error => {

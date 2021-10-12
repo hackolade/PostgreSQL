@@ -228,7 +228,7 @@ const getQueryName = query => {
     const queryEntry =
         Object.entries(queryConstants).find(([queryName, constantQuery]) => query === constantQuery) || [];
 
-    return queryEntry[0];
+    return queryEntry[0] || 'Custom query';
 };
 
 module.exports = {
