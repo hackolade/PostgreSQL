@@ -51,7 +51,7 @@ const mapFunctionData = (functionData, functionArgs, additionalData) => {
         name: functionData.name,
         functionDescription: additionalData?.description,
         functionArguments: mapFunctionArgs(functionArgs),
-        functionReturnsSetOf: additionalData?.returnsSet,
+        functionReturnsSetOf: additionalData?.returns_set,
         functionReturnType: functionData.return_data_type,
         functionLanguage: _.toLower(functionData.external_language),
         functionDefinition: functionData.routine_definition,

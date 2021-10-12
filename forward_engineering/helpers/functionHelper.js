@@ -7,7 +7,7 @@ module.exports = ({ _, templates, assignTemplates, getFunctionArguments, getName
                 name: getNamePrefixedWithSchemaName(udf.name, schemaName),
                 orReplace: orReplace,
                 parameters: getFunctionArguments(udf.functionArguments),
-                returnType: udf.functionReturnsSetOf ? 'SETOF' : udf.functionReturnType,
+                returnType: udf.functionReturnsSetOf ? `SETOF ${udf.functionReturnType}` : udf.functionReturnType,
                 language: udf.functionLanguage,
                 properties: getProperties(udf),
                 definition: udf.functionDefinition,

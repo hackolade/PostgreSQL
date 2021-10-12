@@ -159,7 +159,9 @@ module.exports = {
         const functionAdditionalData = await db.queryTolerant(queryConstants.GET_FUNCTIONS_WITH_PROCEDURES_ADDITIONAL, [
             schemaOid,
         ]);
-        const [functions, procedures] = _.partition(functionsWithProcedures, { routine_type: 'FUNCTION' });
+        const [functions, procedures] = _.partition(_.filter(functionsWithProcedures, 'routine_type'), {
+            routine_type: 'FUNCTION',
+        });
 
         const userDefinedFunctions = await mapPromises(functions, async functionData => {
             const functionArgs = await db.queryTolerant(queryConstants.GET_FUNCTIONS_WITH_PROCEDURES_ARGS, [

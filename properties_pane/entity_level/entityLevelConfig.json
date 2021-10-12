@@ -139,7 +139,8 @@ making sure that you maintain a proper JSON format.
 				"propertyName": "If not exists",
 				"propertyKeyword": "ifNotExist",
 				"propertyTooltip": "When the IF NOT EXISTS clause is used, MariaDB will return a warning instead of an error if the specified table already exists. Cannot be used together with the OR REPLACE clause.",
-				"propertyType": "checkbox"
+				"propertyType": "checkbox",
+				"defaultValue": true
 			},
 			{
 				"propertyName": "Inherits parent table",
