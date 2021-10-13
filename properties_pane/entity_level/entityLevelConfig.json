@@ -675,7 +675,9 @@ making sure that you maintain a proper JSON format.
 						"propertyName": "With storage parameters",
 						"propertyKeyword": "indexStorageParameters",
 						"propertyType": "details",
-						"template": "textarea"
+						"template": "textarea",
+						"markdown": false,
+						"addTimestampButton": false
 					},
 					{
 						"propertyName": "Index tablespace",
@@ -722,7 +724,9 @@ making sure that you maintain a proper JSON format.
 						"propertyName": "With storage parameters",
 						"propertyKeyword": "indexStorageParameters",
 						"propertyType": "details",
-						"template": "textarea"
+						"template": "textarea",
+						"markdown": false,
+						"addTimestampButton": false
 					},
 					{
 						"propertyName": "Index tablespace",

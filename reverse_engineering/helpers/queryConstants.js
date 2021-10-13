@@ -14,6 +14,14 @@ const queryConstants = {
             LEFT JOIN pg_catalog.pg_tablespace AS pt 
             ON pc.reltablespace = pt.oid
             WHERE pc.relname = $1 AND pc.relnamespace = $2;`,
+    GET_TABLE_TOAST_OPTIONS: `
+        SELECT reloptions AS toast_options
+        FROM pg_catalog.pg_class
+        WHERE oid =
+                (SELECT reltoastrelid
+                 FROM pg_catalog.pg_class
+                 WHERE relname=$1 AND relnamespace = $2
+                 LIMIT 1)`,
     GET_TABLE_PARTITION_DATA: `
         SELECT partstrat as partition_method,
 	            partattrs::int2[] as partition_attributes_positions,

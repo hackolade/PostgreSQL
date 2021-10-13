@@ -6,12 +6,13 @@ const setDependencies = app => {
     _ = app.require('lodash');
 };
 
-const prepareStorageParameters = reloptions => {
-    if (!reloptions) {
+const prepareStorageParameters = (reloptions, tableToastOptions) => {
+    if (!reloptions && !tableToastOptions) {
         return null;
     }
 
-    const options = _.fromPairs(_.map(reloptions, splitByEqualitySymbol));
+    const options = prepareOptions(reloptions);
+    const toastOptions = prepareOptions(tableToastOptions?.toast_options);
 
     const fillfactor = options.fillfactor;
     const parallel_workers = options.parallel_workers;
@@ -36,24 +37,24 @@ const prepareStorageParameters = reloptions => {
         log_autovacuum_min_duration: options.log_autovacuum_min_duration,
     };
     const user_catalog_table = options.user_catalog_table;
-    const toast_autovacuum_enabled = options['toast.autovacuum_enabled'];
+    const toast_autovacuum_enabled = toastOptions.autovacuum_enabled;
     const toast = {
         toast_tuple_target: options.toast_tuple_target,
-        toast_vacuum_index_cleanup: options['toast.vacuum_index_cleanup'],
-        toast_vacuum_truncate: options['toast.vacuum_truncate'],
-        toast_autovacuum_vacuum_threshold: options['toast.autovacuum_vacuum_threshold'],
-        toast_autovacuum_vacuum_scale_factor: options['toast.autovacuum_vacuum_scale_factor'],
-        toast_autovacuum_vacuum_insert_threshold: options['toast.autovacuum_vacuum_insert_threshold'],
-        toast_autovacuum_vacuum_insert_scale_factor: options['toast.autovacuum_vacuum_insert_scale_factor'],
-        toast_autovacuum_vacuum_cost_delay: options['toast.autovacuum_vacuum_cost_delay'],
-        toast_autovacuum_vacuum_cost_limit: options['toast.autovacuum_vacuum_cost_limit'],
-        toast_autovacuum_freeze_min_age: options['toast.autovacuum_freeze_min_age'],
-        toast_autovacuum_freeze_max_age: options['toast.autovacuum_freeze_max_age'],
-        toast_autovacuum_freeze_table_age: options['toast.autovacuum_freeze_table_age'],
-        toast_autovacuum_multixact_freeze_min_age: options['toast.autovacuum_multixact_freeze_min_age'],
-        toast_autovacuum_multixact_freeze_max_age: options['toast.autovacuum_multixact_freeze_max_age'],
-        toast_autovacuum_multixact_freeze_table_age: options['toast.autovacuum_multixact_freeze_table_age'],
-        toast_log_autovacuum_min_duration: options['toast.log_autovacuum_min_duration'],
+        toast_vacuum_index_cleanup: toastOptions.vacuum_index_cleanup,
+        toast_vacuum_truncate: toastOptions.vacuum_truncate,
+        toast_autovacuum_vacuum_threshold: toastOptions.autovacuum_vacuum_threshold,
+        toast_autovacuum_vacuum_scale_factor: toastOptions.autovacuum_vacuum_scale_factor,
+        toast_autovacuum_vacuum_insert_threshold: toastOptions.autovacuum_vacuum_insert_threshold,
+        toast_autovacuum_vacuum_insert_scale_factor: toastOptions.autovacuum_vacuum_insert_scale_factor,
+        toast_autovacuum_vacuum_cost_delay: toastOptions.autovacuum_vacuum_cost_delay,
+        toast_autovacuum_vacuum_cost_limit: toastOptions.autovacuum_vacuum_cost_limit,
+        toast_autovacuum_freeze_min_age: toastOptions.autovacuum_freeze_min_age,
+        toast_autovacuum_freeze_max_age: toastOptions.autovacuum_freeze_max_age,
+        toast_autovacuum_freeze_table_age: toastOptions.autovacuum_freeze_table_age,
+        toast_autovacuum_multixact_freeze_min_age: toastOptions.autovacuum_multixact_freeze_min_age,
+        toast_autovacuum_multixact_freeze_max_age: toastOptions.autovacuum_multixact_freeze_max_age,
+        toast_autovacuum_multixact_freeze_table_age: toastOptions.autovacuum_multixact_freeze_table_age,
+        toast_log_autovacuum_min_duration: toastOptions.log_autovacuum_min_duration,
     };
 
     const storage_parameter = {
@@ -277,10 +278,10 @@ const getIndexStorageParameters = storageParameters => {
     return clearEmptyPropertiesInObject(data);
 };
 
-const prepareTableLevelData = tableLevelData => {
+const prepareTableLevelData = (tableLevelData, tableToastOptions) => {
     const temporary = tableLevelData?.relpersistence === 't';
     const unlogged = tableLevelData?.relpersistence === 'u';
-    const storage_parameter = prepareStorageParameters(tableLevelData?.reloptions);
+    const storage_parameter = prepareStorageParameters(tableLevelData?.reloptions, tableToastOptions);
     const table_tablespace_name = tableLevelData?.spcname;
 
     return {
@@ -289,6 +290,41 @@ const prepareTableLevelData = tableLevelData => {
         storage_parameter,
         table_tablespace_name,
     };
+};
+
+const convertValueToType = value => {
+    switch (getTypeOfValue(value)) {
+        case 'number':
+        case 'boolean':
+            return JSON.parse(value);
+        case 'string':
+        default:
+            return value;
+    }
+};
+
+const getTypeOfValue = value => {
+    try {
+        const type = typeof JSON.parse(value);
+
+        if (type === 'object') {
+            return 'string';
+        }
+
+        return type;
+    } catch (error) {
+        return 'string';
+    }
+};
+
+const prepareOptions = options => {
+    return (
+        _.chain(options)
+            .map(splitByEqualitySymbol)
+            .map(([key, value]) => [key, convertValueToType(value)])
+            .fromPairs()
+            .value() || {}
+    );
 };
 
 module.exports = {

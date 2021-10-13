@@ -18,9 +18,9 @@ module.exports = ({ _, getColumnsList, checkAllKeysDeactivated }) => {
             { key: 'inherits', getValue: getBasicValue('INHERITS') },
             { key: 'partitioning', getValue: getPartitioning },
             { key: 'usingMethod', getValue: getBasicValue('USING') },
+            { key: 'storage_parameter', getValue: getStorageParameters },
             { key: 'on_commit', getValue: getOnCommit },
             { key: 'table_tablespace_name', getValue: getBasicValue('TABLESPACE') },
-            { key: 'storage_parameter', getValue: getStorageParameters },
             { key: 'selectStatement', getValue: getBasicValue('AS') },
         ]
             .map(config => wrap(config.getValue(tableData[config.key], tableData)))
@@ -61,7 +61,6 @@ module.exports = ({ _, getColumnsList, checkAllKeysDeactivated }) => {
 
     const toastKeys = [
         'toast_autovacuum_enabled',
-        'toast_tuple_target',
         'toast_vacuum_index_cleanup',
         'toast_vacuum_truncate',
         'toast_autovacuum_vacuum_threshold',

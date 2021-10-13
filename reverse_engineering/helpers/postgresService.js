@@ -212,6 +212,7 @@ module.exports = {
         );
         const tableOid = tableLevelData?.oid;
 
+        const tableToastOptions = await db.queryTolerant(queryConstants.GET_TABLE_TOAST_OPTIONS, [tableName, schemaOid], true);
         const partitionResult = await db.queryTolerant(queryConstants.GET_TABLE_PARTITION_DATA, [tableOid], true);
         const tableColumns = await this._getTableColumns(tableName, schemaName, tableOid);
         const descriptionResult = await db.queryTolerant(queryConstants.GET_DESCRIPTION_BY_OID, [tableOid], true);
@@ -221,7 +222,7 @@ module.exports = {
         const tableForeignKeys = await db.queryTolerant(queryConstants.GET_TABLE_FOREIGN_KEYS, [tableOid]);
 
         const partitioning = prepareTablePartition(partitionResult, tableColumns);
-        const tableLevelProperties = prepareTableLevelData(tableLevelData);
+        const tableLevelProperties = prepareTableLevelData(tableLevelData, tableToastOptions);
         const description = getDescriptionFromResult(descriptionResult);
         const inherits = inheritsResult?.parent_table_name ? [schemaName, inheritsResult?.parent_table_name] : null;
         const tableConstraint = prepareTableConstraints(tableConstraintsResult, tableColumns);
