@@ -208,14 +208,21 @@ const getCheckConstraint = constraint => {
 
 const prepareTableIndexes = tableIndexesResult => {
     return _.map(tableIndexesResult, indexData => {
-        const columns = mapIndexColumns(indexData);
+        const allColumns = mapIndexColumns(indexData);
+        const columns = _.slice(allColumns, 0, indexData.number_of_keys);
+        const include = _.chain(allColumns)
+            .slice(indexData.number_of_keys)
+            .map(column => _.pick(column, 'name'))
+            .value();
 
         const index = {
             indxName: indexData.indexname,
             index_method: indexData.index_method,
             unique: indexData.index_unique ?? false,
-            index_tablespace_name: indexData.tablespace_name,
+            index_tablespace_name: indexData.tablespace_name || '',
             index_storage_parameter: getIndexStorageParameters(indexData.storage_parameters),
+            where: indexData.where_expression || '',
+            include,
             columns:
                 indexData.index_method === 'btree'
                     ? columns

@@ -67,6 +67,8 @@ const queryConstants = {
         SELECT indexname,
                index_method,
                index_unique,
+               number_of_keys,
+               where_expression,
                array_agg(attname
                          ORDER BY ord)::text[] AS columns,
                array_agg(coll
@@ -90,6 +92,8 @@ const queryConstants = {
                     attribute.attname,
         	 		c.reloptions,
         	 		tablespace_t.spcname AS tablespace_name,
+                    indexes.indnkeyatts AS number_of_keys,
+                    pg_catalog.pg_get_expr(indpred, indrelid) AS where_expression,
                     CASE
                         WHEN collation_namespace.nspname is not null THEN format('%I.%I',collation_namespace.nspname,collation_t.collname)
                     END AS coll,
@@ -126,6 +130,8 @@ const queryConstants = {
                  index_method,
                  index_unique,
         		 reloptions,
+                 number_of_keys,
+                 where_expression,
         		 tablespace_name;`,
     GET_TABLE_FOREIGN_KEYS: `
         SELECT pcon.conname AS relationship_name, 
