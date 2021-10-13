@@ -99,7 +99,10 @@ module.exports = (baseProvider, options, app) => {
                 comment: comments ? comment : '',
             });
 
-            return schemaStatement;
+            const createFunctionStatement = getFunctionsScript(databaseName, udfs);
+            const createProceduresStatement = getProceduresScript(databaseName, procedures);
+
+            return _.trim([schemaStatement, createFunctionStatement, createProceduresStatement].join('\n\n'));
         },
 
         createTable(
@@ -379,14 +382,6 @@ module.exports = (baseProvider, options, app) => {
             const columns = _.map(udt.properties, this.convertColumnDefinition);
 
             return getUserDefinedType(udt, columns);
-        },
-
-        createFunctions({ databaseName, udfs }) {
-            return getFunctionsScript(databaseName, udfs);
-        },
-
-        createProcedures({ databaseName, procedures }) {
-            return getProceduresScript(databaseName, procedures);
         },
 
         getDefaultType(type) {
