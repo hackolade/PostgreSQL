@@ -86,8 +86,6 @@ module.exports = ({ _, getColumnsList, checkAllKeysDeactivated }) => {
         const keysToSkip = ['autovacuum', 'toast', 'id'];
 
         return _.chain(value)
-            .thru(value => (value.autovacuum_enabled ? value : _.omit(value, 'autovacuum')))
-            .thru(value => (value.toast_autovacuum_enabled ? value : _.omit(value, 'toast')))
             .toPairs()
             .flatMap(([key, value]) => {
                 if (key === 'autovacuum' || key === 'toast') {

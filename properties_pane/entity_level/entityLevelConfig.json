@@ -254,15 +254,13 @@ making sure that you maintain a proper JSON format.
 								"propertyName": "Vacuum index cleanup",
 								"propertyKeyword": "vacuum_index_cleanup",
 								"propertyType": "checkbox",
-								"propertyTooltip": "Disabling index cleanup can speed up VACUUM very significantly, but may also lead to severely bloated indexes if table modifications are frequent.",
-								"defaultValue": true
+								"propertyTooltip": "Disabling index cleanup can speed up VACUUM very significantly, but may also lead to severely bloated indexes if table modifications are frequent."
 							},
 							{
 								"propertyName": "Vacuum truncate",
 								"propertyKeyword": "vacuum_truncate",
 								"propertyType": "checkbox",
-								"propertyTooltip": "If true, VACUUM and autovacuum do the truncation and the disk space for the truncated pages is returned to the operating system.",
-								"defaultValue": true
+								"propertyTooltip": "If true, VACUUM and autovacuum do the truncation and the disk space for the truncated pages is returned to the operating system."
 							},
 							{
 								"propertyName": "Vacuum threshold",
@@ -271,8 +269,7 @@ making sure that you maintain a proper JSON format.
 								"valueType": "number",
 								"propertyTooltip": "Specifies the minimum number of updated or deleted tuples needed to trigger a VACUUM in any one table.",
 								"minValue": 0,
-								"step": 1,
-								"defaultValue": 50
+								"step": 1
 							},
 							{
 								"propertyName": "Vacuum scale factor",
@@ -280,8 +277,7 @@ making sure that you maintain a proper JSON format.
 								"propertyType": "numeric",
 								"valueType": "number",
 								"propertyTooltip": "Specifies a fraction of the table size to add to autovacuum_vacuum_threshold when deciding whether to trigger a VACUUM.",
-								"minValue": 0,
-								"defaultValue": 0.2
+								"minValue": 0
 							},
 							{
 								"propertyName": "Insert threshold",
@@ -290,8 +286,7 @@ making sure that you maintain a proper JSON format.
 								"valueType": "number",
 								"propertyTooltip": "Specifies the number of inserted tuples needed to trigger a VACUUM in any one table. ",
 								"minValue": -1,
-								"step": 1,
-								"defaultValue": 1000
+								"step": 1
 							},
 							{
 								"propertyName": "Insert scale factor",
@@ -299,8 +294,7 @@ making sure that you maintain a proper JSON format.
 								"propertyType": "numeric",
 								"valueType": "number",
 								"propertyTooltip": "Specifies a fraction of the table size to add to autovacuum_vacuum_insert_threshold when deciding whether to trigger a VACUUM.",
-								"minValue": 0,
-								"defaultValue": 0.2
+								"minValue": 0
 							},
 							{
 								"propertyName": "Analyze threshold",
@@ -309,8 +303,7 @@ making sure that you maintain a proper JSON format.
 								"valueType": "number",
 								"propertyTooltip": "Specifies the minimum number of inserted, updated or deleted tuples needed to trigger an ANALYZE in any one table. ",
 								"minValue": 0,
-								"step": 1,
-								"defaultValue": 50
+								"step": 1
 							},
 							{
 								"propertyName": "Analyze scale factor",
@@ -318,8 +311,7 @@ making sure that you maintain a proper JSON format.
 								"propertyType": "numeric",
 								"valueType": "number",
 								"propertyTooltip": "Specifies a fraction of the table size to add to autovacuum_analyze_threshold when deciding whether to trigger an ANALYZE. ",
-								"minValue": 0,
-								"defaultValue": 0.1
+								"minValue": 0
 							},
 							{
 								"propertyName": "Vacuum cost delay",
@@ -327,8 +319,7 @@ making sure that you maintain a proper JSON format.
 								"propertyType": "numeric",
 								"valueType": "number",
 								"propertyTooltip": "Specifies the cost delay value that will be used in automatic VACUUM operations. If -1 is specified, the regular vacuum_cost_delay value will be used. The value is specified as milliseconds.",
-								"minValue": -1,
-								"defaultValue": 2
+								"minValue": -1
 							},
 							{
 								"propertyName": "Vacuum cost limit",
@@ -346,8 +337,7 @@ making sure that you maintain a proper JSON format.
 								"valueType": "number",
 								"propertyTooltip": "Specifies the cutoff age (in transactions) that VACUUM should use to decide whether to freeze row versions while scanning a table.",
 								"minValue": 0,
-								"step": 1,
-								"defaultValue": 50000000
+								"step": 1
 							},
 							{
 								"propertyName": "Freeze max age",
@@ -356,8 +346,7 @@ making sure that you maintain a proper JSON format.
 								"valueType": "number",
 								"propertyTooltip": "Specifies the maximum age (in transactions) that a table's pg_class.relfrozenxid field can attain before a VACUUM operation is forced to prevent transaction ID wraparound within the table.",
 								"minValue": 0,
-								"step": 1,
-								"defaultValue": 200000000
+								"step": 1
 							},
 							{
 								"propertyName": "Freeze table age",
@@ -367,8 +356,7 @@ making sure that you maintain a proper JSON format.
 								"propertyTooltip": "Although users can set this value anywhere from zero to two billion, VACUUM will silently limit the effective value to 95% of autovacuum_freeze_max_age.",
 								"minValue": 0,
 								"maxValue": 2000000000,
-								"step": 1,
-								"defaultValue": 150000000
+								"step": 1
 							},
 							{
 								"propertyName": "Multixact freeze min age",
@@ -377,8 +365,7 @@ making sure that you maintain a proper JSON format.
 								"valueType": "number",
 								"propertyTooltip": "Specifies the cutoff age (in multixacts) that VACUUM should use to decide whether to replace multixact IDs with a newer transaction ID or multixact ID while scanning a table.",
 								"minValue": 0,
-								"step": 1,
-								"defaultValue": 5000000
+								"step": 1
 							},
 							{
 								"propertyName": "Multixact freeze max age",
@@ -388,8 +375,7 @@ making sure that you maintain a proper JSON format.
 								"propertyTooltip": "Specifies the maximum age (in multixacts) that a table's pg_class.relminmxid field can attain before a VACUUM operation is forced to prevent multixact ID wraparound within the table.",
 								"minValue": 0,
 								"maxValue": 4000000000,
-								"step": 1,
-								"defaultValue": 5000000
+								"step": 1
 							},
 							{
 								"propertyName": "Multixact freeze table age",
@@ -398,9 +384,7 @@ making sure that you maintain a proper JSON format.
 								"valueType": "number",
 								"propertyTooltip": "Although users can set this value anywhere from zero to two billion, VACUUM will silently limit the effective value to 95% of autovacuum_multixact_freeze_max_age, so that a periodic manual VACUUM has a chance to run before an anti-wraparound is launched for the table.",
 								"minValue": 0,
-								"maxValue": 2000000000,
-								"step": 1,
-								"defaultValue": 150000000
+								"defaultValue": true
 							},
 							{
 								"propertyName": "Log min duration",
@@ -409,14 +393,9 @@ making sure that you maintain a proper JSON format.
 								"valueType": "number",
 								"propertyTooltip": "It is taken as milliseconds. Causes each action executed by autovacuum to be logged if it ran for at least the specified amount of time. Setting this to zero logs all autovacuum actions. -1 (the default) disables logging autovacuum actions.",
 								"minValue": -1,
-								"step": 1,
-								"defaultValue": -1
+								"step": 1
 							}
-						],
-						"dependency": {
-							"key": "autovacuum_enabled",
-							"value": true
-						}
+						]
 					},
 					{
 						"propertyName": "Enable TOAST autovacuum",
@@ -444,15 +423,13 @@ making sure that you maintain a proper JSON format.
 								"propertyName": "Vacuum index cleanup",
 								"propertyKeyword": "toast_vacuum_index_cleanup",
 								"propertyType": "checkbox",
-								"propertyTooltip": "Disabling index cleanup can speed up VACUUM very significantly, but may also lead to severely bloated indexes if table modifications are frequent.",
-								"defaultValue": true
+								"propertyTooltip": "Disabling index cleanup can speed up VACUUM very significantly, but may also lead to severely bloated indexes if table modifications are frequent."
 							},
 							{
 								"propertyName": "Vacuum truncate",
 								"propertyKeyword": "toast_vacuum_truncate",
 								"propertyType": "checkbox",
-								"propertyTooltip": "If true, VACUUM and autovacuum do the truncation and the disk space for the truncated pages is returned to the operating system.",
-								"defaultValue": true
+								"propertyTooltip": "If true, VACUUM and autovacuum do the truncation and the disk space for the truncated pages is returned to the operating system."
 							},
 							{
 								"propertyName": "Vacuum threshold",
@@ -461,8 +438,7 @@ making sure that you maintain a proper JSON format.
 								"valueType": "number",
 								"propertyTooltip": "Specifies the minimum number of updated or deleted tuples needed to trigger a VACUUM in any one table.",
 								"minValue": 0,
-								"step": 1,
-								"defaultValue": 50
+								"step": 1
 							},
 							{
 								"propertyName": "Vacuum scale factor",
@@ -470,8 +446,7 @@ making sure that you maintain a proper JSON format.
 								"propertyType": "numeric",
 								"valueType": "number",
 								"propertyTooltip": "Specifies a fraction of the table size to add to autovacuum_vacuum_threshold when deciding whether to trigger a VACUUM.",
-								"minValue": 0,
-								"defaultValue": 0.2
+								"minValue": 0
 							},
 							{
 								"propertyName": "Insert threshold",
@@ -480,8 +455,7 @@ making sure that you maintain a proper JSON format.
 								"valueType": "number",
 								"propertyTooltip": "Specifies the number of inserted tuples needed to trigger a VACUUM in any one table. ",
 								"minValue": -1,
-								"step": 1,
-								"defaultValue": 1000
+								"step": 1
 							},
 							{
 								"propertyName": "Insert scale factor",
@@ -489,8 +463,7 @@ making sure that you maintain a proper JSON format.
 								"propertyType": "numeric",
 								"valueType": "number",
 								"propertyTooltip": "Specifies a fraction of the table size to add to autovacuum_vacuum_insert_threshold when deciding whether to trigger a VACUUM.",
-								"minValue": 0,
-								"defaultValue": 0.2
+								"minValue": 0
 							},
 							{
 								"propertyName": "Vacuum cost delay",
@@ -498,8 +471,7 @@ making sure that you maintain a proper JSON format.
 								"propertyType": "numeric",
 								"valueType": "number",
 								"propertyTooltip": "Specifies the cost delay value that will be used in automatic VACUUM operations. If -1 is specified, the regular vacuum_cost_delay value will be used. The value is specified as milliseconds.",
-								"minValue": -1,
-								"defaultValue": 2
+								"minValue": -1
 							},
 							{
 								"propertyName": "Vacuum cost limit",
@@ -517,8 +489,7 @@ making sure that you maintain a proper JSON format.
 								"valueType": "number",
 								"propertyTooltip": "Specifies the cutoff age (in transactions) that VACUUM should use to decide whether to freeze row versions while scanning a table.",
 								"minValue": 0,
-								"step": 1,
-								"defaultValue": 50000000
+								"step": 1
 							},
 							{
 								"propertyName": "Freeze max age",
@@ -527,8 +498,7 @@ making sure that you maintain a proper JSON format.
 								"valueType": "number",
 								"propertyTooltip": "Specifies the maximum age (in transactions) that a table's pg_class.relfrozenxid field can attain before a VACUUM operation is forced to prevent transaction ID wraparound within the table.",
 								"minValue": 0,
-								"step": 1,
-								"defaultValue": 200000000
+								"step": 1
 							},
 							{
 								"propertyName": "Freeze table age",
@@ -538,8 +508,7 @@ making sure that you maintain a proper JSON format.
 								"propertyTooltip": "Although users can set this value anywhere from zero to two billion, VACUUM will silently limit the effective value to 95% of autovacuum_freeze_max_age.",
 								"minValue": 0,
 								"maxValue": 2000000000,
-								"step": 1,
-								"defaultValue": 150000000
+								"step": 1
 							},
 							{
 								"propertyName": "Multixact freeze min age",
@@ -548,8 +517,7 @@ making sure that you maintain a proper JSON format.
 								"valueType": "number",
 								"propertyTooltip": "Specifies the cutoff age (in multixacts) that VACUUM should use to decide whether to replace multixact IDs with a newer transaction ID or multixact ID while scanning a table.",
 								"minValue": 0,
-								"step": 1,
-								"defaultValue": 5000000
+								"step": 1
 							},
 							{
 								"propertyName": "Multixact freeze max age",
@@ -559,8 +527,7 @@ making sure that you maintain a proper JSON format.
 								"propertyTooltip": "Specifies the maximum age (in multixacts) that a table's pg_class.relminmxid field can attain before a VACUUM operation is forced to prevent multixact ID wraparound within the table.",
 								"minValue": 0,
 								"maxValue": 4000000000,
-								"step": 1,
-								"defaultValue": 5000000
+								"step": 1
 							},
 							{
 								"propertyName": "Multixact freeze table age",
@@ -570,8 +537,7 @@ making sure that you maintain a proper JSON format.
 								"propertyTooltip": "Although users can set this value anywhere from zero to two billion, VACUUM will silently limit the effective value to 95% of autovacuum_multixact_freeze_max_age, so that a periodic manual VACUUM has a chance to run before an anti-wraparound is launched for the table.",
 								"minValue": 0,
 								"maxValue": 2000000000,
-								"step": 1,
-								"defaultValue": 150000000
+								"step": 1
 							},
 							{
 								"propertyName": "Log min duration",
@@ -580,14 +546,9 @@ making sure that you maintain a proper JSON format.
 								"valueType": "number",
 								"propertyTooltip": "It is taken as milliseconds. Causes each action executed by autovacuum to be logged if it ran for at least the specified amount of time. Setting this to zero logs all autovacuum actions. -1 (the default) disables logging autovacuum actions.",
 								"minValue": -1,
-								"step": 1,
-								"defaultValue": -1
+								"step": 1
 							}
-						],
-						"dependency": {
-							"key": "toast_autovacuum_enabled",
-							"value": true
-						}
+						]
 					},
 					{
 						"propertyName": "User catalog table",
