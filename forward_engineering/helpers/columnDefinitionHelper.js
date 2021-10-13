@@ -65,7 +65,7 @@ module.exports = ({
     const decorateDefault = (type, defaultValue) => {
         const constantsValues = ['current_timestamp', 'null'];
         if ((isString(type) || isDateTime(type)) && !constantsValues.includes(_.toLower(defaultValue))) {
-            return wrap(escapeQuotes(defaultValue), '"', '"');
+            return wrap(escapeQuotes(defaultValue), "'", "'");
         } else {
             return defaultValue;
         }
