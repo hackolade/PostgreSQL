@@ -844,7 +844,7 @@ making sure that you maintain a proper JSON format.
 					},
 					{
 						"propertyName": "Columns",
-						"propertyKeyword": "btree_columns",
+						"propertyKeyword": "columns",
 						"propertyType": "fieldList",
 						"template": "orderedList",
 						"propertyTooltip": "The name of a column of the table.",

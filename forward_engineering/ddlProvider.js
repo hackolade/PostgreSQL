@@ -203,7 +203,9 @@ module.exports = (baseProvider, options, app) => {
             const using = index.index_method ? ` USING ${_.toUpper(index.index_method)}` : '';
 
             const keys = getIndexKeys(
-                index.index_method === 'btree' ? index.btree_columns : index.columns,
+                index.index_method === 'btree'
+                    ? index.columns
+                    : _.map(index.columns, column => _.omit(column, 'sortOrder', 'nullsOrder')),
                 isParentActivated
             );
             const options = getIndexOptions(index, isParentActivated);

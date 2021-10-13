@@ -215,9 +215,10 @@ const prepareTableIndexes = tableIndexesResult => {
             unique: indexData.index_unique ?? false,
             index_tablespace_name: indexData.tablespace_name,
             index_storage_parameter: getIndexStorageParameters(indexData.storage_parameters),
-            ...(indexData.index_method === 'btree'
-                ? { btree_columns: columns }
-                : { columns: _.map(columns, column => _.omit(column, 'sortOrder', 'nullsOrder')) }),
+            columns:
+                indexData.index_method === 'btree'
+                    ? columns
+                    : _.map(columns, column => _.omit(column, 'sortOrder', 'nullsOrder')),
         };
 
         return clearEmptyPropertiesInObject(index);
