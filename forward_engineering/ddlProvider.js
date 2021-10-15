@@ -75,15 +75,16 @@ module.exports = (baseProvider, options, app) => {
         getColumnsList,
     });
 
-    const { decorateType, decorateDefault, getColumnComments, replaceTypeByVersion } = require('./helpers/columnDefinitionHelper')({
-        _,
-        wrap,
-        assignTemplates,
-        templates,
-        commentIfDeactivated,
-        getNamePrefixedWithSchemaName,
-        wrapComment,
-    });
+    const { decorateType, decorateDefault, getColumnComments, replaceTypeByVersion } =
+        require('./helpers/columnDefinitionHelper')({
+            _,
+            wrap,
+            assignTemplates,
+            templates,
+            commentIfDeactivated,
+            getNamePrefixedWithSchemaName,
+            wrapComment,
+        });
 
     return {
         createDatabase({ databaseName, ifNotExist, comments, udfs, procedures }) {
@@ -462,20 +463,26 @@ module.exports = (baseProvider, options, app) => {
                 comments: containerData.description,
                 udfs: data?.udfs || [],
                 procedures: data?.procedures || [],
-                dbVersion
+                dbVersion,
             };
         },
 
         hydrateTable({ tableData, entityData, jsonSchema }) {
             const detailsTab = entityData[0];
-            const inheritsTable = _.get(tableData, `relatedSchemas[${detailsTab.inherits}]`, '');
+            const parentTables = _.chain(detailsTab.inherits)
+                .map(({ parentTable }) => _.get(tableData, `relatedSchemas[${parentTable}]`, ''))
+                .compact()
+                .map(table => table.code || table.collectionName)
+                .join(', ')
+                .thru(value => (value ? `(${value})` : ''))
+                .value();
             const partitioning = _.first(detailsTab.partitioning) || {};
             const compositePartitionKey = keyHelper.getKeys(partitioning.compositePartitionKey, jsonSchema);
 
             return {
                 ...tableData,
                 keyConstraints: keyHelper.getTableKeyConstraints(jsonSchema),
-                inherits: inheritsTable?.code || inheritsTable?.collectionName,
+                inherits: parentTables,
                 selectStatement: _.trim(detailsTab.selectStatement),
                 partitioning: _.assign({}, partitioning, { compositePartitionKey }),
                 ..._.pick(

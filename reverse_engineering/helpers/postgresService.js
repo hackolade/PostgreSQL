@@ -27,6 +27,7 @@ const {
     getLimit,
     prepareTableLevelData,
     prepareTableIndexes,
+    prepareTableInheritance,
 } = require('./postgresHelpers/tableHelper');
 const {
     setDependencies: setDependenciesInUserDefinedTypesHelper,
@@ -212,11 +213,15 @@ module.exports = {
         );
         const tableOid = tableLevelData?.oid;
 
-        const tableToastOptions = await db.queryTolerant(queryConstants.GET_TABLE_TOAST_OPTIONS, [tableName, schemaOid], true);
+        const tableToastOptions = await db.queryTolerant(
+            queryConstants.GET_TABLE_TOAST_OPTIONS,
+            [tableName, schemaOid],
+            true
+        );
         const partitionResult = await db.queryTolerant(queryConstants.GET_TABLE_PARTITION_DATA, [tableOid], true);
         const tableColumns = await this._getTableColumns(tableName, schemaName, tableOid);
         const descriptionResult = await db.queryTolerant(queryConstants.GET_DESCRIPTION_BY_OID, [tableOid], true);
-        const inheritsResult = await db.queryTolerant(queryConstants.GET_INHERITS_PARENT_TABLE_NAME, [tableOid], true);
+        const inheritsResult = await db.queryTolerant(queryConstants.GET_INHERITS_PARENT_TABLE_NAME, [tableOid]);
         const tableConstraintsResult = await db.queryTolerant(queryConstants.GET_TABLE_CONSTRAINTS, [tableOid]);
         const tableIndexesResult = await db.queryTolerant(queryConstants.GET_TABLE_INDEXES, [tableOid]);
         const tableForeignKeys = await db.queryTolerant(queryConstants.GET_TABLE_FOREIGN_KEYS, [tableOid]);
@@ -224,7 +229,7 @@ module.exports = {
         const partitioning = prepareTablePartition(partitionResult, tableColumns);
         const tableLevelProperties = prepareTableLevelData(tableLevelData, tableToastOptions);
         const description = getDescriptionFromResult(descriptionResult);
-        const inherits = inheritsResult?.parent_table_name ? [schemaName, inheritsResult?.parent_table_name] : null;
+        const inherits = prepareTableInheritance(schemaName, inheritsResult);
         const tableConstraint = prepareTableConstraints(tableConstraintsResult, tableColumns);
         const tableIndexes = prepareTableIndexes(tableIndexesResult);
         const relationships = prepareForeignKeys(tableForeignKeys, tableName, schemaName, tableColumns);

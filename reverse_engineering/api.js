@@ -127,19 +127,21 @@ module.exports = {
                             Procedures: procedures,
                         };
 
-                        const tablePackages = tables.map(entityData => ({
-                            dbName: schemaName,
-                            collectionName: entityData.name,
-                            documents: entityData.documents,
-                            views: [],
-                            emptyBucket: false,
-                            entityLevel: entityData.entityLevel,
-                            validation: {
-                                jsonSchema: entityData.jsonSchema,
-                            },
-                            bucketInfo,
-                            modelDefinitions,
-                        }));
+                        const tablePackages = tables
+                            .map(entityData => ({
+                                dbName: schemaName,
+                                collectionName: entityData.name,
+                                documents: entityData.documents,
+                                views: [],
+                                emptyBucket: false,
+                                entityLevel: entityData.entityLevel,
+                                validation: {
+                                    jsonSchema: entityData.jsonSchema,
+                                },
+                                bucketInfo,
+                                modelDefinitions,
+                            }))
+                            .sort(data => (app.require('lodash').isEmpty(data.entityLevel.inherits) ? -1 : 1));
 
                         if (views?.length) {
                             const viewPackage = {

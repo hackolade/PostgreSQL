@@ -17,7 +17,7 @@ const prepareStorageParameters = (reloptions, tableToastOptions) => {
     const fillfactor = options.fillfactor;
     const parallel_workers = options.parallel_workers;
     const autovacuum_enabled = options.autovacuum_enabled;
-    const autovacuum = {
+    const autovacuum = clearEmptyPropertiesInObject({
         vacuum_index_cleanup: options.vacuum_index_cleanup,
         vacuum_truncate: options.vacuum_truncate,
         autovacuum_vacuum_threshold: options.autovacuum_vacuum_threshold,
@@ -35,10 +35,10 @@ const prepareStorageParameters = (reloptions, tableToastOptions) => {
         autovacuum_multixact_freeze_max_age: options.autovacuum_multixact_freeze_max_age,
         autovacuum_multixact_freeze_table_age: options.autovacuum_multixact_freeze_table_age,
         log_autovacuum_min_duration: options.log_autovacuum_min_duration,
-    };
+    });
     const user_catalog_table = options.user_catalog_table;
     const toast_autovacuum_enabled = toastOptions.autovacuum_enabled;
-    const toast = {
+    const toast = clearEmptyPropertiesInObject({
         toast_tuple_target: options.toast_tuple_target,
         toast_vacuum_index_cleanup: toastOptions.vacuum_index_cleanup,
         toast_vacuum_truncate: toastOptions.vacuum_truncate,
@@ -55,15 +55,15 @@ const prepareStorageParameters = (reloptions, tableToastOptions) => {
         toast_autovacuum_multixact_freeze_max_age: toastOptions.autovacuum_multixact_freeze_max_age,
         toast_autovacuum_multixact_freeze_table_age: toastOptions.autovacuum_multixact_freeze_table_age,
         toast_log_autovacuum_min_duration: toastOptions.log_autovacuum_min_duration,
-    };
+    });
 
     const storage_parameter = {
         fillfactor,
         parallel_workers,
         autovacuum_enabled,
-        autovacuum: clearEmptyPropertiesInObject(autovacuum),
+        autovacuum: _.isEmpty(autovacuum) ? null : autovacuum,
         toast_autovacuum_enabled,
-        toast: clearEmptyPropertiesInObject(toast),
+        toast: _.isEmpty(toast) ? null : toast,
         user_catalog_table,
     };
 
@@ -334,6 +334,10 @@ const prepareOptions = options => {
     );
 };
 
+const prepareTableInheritance = (schemaName, inheritanceResult) => {
+    return _.map(inheritanceResult, ({ parent_table_name }) => ({ parentTable: [schemaName, parent_table_name] }));
+};
+
 module.exports = {
     prepareStorageParameters,
     prepareTablePartition,
@@ -343,4 +347,5 @@ module.exports = {
     prepareTableLevelData,
     prepareTableIndexes,
     getLimit,
+    prepareTableInheritance,
 };

@@ -143,13 +143,21 @@ making sure that you maintain a proper JSON format.
 				"defaultValue": true
 			},
 			{
-				"propertyName": "Inherits parent table",
+				"propertyName": "Inherits parent tables",
 				"propertyKeyword": "inherits",
+				"propertyType": "group",
 				"propertyTooltip": "To create a table with the same definition as another table, including columns, indexes, and table options. Foreign key definitions, as well as any DATA DIRECTORY or INDEX DIRECTORY table options specified on the original table, will NOT be created.",
-				"propertyType": "selecthashed",
-				"template": "entities",
-				"withEmptyOption": true,
-				"excludeCurrent": true
+				"structure": [
+					{
+						"propertyName": "Table name",
+						"propertyKeyword": "parentTable",
+						"propertyTooltip": "To create a table with the same definition as another table, including columns, indexes, and table options. Foreign key definitions, as well as any DATA DIRECTORY or INDEX DIRECTORY table options specified on the original table, will NOT be created.",
+						"propertyType": "selecthashed",
+						"template": "entities",
+						"withEmptyOption": true,
+						"excludeCurrent": true
+					}
+				]
 			},
 			{
 				"propertyName": "Partitioning",
