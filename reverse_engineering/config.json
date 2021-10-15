@@ -3,7 +3,14 @@
 		"NO_DATABASES": "There is no databases in PostgreSQL Server instance",
 		"WRONG_CONNECTION": "Can not connect to PostgreSQL Server instance"
 	},
-	"defaultDdlType": "mariadb",
-	"excludeDocKind": ["id"],
-	"connectionList": [ "name", "host", "port", "userName" ]
+	"defaultDdlType": "postgres",
+	"excludeDocKind": [
+		"id"
+	],
+	"connectionList": [
+		"name",
+		"host",
+		"port",
+		"userName"
+	]
 }

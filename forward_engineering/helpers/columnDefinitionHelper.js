@@ -87,9 +87,52 @@ module.exports = ({
             .value();
     };
 
+    const TYPES_MAPPING_BY_VERSION = {
+        'v13.x': {
+            int4multirange: 'int4range',
+            int8multirange: 'int8range',
+            nummultirange: 'numrange',
+            datemultirange: 'daterange',
+            tsmultirange: 'tsrange',
+            tstzmultirange: 'tstzrange',
+        },
+        'v12.x': {
+            int4multirange: 'int4range',
+            int8multirange: 'int8range',
+            nummultirange: 'numrange',
+            datemultirange: 'daterange',
+            tsmultirange: 'tsrange',
+            tstzmultirange: 'tstzrange',
+        },
+        'v11.x': {
+            int4multirange: 'int4range',
+            int8multirange: 'int8range',
+            nummultirange: 'numrange',
+            datemultirange: 'daterange',
+            tsmultirange: 'tsrange',
+            tstzmultirange: 'tstzrange',
+        },
+        'v10.x': {
+            int4multirange: 'int4range',
+            int8multirange: 'int8range',
+            nummultirange: 'numrange',
+            datemultirange: 'daterange',
+            tsmultirange: 'tsrange',
+            tstzmultirange: 'tstzrange',
+        },
+    };
+
+    const replaceTypeByVersion = (type, dbVersion) => {
+        const dbVersionMap = TYPES_MAPPING_BY_VERSION[dbVersion];
+        const replacedType = _.get(dbVersionMap, type);
+
+        return replacedType || type;
+    };
+
     return {
         decorateType,
         decorateDefault,
         getColumnComments,
+        replaceTypeByVersion,
     };
 };

@@ -11,7 +11,7 @@
 		"childRelationships": [],
 		"foreignField": [],
 		"enum": [],
-		"mode": "int4range"
+		"mode": "int4multirange"
 	},
 	"descriptor": [
 		{

@@ -75,7 +75,7 @@ module.exports = (baseProvider, options, app) => {
         getColumnsList,
     });
 
-    const { decorateType, decorateDefault, getColumnComments } = require('./helpers/columnDefinitionHelper')({
+    const { decorateType, decorateDefault, getColumnComments, replaceTypeByVersion } = require('./helpers/columnDefinitionHelper')({
         _,
         wrap,
         assignTemplates,
@@ -173,18 +173,19 @@ module.exports = (baseProvider, options, app) => {
         },
 
         convertColumnDefinition(columnDefinition) {
+            const type = replaceTypeByVersion(columnDefinition.type, columnDefinition.dbVersion);
             const notNull = columnDefinition.nullable ? '' : ' NOT NULL';
             const primaryKey = columnDefinition.primaryKey ? ' PRIMARY KEY' : '';
             const uniqueKey = columnDefinition.unique ? ' UNIQUE' : '';
             const collation = columnDefinition.collationRule ? ` COLLATE "${columnDefinition.collationRule}"` : '';
             const defaultValue = !_.isUndefined(columnDefinition.default)
-                ? ' DEFAULT ' + decorateDefault(columnDefinition.type, columnDefinition.default)
+                ? ' DEFAULT ' + decorateDefault(type, columnDefinition.default)
                 : '';
 
             return commentIfDeactivated(
                 assignTemplates(templates.columnDefinition, {
                     name: wrapInQuotes(columnDefinition.name),
-                    type: decorateType(columnDefinition.type, columnDefinition),
+                    type: decorateType(type, columnDefinition),
                     notNull,
                     primaryKey,
                     uniqueKey,
@@ -404,6 +405,7 @@ module.exports = (baseProvider, options, app) => {
             const timePrecision = _.includes(timeTypes, columnDefinition.type) ? jsonSchema.timePrecision : '';
             const with_timezone = _.includes(timeTypes, columnDefinition.type) ? jsonSchema.with_timezone : '';
             const intervalOptions = columnDefinition.type === 'interval' ? jsonSchema.intervalOptions : '';
+            const dbVersion = dbData.dbVersion;
 
             return {
                 name: columnDefinition.name,
@@ -431,6 +433,7 @@ module.exports = (baseProvider, options, app) => {
                 timePrecision,
                 with_timezone,
                 intervalOptions,
+                dbVersion,
             };
         },
 
@@ -451,12 +454,15 @@ module.exports = (baseProvider, options, app) => {
         },
 
         hydrateDatabase(containerData, data) {
+            const dbVersion = _.get(data, 'modelData.0.dbVersion');
+
             return {
                 databaseName: containerData.name,
                 ifNotExist: containerData.ifNotExist,
                 comments: containerData.description,
                 udfs: data?.udfs || [],
                 procedures: data?.procedures || [],
+                dbVersion
             };
         },
 
