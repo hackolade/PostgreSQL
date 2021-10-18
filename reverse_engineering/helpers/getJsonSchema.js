@@ -16,7 +16,11 @@ const getJsonSchema = columns => {
         };
     }, {});
 
-    return { properties };
+    const required = Object.entries(properties)
+        .filter(([filedName, field]) => field.required)
+        .map(([fieldName]) => fieldName);
+
+    return { properties, required };
 };
 
 module.exports = {

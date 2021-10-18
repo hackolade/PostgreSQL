@@ -5,7 +5,7 @@ const setDependencies = app => {
 };
 
 const columnPropertiesMapper = {
-    columns_default: 'default',
+    column_default: 'default',
     is_nullable: {
         keyword: 'required',
         values: {
