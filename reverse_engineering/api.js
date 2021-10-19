@@ -39,7 +39,7 @@ module.exports = {
             logger.log('info', connectionInfo, 'connectionInfo', connectionInfo.hiddenKeys);
 
             const postgresLogger = createLogger({
-                title: 'Get DB collections names',
+                title: 'Get DB names',
                 hiddenKeys: connectionInfo.hiddenKeys,
                 logger,
             });
