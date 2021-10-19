@@ -35,7 +35,8 @@ const queryConstants = {
     GET_TABLE_COLUMNS_ADDITIONAL_DATA: `
         SELECT pg_attribute.attname AS name,
             pg_attribute.attndims AS number_of_array_dimensions,
-            pg_description.description
+            pg_description.description,
+            pg_attribute.atttypmod AS attribute_mode
         FROM pg_catalog.pg_attribute AS pg_attribute
         LEFT JOIN pg_catalog.pg_description AS pg_description ON (pg_description.objsubid=pg_attribute.attnum
                                                                AND pg_description.objoid = pg_attribute.attrelid)

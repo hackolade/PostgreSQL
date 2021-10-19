@@ -1216,9 +1216,14 @@ making sure that you maintain a proper JSON format.
 				}
 			},
 			{
-				"propertyName": "With timezone",
-				"propertyKeyword": "with_timezone",
-				"propertyType": "checkbox",
+				"propertyName": "Timezone",
+				"propertyKeyword": "timezone",
+				"propertyType": "select",
+				"options": [
+					"",
+					"WITH TIME ZONE",
+					"WITHOUT TIME ZONE"
+				],
 				"dependency": {
 					"key": "mode",
 					"value": [

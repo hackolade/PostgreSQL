@@ -404,7 +404,7 @@ module.exports = (baseProvider, options, app) => {
                 : '';
             const timeTypes = ['time', 'timestamp'];
             const timePrecision = _.includes(timeTypes, columnDefinition.type) ? jsonSchema.timePrecision : '';
-            const with_timezone = _.includes(timeTypes, columnDefinition.type) ? jsonSchema.with_timezone : '';
+            const timezone = _.includes(timeTypes, columnDefinition.type) ? jsonSchema.timezone : '';
             const intervalOptions = columnDefinition.type === 'interval' ? jsonSchema.intervalOptions : '';
             const dbVersion = dbData.dbVersion;
 
@@ -434,7 +434,7 @@ module.exports = (baseProvider, options, app) => {
                 checkConstraints: jsonSchema.checkConstraints,
                 collationRule,
                 timePrecision,
-                with_timezone,
+                timezone,
                 intervalOptions,
                 dbVersion,
             };

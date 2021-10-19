@@ -27,9 +27,9 @@ module.exports = ({
         return type;
     };
 
-    const addWithTimezone = (type, with_timezone) => {
-        if (with_timezone) {
-            return `${type} WITH TIME ZONE`;
+    const addWithTimezone = (type, timezone) => {
+        if (timezone) {
+            return `${type} ${timezone}`;
         }
 
         return type;
@@ -49,9 +49,9 @@ module.exports = ({
             return addPrecision(type, columnDefinition.precision);
         } else if (
             canHaveTimePrecision(type) &&
-            (_.isNumber(columnDefinition.timePrecision) || columnDefinition.with_timezone)
+            (_.isNumber(columnDefinition.timePrecision) || columnDefinition.timezone)
         ) {
-            return addWithTimezone(addPrecision(type, columnDefinition.timePrecision), columnDefinition.with_timezone);
+            return addWithTimezone(addPrecision(type, columnDefinition.timePrecision), columnDefinition.timezone);
         }
 
         return type;

@@ -18,6 +18,10 @@ const columnPropertiesMapper = {
     numeric_precision: 'precision',
     numeric_scale: 'scale',
     datetime_precision: 'timePrecision',
+    attribute_mode: {
+        keyword: 'timePrecision',
+        check: (column, value) => value !== -1 && canHaveTimePrecision(column.data_type),
+    },
     interval_type: 'intervalOptions',
     collation_name: 'collationRule',
     column_name: 'name',
@@ -25,7 +29,15 @@ const columnPropertiesMapper = {
     udt_name: 'udt_name',
     character_maximum_length: 'length',
     description: 'description',
-    domain_name: 'domain_name'
+    domain_name: 'domain_name',
+};
+
+const getColumnValue = (column, key, value) => {
+    if (columnPropertiesMapper[key]?.check) {
+        return columnPropertiesMapper[key].check(column, value) ? value : '';
+    }
+
+    return _.get(columnPropertiesMapper, `${key}.values.${value}`, value);
 };
 
 const mapColumnData = userDefinedTypes => column => {
@@ -33,7 +45,7 @@ const mapColumnData = userDefinedTypes => column => {
         .toPairs()
         .map(([key, value]) => [
             columnPropertiesMapper[key]?.keyword || columnPropertiesMapper[key],
-            _.get(columnPropertiesMapper, `${key}.values.${value}`, value),
+            getColumnValue(column, key, value),
         ])
         .filter(([key, value]) => key && !_.isNil(value))
         .fromPairs()
@@ -130,14 +142,14 @@ const mapType = (userDefinedTypes, type) => {
             return { type: 'datetime', mode: type };
         case 'timestamptz':
         case 'timestamp with time zone':
-            return { type: 'datetime', mode: 'timestamp', with_timezone: true };
+            return { type: 'datetime', mode: 'timestamp', timezone: 'WITH TIME ZONE' };
         case 'timestamp without time zone':
-            return { type: 'datetime', mode: 'timestamp' };
+            return { type: 'datetime', mode: 'timestamp', timezone: 'WITHOUT TIME ZONE' };
         case 'timetz':
         case 'time with time zone':
-            return { type: 'datetime', mode: 'time', with_timezone: true };
+            return { type: 'datetime', mode: 'time', timezone: 'WITH TIME ZONE' };
         case 'time without time zone':
-            return { type: 'datetime', mode: 'time' };
+            return { type: 'datetime', mode: 'time', timezone: 'WITHOUT TIME ZONE' };
         case 'json':
         case 'jsonb':
             return { type: 'json', mode: type, subtype: 'object' };
@@ -224,6 +236,13 @@ const getParsedJsonValueType = value => {
     }
 
     return type;
+};
+
+const canHaveTimePrecision = columnDataType => {
+    return _.includes(
+        ['timestamp with time zone', 'timestamp without time zone', 'time with time zone', 'time without time zone'],
+        columnDataType
+    );
 };
 
 module.exports = {
