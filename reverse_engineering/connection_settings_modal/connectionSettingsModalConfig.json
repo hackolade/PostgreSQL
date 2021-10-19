@@ -24,12 +24,13 @@
 				"defaultValue": 5432
 			},
 			{
-				"inputLabel": "Database name",
-				"inputKeyword": "databaseName",
-				"description": "Database name (optional)",
+				"inputLabel": "Maintenance database",
+				"inputKeyword": "maintenanceDatabase",
+				"description": "Maintenance database name (default: postgres)",
 				"inputType": "text",
-				"inputPlaceholder": "Database name",
-				"regex": "([^\\s])"
+				"inputPlaceholder": "Maintenance database",
+				"regex": "([^\\s])",
+				"default": "postgres"
 			}
 		]
 	},
@@ -64,30 +65,41 @@
 				"inputLabel": "SSL",
 				"inputKeyword": "sslType",
 				"inputType": "select",
-				"options": [{
-					"value": "Off", 
-					"label": "Off"
-				}, {
-					"value": "TRUST_ALL_CERTIFICATES",
-					"label": "Unvalidated"
-				},{
-					"value": "TRUST_CUSTOM_CA_SIGNED_CERTIFICATES",
-					"label": "Server validation"
-
-				},{
-					"value": "TRUST_SERVER_CLIENT_CERTIFICATES",
-					"label": "Server and client validation"
-				}]
+				"options": [
+					{
+						"value": "Off",
+						"label": "Off"
+					},
+					{
+						"value": "TRUST_ALL_CERTIFICATES",
+						"label": "Unvalidated"
+					},
+					{
+						"value": "TRUST_CUSTOM_CA_SIGNED_CERTIFICATES",
+						"label": "Server validation"
+					},
+					{
+						"value": "TRUST_SERVER_CLIENT_CERTIFICATES",
+						"label": "Server and client validation"
+					}
+				]
 			},
 			{
 				"inputLabel": "Certificate Authority",
 				"inputKeyword": "certAuthority",
 				"inputType": "file",
 				"inputPlaceholder": "Certificate Authority",
-				"extensions": ["pem", "crt", "key"],
+				"extensions": [
+					"pem",
+					"crt",
+					"key"
+				],
 				"dependency": {
 					"key": "sslType",
-					"value": ["TRUST_CUSTOM_CA_SIGNED_CERTIFICATES", "TRUST_SERVER_CLIENT_CERTIFICATES"]
+					"value": [
+						"TRUST_CUSTOM_CA_SIGNED_CERTIFICATES",
+						"TRUST_SERVER_CLIENT_CERTIFICATES"
+					]
 				}
 			},
 			{
@@ -95,7 +107,11 @@
 				"inputKeyword": "clientCert",
 				"inputType": "file",
 				"inputPlaceholder": "Client Certificate",
-				"extensions": ["pem", "crt", "key"],
+				"extensions": [
+					"pem",
+					"crt",
+					"key"
+				],
 				"dependency": {
 					"key": "sslType",
 					"value": "TRUST_SERVER_CLIENT_CERTIFICATES"
@@ -106,7 +122,11 @@
 				"inputKeyword": "clientPrivateKey",
 				"inputType": "file",
 				"inputPlaceholder": "Client Private Key",
-				"extensions": ["pem", "crt", "key"],
+				"extensions": [
+					"pem",
+					"crt",
+					"key"
+				],
 				"dependency": {
 					"key": "sslType",
 					"value": "TRUST_SERVER_CLIENT_CERTIFICATES"
@@ -158,13 +178,16 @@
 				"inputLabel": "SSH Auth Method",
 				"inputKeyword": "ssh_method",
 				"inputType": "select",
-				"options": [{
-					"value": "privateKey", 
-					"label": "Private Key"
-				}, {
-					"value": "password",
-					"label": "Password"
-				}],
+				"options": [
+					{
+						"value": "privateKey",
+						"label": "Private Key"
+					},
+					{
+						"value": "password",
+						"label": "Password"
+					}
+				],
 				"disable": {
 					"key": "ssh",
 					"value": false
@@ -176,10 +199,15 @@
 				"inputKeyword": "ssh_key_file",
 				"inputType": "file",
 				"inputPlaceholder": "Private Key",
-				"extensions": ["*"],
+				"extensions": [
+					"*"
+				],
 				"dependency": {
 					"key": "ssh_method",
-					"value": ["privateKey", ""]
+					"value": [
+						"privateKey",
+						""
+					]
 				},
 				"disable": {
 					"key": "ssh",
@@ -194,7 +222,10 @@
 				"isHiddenKey": true,
 				"dependency": {
 					"key": "ssh_method",
-					"value": ["privateKey", ""]
+					"value": [
+						"privateKey",
+						""
+					]
 				},
 				"disable": {
 					"key": "ssh",
@@ -209,7 +240,10 @@
 				"isHiddenKey": true,
 				"dependency": {
 					"key": "ssh_method",
-					"value": ["password", ""]
+					"value": [
+						"password",
+						""
+					]
 				},
 				"disable": {
 					"key": "ssh",

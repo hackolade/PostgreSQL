@@ -11,6 +11,10 @@ module.exports = {
         pool.on('error', error => newLogger.error(error));
     },
 
+    isPoolInitialized() {
+        return Boolean(pool);
+    },
+
     async releasePool() {
         if (pool) {
             await pool.end();

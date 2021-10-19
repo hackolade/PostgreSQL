@@ -248,6 +248,8 @@ const queryConstants = {
         LEFT JOIN pg_catalog.pg_constraint AS pg_constraint ON (pg_constraint.contypid = pg_type.oid)
         LEFT JOIN pg_catalog.pg_namespace AS pg_namespace ON (pg_namespace.oid = pg_type.typnamespace)
         WHERE pg_type.typname = $1 AND pg_namespace.nspname = $2 AND pg_constraint.contype = 'c';`,
+    GET_DATABASES:
+        'SELECT datname AS database_name FROM pg_catalog.pg_database WHERE datistemplate != TRUE AND datallowconn = TRUE;',
 };
 
 const getQueryName = query => {

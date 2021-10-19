@@ -4,6 +4,7 @@
 		"WRONG_CONNECTION": "Can not connect to PostgreSQL Server instance"
 	},
 	"defaultDdlType": "postgres",
+	"scenario": "getDatabases",
 	"excludeDocKind": [
 		"id"
 	],

@@ -62,6 +62,10 @@ module.exports = {
     },
 
     async connect(connectionInfo, specificLogger) {
+        if (db.isPoolInitialized()) {
+            await this.disconnect();
+        }
+
         const { pool, sshTunnel } = await createConnectionPool(connectionInfo);
 
         db.initializePool(pool, specificLogger);
@@ -86,6 +90,10 @@ module.exports = {
 
     applyScript(script) {
         return db.query(script);
+    },
+
+    async getDatabaseNames() {
+        return _.map(await db.query(queryConstants.GET_DATABASES), 'database_name');
     },
 
     async logVersion() {

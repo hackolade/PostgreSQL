@@ -87,7 +87,7 @@ const createConnectionPool = async connectionInfo => {
         connectionTimeoutMillis: Number(connectionInfo.queryRequestTimeout) || 60000,
         query_timeout: Number(connectionInfo.queryRequestTimeout) || 60000,
         statement_timeout: Number(connectionInfo.queryRequestTimeout) || 60000,
-        database: connectionInfo.databaseName,
+        database: connectionInfo.database || connectionInfo.maintenanceDatabase,
     };
 
     const pool = await new Pool(config);

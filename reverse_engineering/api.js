@@ -1,6 +1,7 @@
 'use strict';
 
 const { createLogger } = require('./helpers/loggerHelper');
+const { connect } = require('./helpers/postgresService');
 const postgresService = require('./helpers/postgresService');
 
 module.exports = {
@@ -30,6 +31,33 @@ module.exports = {
         } finally {
             await postgresService.disconnect();
         }
+    },
+
+    async getDatabases(connectionInfo, logger, cb, app) {
+        try {
+            logger.clear();
+            logger.log('info', connectionInfo, 'connectionInfo', connectionInfo.hiddenKeys);
+
+            const postgresLogger = createLogger({
+                title: 'Get DB collections names',
+                hiddenKeys: connectionInfo.hiddenKeys,
+                logger,
+            });
+
+            postgresService.setDependencies(app);
+            await postgresService.connect(connectionInfo, postgresLogger);
+
+            const dbs = await postgresService.getDatabaseNames();
+            logger.log('info', dbs, 'All databases list', connectionInfo.hiddenKeys);
+            return cb(null, dbs);
+        } catch (err) {
+            logger.log('error', err);
+            return cb(mapError(err));
+        }
+    },
+
+    getDocumentKinds: function (connectionInfo, logger, cb) {
+        cb(null, []);
     },
 
     async getDbCollectionsNames(connectionInfo, logger, callback, app) {
