@@ -8,6 +8,9 @@
 		"view": true
 	},
 	"applyScriptToInstance": true,
+	"applyToInstanceSettings": {
+		"scenario": "getDatabases"
+	},
 	"combinedContainers": true,
 	"feLevelSelector": {
 		"container": true,

@@ -3,6 +3,11 @@ const { createLogger } = require('../reverse_engineering/helpers/loggerHelper');
 const applyToInstanceHelper = require('./applyToInstanceHelper');
 
 module.exports = {
+    getDatabases(connectionInfo, logger, callback, app) {
+        logger.progress({ message: 'Find all databases' });
+
+        reApi.getDatabases(connectionInfo, logger, callback, app);
+    },
     applyToInstance(connectionInfo, logger, callback, app) {
         logger.clear();
         logger.log(
