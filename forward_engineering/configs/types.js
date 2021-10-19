@@ -16,11 +16,11 @@ module.exports = {
         size: 1,
         mode: 'varying',
     },
-    "tsvector": {
-        mode: 'text'
+    tsvector: {
+        mode: 'text',
     },
-    "tsquery": {
-        mode: 'text'
+    tsquery: {
+        mode: 'text',
     },
     smallint: {
         capacity: 2,
@@ -196,5 +196,8 @@ module.exports = {
     },
     range_udt: {
         mode: 'range',
+    },
+    domain: {
+        mode: 'domain',
     },
 };

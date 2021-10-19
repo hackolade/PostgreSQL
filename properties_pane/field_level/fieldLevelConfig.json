@@ -3710,6 +3710,70 @@ making sure that you maintain a proper JSON format.
 				"template": "textarea"
 			}
 		],
+		"domain": [
+			"name",
+			"code",
+			"schemaId",
+			"type",
+			{
+				"propertyName": "Underlying type",
+				"propertyKeyword": "underlyingType",
+				"propertyTooltip": "The underlying data type of the domain.",
+				"propertyType": "text"
+			},
+			{
+				"propertyName": "Collation",
+				"propertyKeyword": "collation",
+				"propertyTooltip": "An optional collation for the domain. If no collation is specified, the underlying data type's default collation is used. The underlying type must be collatable if COLLATE is specified.",
+				"propertyType": "text"
+			},
+			{
+				"propertyName": "Not null",
+				"propertyKeyword": "required",
+				"enableForReference": true,
+				"propertyType": "checkbox"
+			},
+			"default",
+			{
+				"propertyName": "Check constraints",
+				"propertyKeyword": "checkConstraints",
+				"propertyType": "group",
+				"propertyTooltip": "CHECK clauses specify integrity constraints or tests which values of the domain must satisfy. Each constraint must be an expression producing a Boolean result. ",
+				"structure": [
+					{
+						"propertyName": "Constraint name",
+						"propertyKeyword": "name",
+						"propertyType": "text"
+					},
+					{
+						"propertyName": "Check expression",
+						"propertyKeyword": "expression",
+						"propertyType": "details",
+						"template": "textarea",
+						"markdown": false
+					}
+				]
+			},
+			{
+				"propertyName": "Comments",
+				"propertyKeyword": "description",
+				"propertyTooltip": "comments",
+				"addTimestampButton": false,
+				"propertyType": "details",
+				"template": "textarea"
+			},
+			"enum",
+			"sample",
+			{
+				"propertyName": "Remarks",
+				"propertyKeyword": "comments",
+				"shouldValidate": false,
+				"propertyTooltip": "remarks",
+				"addTimestampButton": true,
+				"propertyType": "details",
+				"template": "textarea"
+			}
+		],
 		"___2": []
 	}
 }

@@ -27,7 +27,8 @@
 				"multirange",
 				"enum",
 				"composite",
-				"range_udt"
+				"range_udt",
+				"domain"
 			]
 		}
 	}

@@ -1,0 +1,11 @@
+{
+    "name": "domain",
+    "erdAbbreviation": "<dmn>",
+    "dtdAbbreviation": "{dmn}",
+    "parentType": "string",
+    "hiddenOnEntity": [
+        "collection",
+        "view"
+    ],
+    "defaultValues": {}
+}

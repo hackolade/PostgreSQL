@@ -44,4 +44,5 @@ module.exports = {
     createCompositeType: 'CREATE TYPE ${name} AS (\n\t${columnDefinitions}\n);\n${comment}\n',
     createEnumType: 'CREATE TYPE ${name} AS ENUM (${values});\n${comment}\n',
     createRangeType: 'CREATE TYPE ${name} AS RANGE (\n\tSUBTYPE=${subtype}${options}\n);\n${comment}\n',
+    createDomainType: 'CREATE DOMAIN ${name} AS ${underlyingType}${notNull}${collate}${default}${constraints};\n${comment}\n'
 };

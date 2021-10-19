@@ -430,6 +430,8 @@ module.exports = (baseProvider, options, app) => {
                 subtypeDiffFunction: jsonSchema.subtypeDiffFunction,
                 multiRangeType: jsonSchema.multiRangeType,
                 databaseName: dbData.databaseName,
+                underlyingType: jsonSchema.underlyingType,
+                checkConstraints: jsonSchema.checkConstraints,
                 collationRule,
                 timePrecision,
                 with_timezone,

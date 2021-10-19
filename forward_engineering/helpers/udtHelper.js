@@ -34,6 +34,23 @@ module.exports = ({
                     options: getRangeOptions(udt),
                     comment: udt.comment ? comment : '',
                 });
+            case 'domain': {
+                const comment = assignTemplates(templates.comment, {
+                    object: 'DOMAIN',
+                    objectName: udtName,
+                    comment: wrapComment(udt.comment),
+                });
+
+                return assignTemplates(templates.createDomainType, {
+                    name: udtName,
+                    underlyingType: udt.underlyingType,
+                    notNull: !udt.nullable ? ' NOT NULL' : '',
+                    collate: udt.collation ? `\n\tCOLLATE ${udt.collation}` : '',
+                    default: udt.default ? `\n\tDEFAULT ${udt.default}` : '',
+                    constraints: getDomainConstraints(udt),
+                    comment: udt.comment ? comment : '',
+                });
+            }
             default:
                 return '';
         }
@@ -54,6 +71,16 @@ module.exports = ({
             .join(',\n');
 
         return _.trim(statements) ? ',\n\t' + _.trim(statements) : '';
+    };
+
+    const getDomainConstraints = udt => {
+        return _.map(udt.checkConstraints, constraint => {
+            if (constraint.name) {
+                return `\n\tCONSTRAINT ${constraint.name} CHECK (${constraint.expression})`;
+            }
+
+            return `\n\tCHECK (${constraint.expression})`;
+        }).join('');
     };
 
     const getBasicValue = prefix => value => {

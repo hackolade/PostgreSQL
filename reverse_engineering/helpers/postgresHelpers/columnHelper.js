@@ -25,6 +25,7 @@ const columnPropertiesMapper = {
     udt_name: 'udt_name',
     character_maximum_length: 'length',
     description: 'description',
+    domain_name: 'domain_name'
 };
 
 const mapColumnData = userDefinedTypes => column => {
@@ -52,6 +53,10 @@ const getType = (userDefinedTypes, column) => {
 
     if (column.type === 'USER-DEFINED') {
         return mapType(userDefinedTypes, column.udt_name);
+    }
+
+    if (column.domain_name) {
+        return mapType(userDefinedTypes, column.domain_name);
     }
 
     return mapType(userDefinedTypes, column.type);
