@@ -254,6 +254,7 @@ making sure that you maintain a proper JSON format.
 			{
 				"propertyName": "Primary key options",
 				"propertyType": "group",
+				"groupItemLimit": 1,
 				"propertyKeyword": "primaryKeyOptions",
 				"enableForReference": true,
 				"propertyTooltip": "Primary key options",
@@ -307,7 +308,7 @@ making sure that you maintain a proper JSON format.
 					},
 					{
 						"propertyName": "With options",
-						"propertyKeyword": "indexWithOptions",
+						"propertyKeyword": "indexStorageParameters",
 						"propertyType": "details",
 						"template": "textarea",
 						"valueType": "string"
@@ -430,7 +431,7 @@ making sure that you maintain a proper JSON format.
 					},
 					{
 						"propertyName": "With options",
-						"propertyKeyword": "indexWithOptions",
+						"propertyKeyword": "indexStorageParameters",
 						"propertyType": "details",
 						"template": "textarea",
 						"valueType": "string"
@@ -603,6 +604,7 @@ making sure that you maintain a proper JSON format.
 			{
 				"propertyName": "Primary key options",
 				"propertyType": "group",
+				"groupItemLimit": 1,
 				"propertyKeyword": "primaryKeyOptions",
 				"enableForReference": true,
 				"propertyTooltip": "Primary key options",
@@ -656,7 +658,7 @@ making sure that you maintain a proper JSON format.
 					},
 					{
 						"propertyName": "With options",
-						"propertyKeyword": "indexWithOptions",
+						"propertyKeyword": "indexStorageParameters",
 						"propertyType": "details",
 						"template": "textarea",
 						"valueType": "string"
@@ -779,7 +781,7 @@ making sure that you maintain a proper JSON format.
 					},
 					{
 						"propertyName": "With options",
-						"propertyKeyword": "indexWithOptions",
+						"propertyKeyword": "indexStorageParameters",
 						"propertyType": "details",
 						"template": "textarea",
 						"valueType": "string"
@@ -920,6 +922,7 @@ making sure that you maintain a proper JSON format.
 			{
 				"propertyName": "Primary key options",
 				"propertyType": "group",
+				"groupItemLimit": 1,
 				"propertyKeyword": "primaryKeyOptions",
 				"enableForReference": true,
 				"propertyTooltip": "Primary key options",
@@ -973,7 +976,7 @@ making sure that you maintain a proper JSON format.
 					},
 					{
 						"propertyName": "With options",
-						"propertyKeyword": "indexWithOptions",
+						"propertyKeyword": "indexStorageParameters",
 						"propertyType": "details",
 						"template": "textarea",
 						"valueType": "string"
@@ -1096,7 +1099,7 @@ making sure that you maintain a proper JSON format.
 					},
 					{
 						"propertyName": "With options",
-						"propertyKeyword": "indexWithOptions",
+						"propertyKeyword": "indexStorageParameters",
 						"propertyType": "details",
 						"template": "textarea",
 						"valueType": "string"
@@ -1290,6 +1293,7 @@ making sure that you maintain a proper JSON format.
 			{
 				"propertyName": "Primary key options",
 				"propertyType": "group",
+				"groupItemLimit": 1,
 				"propertyKeyword": "primaryKeyOptions",
 				"enableForReference": true,
 				"propertyTooltip": "Primary key options",
@@ -1343,7 +1347,7 @@ making sure that you maintain a proper JSON format.
 					},
 					{
 						"propertyName": "With options",
-						"propertyKeyword": "indexWithOptions",
+						"propertyKeyword": "indexStorageParameters",
 						"propertyType": "details",
 						"template": "textarea",
 						"valueType": "string"
@@ -1466,7 +1470,7 @@ making sure that you maintain a proper JSON format.
 					},
 					{
 						"propertyName": "With options",
-						"propertyKeyword": "indexWithOptions",
+						"propertyKeyword": "indexStorageParameters",
 						"propertyType": "details",
 						"template": "textarea",
 						"valueType": "string"
@@ -1649,6 +1653,7 @@ making sure that you maintain a proper JSON format.
 			{
 				"propertyName": "Primary key options",
 				"propertyType": "group",
+				"groupItemLimit": 1,
 				"propertyKeyword": "primaryKeyOptions",
 				"enableForReference": true,
 				"propertyTooltip": "Primary key options",
@@ -1702,7 +1707,7 @@ making sure that you maintain a proper JSON format.
 					},
 					{
 						"propertyName": "With options",
-						"propertyKeyword": "indexWithOptions",
+						"propertyKeyword": "indexStorageParameters",
 						"propertyType": "details",
 						"template": "textarea",
 						"valueType": "string"
@@ -1825,7 +1830,7 @@ making sure that you maintain a proper JSON format.
 					},
 					{
 						"propertyName": "With options",
-						"propertyKeyword": "indexWithOptions",
+						"propertyKeyword": "indexStorageParameters",
 						"propertyType": "details",
 						"template": "textarea",
 						"valueType": "string"
@@ -1970,6 +1975,7 @@ making sure that you maintain a proper JSON format.
 			{
 				"propertyName": "Primary key options",
 				"propertyType": "group",
+				"groupItemLimit": 1,
 				"propertyKeyword": "primaryKeyOptions",
 				"enableForReference": true,
 				"propertyTooltip": "Primary key options",
@@ -2023,7 +2029,7 @@ making sure that you maintain a proper JSON format.
 					},
 					{
 						"propertyName": "With options",
-						"propertyKeyword": "indexWithOptions",
+						"propertyKeyword": "indexStorageParameters",
 						"propertyType": "details",
 						"template": "textarea",
 						"valueType": "string"
@@ -2146,7 +2152,7 @@ making sure that you maintain a proper JSON format.
 					},
 					{
 						"propertyName": "With options",
-						"propertyKeyword": "indexWithOptions",
+						"propertyKeyword": "indexStorageParameters",
 						"propertyType": "details",
 						"template": "textarea",
 						"valueType": "string"
@@ -2355,6 +2361,7 @@ making sure that you maintain a proper JSON format.
 			{
 				"propertyName": "Primary key options",
 				"propertyType": "group",
+				"groupItemLimit": 1,
 				"propertyKeyword": "primaryKeyOptions",
 				"enableForReference": true,
 				"propertyTooltip": "Primary key options",
@@ -2408,7 +2415,7 @@ making sure that you maintain a proper JSON format.
 					},
 					{
 						"propertyName": "With options",
-						"propertyKeyword": "indexWithOptions",
+						"propertyKeyword": "indexStorageParameters",
 						"propertyType": "details",
 						"template": "textarea",
 						"valueType": "string"
@@ -2531,7 +2538,7 @@ making sure that you maintain a proper JSON format.
 					},
 					{
 						"propertyName": "With options",
-						"propertyKeyword": "indexWithOptions",
+						"propertyKeyword": "indexStorageParameters",
 						"propertyType": "details",
 						"template": "textarea",
 						"valueType": "string"
@@ -2656,6 +2663,7 @@ making sure that you maintain a proper JSON format.
 			{
 				"propertyName": "Primary key options",
 				"propertyType": "group",
+				"groupItemLimit": 1,
 				"propertyKeyword": "primaryKeyOptions",
 				"enableForReference": true,
 				"propertyTooltip": "Primary key options",
@@ -2709,7 +2717,7 @@ making sure that you maintain a proper JSON format.
 					},
 					{
 						"propertyName": "With options",
-						"propertyKeyword": "indexWithOptions",
+						"propertyKeyword": "indexStorageParameters",
 						"propertyType": "details",
 						"template": "textarea",
 						"valueType": "string"
@@ -2832,7 +2840,7 @@ making sure that you maintain a proper JSON format.
 					},
 					{
 						"propertyName": "With options",
-						"propertyKeyword": "indexWithOptions",
+						"propertyKeyword": "indexStorageParameters",
 						"propertyType": "details",
 						"template": "textarea",
 						"valueType": "string"
@@ -2978,6 +2986,7 @@ making sure that you maintain a proper JSON format.
 			{
 				"propertyName": "Primary key options",
 				"propertyType": "group",
+				"groupItemLimit": 1,
 				"propertyKeyword": "primaryKeyOptions",
 				"enableForReference": true,
 				"propertyTooltip": "Primary key options",
@@ -3031,7 +3040,7 @@ making sure that you maintain a proper JSON format.
 					},
 					{
 						"propertyName": "With options",
-						"propertyKeyword": "indexWithOptions",
+						"propertyKeyword": "indexStorageParameters",
 						"propertyType": "details",
 						"template": "textarea",
 						"valueType": "string"
@@ -3154,7 +3163,7 @@ making sure that you maintain a proper JSON format.
 					},
 					{
 						"propertyName": "With options",
-						"propertyKeyword": "indexWithOptions",
+						"propertyKeyword": "indexStorageParameters",
 						"propertyType": "details",
 						"template": "textarea",
 						"valueType": "string"

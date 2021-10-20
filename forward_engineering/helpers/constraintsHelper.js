@@ -50,8 +50,8 @@ module.exports = ({
         const constraintName = wrapInQuotes(_.trim(keyData.name));
         const isAllColumnsDeactivated = checkAllKeysDeactivated(keyData.columns);
         const columns = getColumnsList(keyData.columns, isAllColumnsDeactivated, isParentActivated);
-        const includeNonKey = keyData.includeNonKey
-            ? ` INCLUDE (${getColumnsList(keyData.include, isAllColumnsDeactivated, isParentActivated)})`
+        const includeNonKey = keyData.include
+            ? ` INCLUDE${getColumnsList(keyData.include, isAllColumnsDeactivated, isParentActivated)}`
             : '';
         const storageParameters = keyData.storageParameters ? ` WITH (${keyData.storageParameters})` : '';
         const tablespace = keyData.tablespace ? ` USING INDEX TABLESPACE ${wrapInQuotes(keyData.tablespace)}` : '';

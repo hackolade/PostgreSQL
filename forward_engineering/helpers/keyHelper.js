@@ -33,7 +33,7 @@ module.exports = (_, clean) => {
         return isPrimaryKey(column) && _.isEmpty(column.primaryKeyOptions);
     };
 
-    const hydrateUniqueOptions = (options, columnName, isActivated) =>
+    const hydrateUniqueOptions = (options, columnName, isActivated, jsonSchema) =>
         clean({
             keyType: 'UNIQUE',
             name: options['constraintName'],
@@ -43,13 +43,13 @@ module.exports = (_, clean) => {
                     isActivated: isActivated,
                 },
             ],
-            include: options['include'],
+            include: getKeys(options['include'] || options['indexInclude'] || [], jsonSchema),
             storageParameters: options['indexStorageParameters'],
             comment: options['indexComment'],
             tablespace: options['indexTablespace'],
         });
 
-    const hydratePrimaryKeyOptions = (options, columnName, isActivated) =>
+    const hydratePrimaryKeyOptions = (options, columnName, isActivated, jsonSchema) =>
         clean({
             keyType: 'PRIMARY KEY',
             name: options['constraintName'],
@@ -59,7 +59,7 @@ module.exports = (_, clean) => {
                     isActivated: isActivated,
                 },
             ],
-            include: options['include'],
+            include: getKeys(options['include'] || options['indexInclude'] || [], jsonSchema),
             storageParameters: options['indexStorageParameters'],
             comment: options['indexComment'],
             tablespace: options['indexTablespace'],
@@ -94,7 +94,7 @@ module.exports = (_, clean) => {
         return jsonSchema.primaryKey
             .filter(primaryKey => !_.isEmpty(primaryKey.compositePrimaryKey))
             .map(primaryKey => ({
-                ...hydratePrimaryKeyOptions(primaryKey),
+                ...hydratePrimaryKeyOptions(primaryKey, null, null, jsonSchema),
                 columns: getKeys(primaryKey.compositePrimaryKey, jsonSchema),
             }));
     };
@@ -107,7 +107,7 @@ module.exports = (_, clean) => {
         return jsonSchema.uniqueKey
             .filter(uniqueKey => !_.isEmpty(uniqueKey.compositeUniqueKey))
             .map(uniqueKey => ({
-                ...hydrateUniqueOptions(uniqueKey),
+                ...hydrateUniqueOptions(uniqueKey, null, null, jsonSchema),
                 columns: getKeys(uniqueKey.compositeUniqueKey, jsonSchema),
             }));
     };
@@ -124,7 +124,7 @@ module.exports = (_, clean) => {
                 return;
             }
 
-            return hydratePrimaryKeyOptions(schema.primaryKeyOptions, name, schema.isActivated);
+            return hydratePrimaryKeyOptions(_.first(schema.primaryKeyOptions), name, schema.isActivated, jsonSchema);
         }).filter(Boolean);
 
         const uniqueKeyConstraints = _.flatten(
@@ -136,7 +136,7 @@ module.exports = (_, clean) => {
                 }
 
                 return schema.uniqueKeyOptions.map(uniqueKey =>
-                    hydrateUniqueOptions(uniqueKey, name, schema.isActivated)
+                    hydrateUniqueOptions(uniqueKey, name, schema.isActivated, jsonSchema)
                 );
             })
         ).filter(Boolean);
