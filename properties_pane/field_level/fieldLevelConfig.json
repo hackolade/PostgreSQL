@@ -253,7 +253,7 @@ making sure that you maintain a proper JSON format.
 			},
 			{
 				"propertyName": "Primary key options",
-				"propertyType": "block",
+				"propertyType": "group",
 				"propertyKeyword": "primaryKeyOptions",
 				"enableForReference": true,
 				"propertyTooltip": "Primary key options",
@@ -296,35 +296,26 @@ making sure that you maintain a proper JSON format.
 					{
 						"propertyName": "Constraint name",
 						"propertyKeyword": "constraintName",
-						"propertyTooltip": "",
 						"propertyType": "text"
 					},
 					{
-						"propertyName": "Category",
-						"propertyKeyword": "indexCategory",
-						"propertyTooltip": "",
-						"propertyType": "select",
-						"defaultValue": "",
-						"options": [
-							"",
-							"btree",
-							"hash",
-							"gist",
-							"spgist",
-							"gin",
-							"brin"
-						]
+						"propertyName": "Include non-key columns",
+						"propertyKeyword": "indexInclude",
+						"propertyType": "fieldList",
+						"template": "orderedList",
+						"propertyTooltip": "The optional INCLUDE clause specifies a list of columns which will be included in the constraint as non-key columns."
 					},
 					{
-						"propertyName": "Key order",
-						"propertyKeyword": "indexOrder",
-						"propertyTooltip": "",
-						"propertyType": "select",
-						"options": [
-							"",
-							"ASC",
-							"DESC"
-						]
+						"propertyName": "With options",
+						"propertyKeyword": "indexWithOptions",
+						"propertyType": "details",
+						"template": "textarea",
+						"valueType": "string"
+					},
+					{
+						"propertyName": "Tablespace",
+						"propertyKeyword": "indexTablespace",
+						"propertyType": "text"
 					},
 					{
 						"propertyName": "Comment",
@@ -431,31 +422,23 @@ making sure that you maintain a proper JSON format.
 						"propertyType": "text"
 					},
 					{
-						"propertyName": "Category",
-						"propertyKeyword": "indexCategory",
-						"propertyTooltip": "",
-						"propertyType": "select",
-						"defaultValue": "",
-						"options": [
-							"",
-							"btree",
-							"hash",
-							"gist",
-							"spgist",
-							"gin",
-							"brin"
-						]
+						"propertyName": "Include non-key columns",
+						"propertyKeyword": "indexInclude",
+						"propertyType": "fieldList",
+						"template": "orderedList",
+						"propertyTooltip": "The optional INCLUDE clause specifies a list of columns which will be included in the constraint as non-key columns."
 					},
 					{
-						"propertyName": "Key order",
-						"propertyKeyword": "indexOrder",
-						"propertyTooltip": "",
-						"propertyType": "select",
-						"options": [
-							"",
-							"ASC",
-							"DESC"
-						]
+						"propertyName": "With options",
+						"propertyKeyword": "indexWithOptions",
+						"propertyType": "details",
+						"template": "textarea",
+						"valueType": "string"
+					},
+					{
+						"propertyName": "Tablespace",
+						"propertyKeyword": "indexTablespace",
+						"propertyType": "text"
 					},
 					{
 						"propertyName": "Comment",
@@ -619,7 +602,7 @@ making sure that you maintain a proper JSON format.
 			},
 			{
 				"propertyName": "Primary key options",
-				"propertyType": "block",
+				"propertyType": "group",
 				"propertyKeyword": "primaryKeyOptions",
 				"enableForReference": true,
 				"propertyTooltip": "Primary key options",
@@ -662,35 +645,26 @@ making sure that you maintain a proper JSON format.
 					{
 						"propertyName": "Constraint name",
 						"propertyKeyword": "constraintName",
-						"propertyTooltip": "",
 						"propertyType": "text"
 					},
 					{
-						"propertyName": "Category",
-						"propertyKeyword": "indexCategory",
-						"propertyTooltip": "",
-						"propertyType": "select",
-						"defaultValue": "",
-						"options": [
-							"",
-							"btree",
-							"hash",
-							"gist",
-							"spgist",
-							"gin",
-							"brin"
-						]
+						"propertyName": "Include non-key columns",
+						"propertyKeyword": "indexInclude",
+						"propertyType": "fieldList",
+						"template": "orderedList",
+						"propertyTooltip": "The optional INCLUDE clause specifies a list of columns which will be included in the constraint as non-key columns."
 					},
 					{
-						"propertyName": "Key order",
-						"propertyKeyword": "indexOrder",
-						"propertyTooltip": "",
-						"propertyType": "select",
-						"options": [
-							"",
-							"ASC",
-							"DESC"
-						]
+						"propertyName": "With options",
+						"propertyKeyword": "indexWithOptions",
+						"propertyType": "details",
+						"template": "textarea",
+						"valueType": "string"
+					},
+					{
+						"propertyName": "Tablespace",
+						"propertyKeyword": "indexTablespace",
+						"propertyType": "text"
 					},
 					{
 						"propertyName": "Comment",
@@ -797,31 +771,23 @@ making sure that you maintain a proper JSON format.
 						"propertyType": "text"
 					},
 					{
-						"propertyName": "Category",
-						"propertyKeyword": "indexCategory",
-						"propertyTooltip": "",
-						"propertyType": "select",
-						"defaultValue": "",
-						"options": [
-							"",
-							"btree",
-							"hash",
-							"gist",
-							"spgist",
-							"gin",
-							"brin"
-						]
+						"propertyName": "Include non-key columns",
+						"propertyKeyword": "indexInclude",
+						"propertyType": "fieldList",
+						"template": "orderedList",
+						"propertyTooltip": "The optional INCLUDE clause specifies a list of columns which will be included in the constraint as non-key columns."
 					},
 					{
-						"propertyName": "Key order",
-						"propertyKeyword": "indexOrder",
-						"propertyTooltip": "",
-						"propertyType": "select",
-						"options": [
-							"",
-							"ASC",
-							"DESC"
-						]
+						"propertyName": "With options",
+						"propertyKeyword": "indexWithOptions",
+						"propertyType": "details",
+						"template": "textarea",
+						"valueType": "string"
+					},
+					{
+						"propertyName": "Tablespace",
+						"propertyKeyword": "indexTablespace",
+						"propertyType": "text"
 					},
 					{
 						"propertyName": "Comment",
@@ -953,7 +919,7 @@ making sure that you maintain a proper JSON format.
 			},
 			{
 				"propertyName": "Primary key options",
-				"propertyType": "block",
+				"propertyType": "group",
 				"propertyKeyword": "primaryKeyOptions",
 				"enableForReference": true,
 				"propertyTooltip": "Primary key options",
@@ -996,35 +962,26 @@ making sure that you maintain a proper JSON format.
 					{
 						"propertyName": "Constraint name",
 						"propertyKeyword": "constraintName",
-						"propertyTooltip": "",
 						"propertyType": "text"
 					},
 					{
-						"propertyName": "Category",
-						"propertyKeyword": "indexCategory",
-						"propertyTooltip": "",
-						"propertyType": "select",
-						"defaultValue": "",
-						"options": [
-							"",
-							"btree",
-							"hash",
-							"gist",
-							"spgist",
-							"gin",
-							"brin"
-						]
+						"propertyName": "Include non-key columns",
+						"propertyKeyword": "indexInclude",
+						"propertyType": "fieldList",
+						"template": "orderedList",
+						"propertyTooltip": "The optional INCLUDE clause specifies a list of columns which will be included in the constraint as non-key columns."
 					},
 					{
-						"propertyName": "Key order",
-						"propertyKeyword": "indexOrder",
-						"propertyTooltip": "",
-						"propertyType": "select",
-						"options": [
-							"",
-							"ASC",
-							"DESC"
-						]
+						"propertyName": "With options",
+						"propertyKeyword": "indexWithOptions",
+						"propertyType": "details",
+						"template": "textarea",
+						"valueType": "string"
+					},
+					{
+						"propertyName": "Tablespace",
+						"propertyKeyword": "indexTablespace",
+						"propertyType": "text"
 					},
 					{
 						"propertyName": "Comment",
@@ -1131,31 +1088,23 @@ making sure that you maintain a proper JSON format.
 						"propertyType": "text"
 					},
 					{
-						"propertyName": "Category",
-						"propertyKeyword": "indexCategory",
-						"propertyTooltip": "",
-						"propertyType": "select",
-						"defaultValue": "",
-						"options": [
-							"",
-							"btree",
-							"hash",
-							"gist",
-							"spgist",
-							"gin",
-							"brin"
-						]
+						"propertyName": "Include non-key columns",
+						"propertyKeyword": "indexInclude",
+						"propertyType": "fieldList",
+						"template": "orderedList",
+						"propertyTooltip": "The optional INCLUDE clause specifies a list of columns which will be included in the constraint as non-key columns."
 					},
 					{
-						"propertyName": "Key order",
-						"propertyKeyword": "indexOrder",
-						"propertyTooltip": "",
-						"propertyType": "select",
-						"options": [
-							"",
-							"ASC",
-							"DESC"
-						]
+						"propertyName": "With options",
+						"propertyKeyword": "indexWithOptions",
+						"propertyType": "details",
+						"template": "textarea",
+						"valueType": "string"
+					},
+					{
+						"propertyName": "Tablespace",
+						"propertyKeyword": "indexTablespace",
+						"propertyType": "text"
 					},
 					{
 						"propertyName": "Comment",
@@ -1211,7 +1160,8 @@ making sure that you maintain a proper JSON format.
 					"key": "mode",
 					"value": [
 						"time",
-						"timestamp"
+						"timestamp",
+						"interval"
 					]
 				}
 			},
@@ -1339,7 +1289,7 @@ making sure that you maintain a proper JSON format.
 			},
 			{
 				"propertyName": "Primary key options",
-				"propertyType": "block",
+				"propertyType": "group",
 				"propertyKeyword": "primaryKeyOptions",
 				"enableForReference": true,
 				"propertyTooltip": "Primary key options",
@@ -1382,35 +1332,26 @@ making sure that you maintain a proper JSON format.
 					{
 						"propertyName": "Constraint name",
 						"propertyKeyword": "constraintName",
-						"propertyTooltip": "",
 						"propertyType": "text"
 					},
 					{
-						"propertyName": "Category",
-						"propertyKeyword": "indexCategory",
-						"propertyTooltip": "",
-						"propertyType": "select",
-						"defaultValue": "",
-						"options": [
-							"",
-							"btree",
-							"hash",
-							"gist",
-							"spgist",
-							"gin",
-							"brin"
-						]
+						"propertyName": "Include non-key columns",
+						"propertyKeyword": "indexInclude",
+						"propertyType": "fieldList",
+						"template": "orderedList",
+						"propertyTooltip": "The optional INCLUDE clause specifies a list of columns which will be included in the constraint as non-key columns."
 					},
 					{
-						"propertyName": "Key order",
-						"propertyKeyword": "indexOrder",
-						"propertyTooltip": "",
-						"propertyType": "select",
-						"options": [
-							"",
-							"ASC",
-							"DESC"
-						]
+						"propertyName": "With options",
+						"propertyKeyword": "indexWithOptions",
+						"propertyType": "details",
+						"template": "textarea",
+						"valueType": "string"
+					},
+					{
+						"propertyName": "Tablespace",
+						"propertyKeyword": "indexTablespace",
+						"propertyType": "text"
 					},
 					{
 						"propertyName": "Comment",
@@ -1517,31 +1458,23 @@ making sure that you maintain a proper JSON format.
 						"propertyType": "text"
 					},
 					{
-						"propertyName": "Category",
-						"propertyKeyword": "indexCategory",
-						"propertyTooltip": "",
-						"propertyType": "select",
-						"defaultValue": "",
-						"options": [
-							"",
-							"btree",
-							"hash",
-							"gist",
-							"spgist",
-							"gin",
-							"brin"
-						]
+						"propertyName": "Include non-key columns",
+						"propertyKeyword": "indexInclude",
+						"propertyType": "fieldList",
+						"template": "orderedList",
+						"propertyTooltip": "The optional INCLUDE clause specifies a list of columns which will be included in the constraint as non-key columns."
 					},
 					{
-						"propertyName": "Key order",
-						"propertyKeyword": "indexOrder",
-						"propertyTooltip": "",
-						"propertyType": "select",
-						"options": [
-							"",
-							"ASC",
-							"DESC"
-						]
+						"propertyName": "With options",
+						"propertyKeyword": "indexWithOptions",
+						"propertyType": "details",
+						"template": "textarea",
+						"valueType": "string"
+					},
+					{
+						"propertyName": "Tablespace",
+						"propertyKeyword": "indexTablespace",
+						"propertyType": "text"
 					},
 					{
 						"propertyName": "Comment",
@@ -1715,7 +1648,7 @@ making sure that you maintain a proper JSON format.
 			},
 			{
 				"propertyName": "Primary key options",
-				"propertyType": "block",
+				"propertyType": "group",
 				"propertyKeyword": "primaryKeyOptions",
 				"enableForReference": true,
 				"propertyTooltip": "Primary key options",
@@ -1758,35 +1691,26 @@ making sure that you maintain a proper JSON format.
 					{
 						"propertyName": "Constraint name",
 						"propertyKeyword": "constraintName",
-						"propertyTooltip": "",
 						"propertyType": "text"
 					},
 					{
-						"propertyName": "Category",
-						"propertyKeyword": "indexCategory",
-						"propertyTooltip": "",
-						"propertyType": "select",
-						"defaultValue": "",
-						"options": [
-							"",
-							"btree",
-							"hash",
-							"gist",
-							"spgist",
-							"gin",
-							"brin"
-						]
+						"propertyName": "Include non-key columns",
+						"propertyKeyword": "indexInclude",
+						"propertyType": "fieldList",
+						"template": "orderedList",
+						"propertyTooltip": "The optional INCLUDE clause specifies a list of columns which will be included in the constraint as non-key columns."
 					},
 					{
-						"propertyName": "Key order",
-						"propertyKeyword": "indexOrder",
-						"propertyTooltip": "",
-						"propertyType": "select",
-						"options": [
-							"",
-							"ASC",
-							"DESC"
-						]
+						"propertyName": "With options",
+						"propertyKeyword": "indexWithOptions",
+						"propertyType": "details",
+						"template": "textarea",
+						"valueType": "string"
+					},
+					{
+						"propertyName": "Tablespace",
+						"propertyKeyword": "indexTablespace",
+						"propertyType": "text"
 					},
 					{
 						"propertyName": "Comment",
@@ -1893,31 +1817,23 @@ making sure that you maintain a proper JSON format.
 						"propertyType": "text"
 					},
 					{
-						"propertyName": "Category",
-						"propertyKeyword": "indexCategory",
-						"propertyTooltip": "",
-						"propertyType": "select",
-						"defaultValue": "",
-						"options": [
-							"",
-							"btree",
-							"hash",
-							"gist",
-							"spgist",
-							"gin",
-							"brin"
-						]
+						"propertyName": "Include non-key columns",
+						"propertyKeyword": "indexInclude",
+						"propertyType": "fieldList",
+						"template": "orderedList",
+						"propertyTooltip": "The optional INCLUDE clause specifies a list of columns which will be included in the constraint as non-key columns."
 					},
 					{
-						"propertyName": "Key order",
-						"propertyKeyword": "indexOrder",
-						"propertyTooltip": "",
-						"propertyType": "select",
-						"options": [
-							"",
-							"ASC",
-							"DESC"
-						]
+						"propertyName": "With options",
+						"propertyKeyword": "indexWithOptions",
+						"propertyType": "details",
+						"template": "textarea",
+						"valueType": "string"
+					},
+					{
+						"propertyName": "Tablespace",
+						"propertyKeyword": "indexTablespace",
+						"propertyType": "text"
 					},
 					{
 						"propertyName": "Comment",
@@ -2053,7 +1969,7 @@ making sure that you maintain a proper JSON format.
 			},
 			{
 				"propertyName": "Primary key options",
-				"propertyType": "block",
+				"propertyType": "group",
 				"propertyKeyword": "primaryKeyOptions",
 				"enableForReference": true,
 				"propertyTooltip": "Primary key options",
@@ -2096,35 +2012,26 @@ making sure that you maintain a proper JSON format.
 					{
 						"propertyName": "Constraint name",
 						"propertyKeyword": "constraintName",
-						"propertyTooltip": "",
 						"propertyType": "text"
 					},
 					{
-						"propertyName": "Category",
-						"propertyKeyword": "indexCategory",
-						"propertyTooltip": "",
-						"propertyType": "select",
-						"defaultValue": "",
-						"options": [
-							"",
-							"btree",
-							"hash",
-							"gist",
-							"spgist",
-							"gin",
-							"brin"
-						]
+						"propertyName": "Include non-key columns",
+						"propertyKeyword": "indexInclude",
+						"propertyType": "fieldList",
+						"template": "orderedList",
+						"propertyTooltip": "The optional INCLUDE clause specifies a list of columns which will be included in the constraint as non-key columns."
 					},
 					{
-						"propertyName": "Key order",
-						"propertyKeyword": "indexOrder",
-						"propertyTooltip": "",
-						"propertyType": "select",
-						"options": [
-							"",
-							"ASC",
-							"DESC"
-						]
+						"propertyName": "With options",
+						"propertyKeyword": "indexWithOptions",
+						"propertyType": "details",
+						"template": "textarea",
+						"valueType": "string"
+					},
+					{
+						"propertyName": "Tablespace",
+						"propertyKeyword": "indexTablespace",
+						"propertyType": "text"
 					},
 					{
 						"propertyName": "Comment",
@@ -2231,31 +2138,23 @@ making sure that you maintain a proper JSON format.
 						"propertyType": "text"
 					},
 					{
-						"propertyName": "Category",
-						"propertyKeyword": "indexCategory",
-						"propertyTooltip": "",
-						"propertyType": "select",
-						"defaultValue": "",
-						"options": [
-							"",
-							"btree",
-							"hash",
-							"gist",
-							"spgist",
-							"gin",
-							"brin"
-						]
+						"propertyName": "Include non-key columns",
+						"propertyKeyword": "indexInclude",
+						"propertyType": "fieldList",
+						"template": "orderedList",
+						"propertyTooltip": "The optional INCLUDE clause specifies a list of columns which will be included in the constraint as non-key columns."
 					},
 					{
-						"propertyName": "Key order",
-						"propertyKeyword": "indexOrder",
-						"propertyTooltip": "",
-						"propertyType": "select",
-						"options": [
-							"",
-							"ASC",
-							"DESC"
-						]
+						"propertyName": "With options",
+						"propertyKeyword": "indexWithOptions",
+						"propertyType": "details",
+						"template": "textarea",
+						"valueType": "string"
+					},
+					{
+						"propertyName": "Tablespace",
+						"propertyKeyword": "indexTablespace",
+						"propertyType": "text"
 					},
 					{
 						"propertyName": "Comment",
@@ -2455,7 +2354,7 @@ making sure that you maintain a proper JSON format.
 			},
 			{
 				"propertyName": "Primary key options",
-				"propertyType": "block",
+				"propertyType": "group",
 				"propertyKeyword": "primaryKeyOptions",
 				"enableForReference": true,
 				"propertyTooltip": "Primary key options",
@@ -2498,35 +2397,26 @@ making sure that you maintain a proper JSON format.
 					{
 						"propertyName": "Constraint name",
 						"propertyKeyword": "constraintName",
-						"propertyTooltip": "",
 						"propertyType": "text"
 					},
 					{
-						"propertyName": "Category",
-						"propertyKeyword": "indexCategory",
-						"propertyTooltip": "",
-						"propertyType": "select",
-						"defaultValue": "",
-						"options": [
-							"",
-							"btree",
-							"hash",
-							"gist",
-							"spgist",
-							"gin",
-							"brin"
-						]
+						"propertyName": "Include non-key columns",
+						"propertyKeyword": "indexInclude",
+						"propertyType": "fieldList",
+						"template": "orderedList",
+						"propertyTooltip": "The optional INCLUDE clause specifies a list of columns which will be included in the constraint as non-key columns."
 					},
 					{
-						"propertyName": "Key order",
-						"propertyKeyword": "indexOrder",
-						"propertyTooltip": "",
-						"propertyType": "select",
-						"options": [
-							"",
-							"ASC",
-							"DESC"
-						]
+						"propertyName": "With options",
+						"propertyKeyword": "indexWithOptions",
+						"propertyType": "details",
+						"template": "textarea",
+						"valueType": "string"
+					},
+					{
+						"propertyName": "Tablespace",
+						"propertyKeyword": "indexTablespace",
+						"propertyType": "text"
 					},
 					{
 						"propertyName": "Comment",
@@ -2633,31 +2523,23 @@ making sure that you maintain a proper JSON format.
 						"propertyType": "text"
 					},
 					{
-						"propertyName": "Category",
-						"propertyKeyword": "indexCategory",
-						"propertyTooltip": "",
-						"propertyType": "select",
-						"defaultValue": "",
-						"options": [
-							"",
-							"btree",
-							"hash",
-							"gist",
-							"spgist",
-							"gin",
-							"brin"
-						]
+						"propertyName": "Include non-key columns",
+						"propertyKeyword": "indexInclude",
+						"propertyType": "fieldList",
+						"template": "orderedList",
+						"propertyTooltip": "The optional INCLUDE clause specifies a list of columns which will be included in the constraint as non-key columns."
 					},
 					{
-						"propertyName": "Key order",
-						"propertyKeyword": "indexOrder",
-						"propertyTooltip": "",
-						"propertyType": "select",
-						"options": [
-							"",
-							"ASC",
-							"DESC"
-						]
+						"propertyName": "With options",
+						"propertyKeyword": "indexWithOptions",
+						"propertyType": "details",
+						"template": "textarea",
+						"valueType": "string"
+					},
+					{
+						"propertyName": "Tablespace",
+						"propertyKeyword": "indexTablespace",
+						"propertyType": "text"
 					},
 					{
 						"propertyName": "Comment",
@@ -2773,7 +2655,7 @@ making sure that you maintain a proper JSON format.
 			},
 			{
 				"propertyName": "Primary key options",
-				"propertyType": "block",
+				"propertyType": "group",
 				"propertyKeyword": "primaryKeyOptions",
 				"enableForReference": true,
 				"propertyTooltip": "Primary key options",
@@ -2816,35 +2698,26 @@ making sure that you maintain a proper JSON format.
 					{
 						"propertyName": "Constraint name",
 						"propertyKeyword": "constraintName",
-						"propertyTooltip": "",
 						"propertyType": "text"
 					},
 					{
-						"propertyName": "Category",
-						"propertyKeyword": "indexCategory",
-						"propertyTooltip": "",
-						"propertyType": "select",
-						"defaultValue": "",
-						"options": [
-							"",
-							"btree",
-							"hash",
-							"gist",
-							"spgist",
-							"gin",
-							"brin"
-						]
+						"propertyName": "Include non-key columns",
+						"propertyKeyword": "indexInclude",
+						"propertyType": "fieldList",
+						"template": "orderedList",
+						"propertyTooltip": "The optional INCLUDE clause specifies a list of columns which will be included in the constraint as non-key columns."
 					},
 					{
-						"propertyName": "Key order",
-						"propertyKeyword": "indexOrder",
-						"propertyTooltip": "",
-						"propertyType": "select",
-						"options": [
-							"",
-							"ASC",
-							"DESC"
-						]
+						"propertyName": "With options",
+						"propertyKeyword": "indexWithOptions",
+						"propertyType": "details",
+						"template": "textarea",
+						"valueType": "string"
+					},
+					{
+						"propertyName": "Tablespace",
+						"propertyKeyword": "indexTablespace",
+						"propertyType": "text"
 					},
 					{
 						"propertyName": "Comment",
@@ -2951,31 +2824,23 @@ making sure that you maintain a proper JSON format.
 						"propertyType": "text"
 					},
 					{
-						"propertyName": "Category",
-						"propertyKeyword": "indexCategory",
-						"propertyTooltip": "",
-						"propertyType": "select",
-						"defaultValue": "",
-						"options": [
-							"",
-							"btree",
-							"hash",
-							"gist",
-							"spgist",
-							"gin",
-							"brin"
-						]
+						"propertyName": "Include non-key columns",
+						"propertyKeyword": "indexInclude",
+						"propertyType": "fieldList",
+						"template": "orderedList",
+						"propertyTooltip": "The optional INCLUDE clause specifies a list of columns which will be included in the constraint as non-key columns."
 					},
 					{
-						"propertyName": "Key order",
-						"propertyKeyword": "indexOrder",
-						"propertyTooltip": "",
-						"propertyType": "select",
-						"options": [
-							"",
-							"ASC",
-							"DESC"
-						]
+						"propertyName": "With options",
+						"propertyKeyword": "indexWithOptions",
+						"propertyType": "details",
+						"template": "textarea",
+						"valueType": "string"
+					},
+					{
+						"propertyName": "Tablespace",
+						"propertyKeyword": "indexTablespace",
+						"propertyType": "text"
 					},
 					{
 						"propertyName": "Comment",
@@ -3112,7 +2977,7 @@ making sure that you maintain a proper JSON format.
 			},
 			{
 				"propertyName": "Primary key options",
-				"propertyType": "block",
+				"propertyType": "group",
 				"propertyKeyword": "primaryKeyOptions",
 				"enableForReference": true,
 				"propertyTooltip": "Primary key options",
@@ -3155,35 +3020,26 @@ making sure that you maintain a proper JSON format.
 					{
 						"propertyName": "Constraint name",
 						"propertyKeyword": "constraintName",
-						"propertyTooltip": "",
 						"propertyType": "text"
 					},
 					{
-						"propertyName": "Category",
-						"propertyKeyword": "indexCategory",
-						"propertyTooltip": "",
-						"propertyType": "select",
-						"defaultValue": "",
-						"options": [
-							"",
-							"btree",
-							"hash",
-							"gist",
-							"spgist",
-							"gin",
-							"brin"
-						]
+						"propertyName": "Include non-key columns",
+						"propertyKeyword": "indexInclude",
+						"propertyType": "fieldList",
+						"template": "orderedList",
+						"propertyTooltip": "The optional INCLUDE clause specifies a list of columns which will be included in the constraint as non-key columns."
 					},
 					{
-						"propertyName": "Key order",
-						"propertyKeyword": "indexOrder",
-						"propertyTooltip": "",
-						"propertyType": "select",
-						"options": [
-							"",
-							"ASC",
-							"DESC"
-						]
+						"propertyName": "With options",
+						"propertyKeyword": "indexWithOptions",
+						"propertyType": "details",
+						"template": "textarea",
+						"valueType": "string"
+					},
+					{
+						"propertyName": "Tablespace",
+						"propertyKeyword": "indexTablespace",
+						"propertyType": "text"
 					},
 					{
 						"propertyName": "Comment",
@@ -3290,31 +3146,23 @@ making sure that you maintain a proper JSON format.
 						"propertyType": "text"
 					},
 					{
-						"propertyName": "Category",
-						"propertyKeyword": "indexCategory",
-						"propertyTooltip": "",
-						"propertyType": "select",
-						"defaultValue": "",
-						"options": [
-							"",
-							"btree",
-							"hash",
-							"gist",
-							"spgist",
-							"gin",
-							"brin"
-						]
+						"propertyName": "Include non-key columns",
+						"propertyKeyword": "indexInclude",
+						"propertyType": "fieldList",
+						"template": "orderedList",
+						"propertyTooltip": "The optional INCLUDE clause specifies a list of columns which will be included in the constraint as non-key columns."
 					},
 					{
-						"propertyName": "Key order",
-						"propertyKeyword": "indexOrder",
-						"propertyTooltip": "",
-						"propertyType": "select",
-						"options": [
-							"",
-							"ASC",
-							"DESC"
-						]
+						"propertyName": "With options",
+						"propertyKeyword": "indexWithOptions",
+						"propertyType": "details",
+						"template": "textarea",
+						"valueType": "string"
+					},
+					{
+						"propertyName": "Tablespace",
+						"propertyKeyword": "indexTablespace",
+						"propertyType": "text"
 					},
 					{
 						"propertyName": "Comment",

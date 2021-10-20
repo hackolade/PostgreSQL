@@ -51,7 +51,6 @@ making sure that you maintain a proper JSON format.
 			}
 
 */
-
 [
 	{
 		"lowerTab": "Details",
@@ -153,16 +152,48 @@ making sure that you maintain a proper JSON format.
 				"propertyType": "text"
 			},
 			{
+				"propertyName": "Locale",
+				"propertyKeyword": "locale",
+				"propertyTooltip": "Collation order (LC_COLLATE) to use in the new database. ",
+				"propertyType": "text"
+			},
+			{
 				"propertyName": "Collation",
 				"propertyKeyword": "LC_COLLATE",
 				"propertyTooltip": "Collation order (LC_COLLATE) to use in the new database. ",
-				"propertyType": "text"
+				"propertyType": "text",
+				"dependency": {
+					"type": "or",
+					"values": [
+						{
+							"key": "locale",
+							"exists": false
+						},
+						{
+							"key": "locale",
+							"value": ""
+						}
+					]
+				}
 			},
 			{
 				"propertyName": "Character type",
 				"propertyKeyword": "LC_CTYPE",
 				"propertyTooltip": "Character classification (LC_CTYPE) to use in the new database. ",
-				"propertyType": "text"
+				"propertyType": "text",
+				"dependency": {
+					"type": "or",
+					"values": [
+						{
+							"key": "locale",
+							"exists": false
+						},
+						{
+							"key": "locale",
+							"value": ""
+						}
+					]
+				}
 			},
 			{
 				"propertyName": "Comments",
