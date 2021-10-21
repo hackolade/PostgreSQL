@@ -7,7 +7,7 @@ module.exports = ({
     wrapComment,
 }) => {
     const getPlainUdt = (udt, columns) => {
-        const udtName = getNamePrefixedWithSchemaName(udt.name, udt.databaseName);
+        const udtName = getNamePrefixedWithSchemaName(udt.name, udt.schemaName);
         const comment = assignTemplates(templates.comment, {
             object: 'TYPE',
             objectName: udtName,

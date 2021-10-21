@@ -86,22 +86,42 @@ module.exports = (baseProvider, options, app) => {
             wrapComment,
         });
 
+    const { getLocaleProperties } = require('./helpers/databaseHelper')();
+
     return {
-        createDatabase({ databaseName, ifNotExist, comments, udfs, procedures }) {
+        createDatabase(modelData) {
+            if (!modelData.databaseName) {
+                return '';
+            }
+
+            const { locale, collate, characterClassification } = getLocaleProperties(modelData);
+
+            return assignTemplates(templates.createDatabase, {
+                name: wrapInQuotes(modelData.databaseName),
+                template: modelData.template ? `\n\tTEMPLATE ${modelData.template}` : '',
+                encoding: modelData.encoding ? `\n\tENCODING ${modelData.encoding}` : '',
+                locale: locale ? `\n\tLOCALE '${modelData.locale}'` : '',
+                collate: collate ? `\n\tLC_COLLATE '${modelData.collate}'` : '',
+                characterClassification: characterClassification ? `\n\tLC_CTYPE '${characterClassification}'` : '',
+                tablespace: modelData.tablespace ? `\n\tTABLESPACE '${modelData.tablespace}'` : '',
+            });
+        },
+
+        createSchema({ schemaName, ifNotExist, comments, udfs, procedures }) {
             const comment = assignTemplates(templates.comment, {
                 object: 'SCHEMA',
-                objectName: wrapInQuotes(databaseName),
+                objectName: wrapInQuotes(schemaName),
                 comment: wrapComment(comments),
             });
 
             const schemaStatement = assignTemplates(templates.createSchema, {
-                name: wrapInQuotes(databaseName),
+                name: wrapInQuotes(schemaName),
                 ifNotExist: ifNotExist ? ' IF NOT EXISTS' : '',
                 comment: comments ? comment : '',
             });
 
-            const createFunctionStatement = getFunctionsScript(databaseName, udfs);
-            const createProceduresStatement = getProceduresScript(databaseName, procedures);
+            const createFunctionStatement = getFunctionsScript(schemaName, udfs);
+            const createProceduresStatement = getProceduresScript(schemaName, procedures);
 
             return _.trim([schemaStatement, createFunctionStatement, createProceduresStatement].join('\n\n'));
         },
@@ -113,6 +133,7 @@ module.exports = (baseProvider, options, app) => {
                 checkConstraints,
                 foreignKeyConstraints,
                 dbData,
+                schemaData,
                 columnDefinitions,
                 relatedSchemas,
                 keyConstraints,
@@ -131,7 +152,7 @@ module.exports = (baseProvider, options, app) => {
             isActivated
         ) {
             const ifNotExistStr = ifNotExist ? ' IF NOT EXISTS' : '';
-            const tableName = getNamePrefixedWithSchemaName(name, dbData.databaseName);
+            const tableName = getNamePrefixedWithSchemaName(name, schemaData.schemaName);
             const comment = assignTemplates(templates.comment, {
                 object: 'TABLE',
                 objectName: tableName,
@@ -225,7 +246,7 @@ module.exports = (baseProvider, options, app) => {
                     using,
                     keys,
                     options,
-                    tableName: getNamePrefixedWithSchemaName(tableName, dbData.databaseName),
+                    tableName: getNamePrefixedWithSchemaName(tableName, index.schemaName),
                 }),
                 {
                     isActivated: index.isActivated,
@@ -252,7 +273,8 @@ module.exports = (baseProvider, options, app) => {
                 foreignSchemaName,
                 primarySchemaName,
             },
-            dbData
+            dbData,
+            schemaData
         ) {
             const isAllPrimaryKeysDeactivated = checkAllKeysDeactivated(primaryKey);
             const isAllForeignKeysDeactivated = checkAllKeysDeactivated(foreignKey);
@@ -263,7 +285,7 @@ module.exports = (baseProvider, options, app) => {
                 foreignTableActivated;
 
             const foreignKeyStatement = assignTemplates(templates.createForeignKeyConstraint, {
-                primaryTable: getNamePrefixedWithSchemaName(primaryTable, primarySchemaName || dbData.databaseName),
+                primaryTable: getNamePrefixedWithSchemaName(primaryTable, primarySchemaName || schemaData.schemaName),
                 name: name ? `CONSTRAINT ${wrapInQuotes(name)}` : '',
                 foreignKey: isActivated ? foreignKeysToString(foreignKey) : foreignActiveKeysToString(foreignKey),
                 primaryKey: isActivated ? foreignKeysToString(primaryKey) : foreignActiveKeysToString(primaryKey),
@@ -287,7 +309,8 @@ module.exports = (baseProvider, options, app) => {
                 foreignSchemaName,
                 primarySchemaName,
             },
-            dbData
+            dbData,
+            schemaData
         ) {
             const isAllPrimaryKeysDeactivated = checkAllKeysDeactivated(primaryKey);
             const isAllForeignKeysDeactivated = checkAllKeysDeactivated(foreignKey);
@@ -298,8 +321,8 @@ module.exports = (baseProvider, options, app) => {
                 foreignTableActivated;
 
             const foreignKeyStatement = assignTemplates(templates.createForeignKey, {
-                primaryTable: getNamePrefixedWithSchemaName(primaryTable, primarySchemaName || dbData.databaseName),
-                foreignTable: getNamePrefixedWithSchemaName(foreignTable, foreignSchemaName || dbData.databaseName),
+                primaryTable: getNamePrefixedWithSchemaName(primaryTable, primarySchemaName || schemaData.schemaName),
+                foreignTable: getNamePrefixedWithSchemaName(foreignTable, foreignSchemaName || schemaData.schemaName),
                 name: name ? wrapInQuotes(name) : '',
                 foreignKey: isActivated ? foreignKeysToString(foreignKey) : foreignActiveKeysToString(foreignKey),
                 primaryKey: isActivated ? foreignKeysToString(primaryKey) : foreignActiveKeysToString(primaryKey),
@@ -312,7 +335,7 @@ module.exports = (baseProvider, options, app) => {
         },
 
         createView(viewData, dbData, isActivated) {
-            const viewName = getNamePrefixedWithSchemaName(viewData.name, dbData.databaseName);
+            const viewName = getNamePrefixedWithSchemaName(viewData.name, viewData.schemaName);
 
             const comment = assignTemplates(templates.comment, {
                 object: 'VIEW',
@@ -322,7 +345,7 @@ module.exports = (baseProvider, options, app) => {
 
             const allDeactivated = checkAllKeysDeactivated(viewData.keys || []);
             const deactivatedWholeStatement = allDeactivated || !isActivated;
-            const { columns, tables } = getViewData(viewData.keys, dbData);
+            const { columns, tables } = getViewData(viewData.keys);
             let columnsAsString = columns.map(column => column.statement).join(',\n\t\t');
 
             if (!deactivatedWholeStatement) {
@@ -376,11 +399,11 @@ module.exports = (baseProvider, options, app) => {
             );
         },
 
-        createViewIndex(viewName, index, dbData, isParentActivated) {
+        createViewIndex() {
             return '';
         },
 
-        createUdt(udt, dbData) {
+        createUdt(udt) {
             const columns = _.map(udt.properties, this.convertColumnDefinition);
 
             return getUserDefinedType(udt, columns);
@@ -398,7 +421,22 @@ module.exports = (baseProvider, options, app) => {
             return hasType(types, type);
         },
 
-        hydrateColumn({ columnDefinition, jsonSchema, dbData }) {
+        hydrateDatabase({ modelData }) {
+            modelData = _.get(modelData, '0', {});
+
+            return {
+                databaseName: modelData.database_name,
+                tablespace: modelData.tablespace_name,
+                encoding: modelData.encoding,
+                template: modelData.template,
+                collate: modelData.LC_COLLATE,
+                characterClassification: modelData.LC_CTYPE,
+                dbVersion: modelData.dbVersion,
+                locale: modelData.locale,
+            };
+        },
+
+        hydrateColumn({ columnDefinition, jsonSchema, schemaData }) {
             const collationRule = _.includes(['char', 'varchar', 'text'], columnDefinition.type)
                 ? jsonSchema.collationRule
                 : '';
@@ -406,7 +444,7 @@ module.exports = (baseProvider, options, app) => {
             const timePrecision = _.includes(timeTypes, columnDefinition.type) ? jsonSchema.timePrecision : '';
             const timezone = _.includes(timeTypes, columnDefinition.type) ? jsonSchema.timezone : '';
             const intervalOptions = columnDefinition.type === 'interval' ? jsonSchema.intervalOptions : '';
-            const dbVersion = dbData.dbVersion;
+            const dbVersion = schemaData.dbVersion;
 
             return {
                 name: columnDefinition.name,
@@ -429,7 +467,7 @@ module.exports = (baseProvider, options, app) => {
                 canonicalFunction: jsonSchema.canonicalFunction,
                 subtypeDiffFunction: jsonSchema.subtypeDiffFunction,
                 multiRangeType: jsonSchema.multiRangeType,
-                databaseName: dbData.databaseName,
+                schemaName: schemaData.schemaName,
                 underlyingType: jsonSchema.underlyingType,
                 checkConstraints: jsonSchema.checkConstraints,
                 collationRule,
@@ -440,8 +478,8 @@ module.exports = (baseProvider, options, app) => {
             };
         },
 
-        hydrateIndex(indexData, tableData) {
-            return indexData;
+        hydrateIndex(indexData, tableData, schemaData) {
+            return { ...indexData, schemaName: schemaData.schemaName };
         },
 
         hydrateViewIndex(indexData) {
@@ -456,11 +494,11 @@ module.exports = (baseProvider, options, app) => {
             };
         },
 
-        hydrateDatabase(containerData, data) {
+        hydrateSchema(containerData, data) {
             const dbVersion = _.get(data, 'modelData.0.dbVersion');
 
             return {
-                databaseName: containerData.name,
+                schemaName: containerData.name,
                 ifNotExist: containerData.ifNotExist,
                 comments: containerData.description,
                 udfs: data?.udfs || [],
@@ -510,7 +548,7 @@ module.exports = (baseProvider, options, app) => {
             };
         },
 
-        hydrateView({ viewData, entityData, relatedSchemas, relatedContainers }) {
+        hydrateView({ viewData, entityData }) {
             const detailsTab = entityData[0];
 
             return {
@@ -524,6 +562,7 @@ module.exports = (baseProvider, options, app) => {
                 selectStatement: detailsTab.selectStatement,
                 withCheckOption: detailsTab.withCheckOption,
                 checkTestingScope: detailsTab.withCheckOption ? detailsTab.checkTestingScope : '',
+                schemaName: viewData.schemaData.schemaName,
             };
         },
 
