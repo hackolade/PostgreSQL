@@ -5,11 +5,17 @@ const applyToInstance = async (connectionInfo, logger, app) => {
         postgresService.setDependencies(app);
         await postgresService.connect(connectionInfo, logger);
         await postgresService.logVersion();
-        await postgresService.applyScript(connectionInfo.script);
+        await postgresService.applyScript(removeCreateDbScript(connectionInfo.script));
     } catch (error) {
         logger.error(error);
         throw prepareError(error);
     }
+};
+
+const removeCreateDbScript = script => {
+    const createDbScriptRegexp = /CREATE DATABASE[^;]*;/gi;
+
+    return script.replace(createDbScriptRegexp, '');
 };
 
 const prepareError = error => {

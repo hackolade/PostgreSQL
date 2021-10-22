@@ -50,7 +50,7 @@ module.exports = ({
         const constraintName = wrapInQuotes(_.trim(keyData.name));
         const isAllColumnsDeactivated = checkAllKeysDeactivated(keyData.columns);
         const columns = getColumnsList(keyData.columns, isAllColumnsDeactivated, isParentActivated);
-        const includeNonKey = keyData.include
+        const includeNonKey = keyData.include.length
             ? ` INCLUDE${getColumnsList(keyData.include, isAllColumnsDeactivated, isParentActivated)}`
             : '';
         const storageParameters = keyData.storageParameters ? ` WITH (${keyData.storageParameters})` : '';
