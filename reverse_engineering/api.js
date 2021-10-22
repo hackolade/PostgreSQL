@@ -52,7 +52,7 @@ module.exports = {
             return cb(null, dbs);
         } catch (err) {
             logger.log('error', err);
-            return cb(mapError(err));
+            return cb(prepareError(err));
         }
     },
 
