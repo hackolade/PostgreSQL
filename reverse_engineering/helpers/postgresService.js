@@ -71,8 +71,6 @@ module.exports = {
         db.initializePool(pool, specificLogger);
         currentSshTunnel = sshTunnel;
         logger = specificLogger;
-
-        await this.logVersion();
     },
 
     async disconnect() {

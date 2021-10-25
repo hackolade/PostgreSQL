@@ -1,7 +1,6 @@
 'use strict';
 
 const { createLogger } = require('./helpers/loggerHelper');
-const { connect } = require('./helpers/postgresService');
 const postgresService = require('./helpers/postgresService');
 
 module.exports = {
@@ -24,6 +23,7 @@ module.exports = {
 
             await postgresService.connect(connectionInfo, postgresLogger);
             await postgresService.pingDb();
+            await postgresService.logVersion();
             callback();
         } catch (error) {
             logger.log('error', prepareError(error), 'Test connection instance log');
@@ -46,6 +46,7 @@ module.exports = {
 
             postgresService.setDependencies(app);
             await postgresService.connect(connectionInfo, postgresLogger);
+            await postgresService.logVersion();
 
             const dbs = await postgresService.getDatabaseNames();
             logger.log('info', dbs, 'All databases list', connectionInfo.hiddenKeys);
@@ -73,6 +74,7 @@ module.exports = {
 
             postgresService.setDependencies(app);
             await postgresService.connect(connectionInfo, postgresLogger);
+            await postgresService.logVersion();
             const schemasNames = await postgresService.getAllSchemasNames();
 
             const collections = await schemasNames.reduce(async (next, dbName) => {
