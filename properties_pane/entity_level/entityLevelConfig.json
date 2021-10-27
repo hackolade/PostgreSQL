@@ -1016,7 +1016,7 @@ making sure that you maintain a proper JSON format.
 							},
 							{
 								"propertyName": "Auto summarize",
-								"propertyKeyword": "autosummarize ",
+								"propertyKeyword": "autosummarize",
 								"propertyType": "checkbox",
 								"propertyTooltip": "Defines whether a summarization run is invoked for the previous page range whenever an insertion is detected on the next one.",
 								"defaultValue": true
