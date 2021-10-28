@@ -175,6 +175,7 @@ making sure that you maintain a proper JSON format.
 								"defaultValue": "IN",
 								"options": [
 									"IN",
+									"OUT",
 									"INOUT",
 									"VARIADIC"
 								]
@@ -400,6 +401,7 @@ making sure that you maintain a proper JSON format.
 								"defaultValue": "IN",
 								"options": [
 									"IN",
+									"OUT",
 									"INOUT",
 									"VARIADIC"
 								]
