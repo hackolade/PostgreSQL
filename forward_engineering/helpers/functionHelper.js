@@ -10,7 +10,7 @@ module.exports = ({ _, templates, assignTemplates, getFunctionArguments, getName
                 returnType: udf.functionReturnsSetOf ? `SETOF ${udf.functionReturnType}` : udf.functionReturnType,
                 language: udf.functionLanguage,
                 properties: getProperties(udf),
-                definition: udf.functionDefinition,
+                definition: udf.functionBody,
             });
         }).join('\n');
     };
