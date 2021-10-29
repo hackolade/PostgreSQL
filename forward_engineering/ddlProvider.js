@@ -82,7 +82,7 @@ module.exports = (baseProvider, options, app) => {
             assignTemplates,
             templates,
             commentIfDeactivated,
-            getNamePrefixedWithSchemaName,
+            wrapInQuotes,
             wrapComment,
         });
 

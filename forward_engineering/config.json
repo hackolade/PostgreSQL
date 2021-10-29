@@ -2,6 +2,7 @@
 	"type": "ddl",
 	"ddlType": "plugin",
 	"namePrefix": "PostgreSQL",
+	"mode": "pgsql",
 	"level": {
 		"container": true,
 		"entity": true,
