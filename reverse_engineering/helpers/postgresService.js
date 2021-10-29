@@ -130,12 +130,12 @@ module.exports = {
         const encoding = (await db.queryTolerant(queryConstants.GET_DB_ENCODING, [], true))?.server_encoding;
         const LC_COLLATE = (await db.queryTolerant(queryConstants.GET_DB_COLLATE_NAME, [], true))?.default_collate_name;
 
-        return {
+        return clearEmptyPropertiesInObject({
             database_name,
             encoding,
             LC_COLLATE,
             LC_CTYPE: LC_COLLATE,
-        };
+        });
     },
 
     async retrieveEntitiesData(schemaName, entitiesNames, recordSamplingSettings) {
