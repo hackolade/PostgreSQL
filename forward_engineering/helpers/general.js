@@ -177,13 +177,7 @@ module.exports = ({ _, divideIntoActivatedAndDeactivated, commentIfDeactivated }
         );
     };
 
-    const wrapComment = comment => {
-        if (_.includes(comment, "'")) {
-            return `'${comment.replace("'", "''")}'`;
-        }
-
-        return `'${comment}'`;
-    };
+    const wrapComment = comment => `$$${comment}$$`;
 
     return {
         getFunctionArguments,

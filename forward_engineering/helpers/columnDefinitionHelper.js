@@ -4,8 +4,8 @@ module.exports = ({
     assignTemplates,
     templates,
     commentIfDeactivated,
-    getNamePrefixedWithSchemaName,
     wrapComment,
+    wrapInQuotes
 }) => {
     const addLength = (type, length) => {
         return `${type}(${length})`;
@@ -60,12 +60,10 @@ module.exports = ({
     const isString = type => ['char', 'varchar', 'text', 'bit', 'varbit'].includes(type);
     const isDateTime = type => ['date', 'time', 'timestamp', 'interval'].includes(type);
 
-    const escapeQuotes = str => _.trim(str).replace(/(\')+/g, "'$1");
-
     const decorateDefault = (type, defaultValue) => {
         const constantsValues = ['current_timestamp', 'null'];
         if ((isString(type) || isDateTime(type)) && !constantsValues.includes(_.toLower(defaultValue))) {
-            return wrap(escapeQuotes(defaultValue), "'", "'");
+            return wrap(defaultValue, "$$", "$$");
         } else {
             return defaultValue;
         }
@@ -77,7 +75,7 @@ module.exports = ({
             .map(columnData => {
                 const comment = assignTemplates(templates.comment, {
                     object: 'COLUMN',
-                    objectName: getNamePrefixedWithSchemaName(columnData.name, tableName),
+                    objectName: `${tableName}.${wrapInQuotes(columnData.name)}`,
                     comment: wrapComment(columnData.comment),
                 });
 

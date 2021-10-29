@@ -175,6 +175,7 @@ making sure that you maintain a proper JSON format.
 								"defaultValue": "IN",
 								"options": [
 									"IN",
+									"OUT",
 									"INOUT",
 									"VARIADIC"
 								]
@@ -226,7 +227,7 @@ making sure that you maintain a proper JSON format.
 					},
 					{
 						"propertyName": "Definition",
-						"propertyKeyword": "functionDefinition",
+						"propertyKeyword": "functionBody",
 						"propertyTooltip": "A string constant defining the function; the meaning depends on the language. It can be an internal function name, the path to an object file, an SQL command, or text in a procedural language.",
 						"propertyType": "details",
 						"template": "textarea",
@@ -400,6 +401,7 @@ making sure that you maintain a proper JSON format.
 								"defaultValue": "IN",
 								"options": [
 									"IN",
+									"OUT",
 									"INOUT",
 									"VARIADIC"
 								]

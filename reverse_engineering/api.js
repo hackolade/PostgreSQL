@@ -1,6 +1,6 @@
 'use strict';
 
-const { createLogger } = require('./helpers/loggerHelper');
+const { createLogger, getSystemInfo } = require('./helpers/loggerHelper');
 const postgresService = require('./helpers/postgresService');
 
 module.exports = {
@@ -12,8 +12,7 @@ module.exports = {
 
     async testConnection(connectionInfo, logger, callback, app) {
         try {
-            logger.clear();
-            logger.log('info', connectionInfo, 'connectionInfo', connectionInfo.hiddenKeys);
+            logInfo('Test connection', connectionInfo, logger);
 
             const postgresLogger = createLogger({
                 title: 'Test connection instance log',
@@ -35,8 +34,7 @@ module.exports = {
 
     async getDatabases(connectionInfo, logger, cb, app) {
         try {
-            logger.clear();
-            logger.log('info', connectionInfo, 'connectionInfo', connectionInfo.hiddenKeys);
+            logInfo('Get databases', connectionInfo, logger);
 
             const postgresLogger = createLogger({
                 title: 'Get DB names',
@@ -63,8 +61,7 @@ module.exports = {
 
     async getDbCollectionsNames(connectionInfo, logger, callback, app) {
         try {
-            logger.clear();
-            logger.log('info', connectionInfo, 'connectionInfo', connectionInfo.hiddenKeys);
+            logInfo('Get DB table names', connectionInfo, logger);
 
             const postgresLogger = createLogger({
                 title: 'Get DB collections names',
@@ -203,4 +200,10 @@ const prepareError = error => {
     error = JSON.stringify(error, Object.getOwnPropertyNames(error));
     error = JSON.parse(error);
     return error;
+};
+
+const logInfo = (step, connectionInfo, logger) => {
+    logger.clear();
+    logger.log('info', getSystemInfo(connectionInfo.appVersion), step);
+    logger.log('info', connectionInfo, 'connectionInfo', connectionInfo.hiddenKeys);
 };
