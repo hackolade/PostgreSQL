@@ -46,13 +46,6 @@
 		},
 		{
 			"schema": {
-				"mode": "decimal"
-			},
-			"capacity": 16,
-			"mode": "decimal"
-		},
-		{
-			"schema": {
 				"mode": "numeric"
 			},
 			"capacity": 12,
@@ -76,19 +69,22 @@
 			"schema": {
 				"mode": "smallserial"
 			},
-			"capacity": 2
+			"capacity": 2,
+			"mode": "serial"
 		},
 		{
 			"schema": {
 				"mode": "serial"
 			},
-			"capacity": 4
+			"capacity": 4,
+			"mode": "serial"
 		},
 		{
 			"schema": {
 				"mode": "bigserial"
 			},
-			"capacity": 8
+			"capacity": 8,
+			"mode": "serial"
 		},
 		{
 			"schema": {
