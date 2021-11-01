@@ -24,5 +24,63 @@
 		"enum": [],
 		"mode": "int4range",
 		"sample": ""
-	}
+	},
+	"descriptor": [
+		{
+			"schema": {
+				"mode": "int4range"
+			},
+			"mode": "range",
+			"modeType": "integer",
+			"capacity": 4
+		},
+		{
+			"schema": {
+				"mode": "int8range"
+			},
+			"mode": "range",
+			"modeType": "integer",
+			"capacity": 8
+		},
+		{
+			"schema": {
+				"mode": "numrange"
+			},
+			"mode": "range",
+			"modeType": "decimal",
+			"capacity": 12
+		},
+		{
+			"schema": {
+				"mode": "daterange"
+			},
+			"mode": "range",
+			"modeType": "date",
+			"format": "YYYY-MM-DD"
+		},
+		{
+			"schema": {
+				"mode": "tsrange"
+			},
+			"mode": "range",
+			"modeType": "timestamp",
+			"format": "YYYY-MM-DD hh:mm:ss"
+		},
+		{
+			"schema": {
+				"mode": "tstzrange"
+			},
+			"mode": "range",
+			"modeType": "timestamp",
+			"format": "YYYY-MM-DD hh:mm:ss.nnnZ"
+		},
+		{
+			"schema": {
+				"mode": "tstzrange"
+			},
+			"mode": "range",
+			"modeType": "timestamp",
+			"format": "YYYY-MM-DD hh:mm:ss.nnnnnnZ"
+		}
+	]
 }

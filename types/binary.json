@@ -17,6 +17,12 @@
 			},
 			"size": 4,
 			"mode": "binary"
+		},
+		{
+			"schema": {
+				"mode": "bytea"
+			},
+			"mode": "binary"
 		}
 	]
 }

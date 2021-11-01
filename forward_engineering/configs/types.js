@@ -69,61 +69,72 @@ module.exports = {
     timestamp: {
         format: 'YYYY-MM-DD hh:mm:ss',
     },
-    interval: {},
+    interval: {
+        format: 'PnYnMnDTnHnMnS',
+    },
     boolean: {
         mode: 'boolean',
     },
     int4range: {
-        capacity: 4,
         mode: 'range',
+        modeType: 'integer',
+        capacity: 4,
     },
     int8range: {
-        capacity: 8,
         mode: 'range',
+        modeType: 'integer',
+        capacity: 8,
     },
     numrange: {
-        capacity: 12,
-        mode: 'decimal',
         mode: 'range',
+        modeType: 'decimal',
+        capacity: 12,
     },
     daterange: {
-        format: 'YYYY-MM-DD',
         mode: 'range',
+        modeType: 'date',
+        format: 'YYYY-MM-DD',
     },
     tsrange: {
-        format: 'YYYY-MM-DD hh:mm:ss',
         mode: 'range',
+        modeType: 'timestamp',
+        format: 'YYYY-MM-DD hh:mm:ss',
     },
     tstzrange: {
-        format: 'YYYY-MM-DD hh:mm:ss',
         mode: 'range',
+        modeType: 'timestamp',
+        format: 'YYYY-MM-DD hh:mm:ss.nnnZ',
     },
 
     int4multirange: {
-        capacity: 4,
         mode: 'multirange',
+        modeType: 'integer',
+        capacity: 4,
     },
     int8multirange: {
-        capacity: 12,
-        mode: 'decimal',
         mode: 'multirange',
+        modeType: 'integer',
+        capacity: 8,
     },
     nummultirange: {
-        capacity: 12,
-        mode: 'decimal',
         mode: 'multirange',
+        modeType: 'decimal',
+        capacity: 12,
     },
     datemultirange: {
-        format: 'YYYY-MM-DD',
         mode: 'multirange',
+        modeType: 'date',
+        format: 'YYYY-MM-DD',
     },
     tsmultirange: {
-        format: 'YYYY-MM-DD hh:mm:ss',
         mode: 'multirange',
+        modeType: 'timestamp',
+        format: 'YYYY-MM-DD hh:mm:ss',
     },
     tstzmultirange: {
-        format: 'YYYY-MM-DD hh:mm:ss',
         mode: 'multirange',
+        modeType: 'timestamp',
+        format: 'YYYY-MM-DD hh:mm:ss.nnnZ',
     },
     point: {
         format: 'euclidian',

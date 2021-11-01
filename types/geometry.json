@@ -15,5 +15,11 @@
 		"maxProperties": "",
 		"additionalProperties": false,
 		"enum": []
-	}
+	},
+	"descriptor": [
+		{
+			"format": "euclidian",
+			"mode": "geospatial"
+		}
+	]
 }

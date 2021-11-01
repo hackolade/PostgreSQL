@@ -62,6 +62,12 @@
 				"mode": "timestamp"
 			},
 			"format": "YYYY-MM-DD hh:mm:ss.nnnnnnZ"
+		},
+		{
+			"schema": {
+				"mode": "interval"
+			},
+			"format": "PnYnMnDTnHnMnS"
 		}
 	]
 }
