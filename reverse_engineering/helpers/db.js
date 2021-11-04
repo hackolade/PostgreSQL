@@ -1,25 +1,32 @@
 const queryConstants = require('./queryConstants');
 
-let pool = null;
+let client = null;
 let logger = null;
+let queue = [];
 
 module.exports = {
-    initializePool(newPool, newLogger) {
-        pool = newPool;
+    initializeClient(newClient, newLogger) {
+        client = newClient;
         logger = newLogger;
 
-        pool.on('error', error => newLogger.error(error));
+        client.on('error', error => newLogger.error(error));
     },
 
-    isPoolInitialized() {
-        return Boolean(pool);
+    isClientInitialized() {
+        return Boolean(client);
     },
 
-    async releasePool() {
-        if (pool) {
-            await pool.end();
-            pool = null;
+    releaseClient() {
+        if (client) {
+            return new Promise(resolve => {
+                client.end(() => {
+                    client = null;
+                    resolve();
+                });
+            });
         }
+
+        return Promise.resolve();
     },
 
     async query(query, params, firstRow = false) {
@@ -28,7 +35,7 @@ module.exports = {
         logger.info('Execute query', { queryName, params });
 
         const start = Date.now();
-        const result = await pool.query(query, params);
+        const result = await this._executeQuery(query, params);
         const duration = Date.now() - start;
 
         logger.info('Query executed', { queryName, params, duration, rowsCount: result.rowCount });
@@ -49,5 +56,17 @@ module.exports = {
 
             return null;
         }
+    },
+
+    _executeQuery(query, params = []) {
+        return new Promise((resolve, reject) => {
+            try {
+                const rows = client.querySync(query, params);
+
+                resolve({ rows });
+            } catch (err) {
+                return reject(err);
+            }
+        });
     },
 };

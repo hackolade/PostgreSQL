@@ -20,6 +20,7 @@ module.exports = {
                 logger,
             });
 
+            postgresService.setDependencies(app);
             await postgresService.connect(connectionInfo, postgresLogger);
             await postgresService.pingDb();
             await postgresService.logVersion();

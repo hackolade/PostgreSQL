@@ -1,6 +1,11 @@
-const Pool = require('pg').Pool;
 const fs = require('fs');
 const ssh = require('tunnel-ssh');
+
+let Client = null;
+
+const setConnectionHelperDependencies = app => {
+    Client = app.require('pg-native');
+};
 
 const getSshConfig = info => {
     const config = {
@@ -43,32 +48,39 @@ const connectViaSsh = info =>
     });
 
 const getSslOptions = connectionInfo => {
-    if (connectionInfo.sslType === 'Off') {
-        return false;
+    const sslType = mapSslType(connectionInfo.sslType);
+
+    if (sslType === 'disable') {
+        return {};
     }
 
-    if (connectionInfo.sslType === 'Unvalidated') {
+    if (sslType === 'allow') {
         return {
             rejectUnauthorized: false,
         };
     }
 
-    if (connectionInfo.sslType === 'TRUST_CUSTOM_CA_SIGNED_CERTIFICATES') {
+    if (['prefer', 'require', 'verify-ca', 'verify-full'].includes(sslType)) {
         return {
-            ca: fs.readFileSync(connectionInfo.certAuthority),
-        };
-    }
-
-    if (connectionInfo.sslType === 'TRUST_SERVER_CLIENT_CERTIFICATES') {
-        return {
-            ca: fs.readFileSync(connectionInfo.certAuthority),
-            cert: fs.readFileSync(connectionInfo.clientCert),
-            key: fs.readFileSync(connectionInfo.clientPrivateKey),
+            sslrootcert: connectionInfo.certAuthority,
+            sslcert: connectionInfo.clientCert,
+            sslkey: connectionInfo.clientPrivateKey,
         };
     }
 };
 
-const createConnectionPool = async connectionInfo => {
+const mapSslType = sslType => {
+    const oldToNewSslType = {
+        Off: 'disable',
+        TRUST_ALL_CERTIFICATES: 'allow',
+        TRUST_CUSTOM_CA_SIGNED_CERTIFICATES: 'prefer',
+        TRUST_SERVER_CLIENT_CERTIFICATES: 'verify-full',
+    };
+
+    return oldToNewSslType[sslType] || sslType;
+};
+
+const createClient = async connectionInfo => {
     let sshTunnel = null;
 
     if (connectionInfo.ssh) {
@@ -79,22 +91,49 @@ const createConnectionPool = async connectionInfo => {
 
     const config = {
         host: connectionInfo.host,
+        port: connectionInfo.port,
+        dbname: connectionInfo.database || connectionInfo.maintenanceDatabase,
         user: connectionInfo.userName,
         password: connectionInfo.userPassword,
-        port: connectionInfo.port,
-        keepAlive: true,
-        ssl: getSslOptions(connectionInfo),
-        connectionTimeoutMillis: Number(connectionInfo.queryRequestTimeout) || 60000,
-        query_timeout: Number(connectionInfo.queryRequestTimeout) || 60000,
-        statement_timeout: Number(connectionInfo.queryRequestTimeout) || 60000,
-        database: connectionInfo.database || connectionInfo.maintenanceDatabase,
+        connect_timeout: Number(connectionInfo.queryRequestTimeout) || 60000,
+        application_name: 'hackolade',
+        keepalives: 1,
+        sslmode: connectionInfo.sslType,
+        ...getSslOptions(connectionInfo),
     };
 
-    const pool = await new Pool(config);
+    const client = await connectClient(config);
 
-    return { pool, sshTunnel };
+    return { client, sshTunnel };
+};
+
+const connectClient = config => {
+    return new Promise((resolve, reject) => {
+        const paramsString = Object.entries(config)
+            .map(([key, value]) => getParameter(key, value))
+            .join(' ');
+
+        const client = new Client();
+
+        client.connect(paramsString, error => {
+            if (error) {
+                return reject(error);
+            }
+
+            resolve(client);
+        });
+    });
+};
+
+const getParameter = (key, value) => {
+    if (value?.toString()) {
+        return `${key}=${value}`;
+    }
+
+    return '';
 };
 
 module.exports = {
-    createConnectionPool,
+    createClient,
+    setConnectionHelperDependencies,
 };

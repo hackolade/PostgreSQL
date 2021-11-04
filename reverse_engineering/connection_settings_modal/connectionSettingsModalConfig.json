@@ -67,20 +67,28 @@
 				"inputType": "select",
 				"options": [
 					{
-						"value": "Off",
-						"label": "Off"
+						"value": "disable",
+						"label": "Disable"
 					},
 					{
-						"value": "TRUST_ALL_CERTIFICATES",
-						"label": "Unvalidated"
+						"value": "allow",
+						"label": "Allow"
 					},
 					{
-						"value": "TRUST_CUSTOM_CA_SIGNED_CERTIFICATES",
-						"label": "Server validation"
+						"value": "prefer",
+						"label": "Prefer"
 					},
 					{
-						"value": "TRUST_SERVER_CLIENT_CERTIFICATES",
-						"label": "Server and client validation"
+						"value": "require",
+						"label": "Require"
+					},
+					{
+						"value": "verify-ca",
+						"label": "Verify CA"
+					},
+					{
+						"value": "verify-full",
+						"label": "verify Full"
 					}
 				]
 			},
@@ -97,8 +105,10 @@
 				"dependency": {
 					"key": "sslType",
 					"value": [
-						"TRUST_CUSTOM_CA_SIGNED_CERTIFICATES",
-						"TRUST_SERVER_CLIENT_CERTIFICATES"
+						"prefer",
+						"require",
+						"verify-ca",
+						"verify-full"
 					]
 				}
 			},
@@ -114,7 +124,12 @@
 				],
 				"dependency": {
 					"key": "sslType",
-					"value": "TRUST_SERVER_CLIENT_CERTIFICATES"
+					"value": [
+						"prefer",
+						"require",
+						"verify-ca",
+						"verify-full"
+					]
 				}
 			},
 			{
@@ -129,7 +144,12 @@
 				],
 				"dependency": {
 					"key": "sslType",
-					"value": "TRUST_SERVER_CLIENT_CERTIFICATES"
+					"value": [
+						"prefer",
+						"require",
+						"verify-ca",
+						"verify-full"
+					]
 				}
 			}
 		]

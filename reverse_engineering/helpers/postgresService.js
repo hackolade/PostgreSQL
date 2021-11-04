@@ -1,4 +1,4 @@
-const { createConnectionPool } = require('./connectionHelper');
+const { createClient, setConnectionHelperDependencies } = require('./connectionHelper');
 const db = require('./db');
 const { getJsonSchema } = require('./getJsonSchema');
 const {
@@ -52,6 +52,7 @@ let logger = null;
 module.exports = {
     setDependencies(app) {
         _ = app.require('lodash');
+        setConnectionHelperDependencies(app);
         setDependenciesInCommonHelper(app);
         setDependenciesInTableHelper(app);
         setDependenciesInColumnHelper(app);
@@ -62,13 +63,13 @@ module.exports = {
     },
 
     async connect(connectionInfo, specificLogger) {
-        if (db.isPoolInitialized()) {
+        if (db.isClientInitialized()) {
             await this.disconnect();
         }
 
-        const { pool, sshTunnel } = await createConnectionPool(connectionInfo);
+        const { client, sshTunnel } = await createClient(connectionInfo);
 
-        db.initializePool(pool, specificLogger);
+        db.initializeClient(client, specificLogger);
         currentSshTunnel = sshTunnel;
         logger = specificLogger;
     },
@@ -79,7 +80,7 @@ module.exports = {
             currentSshTunnel = null;
         }
 
-        await db.releasePool();
+        await db.releaseClient();
     },
 
     pingDb() {
