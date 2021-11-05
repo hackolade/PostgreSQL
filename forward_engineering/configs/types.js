@@ -136,6 +136,10 @@ module.exports = {
         modeType: 'timestamp',
         format: 'YYYY-MM-DD hh:mm:ss.nnnZ',
     },
+    geometry: {
+        format: 'euclidian',
+        mode: 'geospatial',
+    },
     point: {
         format: 'euclidian',
         mode: 'geospatial',
