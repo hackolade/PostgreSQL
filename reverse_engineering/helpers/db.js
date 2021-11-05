@@ -2,7 +2,6 @@ const queryConstants = require('./queryConstants');
 
 let client = null;
 let logger = null;
-let queue = [];
 
 module.exports = {
     initializeClient(newClient, newLogger) {
@@ -35,7 +34,7 @@ module.exports = {
         logger.info('Execute query', { queryName, params });
 
         const start = Date.now();
-        const result = await this._executeQuery(query, params);
+        const result = await client.query(query, params);
         const duration = Date.now() - start;
 
         logger.info('Query executed', { queryName, params, duration, rowsCount: result.rowCount });
@@ -56,17 +55,5 @@ module.exports = {
 
             return null;
         }
-    },
-
-    _executeQuery(query, params = []) {
-        return new Promise((resolve, reject) => {
-            try {
-                const rows = client.querySync(query, params);
-
-                resolve({ rows });
-            } catch (err) {
-                return reject(err);
-            }
-        });
     },
 };

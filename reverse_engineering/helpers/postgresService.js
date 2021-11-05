@@ -1,4 +1,4 @@
-const { createClient, setConnectionHelperDependencies } = require('./connectionHelper');
+const { createClient } = require('./connectionHelper');
 const db = require('./db');
 const { getJsonSchema } = require('./getJsonSchema');
 const {
@@ -52,7 +52,6 @@ let logger = null;
 module.exports = {
     setDependencies(app) {
         _ = app.require('lodash');
-        setConnectionHelperDependencies(app);
         setDependenciesInCommonHelper(app);
         setDependenciesInTableHelper(app);
         setDependenciesInColumnHelper(app);

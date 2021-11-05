@@ -1,11 +1,6 @@
 const fs = require('fs');
 const ssh = require('tunnel-ssh');
-
-let Client = null;
-
-const setConnectionHelperDependencies = app => {
-    Client = app.require('pg-native');
-};
+const pg = require('pg');
 
 const getSshConfig = info => {
     const config = {
@@ -51,20 +46,22 @@ const getSslOptions = connectionInfo => {
     const sslType = mapSslType(connectionInfo.sslType);
 
     if (sslType === 'disable') {
-        return {};
+        return false;
     }
 
     if (sslType === 'allow') {
-        return {
-            rejectUnauthorized: false,
-        };
+        true;
     }
 
     if (['prefer', 'require', 'verify-ca', 'verify-full'].includes(sslType)) {
         return {
-            sslrootcert: connectionInfo.certAuthority,
-            sslcert: connectionInfo.clientCert,
-            sslkey: connectionInfo.clientPrivateKey,
+            ca: fs.existsSync(connectionInfo.certAuthority)
+                ? fs.readFileSync(connectionInfo.certAuthority).toString()
+                : '',
+            cert: fs.existsSync(connectionInfo.clientCert) ? fs.readFileSync(connectionInfo.clientCert).toString() : '',
+            key: fs.existsSync(connectionInfo.clientPrivateKey)
+                ? fs.readFileSync(connectionInfo.clientPrivateKey).toString()
+                : '',
         };
     }
 };
@@ -91,49 +88,24 @@ const createClient = async connectionInfo => {
 
     const config = {
         host: connectionInfo.host,
-        port: connectionInfo.port,
-        dbname: connectionInfo.database || connectionInfo.maintenanceDatabase,
         user: connectionInfo.userName,
         password: connectionInfo.userPassword,
-        connect_timeout: Number(connectionInfo.queryRequestTimeout) || 60000,
-        application_name: 'hackolade',
-        keepalives: 1,
-        sslmode: connectionInfo.sslType,
-        ...getSslOptions(connectionInfo),
+        port: connectionInfo.port,
+        keepAlive: true,
+        ssl: getSslOptions(connectionInfo),
+        connectionTimeoutMillis: Number(connectionInfo.queryRequestTimeout) || 60000,
+        query_timeout: Number(connectionInfo.queryRequestTimeout) || 60000,
+        statement_timeout: Number(connectionInfo.queryRequestTimeout) || 60000,
+        database: connectionInfo.database || connectionInfo.maintenanceDatabase,
+        application_name: 'Hackolade',
     };
 
-    const client = await connectClient(config);
+    const client = new pg.Client(config);
+    await client.connect();
 
     return { client, sshTunnel };
 };
 
-const connectClient = config => {
-    return new Promise((resolve, reject) => {
-        const paramsString = Object.entries(config)
-            .map(([key, value]) => getParameter(key, value))
-            .join(' ');
-
-        const client = new Client();
-
-        client.connect(paramsString, error => {
-            if (error) {
-                return reject(error);
-            }
-
-            resolve(client);
-        });
-    });
-};
-
-const getParameter = (key, value) => {
-    if (value?.toString()) {
-        return `${key}=${value}`;
-    }
-
-    return '';
-};
-
 module.exports = {
     createClient,
-    setConnectionHelperDependencies,
 };
