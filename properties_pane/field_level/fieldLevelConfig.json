@@ -2220,6 +2220,7 @@ making sure that you maintain a proper JSON format.
 				"propertyKeyword": "mode",
 				"propertyType": "select",
 				"options": [
+					"",
 					"point",
 					"line",
 					"lseg",
