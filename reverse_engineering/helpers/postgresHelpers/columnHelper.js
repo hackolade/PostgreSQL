@@ -127,6 +127,11 @@ const mapType = (userDefinedTypes, type) => {
         case 'path':
         case 'polygon':
         case 'circle':
+        case 'box2d':
+        case 'box3d':
+        case 'geometry':
+        case 'geometry_dump':
+        case 'geography':
             return { type: 'geometry', mode: type };
         case 'bytea':
             return { type: 'binary', mode: type };

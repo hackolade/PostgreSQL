@@ -140,6 +140,22 @@ module.exports = {
         format: 'euclidian',
         mode: 'geospatial',
     },
+    geography: {
+        format: 'euclidian',
+        mode: 'geospatial',
+    },
+    box2d: {
+        format: 'euclidian',
+        mode: 'geospatial',
+    },
+    box3d: {
+        format: 'euclidian',
+        mode: 'geospatial',
+    },
+    geometry_dump: {
+        format: 'euclidian',
+        mode: 'geospatial',
+    },
     point: {
         format: 'euclidian',
         mode: 'geospatial',

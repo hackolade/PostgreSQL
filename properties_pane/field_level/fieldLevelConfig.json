@@ -2220,14 +2220,18 @@ making sure that you maintain a proper JSON format.
 				"propertyKeyword": "mode",
 				"propertyType": "select",
 				"options": [
-					"",
 					"point",
 					"line",
 					"lseg",
 					"box",
 					"path",
 					"polygon",
-					"circle"
+					"circle",
+					"box2d",
+					"box3d",
+					"geometry",
+					"geometry_dump",
+					"geography"
 				],
 				"data": "options",
 				"valueType": "string"
