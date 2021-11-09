@@ -66,7 +66,7 @@ module.exports = {
             await this.disconnect();
         }
 
-        const { client, sshTunnel } = await createClient(connectionInfo);
+        const { client, sshTunnel } = await createClient(connectionInfo, specificLogger);
 
         db.initializeClient(client, specificLogger);
         currentSshTunnel = sshTunnel;
