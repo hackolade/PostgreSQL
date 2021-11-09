@@ -42,7 +42,7 @@ const connectViaSsh = info =>
         });
     });
 
-const getSslOptions = connectionInfo => {
+const getSslOptions = (connectionInfo, logger) => {
     const sslType = mapSslType(connectionInfo.sslType);
 
     if (sslType === 'disable') {
@@ -50,20 +50,36 @@ const getSslOptions = connectionInfo => {
     }
 
     if (sslType === 'allow') {
-        true;
+        return true;
     }
 
-    if (['prefer', 'require', 'verify-ca', 'verify-full'].includes(sslType)) {
-        return {
-            ca: fs.existsSync(connectionInfo.certAuthority)
-                ? fs.readFileSync(connectionInfo.certAuthority).toString()
-                : '',
-            cert: fs.existsSync(connectionInfo.clientCert) ? fs.readFileSync(connectionInfo.clientCert).toString() : '',
-            key: fs.existsSync(connectionInfo.clientPrivateKey)
-                ? fs.readFileSync(connectionInfo.clientPrivateKey).toString()
-                : '',
-        };
+    let sslOptions = {
+        checkServerIdentity(hostname, cert) {
+            logger.info('Certificate', {
+                hostname,
+                cert: {
+                    subject: cert.subject,
+                    issuer: cert.issuer,
+                    valid_from: cert.valid_from,
+                    valid_to: cert.valid_to,
+                },
+            });
+        }
+    };
+
+    if (fs.existsSync(connectionInfo.certAuthority)) {
+        sslOptions.ca = fs.readFileSync(connectionInfo.certAuthority).toString();
     }
+
+    if (fs.existsSync(connectionInfo.clientCert)) {
+        sslOptions.cert = fs.readFileSync(connectionInfo.clientCert).toString();
+    }
+
+    if (fs.existsSync(connectionInfo.clientPrivateKey)) {
+        sslOptions.key = fs.readFileSync(connectionInfo.clientPrivateKey).toString();
+    }
+
+    return sslOptions;
 };
 
 const mapSslType = sslType => {
@@ -77,7 +93,7 @@ const mapSslType = sslType => {
     return oldToNewSslType[sslType] || sslType;
 };
 
-const createClient = async connectionInfo => {
+const createClient = async (connectionInfo, logger) => {
     let sshTunnel = null;
 
     if (connectionInfo.ssh) {
@@ -92,7 +108,7 @@ const createClient = async connectionInfo => {
         password: connectionInfo.userPassword,
         port: connectionInfo.port,
         keepAlive: true,
-        ssl: getSslOptions(connectionInfo),
+        ssl: getSslOptions(connectionInfo, logger),
         connectionTimeoutMillis: Number(connectionInfo.queryRequestTimeout) || 60000,
         query_timeout: Number(connectionInfo.queryRequestTimeout) || 60000,
         statement_timeout: Number(connectionInfo.queryRequestTimeout) || 60000,
