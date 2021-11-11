@@ -45,7 +45,7 @@ const connectViaSsh = info =>
 const getSslOptions = (connectionInfo, logger) => {
     const sslType = mapSslType(connectionInfo.sslType);
 
-    if (sslType === 'disable') {
+    if (!sslType || sslType === 'disable') {
         return false;
     }
 
