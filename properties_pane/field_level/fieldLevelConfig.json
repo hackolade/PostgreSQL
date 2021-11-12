@@ -2237,6 +2237,42 @@ making sure that you maintain a proper JSON format.
 				"valueType": "string"
 			},
 			{
+				"propertyName": "Type modifier",
+				"propertyKeyword": "typeModifier",
+				"propertyType": "text",
+				"dependency": {
+					"type": "or",
+					"values": [
+						{
+							"key": "mode",
+							"value": "geometry"
+						},
+						{
+							"key": "mode",
+							"value": "geography"
+						}
+					]
+				}
+			},
+			{
+				"propertyName": "SRID",
+				"propertyKeyword": "srid",
+				"propertyType": "text",
+				"dependency": {
+					"type": "or",
+					"values": [
+						{
+							"key": "mode",
+							"value": "geometry"
+						},
+						{
+							"key": "mode",
+							"value": "geography"
+						}
+					]
+				}
+			},
+			{
 				"propertyName": "Comments",
 				"propertyKeyword": "description",
 				"propertyTooltip": "comments",

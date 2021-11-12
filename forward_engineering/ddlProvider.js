@@ -470,6 +470,8 @@ module.exports = (baseProvider, options, app) => {
                 schemaName: schemaData.schemaName,
                 underlyingType: jsonSchema.underlyingType,
                 checkConstraints: jsonSchema.checkConstraints,
+                typeModifier: jsonSchema.typeModifier,
+                srid: jsonSchema.srid,
                 collationRule,
                 timePrecision,
                 timezone,

@@ -35,10 +35,19 @@ module.exports = ({
         return type;
     };
 
+    const addTypeModifier = ({ type, typeModifier, srid }) => {
+        const typeSrid = srid ? `, ${srid}` : ``;
+        if (typeModifier && typeModifier !== "") {
+            return `${type}(${typeModifier}${typeSrid})`
+        }
+        return type;
+    }
+
     const canHaveLength = type => ['char', 'varchar', 'bit', 'varbit'].includes(type);
     const canHavePrecision = type => type === 'numeric';
     const canHaveTimePrecision = type => ['time', 'timestamp'].includes(type);
     const canHaveScale = type => type === 'numeric';
+    const canHaveTypeModifier = type => ['geography', 'geometry'].includes(type);
 
     const decorateType = (type, columnDefinition) => {
         if (canHaveLength(type) && _.isNumber(columnDefinition.length)) {
@@ -47,6 +56,12 @@ module.exports = ({
             return addScalePrecision(type, columnDefinition.precision, columnDefinition.scale);
         } else if (canHavePrecision(type) && _.isNumber(columnDefinition.precision)) {
             return addPrecision(type, columnDefinition.precision);
+        } else if (canHaveTypeModifier(type)) {
+            return addTypeModifier({
+                type,
+                typeModifier: columnDefinition.typeModifier,
+                srid: columnDefinition.srid
+            });
         } else if (
             canHaveTimePrecision(type) &&
             (_.isNumber(columnDefinition.timePrecision) || columnDefinition.timezone)
