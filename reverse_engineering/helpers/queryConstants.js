@@ -150,6 +150,7 @@ const queryConstants = {
             JOIN pg_catalog.pg_namespace AS foreign_table_namespace ON (pc_foreign_table.relnamespace = foreign_table_namespace.oid)
             WHERE pcon.conrelid = $1 AND pcon.contype = 'f';`,
     GET_VIEW_DATA: `SELECT * FROM information_schema.views WHERE table_name = $1 AND table_schema = $2;`,
+    GET_VIEW_SELECT_STMT_FALLBACK: `SELECT definition FROM pg_views WHERE viewname = $1 AND schemaname = $2;`,
     GET_VIEW_OPTIONS: `
         SELECT reloptions AS view_options,
             relpersistence AS persistence,
