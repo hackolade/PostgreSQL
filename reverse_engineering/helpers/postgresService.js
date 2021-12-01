@@ -329,7 +329,7 @@ module.exports = {
             return {
                 name: viewName,
                 data,
-                jsonSchema: {},
+                jsonSchema: { properties: [] },
             };
         }
 
