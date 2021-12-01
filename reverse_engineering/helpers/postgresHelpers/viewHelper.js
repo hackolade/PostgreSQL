@@ -13,8 +13,14 @@ const isViewByName = name => _.endsWith(name, VIEW_SUFFIX);
 const removeViewNameSuffix = name => name.slice(0, -VIEW_SUFFIX.length);
 const setViewSuffix = name => `${name}${VIEW_SUFFIX}`;
 
-const generateCreateViewScript = (viewName, viewData) => {
-    return `CREATE VIEW ${viewName} AS ${viewData.view_definition}`;
+const generateCreateViewScript = (viewName, viewData, viewDefinitionFallback = {}) => {
+    const selectStatement = _.trim(viewData.view_definition || viewDefinitionFallback.definition || '');
+
+    if (!selectStatement) {
+        return ''
+    }
+
+    return `CREATE VIEW ${viewName} AS ${selectStatement}`;
 };
 
 const prepareViewData = (viewData, viewOptions) => {

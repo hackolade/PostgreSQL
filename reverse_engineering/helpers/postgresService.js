@@ -315,10 +315,23 @@ module.exports = {
         viewName = removeViewNameSuffix(viewName);
 
         const viewData = await db.query(queryConstants.GET_VIEW_DATA, [viewName, schemaName], true);
+        const viewDefinitionFallback =
+            !viewData.view_definition &&
+            (await db.queryTolerant(queryConstants.GET_VIEW_SELECT_STMT_FALLBACK, [viewName, schemaName], true));
         const viewOptions = await db.queryTolerant(queryConstants.GET_VIEW_OPTIONS, [viewName, schemaOid], true);
 
-        const script = generateCreateViewScript(viewName, viewData);
+        const script = generateCreateViewScript(viewName, viewData, viewDefinitionFallback);
         const data = prepareViewData(viewData, viewOptions);
+
+        if (!script) {
+            logger.info('View select statement was not retrieved', { schemaName, viewName });
+
+            return {
+                name: viewName,
+                data,
+                jsonSchema: {},
+            };
+        }
 
         return {
             name: viewName,
