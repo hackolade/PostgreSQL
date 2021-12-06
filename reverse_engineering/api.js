@@ -143,49 +143,54 @@ module.exports = {
                         modelDefinitions,
                     };
                 })
-            ).then(schemaData => {
-                const relationships = schemaData
-                    .flatMap(({ tables }) => tables.map(entityData => entityData.relationships))
-                    .flat();
+            )
+                .then(schemaData => {
+                    const relationships = schemaData
+                        .flatMap(({ tables }) => tables.map(entityData => entityData.relationships))
+                        .flat();
 
-                const packages = schemaData.flatMap(
-                    ({ schemaName, tables, views, functions, procedures, modelDefinitions }) => {
-                        const bucketInfo = {
-                            UDFs: functions,
-                            Procedures: procedures,
-                        };
-
-                        const tablePackages = tables
-                            .map(entityData => ({
-                                dbName: schemaName,
-                                collectionName: entityData.name,
-                                documents: entityData.documents,
-                                views: [],
-                                emptyBucket: false,
-                                entityLevel: entityData.entityLevel,
-                                validation: {
-                                    jsonSchema: entityData.jsonSchema,
-                                },
-                                bucketInfo,
-                                modelDefinitions,
-                            }))
-                            .sort(data => (app.require('lodash').isEmpty(data.entityLevel.inherits) ? -1 : 1));
-
-                        if (views?.length) {
-                            const viewPackage = {
-                                dbName: schemaName,
-                                views: views,
-                                emptyBucket: false,
+                    const packages = schemaData.flatMap(
+                        ({ schemaName, tables, views, functions, procedures, modelDefinitions }) => {
+                            const bucketInfo = {
+                                UDFs: functions,
+                                Procedures: procedures,
                             };
 
-                            return [...tablePackages, viewPackage];
-                        }
+                            const tablePackages = tables
+                                .map(entityData => ({
+                                    dbName: schemaName,
+                                    collectionName: entityData.name,
+                                    documents: entityData.documents,
+                                    views: [],
+                                    emptyBucket: false,
+                                    entityLevel: entityData.entityLevel,
+                                    validation: {
+                                        jsonSchema: entityData.jsonSchema,
+                                    },
+                                    bucketInfo,
+                                    modelDefinitions,
+                                }))
+                                .sort(data => (app.require('lodash').isEmpty(data.entityLevel.inherits) ? -1 : 1));
 
-                        return tablePackages;
-                    }
-                );
-                return { packages, relationships };
-            });
+                            if (views?.length) {
+                                const viewPackage = {
+                                    dbName: schemaName,
+                                    views: views,
+                                    emptyBucket: false,
+                                };
+
+                                return [...tablePackages, viewPackage];
+                            }
+
+                            return tablePackages;
+                        }
+                    );
+                    return { packages, relationships };
+                })
+                .then(({ packages, relationships }) => ({
+                    packages: facilitatePackages(packages, logger),
+                    relationships,
+                }));
 
             callback(null, packages, modelData, relationships);
         } catch (error) {
@@ -207,4 +212,32 @@ const logInfo = (step, connectionInfo, logger) => {
     logger.clear();
     logger.log('info', getSystemInfo(connectionInfo.appVersion), step);
     logger.log('info', connectionInfo, 'connectionInfo', connectionInfo.hiddenKeys);
+};
+
+const facilitatePackages = (packages, logger) => {
+    if (checkPackagesCannotBeStringified(packages, logger)) {
+        return packages.map(pack => {
+            if (!Array.isArray(pack.documents)) {
+                return pack;
+            }
+
+            const documents = pack.documents.slice(0, Math.floor(pack.documents.length / 2));
+
+            return { ...pack, documents };
+        });
+    }
+
+    return packages;
+};
+
+const checkPackagesCannotBeStringified = (packages, logger) => {
+    try {
+        const str = JSON.stringify(packages);
+
+        return false;
+    } catch (error) {
+        logger.log('info', prepareError(error), 'Packages cannot be stringified');
+
+        return true;
+    }
 };
