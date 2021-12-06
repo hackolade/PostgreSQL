@@ -43,7 +43,7 @@ const queryConstants = {
         WHERE pg_attribute.attrelid = $1;`,
     GET_DESCRIPTION_BY_OID: `SELECT obj_description($1)`,
     GET_ROWS_COUNT: fullTableName => `SELECT COUNT(*) AS quantity FROM ${fullTableName};`,
-    GET_SAMPLED_DATA: fullTableName => `SELECT * FROM ${fullTableName} LIMIT $1;`,
+    GET_SAMPLED_DATA: (fullTableName, jsonColumns) => `SELECT ${jsonColumns} FROM ${fullTableName} LIMIT $1;`,
     GET_INHERITS_PARENT_TABLE_NAME: `
         SELECT pc.relname AS parent_table_name FROM pg_catalog.pg_inherits AS pi
 	        INNER JOIN pg_catalog.pg_class AS pc

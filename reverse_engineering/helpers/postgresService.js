@@ -269,7 +269,7 @@ module.exports = {
         let documents = [];
 
         if (hasJsonTypes) {
-            documents = await this._getDocuments(schemaName, tableName, recordSamplingSettings);
+            documents = await this._getDocuments(schemaName, tableName, targetAttributes, recordSamplingSettings);
             targetAttributes = setSubtypeFromSampledJsonValues(targetAttributes, documents);
         }
 
@@ -298,7 +298,7 @@ module.exports = {
         });
     },
 
-    async _getDocuments(schemaName, tableName, recordSamplingSettings) {
+    async _getDocuments(schemaName, tableName, attributes, recordSamplingSettings) {
         logger.progress('Sampling table', schemaName, tableName);
 
         const fullTableName = `${schemaName}.${tableName}`;
@@ -306,7 +306,13 @@ module.exports = {
             (await db.queryTolerant(queryConstants.GET_ROWS_COUNT(fullTableName), [], true))?.quantity || 0;
         const limit = getLimit(quantity, recordSamplingSettings);
 
-        return await db.queryTolerant(queryConstants.GET_SAMPLED_DATA(fullTableName), [limit]);
+        const jsonColumns = _.chain(attributes)
+            .filter(({ type }) => _.includes(['json', 'jsonb'], type))
+            .map('name')
+            .join(', ')
+            .value();
+
+        return await db.queryTolerant(queryConstants.GET_SAMPLED_DATA(fullTableName, jsonColumns), [limit]);
     },
 
     async _retrieveSingleViewData(schemaOid, schemaName, viewName) {
