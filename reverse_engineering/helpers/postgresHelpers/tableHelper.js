@@ -137,7 +137,7 @@ const getLimit = (count, recordSamplingSettings) => {
         recordSamplingSettings.active === 'absolute'
             ? recordSamplingSettings.absolute.value
             : Math.round((count / 100) * per);
-    return size;
+    return Math.min(size, 100000);
 };
 
 const prepareTableConstraints = (constraintsResult, attributesWithPositions) => {
