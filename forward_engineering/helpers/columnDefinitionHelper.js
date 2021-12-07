@@ -42,6 +42,11 @@ module.exports = ({
         }
         return type;
     }
+    const addArrayDecorator = (type, array_type) => {
+        const arrayDecorator = array_type?.map(item => `[${item?.array_size_limit ?? ''}]`).join('').trim() || '';
+
+        return `${type}${arrayDecorator}`;
+    }
 
     const canHaveLength = type => ['char', 'varchar', 'bit', 'varbit'].includes(type);
     const canHavePrecision = type => type === 'numeric';
@@ -69,7 +74,7 @@ module.exports = ({
             return addWithTimezone(addPrecision(type, columnDefinition.timePrecision), columnDefinition.timezone);
         }
 
-        return type;
+        return addArrayDecorator(type, columnDefinition.array_type);
     };
 
     const isString = type => ['char', 'varchar', 'text', 'bit', 'varbit'].includes(type);
