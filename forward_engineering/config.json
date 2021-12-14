@@ -1,8 +1,31 @@
 {
-	"type": "ddl",
-	"ddlType": "plugin",
+	"options": [
+		{
+			"name": "Create Script",
+			"keyword": "create",
+			"type": "ddl",
+			"ddlType": "plugin",
+			"mode": "pgsql",
+			"fileExtensions": [
+				{
+				  "value": "sql",
+				  "label": "SQL"
+				}
+			  ]
+		},
+		{
+			"name": "Alter Script from Delta model",
+			"keyword": "alterFromDelta",
+			"cliOnly": true,
+			"fileExtensions": [
+				{
+				  "value": "sql",
+				  "label": "SQL"
+				}
+			  ]
+		}
+	],
 	"namePrefix": "PostgreSQL",
-	"mode": "pgsql",
 	"level": {
 		"container": true,
 		"entity": true,

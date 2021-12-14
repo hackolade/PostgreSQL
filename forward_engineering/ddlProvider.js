@@ -3,6 +3,7 @@ const types = require('./configs/types');
 const templates = require('./configs/templates');
 
 module.exports = (baseProvider, options, app) => {
+    const _ = app.require('lodash');
     const {
         tab,
         commentIfDeactivated,
@@ -11,9 +12,8 @@ module.exports = (baseProvider, options, app) => {
         hasType,
         wrap,
         clean,
-    } = app.utils.general;
-    const assignTemplates = app.utils.assignTemplates;
-    const _ = app.require('lodash');
+    } = require('./utils/general')(_);
+    const assignTemplates = require('./utils/assignTemplates');
     const {
         getFunctionArguments,
         wrapInQuotes,
@@ -132,10 +132,8 @@ module.exports = (baseProvider, options, app) => {
                 columns,
                 checkConstraints,
                 foreignKeyConstraints,
-                dbData,
                 schemaData,
                 columnDefinitions,
-                relatedSchemas,
                 keyConstraints,
                 inherits,
                 description,
