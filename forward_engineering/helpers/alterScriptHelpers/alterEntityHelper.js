@@ -1,3 +1,5 @@
+const { checkFieldPropertiesChanged } = require('./common');
+
 const getAddCollectionScript = (app, dbVersion) => collection => {
 	const _ = app.require('lodash');
 	const { getEntityName } = require('../../utils/general')(_);
@@ -16,7 +18,7 @@ const getAddCollectionScript = (app, dbVersion) => collection => {
 			schemaData,
 		}),
 	);
-	const checkConstraints = jsonSchema.chkConstr.map(check =>
+	const checkConstraints = (jsonSchema.chkConstr || []).map(check =>
 		ddlProvider.createCheckConstraint(ddlProvider.hydrateCheckConstraint(check)),
 	);
 	const tableData = {
@@ -70,10 +72,10 @@ const getAddColumnScript = (app, dbVersion) => collection => {
 			}),
 		)
 		.map(ddlProvider.convertColumnDefinition)
-		.map(script => `ALTER TABLE ${fullName} ADD COLUMN IF NOT EXISTS ${script};`);
+		.map(script => `ALTER TABLE IF EXISTS ${fullName} ADD COLUMN IF NOT EXISTS ${script};`);
 };
 
-const getDeleteColumnScript = (app, dbVersion) => collection => {
+const getDeleteColumnScript = app => collection => {
 	const _ = app.require('lodash');
 	const { getEntityName } = require('../../utils/general')(_);
 	const { getNamePrefixedWithSchemaName, wrapInQuotes } = require('../general')({ _ });
@@ -85,7 +87,38 @@ const getDeleteColumnScript = (app, dbVersion) => collection => {
 
 	return _.toPairs(collection.properties)
 		.filter(([name, jsonSchema]) => !jsonSchema.compMod)
-		.map(([name]) => `ALTER TABLE ${fullName} DROP COLUMN IF EXISTS ${wrapInQuotes(name)};`);
+		.map(([name]) => `ALTER TABLE IF EXISTS ${fullName} DROP COLUMN IF EXISTS ${wrapInQuotes(name)};`);
+};
+
+const getModifyColumnScript = app => collection => {
+	const _ = app.require('lodash');
+	const { getEntityName } = require('../../utils/general')(_);
+	const { getNamePrefixedWithSchemaName, wrapInQuotes } = require('../general')({ _ });
+
+	const collectionSchema = { ...collection, ...(_.omit(collection?.role, 'properties') || {}) };
+	const tableName = getEntityName(collectionSchema);
+	const schemaName = collectionSchema.compMod?.keyspaceName;
+	const fullName = getNamePrefixedWithSchemaName(tableName, schemaName);
+
+	const renameColumnScripts = _.values(collection.properties)
+		.filter(jsonSchema => checkFieldPropertiesChanged(jsonSchema.compMod, ['name']))
+		.map(
+			jsonSchema =>
+				`ALTER TABLE IF EXISTS ${fullName} RENAME COLUMN ${wrapInQuotes(
+					jsonSchema.compMod.oldField.name,
+				)} TO ${wrapInQuotes(jsonSchema.compMod.newField.name)};`,
+		);
+
+	const changeTypeScripts = _.toPairs(collection.properties)
+		.filter(([name, jsonSchema]) => checkFieldPropertiesChanged(jsonSchema.compMod, ['type', 'mode']))
+		.map(
+			([name, jsonSchema]) =>
+				`ALTER TABLE IF EXISTS ${fullName} ALTER COLUMN ${wrapInQuotes(name)} SET DATA TYPE ${
+					jsonSchema.compMod.newField.mode || jsonSchema.compMod.newField.type
+				};`,
+		);
+
+	return [...renameColumnScripts, ...changeTypeScripts];
 };
 
 module.exports = {
@@ -93,4 +126,5 @@ module.exports = {
 	getDeleteCollectionScript,
 	getAddColumnScript,
 	getDeleteColumnScript,
+	getModifyColumnScript,
 };

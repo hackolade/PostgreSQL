@@ -8,10 +8,10 @@
 			"mode": "pgsql",
 			"fileExtensions": [
 				{
-				  "value": "sql",
-				  "label": "SQL"
+					"value": "sql",
+					"label": "SQL"
 				}
-			  ]
+			]
 		},
 		{
 			"name": "Alter Script from Delta model",
@@ -19,10 +19,10 @@
 			"cliOnly": true,
 			"fileExtensions": [
 				{
-				  "value": "sql",
-				  "label": "SQL"
+					"value": "sql",
+					"label": "SQL"
 				}
-			  ]
+			]
 		}
 	],
 	"namePrefix": "PostgreSQL",

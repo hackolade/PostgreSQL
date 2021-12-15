@@ -1,3 +1,5 @@
+const { checkFieldPropertiesChanged } = require('./common');
+
 const getCreateUdtScript = (app, dbVersion) => jsonSchema => {
 	const _ = app.require('lodash');
 	const { createColumnDefinitionBySchema } = require('./createColumnDefinition')(_);
@@ -33,9 +35,9 @@ const getDeleteUdtScript = app => udt => {
 	const { wrapInQuotes } = require('../general')({ _ });
 
 	if (udt.type === 'domain') {
-		return `DROP DOMAIN IF EXISTS ${wrapInQuotes(udt.code || udt.name)}`;
+		return `DROP DOMAIN IF EXISTS ${wrapInQuotes(udt.code || udt.name)};`;
 	} else {
-		return `DROP TYPE IF EXISTS ${wrapInQuotes(udt.code || udt.name)}`;
+		return `DROP TYPE IF EXISTS ${wrapInQuotes(udt.code || udt.name)};`;
 	}
 };
 
@@ -74,9 +76,37 @@ const getDeleteColumnFromTypeScript = app => udt => {
 		.map(([name]) => `ALTER TYPE ${fullName} DROP ATTRIBUTE IF EXISTS ${wrapInQuotes(name)};`);
 };
 
+const getModifyColumnOfTypeScript = app => udt => {
+	const _ = app.require('lodash');
+	const { wrapInQuotes } = require('../general')({ _ });
+
+	const fullName = wrapInQuotes(udt.code || udt.name);
+
+	const renameColumnScripts = _.values(udt.properties)
+		.filter(jsonSchema => checkFieldPropertiesChanged(jsonSchema.compMod, ['name']))
+		.map(
+			jsonSchema =>
+				`ALTER TYPE ${fullName} RENAME ATTRIBUTE ${wrapInQuotes(
+					jsonSchema.compMod.oldField.name,
+				)} TO ${wrapInQuotes(jsonSchema.compMod.newField.name)};`,
+		);
+
+	const changeTypeScripts = _.toPairs(udt.properties)
+		.filter(([name, jsonSchema]) => checkFieldPropertiesChanged(jsonSchema.compMod, ['type', 'mode']))
+		.map(
+			([name, jsonSchema]) =>
+				`ALTER TYPE ${fullName} ALTER ATTRIBUTE ${wrapInQuotes(name)} SET DATA TYPE ${
+					jsonSchema.compMod.newField.mode || jsonSchema.compMod.newField.type
+				};`,
+		);
+
+	return [...renameColumnScripts, ...changeTypeScripts];
+};
+
 module.exports = {
 	getCreateUdtScript,
 	getDeleteUdtScript,
 	getAddColumnToTypeScript,
 	getDeleteColumnFromTypeScript,
+	getModifyColumnOfTypeScript,
 };

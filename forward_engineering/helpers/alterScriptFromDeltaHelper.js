@@ -4,12 +4,14 @@ const {
 	getDeleteCollectionScript,
 	getAddColumnScript,
 	getDeleteColumnScript,
+	getModifyColumnScript,
 } = require('./alterScriptHelpers/alterEntityHelper');
 const {
 	getDeleteUdtScript,
 	getCreateUdtScript,
 	getAddColumnToTypeScript,
 	getDeleteColumnFromTypeScript,
+	getModifyColumnOfTypeScript,
 } = require('./alterScriptHelpers/alterUdtHelper');
 const { getAddViewScript, getDeleteViewScript } = require('./alterScriptHelpers/alterViewHelper');
 
@@ -60,10 +62,20 @@ const getAlterCollectionsScripts = (collection, app, dbVersion) => {
 		.map(item => Object.values(item.properties)[0])
 		.filter(collection => !collection.compMod)
 		.flatMap(getDeleteColumnScript(app));
+	const modifyColumnScript = []
+		.concat(collection.properties?.entities?.properties?.modified?.items)
+		.filter(Boolean)
+		.map(item => Object.values(item.properties)[0])
+		.filter(collection => !collection.compMod)
+		.flatMap(getModifyColumnScript(app));
 
-	return [...createCollectionsScripts, ...deleteCollectionScripts, ...addColumnScripts, ...deleteColumnScripts].map(
-		script => script.trim(),
-	);
+	return [
+		...createCollectionsScripts,
+		...deleteCollectionScripts,
+		...addColumnScripts,
+		...deleteColumnScripts,
+		...modifyColumnScript,
+	].map(script => script.trim());
 };
 
 const getAlterViewScripts = (collection, app) => {
@@ -80,7 +92,6 @@ const getAlterViewScripts = (collection, app) => {
 		.filter(Boolean)
 		.map(item => Object.values(item.properties)[0])
 		.map(view => ({ ...view, ...(view.role || {}) }))
-		.filter(view => view.compMod?.deleted)
 		.map(getDeleteViewScript(app));
 
 	return [...deleteViewsScripts, ...createViewsScripts].map(script => script.trim());
@@ -118,9 +129,22 @@ const getAlterModelDefinitionsScripts = (collection, app, dbVersion) => {
 		.filter(item => item.childType === 'composite')
 		.flatMap(getDeleteColumnFromTypeScript(app));
 
-	return [...deleteUdtScripts, ...createUdtScripts, ...addColumnScripts, ...deleteColumnScripts].map(script =>
-		script.trim(),
-	);
+	const modifyColumnScripts = []
+		.concat(collection.properties?.modelDefinitions?.properties?.modified?.items)
+		.filter(Boolean)
+		.map(item => Object.values(item.properties)[0])
+		.filter(item => !item.compMod)
+		.map(item => ({ ...item, ...(app.require('lodash').omit(item.role, 'properties') || {}) }))
+		.filter(item => item.childType === 'composite')
+		.flatMap(getModifyColumnOfTypeScript(app));
+
+	return [
+		...deleteUdtScripts,
+		...createUdtScripts,
+		...addColumnScripts,
+		...deleteColumnScripts,
+		...modifyColumnScripts,
+	].map(script => script.trim());
 };
 
 module.exports = {
