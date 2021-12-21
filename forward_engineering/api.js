@@ -4,43 +4,36 @@ const applyToInstanceHelper = require('./applyToInstanceHelper');
 
 module.exports = {
 	generateScript(data, logger, callback, app) {
-		callback(new Error('Forward-Engineering of delta model on entity level is not supported'));
+		const {
+			getAlterContainersScripts,
+			getAlterCollectionsScripts,
+			getAlterViewScripts,
+			getAlterModelDefinitionsScripts,
+		} = require('./helpers/alterScriptFromDeltaHelper');
+
+		const collection = JSON.parse(data.jsonSchema);
+		if (!collection) {
+			throw new Error(
+				'"comparisonModelCollection" is not found. Alter script can be generated only from Delta model',
+			);
+		}
+
+		const dbVersion = data.modelData[0]?.dbVersion;
+		const containersScripts = getAlterContainersScripts(collection);
+		const collectionsScripts = getAlterCollectionsScripts(collection, app, dbVersion);
+		const viewScripts = getAlterViewScripts(collection, app);
+		const modelDefinitionsScripts = getAlterModelDefinitionsScripts(collection, app);
+
+		callback(
+			null,
+			[...containersScripts, ...collectionsScripts, ...viewScripts, ...modelDefinitionsScripts].join('\n\n'),
+		);
 	},
 	generateViewScript(data, logger, callback, app) {
 		callback(new Error('Forward-Engineering of delta model on view level is not supported'));
 	},
 	generateContainerScript(data, logger, callback, app) {
-		try {
-			const {
-				getComparisonModelCollection,
-				getAlterContainersScripts,
-				getAlterCollectionsScripts,
-				getAlterViewScripts,
-				getAlterModelDefinitionsScripts,
-			} = require('./helpers/alterScriptFromDeltaHelper');
-
-			const collection = getComparisonModelCollection(data.collections);
-			if (!collection) {
-				throw new Error(
-					'"comparisonModelCollection" is not found. Alter script can be generated only from Delta model',
-				);
-			}
-
-			const dbVersion = data.modelData[0]?.dbVersion;
-			const containersScripts = getAlterContainersScripts(collection);
-			const collectionsScripts = getAlterCollectionsScripts(collection, app, dbVersion);
-			const viewScripts = getAlterViewScripts(collection, app);
-			const modelDefinitionsScripts = getAlterModelDefinitionsScripts(collection, app);
-
-			callback(
-				null,
-				[...containersScripts, ...collectionsScripts, ...viewScripts, ...modelDefinitionsScripts].join('\n\n'),
-			);
-		} catch (e) {
-			logger.log('error', { message: e.message, stack: e.stack }, 'Cassandra Forward-Engineering Error');
-
-			callback({ message: e.message, stack: e.stack });
-		}
+		callback(new Error('Forward-Engineering of delta model on container level is not supported'));
 	},
 	getDatabases(connectionInfo, logger, callback, app) {
 		logger.progress({ message: 'Find all databases' });
