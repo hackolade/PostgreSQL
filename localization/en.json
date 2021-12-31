@@ -145,5 +145,7 @@
 	"CONTEXT_MENU___CONVERT_PATTERN_TO_REGULAR_FIELD": "Convert to Regular Column",
 	"FE_LEVEL_SELECTOR_TITLE": "Schemas",
 	"FE_LEVEL_SELECTOR_CONTAINER": "Individual",
-	"FE_LEVEL_SELECTOR_MODEL": "Combined"
+	"FE_LEVEL_SELECTOR_MODEL": "Combined",
+	"FE__BUCKETS_COMP_MODE": "Schema CompMode",
+	"FE__COLLECTIONS_COMP_MODE": "Table Alter Script"
 }
