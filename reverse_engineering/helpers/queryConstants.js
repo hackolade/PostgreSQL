@@ -1,70 +1,5 @@
-const queryConstants = {
-    PING: 'SELECT schema_name FROM information_schema.schemata LIMIT 1;',
-    GET_VERSION: 'SELECT version()',
-    GET_SCHEMA_NAMES: 'SELECT schema_name FROM information_schema.schemata;',
-    GET_TABLE_NAMES: `
-        SELECT table_name, table_type
-            FROM information_schema.tables
- 	        WHERE table_schema = $1
-	        ORDER BY table_name;`,
-    GET_NAMESPACE_OID: 'SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = $1',
-    GET_TABLE_LEVEL_DATA: `
-        SELECT pc.oid, pc.relpersistence, pc.reloptions, pt.spcname
-            FROM pg_catalog.pg_class AS pc 
-            LEFT JOIN pg_catalog.pg_tablespace AS pt 
-            ON pc.reltablespace = pt.oid
-            WHERE pc.relname = $1 AND pc.relnamespace = $2;`,
-    GET_TABLE_TOAST_OPTIONS: `
-        SELECT reloptions AS toast_options
-        FROM pg_catalog.pg_class
-        WHERE oid =
-                (SELECT reltoastrelid
-                 FROM pg_catalog.pg_class
-                 WHERE relname=$1 AND relnamespace = $2
-                 LIMIT 1)`,
-    GET_TABLE_PARTITION_DATA: `
-        SELECT partstrat as partition_method,
-	            partattrs::int2[] as partition_attributes_positions,
-	            pg_catalog.pg_get_expr(partexprs, partrelid) AS expressions
-            FROM pg_catalog.pg_partitioned_table
-            WHERE partrelid = $1;`,
-    GET_TABLE_COLUMNS: `
-        SELECT * FROM information_schema.columns
-            WHERE table_name = $1 AND table_schema = $2
-            ORDER BY ordinal_position`,
-    GET_TABLE_COLUMNS_ADDITIONAL_DATA: `
-        SELECT pg_attribute.attname AS name,
-            pg_attribute.attndims AS number_of_array_dimensions,
-            pg_description.description,
-            pg_attribute.atttypmod AS attribute_mode
-        FROM pg_catalog.pg_attribute AS pg_attribute
-        LEFT JOIN pg_catalog.pg_description AS pg_description ON (pg_description.objsubid=pg_attribute.attnum
-                                                               AND pg_description.objoid = pg_attribute.attrelid)
-        WHERE pg_attribute.attrelid = $1;`,
-    GET_DESCRIPTION_BY_OID: `SELECT obj_description($1)`,
-    GET_ROWS_COUNT: fullTableName => `SELECT COUNT(*) AS quantity FROM ${fullTableName};`,
-    GET_SAMPLED_DATA: (fullTableName, jsonColumns) => `SELECT ${jsonColumns} FROM ${fullTableName} LIMIT $1;`,
-    GET_INHERITS_PARENT_TABLE_NAME: `
-        SELECT pc.relname AS parent_table_name FROM pg_catalog.pg_inherits AS pi
-	        INNER JOIN pg_catalog.pg_class AS pc
-	        ON pc.oid = pi.inhparent
-	        WHERE pi.inhrelid = $1;`,
-    GET_TABLE_CONSTRAINTS: `
-        SELECT pcon.conname AS constraint_name, 
-	            pcon.contype AS constraint_type,
-	            pcon.connoinherit AS no_inherit,
-	            pcon.conkey AS constraint_keys,
-	            pg_catalog.pg_get_expr(pcon.conbin, pcon.conrelid) AS expression,
-	            obj_description(pcon.oid, 'pg_constraint') AS description,
-	            pc.reloptions AS storage_parameters,
-	            pt.spcname AS tablespace
-	        FROM pg_catalog.pg_constraint AS pcon
-	        LEFT JOIN pg_catalog.pg_class AS pc
-	        ON pcon.conindid = pc.oid
-	        LEFT JOIN pg_catalog.pg_tablespace AS pt
-	        ON pc.reltablespace = pt.oid
-	        WHERE pcon.conrelid = $1;`,
-    GET_TABLE_INDEXES: `
+const getGET_TABLE_INDEXES = postgresVersion => {
+	return `
         SELECT indexname,
                index_method,
                index_unique,
@@ -82,8 +17,8 @@ const queryConstants = {
                          ORDER BY ord) AS ascendings,
                array_agg(nulls_first
                          ORDER BY ord) AS nulls_first,
-        		reloptions AS storage_parameters,
-        		tablespace_name
+                reloptions AS storage_parameters,
+                tablespace_name
         FROM
             (SELECT ct.oid AS table_oid,
                     c.relname AS indexname,
@@ -91,9 +26,9 @@ const queryConstants = {
                     indexes.indisunique AS index_unique,
                     indexes.ord,
                     attribute.attname,
-        	 		c.reloptions,
-        	 		tablespace_t.spcname AS tablespace_name,
-                    indexes.indnkeyatts AS number_of_keys,
+                     c.reloptions,
+                     tablespace_t.spcname AS tablespace_name,
+                    indexes.${postgresVersion === 10 ? 'indnatts' : 'indnkeyatts'} AS number_of_keys,
                     pg_catalog.pg_get_expr(indpred, indrelid) AS where_expression,
                     CASE
                         WHEN collation_namespace.nspname is not null THEN format('%I.%I',collation_namespace.nspname,collation_t.collname)
@@ -125,21 +60,93 @@ const queryConstants = {
              LEFT JOIN pg_catalog.pg_namespace collation_namespace ON (collation_namespace.oid=collation_t.collnamespace)
              LEFT JOIN pg_catalog.pg_opclass opclass_t ON (opclass_t.oid=indexes.class)
              LEFT JOIN pg_catalog.pg_namespace opclas_namespace ON (opclas_namespace.oid=opclass_t.opcnamespace)
-        	 LEFT JOIN pg_catalog.pg_tablespace tablespace_t ON (tablespace_t.oid = c.reltablespace)) s2
+             LEFT JOIN pg_catalog.pg_tablespace tablespace_t ON (tablespace_t.oid = c.reltablespace)) s2
         WHERE table_oid = $1
         GROUP BY indexname,
                  index_method,
                  index_unique,
-        		 reloptions,
+                 reloptions,
                  number_of_keys,
                  where_expression,
-        		 tablespace_name;`,
-    GET_TABLE_FOREIGN_KEYS: `
+                 tablespace_name;
+        `;
+};
+
+const queryConstants = {
+	PING: 'SELECT schema_name FROM information_schema.schemata LIMIT 1;',
+	GET_VERSION: 'SELECT version()',
+	GET_VERSION_AS_NUM: 'SHOW server_version_num;',
+	GET_SCHEMA_NAMES: 'SELECT schema_name FROM information_schema.schemata;',
+	GET_TABLE_NAMES: `
+        SELECT table_name, table_type
+            FROM information_schema.tables
+ 	        WHERE table_schema = $1
+	        ORDER BY table_name;`,
+	GET_NAMESPACE_OID: 'SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = $1',
+	GET_TABLE_LEVEL_DATA: `
+        SELECT pc.oid, pc.relpersistence, pc.reloptions, pt.spcname
+            FROM pg_catalog.pg_class AS pc 
+            LEFT JOIN pg_catalog.pg_tablespace AS pt 
+            ON pc.reltablespace = pt.oid
+            WHERE pc.relname = $1 AND pc.relnamespace = $2;`,
+	GET_TABLE_TOAST_OPTIONS: `
+        SELECT reloptions AS toast_options
+        FROM pg_catalog.pg_class
+        WHERE oid =
+                (SELECT reltoastrelid
+                 FROM pg_catalog.pg_class
+                 WHERE relname=$1 AND relnamespace = $2
+                 LIMIT 1)`,
+	GET_TABLE_PARTITION_DATA: `
+        SELECT partstrat as partition_method,
+	            partattrs::int2[] as partition_attributes_positions,
+	            pg_catalog.pg_get_expr(partexprs, partrelid) AS expressions
+            FROM pg_catalog.pg_partitioned_table
+            WHERE partrelid = $1;`,
+	GET_TABLE_COLUMNS: `
+        SELECT * FROM information_schema.columns
+            WHERE table_name = $1 AND table_schema = $2
+            ORDER BY ordinal_position`,
+	GET_TABLE_COLUMNS_ADDITIONAL_DATA: `
+        SELECT pg_attribute.attname AS name,
+            pg_attribute.attndims AS number_of_array_dimensions,
+            pg_description.description,
+            pg_attribute.atttypmod AS attribute_mode
+        FROM pg_catalog.pg_attribute AS pg_attribute
+        LEFT JOIN pg_catalog.pg_description AS pg_description ON (pg_description.objsubid=pg_attribute.attnum
+                                                               AND pg_description.objoid = pg_attribute.attrelid)
+        WHERE pg_attribute.attrelid = $1;`,
+	GET_DESCRIPTION_BY_OID: `SELECT obj_description($1)`,
+	GET_ROWS_COUNT: fullTableName => `SELECT COUNT(*) AS quantity FROM ${fullTableName};`,
+	GET_SAMPLED_DATA: (fullTableName, jsonColumns) => `SELECT ${jsonColumns} FROM ${fullTableName} LIMIT $1;`,
+	GET_INHERITS_PARENT_TABLE_NAME: `
+        SELECT pc.relname AS parent_table_name FROM pg_catalog.pg_inherits AS pi
+	        INNER JOIN pg_catalog.pg_class AS pc
+	        ON pc.oid = pi.inhparent
+	        WHERE pi.inhrelid = $1;`,
+	GET_TABLE_CONSTRAINTS: `
+        SELECT pcon.conname AS constraint_name, 
+	            pcon.contype AS constraint_type,
+	            pcon.connoinherit AS no_inherit,
+	            pcon.conkey AS constraint_keys,
+	            pg_catalog.pg_get_expr(pcon.conbin, pcon.conrelid) AS expression,
+	            obj_description(pcon.oid, 'pg_constraint') AS description,
+	            pc.reloptions AS storage_parameters,
+	            pt.spcname AS tablespace
+	        FROM pg_catalog.pg_constraint AS pcon
+	        LEFT JOIN pg_catalog.pg_class AS pc
+	        ON pcon.conindid = pc.oid
+	        LEFT JOIN pg_catalog.pg_tablespace AS pt
+	        ON pc.reltablespace = pt.oid
+	        WHERE pcon.conrelid = $1;`,
+	GET_TABLE_INDEXES: getGET_TABLE_INDEXES(),
+	GET_TABLE_INDEXES_V_10: getGET_TABLE_INDEXES(10),
+	GET_TABLE_FOREIGN_KEYS: `
         SELECT pcon.conname AS relationship_name, 
                 pcon.conkey AS table_columns_positions,
                 pc_foreign_table.relname AS foreign_table_name, 
                 ARRAY(
-                    SELECT column_name FROM unnest(pcon.confkey) AS column_position 
+                    SELECT column_name::text FROM unnest(pcon.confkey) AS column_position 
                     JOIN information_schema.columns ON (ordinal_position = column_position)
                     WHERE table_name = pc_foreign_table.relname AND table_schema = foreign_table_namespace.nspname)::text[] AS foreign_columns,
                 foreign_table_namespace.nspname AS foreign_table_schema
@@ -149,15 +156,15 @@ const queryConstants = {
             LEFT JOIN pg_catalog.pg_class AS pc_foreign_table ON (pcon.confrelid = pc_foreign_table.oid)
             JOIN pg_catalog.pg_namespace AS foreign_table_namespace ON (pc_foreign_table.relnamespace = foreign_table_namespace.oid)
             WHERE pcon.conrelid = $1 AND pcon.contype = 'f';`,
-    GET_VIEW_DATA: `SELECT * FROM information_schema.views WHERE table_name = $1 AND table_schema = $2;`,
-    GET_VIEW_SELECT_STMT_FALLBACK: `SELECT definition FROM pg_views WHERE viewname = $1 AND schemaname = $2;`,
-    GET_VIEW_OPTIONS: `
+	GET_VIEW_DATA: `SELECT * FROM information_schema.views WHERE table_name = $1 AND table_schema = $2;`,
+	GET_VIEW_SELECT_STMT_FALLBACK: `SELECT definition FROM pg_views WHERE viewname = $1 AND schemaname = $2;`,
+	GET_VIEW_OPTIONS: `
         SELECT reloptions AS view_options,
             relpersistence AS persistence,
             obj_description(oid, 'pg_class') AS description
         FROM pg_catalog.pg_class 
         WHERE relname = $1 AND relnamespace = $2;`,
-    GET_FUNCTIONS_WITH_PROCEDURES: `
+	GET_FUNCTIONS_WITH_PROCEDURES: `
         SELECT specific_name,
             routine_name AS name,
             routine_type,
@@ -167,7 +174,7 @@ const queryConstants = {
             type_udt_name AS return_data_type
 	    FROM information_schema.routines
 	    WHERE specific_schema=$1;`,
-    GET_FUNCTIONS_WITH_PROCEDURES_ARGS: `
+	GET_FUNCTIONS_WITH_PROCEDURES_ARGS: `
         SELECT parameter_name,
             parameter_mode,
             parameter_default,
@@ -176,7 +183,7 @@ const queryConstants = {
         FROM information_schema.parameters
         WHERE specific_name = $1
         ORDER BY ordinal_position;`,
-    GET_FUNCTIONS_WITH_PROCEDURES_ADDITIONAL: `
+	GET_FUNCTIONS_WITH_PROCEDURES_ADDITIONAL: `
         SELECT obj_description(oid, 'pg_proc') AS description,
             proname AS function_name,
 	    	provolatile AS volatility,
@@ -188,7 +195,22 @@ const queryConstants = {
 	    	prorows AS estimated_rows,
             prokind AS kind
 	    FROM pg_catalog.pg_proc WHERE pronamespace = $1;`,
-    GET_USER_DEFINED_TYPES: `
+	GET_FUNCTIONS_WITH_PROCEDURES_ADDITIONAL_V_10: `
+        SELECT obj_description(oid, 'pg_proc') AS description,
+            proname AS function_name,
+	    	provolatile AS volatility,
+	    	proparallel AS parallel,
+	    	proisstrict AS strict,
+	    	proretset AS returns_set,
+	    	proleakproof AS leak_proof,
+	    	procost AS estimated_cost,
+	    	prorows AS estimated_rows,
+            CASE
+		        WHEN proiswindow is true THEN 'w'
+		        ELSE ''
+	        END AS kind
+	    FROM pg_catalog.pg_proc WHERE pronamespace = $1;`,
+	GET_USER_DEFINED_TYPES: `
         SELECT pg_type.typrelid AS pg_class_oid,
             pg_type.typname AS name,
             pg_type.typtype AS type,
@@ -222,7 +244,7 @@ const queryConstants = {
               range_opclass_name,
               range_canonical_proc,
               range_diff_proc;`,
-    GET_COMPOSITE_TYPE_COLUMNS: `
+	GET_COMPOSITE_TYPE_COLUMNS: `
         SELECT pg_attribute.attname AS column_name,
            pg_type.typname AS data_type,
            pg_get_expr(pg_attrdef.adbin, pg_attrdef.adrelid) AS columns_default,
@@ -236,11 +258,11 @@ const queryConstants = {
                                                           AND pg_attrdef.adnum = pg_attribute.attnum)
         LEFT JOIN pg_catalog.pg_collation AS pg_collation ON (pg_collation.oid = pg_attribute.attcollation)
         WHERE pg_attribute.attrelid = $1`,
-    GET_DB_NAME: 'SELECT current_database();',
-    GET_DB_ENCODING: 'SHOW SERVER_ENCODING;',
-    GET_DB_COLLATE_NAME: 'SELECT default_collate_name FROM information_schema.character_sets;',
-    GET_DOMAIN_TYPES: 'SELECT * FROM information_schema.domains WHERE domain_schema = $1',
-    GET_DOMAIN_TYPES_CONSTRAINTS: `
+	GET_DB_NAME: 'SELECT current_database();',
+	GET_DB_ENCODING: 'SHOW SERVER_ENCODING;',
+	GET_DB_COLLATE_NAME: 'SELECT default_collate_name FROM information_schema.character_sets;',
+	GET_DOMAIN_TYPES: 'SELECT * FROM information_schema.domains WHERE domain_schema = $1',
+	GET_DOMAIN_TYPES_CONSTRAINTS: `
         SELECT pg_type.typname AS type_name,
         	pg_type.typnotnull AS not_null,
         	pg_constraint.conname AS constraint_name,
@@ -249,18 +271,18 @@ const queryConstants = {
         LEFT JOIN pg_catalog.pg_constraint AS pg_constraint ON (pg_constraint.contypid = pg_type.oid)
         LEFT JOIN pg_catalog.pg_namespace AS pg_namespace ON (pg_namespace.oid = pg_type.typnamespace)
         WHERE pg_type.typname = $1 AND pg_namespace.nspname = $2 AND pg_constraint.contype = 'c';`,
-    GET_DATABASES:
-        'SELECT datname AS database_name FROM pg_catalog.pg_database WHERE datistemplate != TRUE AND datallowconn = TRUE;',
+	GET_DATABASES:
+		'SELECT datname AS database_name FROM pg_catalog.pg_database WHERE datistemplate != TRUE AND datallowconn = TRUE;',
 };
 
 const getQueryName = query => {
-    const queryEntry =
-        Object.entries(queryConstants).find(([queryName, constantQuery]) => query === constantQuery) || [];
+	const queryEntry =
+		Object.entries(queryConstants).find(([queryName, constantQuery]) => query === constantQuery) || [];
 
-    return queryEntry[0] || 'Custom query';
+	return queryEntry[0] || 'Custom query';
 };
 
 module.exports = {
-    getQueryName,
-    ...queryConstants,
+	getQueryName,
+	...queryConstants,
 };
