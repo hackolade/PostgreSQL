@@ -13,5 +13,6 @@
 		"host",
 		"port",
 		"userName"
-	]
+	],
+	"helpUrl": "https://hackolade.com/help/ConnecttoaPostgreSQLinstance.html"
 }
