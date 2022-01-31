@@ -72,6 +72,25 @@ const getGET_TABLE_INDEXES = postgresVersion => {
         `;
 };
 
+const getGET_FUNCTIONS_WITH_PROCEDURES_ADDITIONAL = postgresVersion => {
+	const kindQuery =
+		postgresVersion === 10 ? `CASE WHEN proiswindow is true THEN 'w' ELSE '' END AS kind` : 'prokind AS kind';
+
+	return `
+        SELECT obj_description(oid, 'pg_proc') AS description,
+            proname AS function_name,
+            provolatile AS volatility,
+            proparallel AS parallel,
+            proisstrict AS strict,
+            proretset AS returns_set,
+            proleakproof AS leak_proof,
+            procost AS estimated_cost,
+            prorows AS estimated_rows,
+            prosrc AS body,
+            ${kindQuery}
+        FROM pg_catalog.pg_proc WHERE pronamespace = $1;`;
+};
+
 const queryConstants = {
 	PING: 'SELECT schema_name FROM information_schema.schemata LIMIT 1;',
 	GET_VERSION: 'SELECT version()',
@@ -183,33 +202,8 @@ const queryConstants = {
         FROM information_schema.parameters
         WHERE specific_name = $1
         ORDER BY ordinal_position;`,
-	GET_FUNCTIONS_WITH_PROCEDURES_ADDITIONAL: `
-        SELECT obj_description(oid, 'pg_proc') AS description,
-            proname AS function_name,
-	    	provolatile AS volatility,
-	    	proparallel AS parallel,
-	    	proisstrict AS strict,
-	    	proretset AS returns_set,
-	    	proleakproof AS leak_proof,
-	    	procost AS estimated_cost,
-	    	prorows AS estimated_rows,
-            prokind AS kind
-	    FROM pg_catalog.pg_proc WHERE pronamespace = $1;`,
-	GET_FUNCTIONS_WITH_PROCEDURES_ADDITIONAL_V_10: `
-        SELECT obj_description(oid, 'pg_proc') AS description,
-            proname AS function_name,
-	    	provolatile AS volatility,
-	    	proparallel AS parallel,
-	    	proisstrict AS strict,
-	    	proretset AS returns_set,
-	    	proleakproof AS leak_proof,
-	    	procost AS estimated_cost,
-	    	prorows AS estimated_rows,
-            CASE
-		        WHEN proiswindow is true THEN 'w'
-		        ELSE ''
-	        END AS kind
-	    FROM pg_catalog.pg_proc WHERE pronamespace = $1;`,
+	GET_FUNCTIONS_WITH_PROCEDURES_ADDITIONAL: getGET_FUNCTIONS_WITH_PROCEDURES_ADDITIONAL(),
+	GET_FUNCTIONS_WITH_PROCEDURES_ADDITIONAL_V_10: getGET_FUNCTIONS_WITH_PROCEDURES_ADDITIONAL(10),
 	GET_USER_DEFINED_TYPES: `
         SELECT pg_type.typrelid AS pg_class_oid,
             pg_type.typname AS name,

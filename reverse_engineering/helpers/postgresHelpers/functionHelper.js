@@ -66,7 +66,7 @@ const mapFunctionData = (functionData, functionArgs, additionalData) => {
 		functionReturnsSetOf: additionalData?.returns_set,
 		functionReturnType: functionData.return_data_type,
 		functionLanguage: _.toLower(functionData.external_language),
-		functionBody: functionData.routine_definition,
+		functionBody: functionData.routine_definition ?? additionalData?.body,
 		functionWindow: additionalData?.kind === 'w',
 		functionVolatility: getVolatility(additionalData?.volatility),
 		functionLeakProof: additionalData?.leak_proof,
