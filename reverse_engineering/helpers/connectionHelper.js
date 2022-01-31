@@ -123,20 +123,26 @@ const createClient = async (connectionInfo, logger) => {
 		application_name: 'Hackolade',
 	};
 
-	const client = await connectClient(config).catch(retryOnSslError(connectionInfo, config));
+	const client = await connectClient(config).catch(retryOnSslError(connectionInfo, config, logger));
 
 	return { client, sshTunnel };
 };
 
-const retryOnSslError = (connectionInfo, config) => async error => {
+const retryOnSslError = (connectionInfo, config, logger) => async error => {
 	if (error.message === SSL_NOT_SUPPORTED_MESSAGE && connectionInfo.sslType === 'prefer') {
+		logger.info("Retry connection without SSL (SSL mode 'prefer')");
+		logger.error(error);
+
 		return await connectClient({
 			...config,
 			ssl: false,
 		});
 	}
 
-	if (error.code === POSTGRES_SSL_REQUIRED_ERROR_CODE && connectionInfo.sslType === 'allow') {
+	if (error.code?.toString() === POSTGRES_SSL_REQUIRED_ERROR_CODE && connectionInfo.sslType === 'allow') {
+		logger.info("Retry connection with SSL (SSL mode 'allow')");
+		logger.error(error);
+
 		return await connectClient({
 			...config,
 			ssl: { rejectUnauthorized: false },
