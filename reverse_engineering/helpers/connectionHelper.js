@@ -2,6 +2,9 @@ const fs = require('fs');
 const ssh = require('tunnel-ssh');
 const pg = require('pg');
 
+const SSL_NOT_SUPPORTED_MESSAGE = 'The server does not support SSL connections';
+const POSTGRES_SSL_REQUIRED_ERROR_CODE = '28000';
+
 const getSshConfig = info => {
 	const config = {
 		username: info.ssh_user,
@@ -43,14 +46,16 @@ const connectViaSsh = info =>
 	});
 
 const getSslOptions = (connectionInfo, logger) => {
-	const sslType = mapSslType(connectionInfo.sslType);
+	const sslType = connectionInfo.sslType;
 
-	if (!sslType || sslType === 'disable') {
+	if (!sslType || sslType === 'disable' || sslType === 'allow') {
 		return false;
 	}
 
-	if (sslType === 'allow') {
-		return true;
+	if (['require', 'prefer'].includes(sslType) && !connectionInfo.certAuthority) {
+		return {
+			rejectUnauthorized: false,
+		};
 	}
 
 	let sslOptions = {
@@ -102,6 +107,8 @@ const createClient = async (connectionInfo, logger) => {
 		connectionInfo = info;
 	}
 
+	connectionInfo = Object.assign({}, connectionInfo, { sslType: mapSslType(connectionInfo.sslType) });
+
 	const config = {
 		host: connectionInfo.host,
 		user: connectionInfo.userName,
@@ -116,10 +123,40 @@ const createClient = async (connectionInfo, logger) => {
 		application_name: 'Hackolade',
 	};
 
+	const client = await connectClient(config).catch(retryOnSslError(connectionInfo, config, logger));
+
+	return { client, sshTunnel };
+};
+
+const retryOnSslError = (connectionInfo, config, logger) => async error => {
+	if (error.message === SSL_NOT_SUPPORTED_MESSAGE && connectionInfo.sslType === 'prefer') {
+		logger.info("Retry connection without SSL (SSL mode 'prefer')");
+		logger.error(error);
+
+		return await connectClient({
+			...config,
+			ssl: false,
+		});
+	}
+
+	if (error.code?.toString() === POSTGRES_SSL_REQUIRED_ERROR_CODE && connectionInfo.sslType === 'allow') {
+		logger.info("Retry connection with SSL (SSL mode 'allow')");
+		logger.error(error);
+
+		return await connectClient({
+			...config,
+			ssl: { rejectUnauthorized: false },
+		});
+	}
+
+	throw error;
+};
+
+const connectClient = async config => {
 	const client = new pg.Client(config);
 	await client.connect();
 
-	return { client, sshTunnel };
+	return client;
 };
 
 module.exports = {
