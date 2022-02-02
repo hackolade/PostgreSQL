@@ -267,6 +267,65 @@ const queryConstants = {
         WHERE pg_type.typname = $1 AND pg_namespace.nspname = $2 AND pg_constraint.contype = 'c';`,
 	GET_DATABASES:
 		'SELECT datname AS database_name FROM pg_catalog.pg_database WHERE datistemplate != TRUE AND datallowconn = TRUE;',
+	GET_TRIGGERS: `
+        SELECT 
+        	trigger_name,
+        	array_agg(event_manipulation)::text[] AS trigger_events,
+        	event_object_schema,
+        	event_object_table,
+        	action_orientation,
+        	action_timing,
+        	action_reference_old_table,
+        	action_reference_new_table,
+        	action_condition,
+        	action_statement 
+        FROM information_schema.triggers
+        WHERE trigger_schema = $1
+        GROUP BY 
+        	trigger_schema,
+        	trigger_name,
+        	event_object_schema,
+        	event_object_table,
+        	action_orientation,
+        	action_timing,
+        	action_reference_old_table,
+        	action_reference_new_table,
+        	action_condition,
+        	action_statement;`,
+	GET_TRIGGERS_ADDITIONAL_DATA: `
+        SELECT
+                pg_catalog.obj_description(pg_trigger.oid, 'pg_trigger') AS description,
+        	pg_trigger.tgname AS trigger_name,
+        	pg_proc.proname AS function_name,
+        	CASE WHEN pg_trigger.tgconstraint != 0 THEN true ELSE false END AS "constraint",
+        	array_agg(pg_attribute.attname)::text[] AS update_attributes,
+        	tgdeferrable AS "deferrable",
+        	tginitdeferred AS deferred,
+                pg_class_referenced.relname AS referenced_table_name,
+                pg_namespace_referenced.nspname AS referenced_table_schema
+        FROM pg_catalog.pg_trigger as pg_trigger
+        LEFT JOIN pg_catalog.pg_proc AS pg_proc 
+        	ON (pg_trigger.tgfoid = pg_proc.oid)
+        LEFT JOIN pg_catalog.pg_attribute AS pg_attribute
+        	ON (pg_attribute.attnum = ANY(pg_trigger.tgattr::int2[]) AND pg_trigger.tgrelid = pg_attribute.attrelid)
+        INNER JOIN pg_catalog.pg_class AS pg_class
+        	ON (pg_class.oid = pg_trigger.tgrelid)
+        INNER JOIN pg_catalog.pg_namespace AS pg_namespace
+        	ON (pg_class.relnamespace = pg_namespace.oid)
+        LEFT JOIN pg_catalog.pg_class AS pg_class_referenced
+                ON(pg_class_referenced.oid = pg_trigger.tgconstrrelid)
+        LEFT JOIN pg_catalog.pg_namespace AS pg_namespace_referenced
+                ON(pg_namespace_referenced.oid = pg_class_referenced.relnamespace)
+        WHERE pg_class.relnamespace = $1
+        GROUP BY 
+        	trigger_name,
+        	function_name,
+        	"constraint",
+        	"deferrable",
+        	deferred,
+                description,
+                referenced_table_name,
+                referenced_table_schema;`,
 };
 
 const getQueryName = query => {

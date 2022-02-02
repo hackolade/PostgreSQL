@@ -130,7 +130,9 @@ module.exports = {
 						collections[schemaName],
 						data.recordSamplingSettings,
 					);
-					const { functions, procedures } = await postgresService.retrieveFunctionsWithProcedures(schemaName);
+					const { functions, procedures, triggers } = await postgresService.retrieveSchemaLevelData(
+						schemaName,
+					);
 
 					postgresLogger.progress('Schema reversed successfully', schemaName);
 
@@ -141,6 +143,7 @@ module.exports = {
 						functions,
 						procedures,
 						modelDefinitions,
+						triggers,
 					};
 				}),
 			)
@@ -150,10 +153,11 @@ module.exports = {
 						.flat();
 
 					const packages = schemaData.flatMap(
-						({ schemaName, tables, views, functions, procedures, modelDefinitions }) => {
+						({ schemaName, tables, views, functions, procedures, triggers, modelDefinitions }) => {
 							const bucketInfo = {
 								UDFs: functions,
 								Procedures: procedures,
+								triggers,
 							};
 
 							const tablePackages = tables

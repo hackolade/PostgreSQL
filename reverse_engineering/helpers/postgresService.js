@@ -43,6 +43,7 @@ const {
 	setViewSuffix,
 	prepareViewData,
 } = require('./postgresHelpers/viewHelper');
+const { setDependencies: setDependenciesInTriggerHelper, getTriggers } = require('./postgresHelpers/triggerHelper');
 const queryConstants = require('./queryConstants');
 
 let currentSshTunnel = null;
@@ -60,6 +61,7 @@ module.exports = {
 		setViewDependenciesInViewHelper(app);
 		setFunctionHelperDependencies(app);
 		setDependenciesInUserDefinedTypesHelper(app);
+		setDependenciesInTriggerHelper(app);
 	},
 
 	async connect(connectionInfo, specificLogger) {
@@ -164,7 +166,7 @@ module.exports = {
 		return { views, tables, modelDefinitions: getJsonSchema(userDefinedTypes) };
 	},
 
-	async retrieveFunctionsWithProcedures(schemaName) {
+	async retrieveSchemaLevelData(schemaName) {
 		logger.progress('Get Functions and Procedures', schemaName);
 
 		const schemaOid = (await db.queryTolerant(queryConstants.GET_NAMESPACE_OID, [schemaName], true))?.oid;
@@ -172,9 +174,7 @@ module.exports = {
 		const functionsWithProcedures = await db.queryTolerant(queryConstants.GET_FUNCTIONS_WITH_PROCEDURES, [
 			schemaName,
 		]);
-		const functionAdditionalData = await db.queryTolerant(getGetFunctionsAdditionalDataQuery(version), [
-			schemaOid,
-		]);
+		const functionAdditionalData = await db.queryTolerant(getGetFunctionsAdditionalDataQuery(version), [schemaOid]);
 		const [functions, procedures] = _.partition(_.filter(functionsWithProcedures, 'routine_type'), {
 			routine_type: 'FUNCTION',
 		});
@@ -197,7 +197,12 @@ module.exports = {
 			return mapProcedureData(functionData, functionArgs, additionalData);
 		});
 
-		return { functions: userDefinedFunctions, procedures: userDefinedProcedures };
+		const triggersData = await db.queryTolerant(queryConstants.GET_TRIGGERS, [schemaName]);
+		const triggersAdditionalData = await db.queryTolerant(queryConstants.GET_TRIGGERS_ADDITIONAL_DATA, [schemaOid]);
+
+		const triggers = getTriggers(triggersData, triggersAdditionalData);
+
+		return { functions: userDefinedFunctions, procedures: userDefinedProcedures, triggers };
 	},
 
 	async _retrieveUserDefinedTypes(schemaName) {
