@@ -51,11 +51,16 @@ module.exports = ({ _, assignTemplates, templates, getNamePrefixedWithSchemaName
 		}
 
 		if (trigger.triggerReferencing) {
-			options += wrap(
-				`REFERENCING ${trigger.triggerImageTransitionRelationOrder} AS ${trigger.triggerTransitionRelationName}`,
-				'\t',
-				'\n',
-			);
+			let triggerReferencingStatement = 'REFERENCING'
+
+			if(trigger.triggerBeforeImageTransitionRelation) {
+				triggerReferencingStatement += ` OLD TABLE ${trigger.triggerBeforeImageTransitionRelation}`
+			}
+			if(trigger.triggerAfterImageTransitionRelation) {
+				triggerReferencingStatement += ` NEW TABLE ${trigger.triggerAfterImageTransitionRelation}`;
+			}
+
+			options += wrap(triggerReferencingStatement, '\t', '\n');
 		}
 
 		options += wrap(trigger.triggerConstraint ? 'FOR EACH ROW' : trigger.triggerEachRowStatement, '\t', '\n');

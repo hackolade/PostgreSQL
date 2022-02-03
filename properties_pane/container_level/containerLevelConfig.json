@@ -580,24 +580,20 @@ making sure that you maintain a proper JSON format.
 						"propertyTooltip": "This keyword immediately precedes the declaration of one or two relation names that provide access to the transition relations of the triggering statement."
 					},
 					{
-						"propertyName": "Image transition relation order",
-						"propertyKeyword": "triggerImageTransitionRelationOrder",
-						"propertyType": "select",
-						"options": [
-							"OLD TABLE",
-							"NEW TABLE"
-						],
-						"propertyTooltip": "This clause indicates whether the following relation name is for the before-image transition relation or the after-image transition relation.",
+						"propertyName": "Before-image transition relation",
+						"propertyKeyword": "triggerBeforeImageTransitionRelation",
+						"propertyType": "text",
+						"propertyTooltip": "Before-image transition relation name (OLD TABLE)",
 						"dependency": {
 							"key": "triggerReferencing",
 							"value": true
 						}
 					},
 					{
-						"propertyName": "Transition relation name",
-						"propertyKeyword": "triggerTransitionRelationName",
+						"propertyName": "After-image transition relation",
+						"propertyKeyword": "triggerAfterImageTransitionRelation",
 						"propertyType": "text",
-						"propertyTooltip": "The (unqualified) name to be used within the trigger for this transition relation.",
+						"propertyTooltip": "After-image transition relation name (NEW TABLE)",
 						"dependency": {
 							"key": "triggerReferencing",
 							"value": true
