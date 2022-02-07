@@ -1,10 +1,9 @@
 module.exports = ({ _, assignTemplates, templates, getNamePrefixedWithSchemaName, wrap, commentIfDeactivated }) => {
-	const getTriggersScript = ({ schemaName, dbVersion, triggers, tableName }) => {
-		return _.map(triggers, getTriggerScript(schemaName, dbVersion, tableName)).join('\n').trim();
+	const getTriggersScript = ({ dbVersion, triggers, tableName }) => {
+		return _.map(triggers, getTriggerScript(dbVersion, tableName)).join('\n').trim();
 	};
 
-	const getTriggerScript = (schemaName, dbVersion, tableName) => trigger => {
-		const name = getNamePrefixedWithSchemaName(trigger.name, schemaName);
+	const getTriggerScript = (dbVersion, tableName) => trigger => {
 		const events = getTriggerEvents(trigger);
 		const options = getTriggerOptions(trigger);
 
@@ -14,8 +13,8 @@ module.exports = ({ _, assignTemplates, templates, getNamePrefixedWithSchemaName
 			actionTiming: trigger.triggerType,
 			functionKey: dbVersion === 'v10.x' ? 'PROCEDURE' : 'FUNCTION',
 			functionName: trigger.triggerFunction,
+			name: trigger.name,
 			tableName,
-			name,
 			events,
 			options,
 		});
@@ -28,12 +27,20 @@ module.exports = ({ _, assignTemplates, templates, getNamePrefixedWithSchemaName
 					return event.triggerEvent;
 				}
 
-				const activatedKeys = _.filter(trigger.triggerUpdateColumns, 'isActivated')
+				const activatedKeys = _.chain(trigger.triggerUpdateColumns)
+					.filter('isActivated')
 					.map(({ name }) => name)
-					.join(', ');
-				const deactivatedKeys = _.reject(trigger.triggerUpdateColumns, 'isActivated')
+					.join(', ')
+					.thru(activatedStr => (Boolean(activatedStr) ? `OF ${activatedStr}` : activatedStr))
+					.value();
+				const deactivatedKeys = _.chain(trigger.triggerUpdateColumns)
+					.reject('isActivated')
 					.map(({ name }) => name)
-					.join(', ');
+					.join(', ')
+					.thru(deactivatedStr =>
+						!Boolean(activatedKeys) && Boolean(deactivatedStr) ? `OF ${deactivatedStr}` : deactivatedStr,
+					)
+					.value();
 				const commentedDeactivatedKeys =
 					deactivatedKeys &&
 					commentIfDeactivated(deactivatedKeys, {

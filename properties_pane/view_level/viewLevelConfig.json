@@ -300,6 +300,8 @@ making sure that you maintain a proper JSON format.
 						"propertyType": "fieldList",
 						"template": "orderedList",
 						"isCompositeKey": true,
+						"setPrimaryKey": false,
+						"abbr": "",
 						"dependency": {
 							"key": "triggerEvents.*.triggerEvent",
 							"value": "UPDATE"

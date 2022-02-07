@@ -206,7 +206,6 @@ module.exports = (baseProvider, options, app) => {
 			});
 
 			const createTriggerStatements = getTriggersScript({
-				schemaName: schemaData.schemaName,
 				dbVersion: schemaData.dbVersion,
 				tableName,
 				triggers,
@@ -420,7 +419,6 @@ module.exports = (baseProvider, options, app) => {
 			);
 
 			const createTriggersStatements = getTriggersScript({
-				schemaName: viewData.schemaName,
 				dbVersion: viewData.dbVersion,
 				tableName: viewName,
 				triggers: viewData.triggers,
