@@ -1,9 +1,9 @@
-module.exports = ({ _, assignTemplates, templates, getNamePrefixedWithSchemaName, wrap }) => {
-	const getTriggersScript = (schemaName, dbVersion, triggers) => {
-		return _.map(triggers, getTriggerScript(schemaName, dbVersion)).join('\n').trim();
+module.exports = ({ _, assignTemplates, templates, getNamePrefixedWithSchemaName, wrap, commentIfDeactivated }) => {
+	const getTriggersScript = ({ schemaName, dbVersion, triggers, tableName }) => {
+		return _.map(triggers, getTriggerScript(schemaName, dbVersion, tableName)).join('\n').trim();
 	};
 
-	const getTriggerScript = (schemaName, dbVersion) => trigger => {
+	const getTriggerScript = (schemaName, dbVersion, tableName) => trigger => {
 		const name = getNamePrefixedWithSchemaName(trigger.name, schemaName);
 		const events = getTriggerEvents(trigger);
 		const options = getTriggerOptions(trigger);
@@ -14,7 +14,7 @@ module.exports = ({ _, assignTemplates, templates, getNamePrefixedWithSchemaName
 			actionTiming: trigger.triggerType,
 			functionKey: dbVersion === 'v10.x' ? 'PROCEDURE' : 'FUNCTION',
 			functionName: trigger.triggerFunction,
-			tableName: trigger.triggerTable,
+			tableName,
 			name,
 			events,
 			options,
@@ -24,13 +24,24 @@ module.exports = ({ _, assignTemplates, templates, getNamePrefixedWithSchemaName
 	const getTriggerEvents = trigger => {
 		return trigger.triggerEvents
 			?.map(event => {
-				if (event.triggerEvent !== 'UPDATE' || _.isEmpty(event.triggerUpdateColumns)) {
+				if (event.triggerEvent !== 'UPDATE' || _.isEmpty(trigger.triggerUpdateColumns)) {
 					return event.triggerEvent;
 				}
 
-				return `UPDATE ${event.triggerUpdateColumns
-					.map(({ triggerUpdateColumnName }) => triggerUpdateColumnName)
-					.join(', ')}`;
+				const activatedKeys = _.filter(trigger.triggerUpdateColumns, 'isActivated')
+					.map(({ name }) => name)
+					.join(', ');
+				const deactivatedKeys = _.reject(trigger.triggerUpdateColumns, 'isActivated')
+					.map(({ name }) => name)
+					.join(', ');
+				const commentedDeactivatedKeys =
+					deactivatedKeys &&
+					commentIfDeactivated(deactivatedKeys, {
+						isActivated: false,
+						isPartOfLine: true,
+					});
+
+				return `UPDATE ${activatedKeys} ${commentedDeactivatedKeys}`;
 			})
 			.join(' OR ');
 	};
@@ -51,19 +62,25 @@ module.exports = ({ _, assignTemplates, templates, getNamePrefixedWithSchemaName
 		}
 
 		if (trigger.triggerReferencing) {
-			let triggerReferencingStatement = 'REFERENCING'
+			let triggerReferencingStatement = 'REFERENCING';
 
-			if(trigger.triggerBeforeImageTransitionRelation) {
-				triggerReferencingStatement += ` OLD TABLE ${trigger.triggerBeforeImageTransitionRelation}`
+			if (trigger.triggerBeforeImageTransitionRelation) {
+				triggerReferencingStatement += ` OLD TABLE ${trigger.triggerBeforeImageTransitionRelation}`;
 			}
-			if(trigger.triggerAfterImageTransitionRelation) {
+			if (trigger.triggerAfterImageTransitionRelation) {
 				triggerReferencingStatement += ` NEW TABLE ${trigger.triggerAfterImageTransitionRelation}`;
 			}
 
 			options += wrap(triggerReferencingStatement, '\t', '\n');
 		}
 
-		options += wrap(trigger.triggerConstraint ? 'FOR EACH ROW' : trigger.triggerEachRowStatement, '\t', '\n');
+		options += wrap(
+			trigger.triggerConstraint || trigger.triggerType === 'INSTEAD OF'
+				? 'FOR EACH ROW'
+				: trigger.triggerEachRowStatement || 'FOR EACH STATEMENT',
+			'\t',
+			'\n',
+		);
 
 		if (trigger.triggerCondition) {
 			options += wrap(`WHEN ${trigger.triggerCondition}`, '\t', '\n');
@@ -72,5 +89,22 @@ module.exports = ({ _, assignTemplates, templates, getNamePrefixedWithSchemaName
 		return options;
 	};
 
-	return { getTriggersScript };
+	const hydrateTriggers = (entityData, relatedSchemas = {}) => {
+		return (_.find(entityData, 'triggers')?.triggers || []).map(trigger => {
+			const referencedTable = relatedSchemas[trigger.triggerReferencedTable];
+
+			if (!referencedTable) {
+				return { ...trigger, triggerReferencedTable: '' };
+			}
+
+			const triggerReferencedTable = getNamePrefixedWithSchemaName(
+				referencedTable.code || referencedTable.collectionName,
+				referencedTable.bucketName,
+			);
+
+			return { ...trigger, triggerReferencedTable };
+		});
+	};
+
+	return { getTriggersScript, hydrateTriggers };
 };

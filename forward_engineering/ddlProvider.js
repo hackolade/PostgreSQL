@@ -86,12 +86,13 @@ module.exports = (baseProvider, options, app) => {
 			wrapComment,
 		});
 
-	const { getTriggersScript } = require('./helpers/triggerHelper')({
+	const { getTriggersScript, hydrateTriggers } = require('./helpers/triggerHelper')({
 		_,
 		wrap,
 		assignTemplates,
 		templates,
 		getNamePrefixedWithSchemaName,
+		commentIfDeactivated,
 	});
 
 	const { getLocaleProperties } = require('./helpers/databaseHelper')();
@@ -115,7 +116,7 @@ module.exports = (baseProvider, options, app) => {
 			});
 		},
 
-		createSchema({ schemaName, ifNotExist, comments, udfs, procedures, triggers, dbVersion }) {
+		createSchema({ schemaName, ifNotExist, comments, udfs, procedures }) {
 			const comment = assignTemplates(templates.comment, {
 				object: 'SCHEMA',
 				objectName: wrapInQuotes(schemaName),
@@ -130,14 +131,8 @@ module.exports = (baseProvider, options, app) => {
 
 			const createFunctionStatement = getFunctionsScript(schemaName, udfs);
 			const createProceduresStatement = getProceduresScript(schemaName, procedures);
-			const createTriggerStatement = getTriggersScript(schemaName, dbVersion, triggers);
 
-			return _.chain([
-				schemaStatement,
-				createFunctionStatement,
-				createProceduresStatement,
-				createTriggerStatement,
-			])
+			return _.chain([schemaStatement, createFunctionStatement, createProceduresStatement])
 				.compact()
 				.map(_.trim)
 				.join('\n\n')
@@ -165,6 +160,8 @@ module.exports = (baseProvider, options, app) => {
 				temporary,
 				unlogged,
 				selectStatement,
+				triggers,
+				relatedSchemas,
 			},
 			isActivated,
 		) {
@@ -208,7 +205,14 @@ module.exports = (baseProvider, options, app) => {
 				columnDescriptions,
 			});
 
-			return tableStatement;
+			const createTriggerStatements = getTriggersScript({
+				schemaName: schemaData.schemaName,
+				dbVersion: schemaData.dbVersion,
+				tableName,
+				triggers,
+			});
+
+			return [tableStatement, createTriggerStatements].map(_.trim).join('\n\n');
 		},
 
 		convertColumnDefinition(columnDefinition) {
@@ -402,7 +406,7 @@ module.exports = (baseProvider, options, app) => {
 				}
 			};
 
-			return commentIfDeactivated(
+			const createViewScript = commentIfDeactivated(
 				assignTemplates(templates.createView, {
 					name: viewName,
 					orReplace: viewData.orReplace ? ' OR REPLACE' : '',
@@ -414,6 +418,15 @@ module.exports = (baseProvider, options, app) => {
 				}),
 				{ isActivated: !deactivatedWholeStatement },
 			);
+
+			const createTriggersStatements = getTriggersScript({
+				schemaName: viewData.schemaName,
+				dbVersion: viewData.dbVersion,
+				tableName: viewName,
+				triggers: viewData.triggers,
+			});
+
+			return [createViewScript, createTriggersStatements].map(_.trim).join('\n\n');
 		},
 
 		createViewIndex() {
@@ -522,7 +535,6 @@ module.exports = (baseProvider, options, app) => {
 				comments: containerData.description,
 				udfs: data?.udfs || [],
 				procedures: data?.procedures || [],
-				triggers: data.triggers || [],
 				dbVersion,
 			};
 		},
@@ -536,11 +548,14 @@ module.exports = (baseProvider, options, app) => {
 				.join(', ')
 				.thru(value => (value ? `(${value})` : ''))
 				.value();
+
 			const partitioning = _.first(detailsTab.partitioning) || {};
 			const compositePartitionKey = keyHelper.getKeys(partitioning.compositePartitionKey, jsonSchema);
+			const triggers = hydrateTriggers(entityData, tableData.relatedSchemas);
 
 			return {
 				...tableData,
+				triggers,
 				keyConstraints: keyHelper.getTableKeyConstraints(jsonSchema),
 				inherits: parentTables,
 				selectStatement: _.trim(detailsTab.selectStatement),
@@ -568,8 +583,9 @@ module.exports = (baseProvider, options, app) => {
 			};
 		},
 
-		hydrateView({ viewData, entityData }) {
+		hydrateView({ viewData, entityData, relatedSchemas }) {
 			const detailsTab = entityData[0];
+			const triggers = hydrateTriggers(entityData, relatedSchemas);
 
 			return {
 				name: viewData.name,
@@ -583,6 +599,7 @@ module.exports = (baseProvider, options, app) => {
 				withCheckOption: detailsTab.withCheckOption,
 				checkTestingScope: detailsTab.withCheckOption ? detailsTab.checkTestingScope : '',
 				schemaName: viewData.schemaData.schemaName,
+				triggers,
 			};
 		},
 
