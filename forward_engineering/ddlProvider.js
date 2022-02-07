@@ -212,7 +212,7 @@ module.exports = (baseProvider, options, app) => {
 				triggers,
 			});
 
-			return [tableStatement, createTriggerStatements].map(_.trim).join('\n\n');
+			return [tableStatement, createTriggerStatements].map(_.trim).join('\n\n').trim() + '\n';
 		},
 
 		convertColumnDefinition(columnDefinition) {
@@ -426,7 +426,7 @@ module.exports = (baseProvider, options, app) => {
 				triggers: viewData.triggers,
 			});
 
-			return [createViewScript, createTriggersStatements].map(_.trim).join('\n\n');
+			return [createViewScript, createTriggersStatements].map(_.trim).join('\n\n').trim() + '\n';
 		},
 
 		createViewIndex() {
