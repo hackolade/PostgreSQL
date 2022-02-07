@@ -21,10 +21,11 @@ const getTrigger = data => {
 		triggerConstraint: data.constraint,
 		triggerTable: `${data.event_object_schema}.${data.event_object_table}`,
 		triggerReferencedTable: data.referenced_table_name
-			? `${data.referenced_table_schema}.${data.referenced_table_name}`
-			: '',
+			? [data.referenced_table_schema, data.referenced_table_name]
+			: [],
 		triggerType: data.action_timing,
 		triggerEvents: getTriggerEvents(data),
+		triggerUpdateColumns: data.update_attributes,
 		triggerDeferrable: data.deferrable,
 		triggerTimeConstraintCheck: data.deferred ? 'INITIALLY DEFERRED' : 'INITIALLY IMMEDIATE',
 		triggerReferencing: Boolean(data.action_reference_old_table) || Boolean(data.action_reference_new_table),
@@ -37,22 +38,7 @@ const getTrigger = data => {
 };
 
 const getTriggerEvents = triggerData => {
-	return _.map(triggerData.trigger_events, triggerEvent => {
-		if (triggerEvent !== 'UPDATE') {
-			return { triggerEvent };
-		}
-
-		if (_.isEmpty(_.compact(triggerData.update_attributes))) {
-			return { triggerEvent };
-		}
-
-		return {
-			triggerEvent,
-			triggerUpdateColumns: _.map(triggerData.update_attributes, triggerUpdateColumnName => ({
-				triggerUpdateColumnName,
-			})),
-		};
-	});
+	return _.map(triggerData.trigger_events, triggerEvent => ({ triggerEvent }));
 };
 
 const getFunctionFromTrigger = executeStatement => {

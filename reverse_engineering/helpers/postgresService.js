@@ -197,12 +197,7 @@ module.exports = {
 			return mapProcedureData(functionData, functionArgs, additionalData);
 		});
 
-		const triggersData = await db.queryTolerant(queryConstants.GET_TRIGGERS, [schemaName]);
-		const triggersAdditionalData = await db.queryTolerant(queryConstants.GET_TRIGGERS_ADDITIONAL_DATA, [schemaOid]);
-
-		const triggers = getTriggers(triggersData, triggersAdditionalData);
-
-		return { functions: userDefinedFunctions, procedures: userDefinedProcedures, triggers };
+		return { functions: userDefinedFunctions, procedures: userDefinedProcedures };
 	},
 
 	async _retrieveUserDefinedTypes(schemaName) {
@@ -257,6 +252,11 @@ module.exports = {
 		const tableConstraintsResult = await db.queryTolerant(queryConstants.GET_TABLE_CONSTRAINTS, [tableOid]);
 		const tableIndexesResult = await db.queryTolerant(getGetIndexesQuery(version), [tableOid]);
 		const tableForeignKeys = await db.queryTolerant(queryConstants.GET_TABLE_FOREIGN_KEYS, [tableOid]);
+		const triggersData = await db.queryTolerant(queryConstants.GET_TRIGGERS, [schemaName, tableName]);
+		const triggersAdditionalData = await db.queryTolerant(queryConstants.GET_TRIGGERS_ADDITIONAL_DATA, [
+			schemaOid,
+			tableOid,
+		]);
 
 		const partitioning = prepareTablePartition(partitionResult, tableColumns);
 		const tableLevelProperties = prepareTableLevelData(tableLevelData, tableToastOptions);
@@ -265,11 +265,13 @@ module.exports = {
 		const tableConstraint = prepareTableConstraints(tableConstraintsResult, tableColumns);
 		const tableIndexes = prepareTableIndexes(tableIndexesResult);
 		const relationships = prepareForeignKeys(tableForeignKeys, tableName, schemaName, tableColumns);
+		const triggers = getTriggers(triggersData, triggersAdditionalData);
 
 		const tableData = {
 			partitioning,
 			description,
 			inherits,
+			triggers,
 			Indxs: tableIndexes,
 			...tableLevelProperties,
 			...tableConstraint,
@@ -339,9 +341,15 @@ module.exports = {
 			!viewData.view_definition &&
 			(await db.queryTolerant(queryConstants.GET_VIEW_SELECT_STMT_FALLBACK, [viewName, schemaName], true));
 		const viewOptions = await db.queryTolerant(queryConstants.GET_VIEW_OPTIONS, [viewName, schemaOid], true);
+		const triggersData = await db.queryTolerant(queryConstants.GET_TRIGGERS, [schemaName, viewName]);
+		const triggersAdditionalData = await db.queryTolerant(queryConstants.GET_TRIGGERS_ADDITIONAL_DATA, [
+			schemaOid,
+			viewOptions?.oid,
+		]);
+		const triggers = getTriggers(triggersData, triggersAdditionalData);
 
 		const script = generateCreateViewScript(viewName, viewData, viewDefinitionFallback);
-		const data = prepareViewData(viewData, viewOptions);
+		const data = prepareViewData(viewData, viewOptions, triggers);
 
 		if (!script) {
 			logger.info('View select statement was not retrieved', { schemaName, viewName });

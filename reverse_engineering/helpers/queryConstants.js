@@ -178,7 +178,8 @@ const queryConstants = {
 	GET_VIEW_DATA: `SELECT * FROM information_schema.views WHERE table_name = $1 AND table_schema = $2;`,
 	GET_VIEW_SELECT_STMT_FALLBACK: `SELECT definition FROM pg_views WHERE viewname = $1 AND schemaname = $2;`,
 	GET_VIEW_OPTIONS: `
-        SELECT reloptions AS view_options,
+        SELECT oid, 
+            reloptions AS view_options,
             relpersistence AS persistence,
             obj_description(oid, 'pg_class') AS description
         FROM pg_catalog.pg_class 
@@ -280,7 +281,7 @@ const queryConstants = {
         	action_condition,
         	action_statement 
         FROM information_schema.triggers
-        WHERE trigger_schema = $1
+        WHERE event_object_schema = $1 AND event_object_table = $2
         GROUP BY 
         	trigger_schema,
         	trigger_name,
@@ -316,7 +317,7 @@ const queryConstants = {
                 ON(pg_class_referenced.oid = pg_trigger.tgconstrrelid)
         LEFT JOIN pg_catalog.pg_namespace AS pg_namespace_referenced
                 ON(pg_namespace_referenced.oid = pg_class_referenced.relnamespace)
-        WHERE pg_class.relnamespace = $1
+        WHERE pg_class.relnamespace = $1 AND pg_class.oid = $2
         GROUP BY 
         	trigger_name,
         	function_name,
