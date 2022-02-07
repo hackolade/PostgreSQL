@@ -271,7 +271,7 @@ const queryConstants = {
 	GET_TRIGGERS: `
         SELECT 
         	trigger_name,
-        	array_agg(event_manipulation)::text[] AS trigger_events,
+        	array_agg(event_manipulation::text) AS trigger_events,
         	event_object_schema,
         	event_object_table,
         	action_orientation,
