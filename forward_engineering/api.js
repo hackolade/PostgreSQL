@@ -1,5 +1,5 @@
 const reApi = require('../reverse_engineering/api');
-const { createLogger, getSystemInfo } = require('../reverse_engineering/helpers/loggerHelper');
+const { createLogger } = require('../reverse_engineering/helpers/loggerHelper');
 const applyToInstanceHelper = require('./applyToInstanceHelper');
 
 module.exports = {
@@ -42,7 +42,6 @@ module.exports = {
 	},
 	applyToInstance(connectionInfo, logger, callback, app) {
 		logger.clear();
-		logger.log('info', getSystemInfo(connectionInfo.appVersion), 'Apply to instance');
 		logger.log(
 			'info',
 			app.require('lodash').omit(connectionInfo, 'script', 'containerData'),

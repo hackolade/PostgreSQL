@@ -1,6 +1,6 @@
 'use strict';
 
-const { createLogger, getSystemInfo } = require('./helpers/loggerHelper');
+const { createLogger } = require('./helpers/loggerHelper');
 const postgresService = require('./helpers/postgresService');
 
 module.exports = {
@@ -211,7 +211,6 @@ const prepareError = error => {
 
 const logInfo = (step, connectionInfo, logger) => {
 	logger.clear();
-	logger.log('info', getSystemInfo(connectionInfo.appVersion), step);
 	logger.log('info', connectionInfo, 'connectionInfo', connectionInfo.hiddenKeys);
 };
 
