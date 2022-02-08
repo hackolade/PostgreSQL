@@ -25,7 +25,7 @@ const getTrigger = data => {
 			: [],
 		triggerType: data.action_timing,
 		triggerEvents: getTriggerEvents(data),
-		triggerUpdateColumns: data.update_attributes,
+		triggerUpdateColumns: data.update_attributes?.filter(Boolean),
 		triggerDeferrable: data.deferrable,
 		triggerTimeConstraintCheck: data.deferred ? 'INITIALLY DEFERRED' : 'INITIALLY IMMEDIATE',
 		triggerReferencing: Boolean(data.action_reference_old_table) || Boolean(data.action_reference_new_table),
