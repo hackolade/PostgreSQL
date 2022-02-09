@@ -147,6 +147,7 @@ module.exports = (baseProvider, options, app) => {
                 unlogged,
                 selectStatement,
                 partitionOf,
+                partitionBounds,
             },
             isActivated
         ) {
@@ -163,6 +164,7 @@ module.exports = (baseProvider, options, app) => {
                 key => key.statement
             );
             const keyConstraintsString = generateConstraintsString(dividedKeysConstraints, isActivated);
+            const keyConstraintsValue = partitionOf ? keyConstraintsString?.slice(1) : keyConstraintsString
 
             const dividedForeignKeys = divideIntoActivatedAndDeactivated(foreignKeyConstraints, key => key.statement);
             const foreignKeyConstraintsString = generateConstraintsString(dividedForeignKeys, isActivated);
@@ -170,17 +172,22 @@ module.exports = (baseProvider, options, app) => {
             const columnDescriptions = '\n' + getColumnComments(tableName, columnDefinitions);
             const template = partitionOf ? templates.createTablePartitionOf : templates.createTable;
             
-            const checkConstraintPrefix = partitionOf && !keyConstraintsString ? '\n\t' : ',\n\t'
+            const checkConstraintPrefix = partitionOf && !keyConstraintsString ? '\n\t' : ',\n\t';
+			const checkConstraintsValue = !_.isEmpty(checkConstraints)
+				? wrap(_.join(checkConstraints, ',\n\t'), checkConstraintPrefix, '')
+				: '';
+
+                const isEmptyPartitionBody = partitionOf && !keyConstraintsValue && !checkConstraintsValue && !foreignKeyConstraintsString
+            const openParenthesis = isEmptyPartitionBody ? '': '('
+            const closeParenthesis = isEmptyPartitionBody ? '' : ')'
 
 			const tableStatement = assignTemplates(template, {
 				temporary: getTableTemporaryValue(temporary, unlogged),
 				ifNotExist: ifNotExistStr,
 				name: tableName,
 				columnDefinitions: !partitionOf ? '\t' + _.join(columns, ',\n\t') : '',
-				keyConstraints: partitionOf ? keyConstraintsString?.slice(1) : keyConstraintsString,
-				checkConstraints: !_.isEmpty(checkConstraints)
-					? wrap(_.join(checkConstraints, ',\n\t'), checkConstraintPrefix, '')
-					: '',
+				keyConstraints: keyConstraintsValue,
+				checkConstraints: checkConstraintsValue,
 				foreignKeyConstraints: foreignKeyConstraintsString,
 				options: getTableOptions({
 					inherits,
@@ -190,10 +197,13 @@ module.exports = (baseProvider, options, app) => {
 					storage_parameter,
 					table_tablespace_name,
 					selectStatement,
+                    partitionBounds,
 				}),
 				comment: description ? comment : '',
-				columnDescriptions,
 				partitionOf: partitionOf ? ` PARTITION OF ${partitionOf} ` : '',
+				columnDescriptions,
+				openParenthesis,
+				closeParenthesis,
 			});
 
             return tableStatement;
@@ -547,6 +557,7 @@ module.exports = (baseProvider, options, app) => {
 					'on_commit',
 					'storage_parameter',
 					'table_tablespace_name',
+                    'partitionBounds'
 				),
 			};
         },
