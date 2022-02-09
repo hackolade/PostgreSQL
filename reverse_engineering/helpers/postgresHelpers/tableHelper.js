@@ -290,12 +290,14 @@ const prepareTableLevelData = (tableLevelData, tableToastOptions) => {
 	const unlogged = tableLevelData?.relpersistence === 'u';
 	const storage_parameter = prepareStorageParameters(tableLevelData?.reloptions, tableToastOptions);
 	const table_tablespace_name = tableLevelData?.spcname;
+	const partitionBounds = tableLevelData.partition_expr;
 
 	return {
 		temporary,
 		unlogged,
 		storage_parameter,
 		table_tablespace_name,
+		partitionBounds,
 	};
 };
 

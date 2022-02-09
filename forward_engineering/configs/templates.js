@@ -9,6 +9,11 @@ module.exports = {
         'CREATE${temporary} TABLE${ifNotExist} ${name} (\n' +
         '${columnDefinitions}${keyConstraints}${checkConstraints}${foreignKeyConstraints}\n' +
         ')${options};\n\n${comment}${columnDescriptions}',
+    
+    createTablePartitionOf:
+        'CREATE${temporary} TABLE${ifNotExist} ${name}\n' +
+        '${partitionOf} (${keyConstraints}${checkConstraints}${foreignKeyConstraints}\n' +
+        ')${options};\n\n${comment}${columnDescriptions}',
 
     columnDefinition: '${name} ${type}${collation}${primaryKey}${uniqueKey}${defaultValue}${notNull}',
 
