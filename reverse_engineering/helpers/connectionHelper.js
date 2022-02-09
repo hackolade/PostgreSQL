@@ -121,6 +121,7 @@ const createClient = async (connectionInfo, logger) => {
 		statement_timeout: Number(connectionInfo.queryRequestTimeout) || 60000,
 		database: connectionInfo.database || connectionInfo.maintenanceDatabase,
 		application_name: 'Hackolade',
+		idleTimeoutMillis: Number(connectionInfo.queryRequestTimeout) || 10000,
 	};
 
 	const client = await connectClient(config).catch(retryOnSslError(connectionInfo, config, logger));
@@ -153,8 +154,7 @@ const retryOnSslError = (connectionInfo, config, logger) => async error => {
 };
 
 const connectClient = async config => {
-	const client = new pg.Client(config);
-	await client.connect();
+	const client = new pg.Pool(config);
 
 	return client;
 };
