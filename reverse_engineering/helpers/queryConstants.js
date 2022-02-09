@@ -97,10 +97,19 @@ const queryConstants = {
 	GET_VERSION_AS_NUM: 'SHOW server_version_num;',
 	GET_SCHEMA_NAMES: 'SELECT schema_name FROM information_schema.schemata;',
 	GET_TABLE_NAMES: `
-        SELECT table_name, table_type
-            FROM information_schema.tables
- 	        WHERE table_schema = $1
-	        ORDER BY table_name;`,
+        SELECT tables.table_name, tables.table_type FROM information_schema.tables AS tables
+        INNER JOIN 
+        (SELECT
+                pg_class.relname AS table_name,
+                 pg_namespace.nspname AS table_schema
+        FROM pg_catalog.pg_class AS pg_class
+        INNER JOIN pg_catalog.pg_namespace AS pg_namespace 
+                ON (pg_namespace.oid = pg_class.relnamespace)
+        WHERE pg_class.relispartition = false
+                AND pg_class.relkind = ANY('{"r","v","t","m","p"}'))
+        AS catalog_table_data
+        ON (catalog_table_data.table_name = tables.table_name AND catalog_table_data.table_schema = tables.table_schema)
+        WHERE tables.table_schema = $1;`,
 	GET_NAMESPACE_OID: 'SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = $1',
 	GET_TABLE_LEVEL_DATA: `
         SELECT pc.oid, pc.relpersistence, pc.reloptions, pt.spcname
@@ -267,6 +276,15 @@ const queryConstants = {
         WHERE pg_type.typname = $1 AND pg_namespace.nspname = $2 AND pg_constraint.contype = 'c';`,
 	GET_DATABASES:
 		'SELECT datname AS database_name FROM pg_catalog.pg_database WHERE datistemplate != TRUE AND datallowconn = TRUE;',
+	GET_PARTITIONS: `
+        SELECT
+        	inher_child.relname AS child_name,
+        	inher_parent.relname AS parent_name
+        FROM pg_inherits
+        LEFT JOIN pg_class AS inher_child ON (inher_child.oid = pg_inherits.inhrelid)
+        LEFT JOIN pg_class AS inher_parent ON (inher_parent.oid = pg_inherits.inhparent)
+        WHERE inher_parent.relkind = 'p'
+        	AND inher_parent.relnamespace = $1;`,
 };
 
 const getQueryName = query => {

@@ -140,15 +140,21 @@ module.exports = {
 		});
 	},
 
-	async retrieveEntitiesData(schemaName, entitiesNames, recordSamplingSettings) {
+	async retrieveEntitiesData(schemaName, entitiesNames, recordSamplingSettings, includePartitions = false) {
 		const userDefinedTypes = await this._retrieveUserDefinedTypes(schemaName);
 		const schemaOidResult = await db.queryTolerant(queryConstants.GET_NAMESPACE_OID, [schemaName], true);
 		const schemaOid = schemaOidResult?.oid;
+		const partitions = includePartitions ? await db.queryTolerant(queryConstants.GET_PARTITIONS, [schemaOid]) : [];
 
 		const [viewsNames, tablesNames] = _.partition(entitiesNames, isViewByName);
 
+		const allTablesList = tablesNames.flatMap(tableName => [
+			tableName,
+			..._.filter(partitions, { parent_name: tableName }).map(({ child_name }) => child_name),
+		]);
+
 		const tables = await mapPromises(
-			tablesNames,
+			allTablesList,
 			_.bind(
 				this._retrieveSingleTableData,
 				this,
@@ -172,9 +178,7 @@ module.exports = {
 		const functionsWithProcedures = await db.queryTolerant(queryConstants.GET_FUNCTIONS_WITH_PROCEDURES, [
 			schemaName,
 		]);
-		const functionAdditionalData = await db.queryTolerant(getGetFunctionsAdditionalDataQuery(version), [
-			schemaOid,
-		]);
+		const functionAdditionalData = await db.queryTolerant(getGetFunctionsAdditionalDataQuery(version), [schemaOid]);
 		const [functions, procedures] = _.partition(_.filter(functionsWithProcedures, 'routine_type'), {
 			routine_type: 'FUNCTION',
 		});
