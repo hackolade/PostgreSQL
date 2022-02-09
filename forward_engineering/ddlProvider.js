@@ -146,6 +146,8 @@ module.exports = (baseProvider, options, app) => {
                 temporary,
                 unlogged,
                 selectStatement,
+                partitionOf,
+                partitionBounds,
             },
             isActivated
         ) {
@@ -162,32 +164,47 @@ module.exports = (baseProvider, options, app) => {
                 key => key.statement
             );
             const keyConstraintsString = generateConstraintsString(dividedKeysConstraints, isActivated);
+            const keyConstraintsValue = partitionOf ? keyConstraintsString?.slice(1) : keyConstraintsString
 
             const dividedForeignKeys = divideIntoActivatedAndDeactivated(foreignKeyConstraints, key => key.statement);
             const foreignKeyConstraintsString = generateConstraintsString(dividedForeignKeys, isActivated);
 
             const columnDescriptions = '\n' + getColumnComments(tableName, columnDefinitions);
+            const template = partitionOf ? templates.createTablePartitionOf : templates.createTable;
+            
+            const checkConstraintPrefix = partitionOf && !keyConstraintsString ? '\n\t' : ',\n\t';
+			const checkConstraintsValue = !_.isEmpty(checkConstraints)
+				? wrap(_.join(checkConstraints, ',\n\t'), checkConstraintPrefix, '')
+				: '';
 
-            const tableStatement = assignTemplates(templates.createTable, {
-                temporary: getTableTemporaryValue(temporary, unlogged),
-                ifNotExist: ifNotExistStr,
-                name: tableName,
-                columnDefinitions: '\t' + _.join(columns, ',\n\t'),
-                keyConstraints: keyConstraintsString,
-                checkConstraints: !_.isEmpty(checkConstraints) ? ',\n\t' + _.join(checkConstraints, ',\n\t') : '',
-                foreignKeyConstraints: foreignKeyConstraintsString,
-                options: getTableOptions({
-                    inherits,
-                    partitioning,
-                    usingMethod,
-                    on_commit,
-                    storage_parameter,
-                    table_tablespace_name,
-                    selectStatement,
-                }),
-                comment: description ? comment : '',
-                columnDescriptions,
-            });
+                const isEmptyPartitionBody = partitionOf && !keyConstraintsValue && !checkConstraintsValue && !foreignKeyConstraintsString
+            const openParenthesis = isEmptyPartitionBody ? '': '('
+            const closeParenthesis = isEmptyPartitionBody ? '' : ')'
+
+			const tableStatement = assignTemplates(template, {
+				temporary: getTableTemporaryValue(temporary, unlogged),
+				ifNotExist: ifNotExistStr,
+				name: tableName,
+				columnDefinitions: !partitionOf ? '\t' + _.join(columns, ',\n\t') : '',
+				keyConstraints: keyConstraintsValue,
+				checkConstraints: checkConstraintsValue,
+				foreignKeyConstraints: foreignKeyConstraintsString,
+				options: getTableOptions({
+					inherits,
+					partitioning,
+					usingMethod,
+					on_commit,
+					storage_parameter,
+					table_tablespace_name,
+					selectStatement,
+                    partitionBounds,
+				}),
+				comment: description ? comment : '',
+				partitionOf: partitionOf ? ` PARTITION OF ${partitionOf} ` : '',
+				columnDescriptions,
+				openParenthesis,
+				closeParenthesis,
+			});
 
             return tableStatement;
         },
@@ -518,25 +535,31 @@ module.exports = (baseProvider, options, app) => {
                 .value();
             const partitioning = _.first(detailsTab.partitioning) || {};
             const compositePartitionKey = keyHelper.getKeys(partitioning.compositePartitionKey, jsonSchema);
+            const partitionParent = _.get(tableData, `relatedSchemas[${detailsTab.partitionOf}]`);
+            const partitionOf =  partitionParent
+            ? getNamePrefixedWithSchemaName(partitionParent.collectionName, partitionParent.bucketName)
+            : '';
 
             return {
-                ...tableData,
-                keyConstraints: keyHelper.getTableKeyConstraints(jsonSchema),
-                inherits: parentTables,
-                selectStatement: _.trim(detailsTab.selectStatement),
-                partitioning: _.assign({}, partitioning, { compositePartitionKey }),
-                ..._.pick(
-                    detailsTab,
-                    'temporary',
-                    'unlogged',
-                    'description',
-                    'ifNotExist',
-                    'usingMethod',
-                    'on_commit',
-                    'storage_parameter',
-                    'table_tablespace_name'
-                ),
-            };
+				...tableData,
+				partitionOf,
+				keyConstraints: keyHelper.getTableKeyConstraints(jsonSchema),
+				inherits: parentTables,
+				selectStatement: _.trim(detailsTab.selectStatement),
+				partitioning: _.assign({}, partitioning, { compositePartitionKey }),
+				..._.pick(
+					detailsTab,
+					'temporary',
+					'unlogged',
+					'description',
+					'ifNotExist',
+					'usingMethod',
+					'on_commit',
+					'storage_parameter',
+					'table_tablespace_name',
+                    'partitionBounds'
+				),
+			};
         },
 
         hydrateViewColumn(data) {

@@ -109,10 +109,14 @@ const queryConstants = {
                 AND pg_class.relkind = ANY('{"r","v","t","m","p"}'))
         AS catalog_table_data
         ON (catalog_table_data.table_name = tables.table_name AND catalog_table_data.table_schema = tables.table_schema)
-        WHERE tables.table_schema = $1;`,
+	LEFT JOIN (SELECT relname AS child_name FROM pg_catalog.pg_inherits AS inherit
+		LEFT JOIN pg_catalog.pg_class AS child ON (child.oid = inherit.inhrelid)) AS inherited_tables
+	ON (inherited_tables.child_name = tables.table_name)
+	WHERE inherited_tables.child_name IS NULL
+        AND tables.table_schema = $1;`,
 	GET_NAMESPACE_OID: 'SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = $1',
 	GET_TABLE_LEVEL_DATA: `
-        SELECT pc.oid, pc.relpersistence, pc.reloptions, pt.spcname
+        SELECT pc.oid, pc.relpersistence, pc.reloptions, pt.spcname, pg_get_expr(pc.relpartbound, pc.oid) AS partition_expr
             FROM pg_catalog.pg_class AS pc 
             LEFT JOIN pg_catalog.pg_tablespace AS pt 
             ON pc.reltablespace = pt.oid
@@ -279,12 +283,12 @@ const queryConstants = {
 	GET_PARTITIONS: `
         SELECT
         	inher_child.relname AS child_name,
-        	inher_parent.relname AS parent_name
+        	inher_parent.relname AS parent_name,
+                CASE WHEN inher_parent.relkind = 'p' THEN TRUE ELSE FALSE END AS is_parent_partitioned
         FROM pg_inherits
         LEFT JOIN pg_class AS inher_child ON (inher_child.oid = pg_inherits.inhrelid)
         LEFT JOIN pg_class AS inher_parent ON (inher_parent.oid = pg_inherits.inhparent)
-        WHERE inher_parent.relkind = 'p'
-        	AND inher_parent.relnamespace = $1;`,
+        WHERE inher_parent.relnamespace = $1;`,
 };
 
 const getQueryName = query => {

@@ -149,12 +149,15 @@ module.exports = {
 		const [viewsNames, tablesNames] = _.partition(entitiesNames, isViewByName);
 
 		const allTablesList = tablesNames.flatMap(tableName => [
-			tableName,
-			..._.filter(partitions, { parent_name: tableName }).map(({ child_name }) => child_name),
+			{ tableName },
+			..._.filter(partitions, { parent_name: tableName }).map(({ child_name, is_parent_partitioned }) => ({
+				isParentPartitioned: is_parent_partitioned,
+				tableName: child_name,
+			})),
 		]);
 
 		const tables = await mapPromises(
-			allTablesList,
+			_.uniq(allTablesList),
 			_.bind(
 				this._retrieveSingleTableData,
 				this,
@@ -234,7 +237,13 @@ module.exports = {
 		return getUserDefinedTypes(udtsWithColumns, domainTypesWithConstraints);
 	},
 
-	async _retrieveSingleTableData(recordSamplingSettings, schemaOid, schemaName, userDefinedTypes, tableName) {
+	async _retrieveSingleTableData(
+		recordSamplingSettings,
+		schemaOid,
+		schemaName,
+		userDefinedTypes,
+		{ tableName, isParentPartitioned },
+	) {
 		logger.progress('Get table data', schemaName, tableName);
 
 		const tableLevelData = await db.queryTolerant(
@@ -268,10 +277,10 @@ module.exports = {
 		const tableData = {
 			partitioning,
 			description,
-			inherits,
 			Indxs: tableIndexes,
 			...tableLevelProperties,
 			...tableConstraint,
+			...(isParentPartitioned ? { partitionOf: _.first(inherits)?.parentTable } : { inherits }),
 		};
 
 		const entityLevel = clearEmptyPropertiesInObject(tableData);
