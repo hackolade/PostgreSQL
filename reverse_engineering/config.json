@@ -14,5 +14,12 @@
 		"port",
 		"userName"
 	],
-	"helpUrl": "https://hackolade.com/help/ConnecttoaPostgreSQLinstance.html"
+	"helpUrl": "https://hackolade.com/help/ConnecttoaPostgreSQLinstance.html",
+	"options": [
+		{
+			"inputLabel": "Include partitions",
+			"inputTooltip": "Reverse-engineer all partitions as tables",
+			"inputKeyword": "includePartitions"
+		}
+	]
 }

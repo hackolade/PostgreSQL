@@ -16,6 +16,7 @@ module.exports = ({ _, getColumnsList, checkAllKeysDeactivated }) => {
 
 		const statements = [
 			{ key: 'inherits', getValue: getBasicValue('INHERITS') },
+			{ key: 'partitionBounds', getValue: getBasicValue('') },
 			{ key: 'partitioning', getValue: getPartitioning },
 			{ key: 'usingMethod', getValue: getBasicValue('USING') },
 			{ key: 'storage_parameter', getValue: getStorageParameters },

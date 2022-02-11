@@ -11,6 +11,11 @@ module.exports = {
 		'${columnDefinitions}${keyConstraints}${checkConstraints}${foreignKeyConstraints}\n' +
 		')${options};\n\n${comment}${columnDescriptions}',
 
+	createTablePartitionOf:
+		'CREATE${temporary} TABLE${ifNotExist} ${name}\n' +
+		'${partitionOf} ${openParenthesis}${keyConstraints}${checkConstraints}${foreignKeyConstraints}\n' +
+		'${closeParenthesis}${options};\n\n${comment}${columnDescriptions}',
+
 	columnDefinition: '${name} ${type}${collation}${primaryKey}${uniqueKey}${defaultValue}${notNull}',
 
 	checkConstraint: '${name} CHECK (${expression})${noInherit}',

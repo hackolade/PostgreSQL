@@ -129,6 +129,7 @@ module.exports = {
 						schemaName,
 						collections[schemaName],
 						data.recordSamplingSettings,
+						data.includePartitions,
 					);
 					const { functions, procedures, triggers } = await postgresService.retrieveSchemaLevelData(
 						schemaName,

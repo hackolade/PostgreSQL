@@ -142,15 +142,24 @@ module.exports = {
 		});
 	},
 
-	async retrieveEntitiesData(schemaName, entitiesNames, recordSamplingSettings) {
+	async retrieveEntitiesData(schemaName, entitiesNames, recordSamplingSettings, includePartitions = false) {
 		const userDefinedTypes = await this._retrieveUserDefinedTypes(schemaName);
 		const schemaOidResult = await db.queryTolerant(queryConstants.GET_NAMESPACE_OID, [schemaName], true);
 		const schemaOid = schemaOidResult?.oid;
+		const partitions = includePartitions ? await db.queryTolerant(queryConstants.GET_PARTITIONS, [schemaOid]) : [];
 
 		const [viewsNames, tablesNames] = _.partition(entitiesNames, isViewByName);
 
+		const allTablesList = tablesNames.flatMap(tableName => [
+			{ tableName },
+			..._.filter(partitions, { parent_name: tableName }).map(({ child_name, is_parent_partitioned }) => ({
+				isParentPartitioned: is_parent_partitioned,
+				tableName: child_name,
+			})),
+		]);
+
 		const tables = await mapPromises(
-			tablesNames,
+			_.uniq(allTablesList),
 			_.bind(
 				this._retrieveSingleTableData,
 				this,
@@ -230,7 +239,13 @@ module.exports = {
 		return getUserDefinedTypes(udtsWithColumns, domainTypesWithConstraints);
 	},
 
-	async _retrieveSingleTableData(recordSamplingSettings, schemaOid, schemaName, userDefinedTypes, tableName) {
+	async _retrieveSingleTableData(
+		recordSamplingSettings,
+		schemaOid,
+		schemaName,
+		userDefinedTypes,
+		{ tableName, isParentPartitioned },
+	) {
 		logger.progress('Get table data', schemaName, tableName);
 
 		const tableLevelData = await db.queryTolerant(
@@ -270,11 +285,11 @@ module.exports = {
 		const tableData = {
 			partitioning,
 			description,
-			inherits,
 			triggers,
 			Indxs: tableIndexes,
 			...tableLevelProperties,
 			...tableConstraint,
+			...(isParentPartitioned ? { partitionOf: _.first(inherits)?.parentTable } : { inherits }),
 		};
 
 		const entityLevel = clearEmptyPropertiesInObject(tableData);

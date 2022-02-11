@@ -1,7 +1,7 @@
 {
     "name": "PostgreSQL",
-    "version": "0.1.10",
-    "versionDate": "2022-01-31",
+    "version": "0.1.13",
+    "versionDate": "2022-02-09",
     "author": "hackolade",
     "engines": {
         "hackolade": "5.4.4",
@@ -39,7 +39,8 @@
             "relationships": {
                 "compositeRelationships": true
             },
-            "FEScriptCommentsSupported": true
+            "FEScriptCommentsSupported": true,
+            "enableFetchSystemEntitiesCheckbox": true
         }
     },
     "description": "Hackolade plugin for PostgreSQL",
