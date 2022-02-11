@@ -8,9 +8,9 @@ module.exports = ({ _, assignTemplates, templates, getNamePrefixedWithSchemaName
 		const options = getTriggerOptions(trigger);
 
 		return assignTemplates(templates.createTrigger, {
-			orReplace: trigger.triggerOrReplace,
+			orReplace: trigger.triggerOrReplace ? ' OR REPLACE' : '',
 			constraint: trigger.triggerConstraint ? ' CONSTRAINT' : '',
-			actionTiming: trigger.triggerType,
+			actionTiming: trigger.triggerType ?? '',
 			functionKey: dbVersion === 'v10.x' ? 'PROCEDURE' : 'FUNCTION',
 			functionName: trigger.triggerFunction,
 			name: trigger.name,
