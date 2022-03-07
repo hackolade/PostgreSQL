@@ -122,41 +122,65 @@ const createClient = async (connectionInfo, logger) => {
 		database: connectionInfo.database || connectionInfo.maintenanceDatabase,
 		application_name: 'Hackolade',
 		idleTimeoutMillis: Number(connectionInfo.queryRequestTimeout) || 10000,
+		sslType: connectionInfo.sslType,
 	};
 
-	const client = await connectClient(config).catch(retryOnSslError(connectionInfo, config, logger));
+	const client = await createConnectionPool(config, logger);
 
 	return { client, sshTunnel };
 };
 
-const retryOnSslError = (connectionInfo, config, logger) => async error => {
-	if (error.message === SSL_NOT_SUPPORTED_MESSAGE && connectionInfo.sslType === 'prefer') {
+const retryOnSslError = (config, logger, error) => {
+	if (error.message === SSL_NOT_SUPPORTED_MESSAGE && config.sslType === 'prefer') {
 		logger.info("Retry connection without SSL (SSL mode 'prefer')");
 		logger.error(error);
 
-		return await connectClient({
-			...config,
-			ssl: false,
-		});
+		return createConnectionPool(
+			{
+				...config,
+				isRetry: true,
+				ssl: false,
+			},
+			logger,
+		);
 	}
 
-	if (error.code?.toString() === POSTGRES_SSL_REQUIRED_ERROR_CODE && connectionInfo.sslType === 'allow') {
+	if (error.code?.toString() === POSTGRES_SSL_REQUIRED_ERROR_CODE && config.sslType === 'allow') {
 		logger.info("Retry connection with SSL (SSL mode 'allow')");
 		logger.error(error);
 
-		return await connectClient({
-			...config,
-			ssl: { rejectUnauthorized: false },
-		});
+		return createConnectionPool(
+			{
+				...config,
+				isRetry: true,
+				ssl: { rejectUnauthorized: false },
+			},
+			logger,
+		);
 	}
 
 	throw error;
 };
 
-const connectClient = async config => {
-	const client = new pg.Pool(config);
+const createConnectionPool = (config, logger) => {
+	const pool = new pg.Pool(config);
 
-	return client;
+	return pool
+		.connect()
+		.then(client => {
+			client.release();
+
+			return pool;
+		})
+		.catch(async error => {
+			await pool.end();
+
+			if (config.isRetry) {
+				throw error;
+			}
+
+			return retryOnSslError(config, logger, error);
+		});
 };
 
 module.exports = {
