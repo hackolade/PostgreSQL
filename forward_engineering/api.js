@@ -1,39 +1,61 @@
 const reApi = require('../reverse_engineering/api');
 const { createLogger } = require('../reverse_engineering/helpers/loggerHelper');
 const applyToInstanceHelper = require('./applyToInstanceHelper');
+const { commentDropStatements } = require('./helpers/commentDropStatements');
+const { DROP_STATEMENTS } = require('./helpers/constants');
 
 module.exports = {
 	generateScript(data, logger, callback, app) {
-		const {
-			getAlterContainersScripts,
-			getAlterCollectionsScripts,
-			getAlterViewScripts,
-			getAlterModelDefinitionsScripts,
-		} = require('./helpers/alterScriptFromDeltaHelper');
+		try {
+			const {
+				getAlterContainersScripts,
+				getAlterCollectionsScripts,
+				getAlterViewScripts,
+				getAlterModelDefinitionsScripts,
+			} = require('./helpers/alterScriptFromDeltaHelper');
 
-		const collection = JSON.parse(data.jsonSchema);
-		if (!collection) {
-			throw new Error(
-				'"comparisonModelCollection" is not found. Alter script can be generated only from Delta model',
+			const collection = JSON.parse(data.jsonSchema);
+			if (!collection) {
+				throw new Error(
+					'"comparisonModelCollection" is not found. Alter script can be generated only from Delta model',
+				);
+			}
+
+			const dbVersion = data.modelData[0]?.dbVersion;
+			const containersScripts = getAlterContainersScripts(collection);
+			const collectionsScripts = getAlterCollectionsScripts(collection, app, dbVersion);
+			const viewScripts = getAlterViewScripts(collection, app);
+			const modelDefinitionsScripts = getAlterModelDefinitionsScripts(collection, app);
+			const script = [
+				...containersScripts,
+				...collectionsScripts,
+				...viewScripts,
+				...modelDefinitionsScripts,
+			].join('\n\n');
+
+			const applyDropStatements = data.options?.additionalOptions?.some(
+				option => option.id === 'applyDropStatements' && option.value,
 			);
+
+			callback(null, applyDropStatements ? script : commentDropStatements(script));
+		} catch (error) {
+			logger.log('error', { message: error.message, stack: error.stack }, 'PostgreSQL Forward-Engineering Error');
+
+			callback({ message: error.message, stack: error.stack });
 		}
-
-		const dbVersion = data.modelData[0]?.dbVersion;
-		const containersScripts = getAlterContainersScripts(collection);
-		const collectionsScripts = getAlterCollectionsScripts(collection, app, dbVersion);
-		const viewScripts = getAlterViewScripts(collection, app);
-		const modelDefinitionsScripts = getAlterModelDefinitionsScripts(collection, app);
-
-		callback(
-			null,
-			[...containersScripts, ...collectionsScripts, ...viewScripts, ...modelDefinitionsScripts].join('\n\n'),
-		);
 	},
 	generateViewScript(data, logger, callback, app) {
 		callback(new Error('Forward-Engineering of delta model on view level is not supported'));
 	},
 	generateContainerScript(data, logger, callback, app) {
-		callback(new Error('Forward-Engineering of delta model on container level is not supported'));
+		try {
+			data.jsonSchema = data.collections[0];
+			this.generateScript(data, logger, callback, app);
+		} catch (error) {
+			logger.log('error', { message: error.message, stack: error.stack }, 'PostgreSQL Forward-Engineering Error');
+
+			callback({ message: error.message, stack: error.stack });
+		}
 	},
 	getDatabases(connectionInfo, logger, callback, app) {
 		logger.progress({ message: 'Find all databases' });
@@ -59,5 +81,22 @@ module.exports = {
 	},
 	testConnection(connectionInfo, logger, callback, app) {
 		reApi.testConnection(connectionInfo, logger, callback, app).then(callback, callback);
+	},
+	isDropInStatements(data, logger, callback, app) {
+		try {
+			const cb = (error, script = '') =>
+				callback(
+					error,
+					DROP_STATEMENTS.some(statement => script.includes(statement)),
+				);
+
+			if (data.level === 'container') {
+				this.generateContainerScript(data, logger, cb, app);
+			} else {
+				this.generateScript(data, logger, cb, app);
+			}
+		} catch (e) {
+			callback({ message: e.message, stack: e.stack });
+		}
 	},
 };

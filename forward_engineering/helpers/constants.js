@@ -1,0 +1,13 @@
+const DROP_STATEMENTS = [
+	'DROP SCHEMA',
+	'DROP TABLE',
+	'DROP COLUMN',
+	'DROP DOMAIN',
+	'DROP TYPE',
+	'DROP ATTRIBUTE',
+	'DROP VIEW',
+];
+
+module.exports = {
+	DROP_STATEMENTS,
+};
