@@ -481,7 +481,7 @@ module.exports = (baseProvider, options, app) => {
 			};
 		},
 
-		hydrateColumn({ columnDefinition, jsonSchema, schemaData }) {
+		hydrateColumn({ columnDefinition, jsonSchema, schemaData, definitionJsonSchema }) {
 			const collationRule = _.includes(['char', 'varchar', 'text'], columnDefinition.type)
 				? jsonSchema.collationRule
 				: '';
@@ -498,7 +498,7 @@ module.exports = (baseProvider, options, app) => {
 				unique: keyHelper.isInlineUnique(jsonSchema),
 				nullable: columnDefinition.nullable,
 				default: columnDefinition.default,
-				comment: jsonSchema.description,
+				comment: jsonSchema.refDescription || jsonSchema.description || definitionJsonSchema.description,
 				isActivated: columnDefinition.isActivated,
 				scale: columnDefinition.scale,
 				precision: columnDefinition.precision,
