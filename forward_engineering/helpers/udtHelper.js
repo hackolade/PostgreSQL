@@ -6,6 +6,7 @@ module.exports = ({
 	getNamePrefixedWithSchemaName,
 	wrapComment,
 }) => {
+	const notPlainTypes = ['composite', 'enum', 'range_udt', 'domain'];
 	const getPlainUdt = (udt, columns) => {
 		const udtName = getNamePrefixedWithSchemaName(udt.name, udt.schemaName);
 		const comment = assignTemplates(templates.comment, {
@@ -56,6 +57,10 @@ module.exports = ({
 		}
 	};
 
+	const isNotPlainType = (definitionJsonSchema) => {
+		return notPlainTypes.includes(definitionJsonSchema.type);
+	};
+
 	const getRangeOptions = udt => {
 		const wrap = value => (value ? `\t${value}` : '');
 
@@ -95,5 +100,5 @@ module.exports = ({
 		});
 	};
 
-	return { getUserDefinedType };
+	return { getUserDefinedType, isNotPlainType };
 };

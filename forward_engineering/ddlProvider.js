@@ -59,7 +59,7 @@ module.exports = (baseProvider, options, app) => {
 		getColumnsList,
 	});
 
-	const { getUserDefinedType } = require('./helpers/udtHelper')({
+	const { getUserDefinedType, isNotPlainType } = require('./helpers/udtHelper')({
 		_,
 		commentIfDeactivated,
 		assignTemplates,
@@ -523,6 +523,15 @@ module.exports = (baseProvider, options, app) => {
 				intervalOptions,
 				dbVersion,
 			};
+		},
+
+		hydrateJsonSchemaColumn(jsonSchema, definitionJsonSchema) {
+			if (!jsonSchema.$ref || _.isEmpty(definitionJsonSchema) || isNotPlainType(definitionJsonSchema)) {
+				return jsonSchema;
+			}
+
+			jsonSchema = _.omit(jsonSchema, '$ref');
+			return  { ...definitionJsonSchema, ...jsonSchema };
 		},
 
 		hydrateIndex(indexData, tableData, schemaData) {
