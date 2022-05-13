@@ -481,7 +481,7 @@ module.exports = (baseProvider, options, app) => {
 			};
 		},
 
-		hydrateColumn({ columnDefinition, jsonSchema, schemaData, definitionJsonSchema }) {
+		hydrateColumn({ columnDefinition, jsonSchema, schemaData, definitionJsonSchema = {} }) {
 			const collationRule = _.includes(['char', 'varchar', 'text'], columnDefinition.type)
 				? jsonSchema.collationRule
 				: '';
