@@ -675,12 +675,17 @@ making sure that you maintain a proper JSON format.
 						"propertyName": "Constraint name",
 						"propertyKeyword": "constraintName",
 						"propertyTooltip": "",
-						"propertyType": "text"
+						"propertyType": "text",
+						"validation": {
+							"indexKey": "compositePrimaryKey",
+							"message": "A primary key constraint cannot be created without any primary key selected"
+						}
 					},
 					{
 						"propertyName": "Key",
 						"propertyKeyword": "compositePrimaryKey",
 						"propertyType": "primaryKeySetter",
+						"requiredProperty": true,
 						"abbr": "pk"
 					},
 					{
@@ -764,12 +769,17 @@ making sure that you maintain a proper JSON format.
 						"propertyName": "Constraint name",
 						"propertyKeyword": "constraintName",
 						"propertyTooltip": "",
-						"propertyType": "text"
+						"propertyType": "text",
+						"validation": {
+							"indexKey": "compositeUniqueKey",
+							"message": "A unique key constraint cannot be created without any unique key selected"
+						}
 					},
 					{
 						"propertyName": "Key",
 						"propertyKeyword": "compositeUniqueKey",
 						"propertyType": "primaryKeySetter",
+						"requiredProperty": true,
 						"abbr": "uk"
 					},
 					{
