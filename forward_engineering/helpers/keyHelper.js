@@ -91,12 +91,17 @@ module.exports = (_, clean) => {
 			return [];
 		}
 
-		return jsonSchema.primaryKey
-			.filter(primaryKey => !_.isEmpty(primaryKey.compositePrimaryKey))
-			.map(primaryKey => ({
-				...hydratePrimaryKeyOptions(primaryKey, null, null, jsonSchema),
-				columns: getKeys(primaryKey.compositePrimaryKey, jsonSchema),
-			}));
+		return jsonSchema.primaryKey.map(primaryKey =>
+			!_.isEmpty(primaryKey.compositePrimaryKey)
+				? {
+						...hydratePrimaryKeyOptions(primaryKey, null, null, jsonSchema),
+						columns: getKeys(primaryKey.compositePrimaryKey, jsonSchema),
+				  }
+				: {
+						name: primaryKey.constraintName,
+						errorMessage: 'A primary key constraint cannot be created without any primary key selected',
+				  },
+		);
 	};
 
 	const getCompositeUniqueKeys = jsonSchema => {
@@ -104,12 +109,17 @@ module.exports = (_, clean) => {
 			return [];
 		}
 
-		return jsonSchema.uniqueKey
-			.filter(uniqueKey => !_.isEmpty(uniqueKey.compositeUniqueKey))
-			.map(uniqueKey => ({
-				...hydrateUniqueOptions(uniqueKey, null, null, jsonSchema),
-				columns: getKeys(uniqueKey.compositeUniqueKey, jsonSchema),
-			}));
+		return jsonSchema.uniqueKey.map(uniqueKey =>
+			!_.isEmpty(uniqueKey.compositeUniqueKey)
+				? {
+						...hydrateUniqueOptions(uniqueKey, null, null, jsonSchema),
+						columns: getKeys(uniqueKey.compositeUniqueKey, jsonSchema),
+				  }
+				: {
+						name: uniqueKey.constraintName,
+						errorMessage: 'A unique key constraint cannot be created without any unique key selected',
+				  },
+		);
 	};
 
 	const getTableKeyConstraints = jsonSchema => {

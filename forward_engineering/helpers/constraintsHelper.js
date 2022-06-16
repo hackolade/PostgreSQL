@@ -69,10 +69,21 @@ module.exports = ({
 		};
 	};
 
+	const getConstraintsWarnings = (invalidConstraints = []) => {
+		return invalidConstraints
+			.map(keyData => {
+				const constraintName = keyData.name ? ` [constraint name: ${keyData.name}]` : '';
+
+				return `-- ${keyData.errorMessage}${constraintName}`;
+			})
+			.join('\n\t');
+	};
+
 	return {
 		generateConstraintsString,
 		foreignKeysToString,
 		foreignActiveKeysToString,
 		createKeyConstraint,
+		getConstraintsWarnings,
 	};
 };
