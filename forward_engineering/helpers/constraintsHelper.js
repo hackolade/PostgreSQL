@@ -70,13 +70,20 @@ module.exports = ({
 	};
 
 	const getConstraintsWarnings = (invalidConstraints = []) => {
-		return invalidConstraints
-			.map(keyData => {
-				const constraintName = keyData.name ? ` [constraint name: ${keyData.name}]` : '';
+		if (_.isEmpty(invalidConstraints)) {
+			return '';
+		}
 
-				return `-- ${keyData.errorMessage}${constraintName}`;
-			})
-			.join('\n\t');
+		return (
+			'\n\t' +
+			invalidConstraints
+				.map(keyData => {
+					const constraintName = keyData.name ? ` [constraint name: ${keyData.name}]` : '';
+
+					return `-- ${keyData.errorMessage}${constraintName}`;
+				})
+				.join('\n\t')
+		);
 	};
 
 	return {
