@@ -176,6 +176,9 @@ const queryConstants = {
 	GET_TABLE_FOREIGN_KEYS: `
         SELECT pcon.conname AS relationship_name, 
                 pcon.conkey AS table_columns_positions,
+                pcon.confdeltype AS relationship_on_delete,
+                pcon.confupdtype AS relationship_on_update,
+                pcon.confmatchtype AS relationship_match,
                 pc_foreign_table.relname AS foreign_table_name, 
                 ARRAY(
                     SELECT column_name::text FROM unnest(pcon.confkey) AS column_position 
