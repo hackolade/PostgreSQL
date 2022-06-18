@@ -191,7 +191,7 @@ module.exports = (baseProvider, options, app) => {
 			const keyConstraintsString = `${generateConstraintsString(
 				dividedKeysConstraints,
 				isActivated,
-			)}\n\t${constraintWarnings}`;
+			)}${constraintWarnings}`;
 			const keyConstraintsValue = partitionOf ? keyConstraintsString?.slice(1) : keyConstraintsString;
 
 			const dividedForeignKeys = divideIntoActivatedAndDeactivated(foreignKeyConstraints, key => key.statement);
