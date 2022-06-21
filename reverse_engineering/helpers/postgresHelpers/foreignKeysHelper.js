@@ -47,7 +47,7 @@ const prepareForeignKeys = (tableForeignKeys, tableName, schemaName, columns) =>
 			childCollection: tableName,
 			childField: _.map(foreignKeyData.table_columns_positions, getColumnNameByPosition(columns)),
 			relationshipType: 'Foreign Key',
-			customProperties: {
+			relationshipInfo: {
 				relationshipOnDelete: prepareDeleteAndUpdate(foreignKeyData.relationship_on_delete),
 				relationshipOnUpdate: prepareDeleteAndUpdate(foreignKeyData.relationship_on_update),
 				relationshipMatch: prepareMatch(foreignKeyData.relationship_match),
