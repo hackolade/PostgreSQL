@@ -26,15 +26,20 @@ module.exports = (baseProvider, options, app) => {
 		divideIntoActivatedAndDeactivated,
 		commentIfDeactivated,
 	});
-	const { generateConstraintsString, foreignKeysToString, foreignActiveKeysToString, createKeyConstraint } =
-		require('./helpers/constraintsHelper')({
-			_,
-			commentIfDeactivated,
-			checkAllKeysDeactivated,
-			assignTemplates,
-			getColumnsList,
-			wrapInQuotes,
-		});
+	const {
+		generateConstraintsString,
+		foreignKeysToString,
+		foreignActiveKeysToString,
+		createKeyConstraint,
+		getConstraintsWarnings,
+	} = require('./helpers/constraintsHelper')({
+		_,
+		commentIfDeactivated,
+		checkAllKeysDeactivated,
+		assignTemplates,
+		getColumnsList,
+		wrapInQuotes,
+	});
 	const keyHelper = require('./helpers/keyHelper')(_, clean);
 
 	const { getFunctionsScript } = require('./helpers/functionHelper')({
@@ -175,10 +180,18 @@ module.exports = (baseProvider, options, app) => {
 			});
 
 			const dividedKeysConstraints = divideIntoActivatedAndDeactivated(
-				keyConstraints.map(createKeyConstraint(templates, isActivated)),
+				keyConstraints
+					.filter(({ errorMessage }) => !errorMessage)
+					.map(createKeyConstraint(templates, isActivated)),
 				key => key.statement,
 			);
-			const keyConstraintsString = generateConstraintsString(dividedKeysConstraints, isActivated);
+			const constraintWarnings = getConstraintsWarnings(
+				keyConstraints.filter(({ errorMessage }) => errorMessage),
+			);
+			const keyConstraintsString = `${generateConstraintsString(
+				dividedKeysConstraints,
+				isActivated,
+			)}${constraintWarnings}`;
 			const keyConstraintsValue = partitionOf ? keyConstraintsString?.slice(1) : keyConstraintsString;
 
 			const dividedForeignKeys = divideIntoActivatedAndDeactivated(foreignKeyConstraints, key => key.statement);
@@ -531,7 +544,7 @@ module.exports = (baseProvider, options, app) => {
 			}
 
 			jsonSchema = _.omit(jsonSchema, '$ref');
-			return  { ...definitionJsonSchema, ...jsonSchema };
+			return { ...definitionJsonSchema, ...jsonSchema };
 		},
 
 		hydrateIndex(indexData, tableData, schemaData) {
