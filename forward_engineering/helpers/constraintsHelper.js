@@ -69,10 +69,18 @@ module.exports = ({
 		};
 	};
 
+	const additionalPropertiesForForeignKey = relationship => {
+		const foreignOnDelete = _.get(relationship, 'relationshipOnDelete', '');
+		const foreignOnUpdate = _.get(relationship, 'relationshipOnUpdate', '');
+		const foreignMatch = _.get(relationship, 'relationshipMatch', '');
+		return { foreignOnDelete, foreignOnUpdate, foreignMatch }
+	};
+
 	return {
 		generateConstraintsString,
 		foreignKeysToString,
 		foreignActiveKeysToString,
 		createKeyConstraint,
+		additionalPropertiesForForeignKey,
 	};
 };
