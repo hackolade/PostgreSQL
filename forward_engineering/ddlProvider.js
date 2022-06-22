@@ -32,6 +32,7 @@ module.exports = (baseProvider, options, app) => {
 		foreignActiveKeysToString,
 		createKeyConstraint,
 		getConstraintsWarnings,
+		additionalPropertiesForForeignKey,
 	} = require('./helpers/constraintsHelper')({
 		_,
 		commentIfDeactivated,
@@ -322,6 +323,7 @@ module.exports = (baseProvider, options, app) => {
 				foreignTableActivated,
 				foreignSchemaName,
 				primarySchemaName,
+				customProperties
 			},
 			dbData,
 			schemaData,
@@ -334,11 +336,16 @@ module.exports = (baseProvider, options, app) => {
 				primaryTableActivated &&
 				foreignTableActivated;
 
+			const { foreignOnDelete, foreignOnUpdate, foreignMatch } = additionalPropertiesForForeignKey(customProperties);
+
 			const foreignKeyStatement = assignTemplates(templates.createForeignKeyConstraint, {
 				primaryTable: getNamePrefixedWithSchemaName(primaryTable, primarySchemaName || schemaData.schemaName),
 				name: name ? `CONSTRAINT ${wrapInQuotes(name)}` : '',
 				foreignKey: isActivated ? foreignKeysToString(foreignKey) : foreignActiveKeysToString(foreignKey),
 				primaryKey: isActivated ? foreignKeysToString(primaryKey) : foreignActiveKeysToString(primaryKey),
+				onDelete: foreignOnDelete ? ` ON DELETE ${foreignOnDelete}` : '',
+				onUpdate: foreignOnUpdate ? ` ON UPDATE ${foreignOnUpdate}` : '',
+				match: foreignMatch ? ` MATCH ${foreignMatch}` : '',
 			});
 
 			return {
@@ -358,6 +365,7 @@ module.exports = (baseProvider, options, app) => {
 				foreignTableActivated,
 				foreignSchemaName,
 				primarySchemaName,
+				customProperties,
 			},
 			dbData,
 			schemaData,
@@ -370,12 +378,17 @@ module.exports = (baseProvider, options, app) => {
 				primaryTableActivated &&
 				foreignTableActivated;
 
+			const { foreignOnDelete, foreignOnUpdate, foreignMatch } = additionalPropertiesForForeignKey(customProperties);
+
 			const foreignKeyStatement = assignTemplates(templates.createForeignKey, {
 				primaryTable: getNamePrefixedWithSchemaName(primaryTable, primarySchemaName || schemaData.schemaName),
 				foreignTable: getNamePrefixedWithSchemaName(foreignTable, foreignSchemaName || schemaData.schemaName),
 				name: name ? wrapInQuotes(name) : '',
 				foreignKey: isActivated ? foreignKeysToString(foreignKey) : foreignActiveKeysToString(foreignKey),
 				primaryKey: isActivated ? foreignKeysToString(primaryKey) : foreignActiveKeysToString(primaryKey),
+				onDelete: foreignOnDelete ? ` ON DELETE ${foreignOnDelete}` : '',
+				onUpdate: foreignOnUpdate ? ` ON UPDATE ${foreignOnUpdate}` : '',
+				match: foreignMatch ? ` MATCH ${foreignMatch}` : '',
 			});
 
 			return {

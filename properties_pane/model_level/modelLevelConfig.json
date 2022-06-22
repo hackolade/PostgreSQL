@@ -205,5 +205,47 @@ making sure that you maintain a proper JSON format.
 				"template": "textarea"
 			}
 		]
+	},
+	{
+		"lowerTab": "Relationships",
+		"structure": [
+			{
+				"propertyName": "On Delete",
+				"propertyKeyword": "relationshipOnDelete",
+				"propertyType": "select",
+				"options": [
+					"",
+					"NO ACTION",
+					"RESTRICT",
+					"CASCADE",
+					"SET NULL",
+					"SET DEFAULT"
+				]
+			},
+			{
+				"propertyName": "On Update",
+				"propertyKeyword": "relationshipOnUpdate",
+				"propertyType": "select",
+				"options": [
+					"",
+					"NO ACTION",
+					"RESTRICT",
+					"CASCADE",
+					"SET NULL",
+					"SET DEFAULT"
+				]
+			},
+			{
+				"propertyName": "Match",
+				"propertyKeyword": "relationshipMatch",
+				"propertyType": "select",
+				"options": [
+					"",
+					"SIMPLE",
+					"PARTIAL",
+					"FULL"
+				]
+			}
+		]
 	}
 ]
