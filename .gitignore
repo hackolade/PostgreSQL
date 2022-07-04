@@ -1,0 +1,6 @@
+.vscode
+.antlr
+.idea
+node_modules
+build
+.DS_Store

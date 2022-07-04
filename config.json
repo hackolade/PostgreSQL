@@ -1,0 +1,40 @@
+{
+	"type": "ddl",
+	"ddlType": "plugin",
+	"mode": "pgsql",
+	"fileExtensions": [
+		{
+			"value": "sql",
+			"label": "SQL"
+		}
+	],
+	"hasUpdateScript": false,
+	"namePrefix": "PostgreSQL",
+	"level": {
+		"container": true,
+		"entity": true,
+		"view": true
+	},
+	"applyScriptToInstance": true,
+	"applyToInstanceSettings": {
+		"scenario": "getDatabases"
+	},
+	"combinedContainers": true,
+	"feLevelSelector": {
+		"container": true,
+		"model": true
+	},
+	"compMode": {
+		"entity": true,
+		"container": true
+	},
+	"additionalOptions": [
+		{
+			"id": "applyDropStatements",
+			"value": false,
+			"forUpdate": true,
+			"name": "Apply Drop Statements",
+			"isDropInStatements": true
+		}
+	]
+}
