@@ -211,7 +211,7 @@ module.exports = (baseProvider, options, app) => {
 			const openParenthesis = isEmptyPartitionBody ? '' : '(';
 			const closeParenthesis = isEmptyPartitionBody ? '' : ')';
 
-			let tableStatement = assignTemplates(template, {
+			const tableStatement = assignTemplates(template, {
 				temporary: getTableTemporaryValue(temporary, unlogged),
 				ifNotExist: ifNotExistStr,
 				name: tableName,
