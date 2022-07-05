@@ -236,15 +236,16 @@ module.exports = (baseProvider, options, app) => {
 				closeParenthesis,
 			});
 
-			tableStatement = (commentIfDeactivated(tableStatement.trim() + '\n', { isActivated }));
-
 			const createTriggerStatements = getTriggersScript({
 				dbVersion: schemaData.dbVersion,
 				tableName,
 				triggers,
 			});
 
-			return [tableStatement, createTriggerStatements].map(_.trim).join('\n\n').trim() + '\n';
+			return commentIfDeactivated(
+				[tableStatement, createTriggerStatements].map(_.trim).join('\n\n').trim() + '\n',
+				{ isActivated }
+			);
 		},
 
 		convertColumnDefinition(columnDefinition) {
