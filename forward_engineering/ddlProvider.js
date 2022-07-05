@@ -211,7 +211,7 @@ module.exports = (baseProvider, options, app) => {
 			const openParenthesis = isEmptyPartitionBody ? '' : '(';
 			const closeParenthesis = isEmptyPartitionBody ? '' : ')';
 
-			const tableStatement = assignTemplates(template, {
+			let tableStatement = assignTemplates(template, {
 				temporary: getTableTemporaryValue(temporary, unlogged),
 				ifNotExist: ifNotExistStr,
 				name: tableName,
@@ -235,6 +235,8 @@ module.exports = (baseProvider, options, app) => {
 				openParenthesis,
 				closeParenthesis,
 			});
+
+			tableStatement = (commentIfDeactivated(tableStatement.trim() + '\n', { isActivated }));
 
 			const createTriggerStatements = getTriggersScript({
 				dbVersion: schemaData.dbVersion,
