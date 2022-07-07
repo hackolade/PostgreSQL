@@ -96,6 +96,8 @@ const POSTGRES_RESERVED_WORDS = [
 	'WITH',
 ];
 
+const MUST_BE_ESCAPED = /\t|\n|'|\f|\r/gm;
+
 module.exports = ({ _, divideIntoActivatedAndDeactivated, commentIfDeactivated }) => {
 	const getFunctionArguments = functionArguments => {
 		return _.map(functionArguments, arg => {
@@ -177,7 +179,11 @@ module.exports = ({ _, divideIntoActivatedAndDeactivated, commentIfDeactivated }
 		);
 	};
 
-	const wrapComment = comment => `$$${comment}$$`;
+	const prepareComment = (comment = '') => 
+		comment.replace(MUST_BE_ESCAPED, character => `${'\\'}${character}`);
+
+
+	const wrapComment = comment => `E'${prepareComment(JSON.stringify(comment)).slice(1, -1)}'`;
 
 	return {
 		getFunctionArguments,
