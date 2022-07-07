@@ -49,6 +49,22 @@
 				"to": {
 					"type": "varchar"
 				}
+			},
+			{
+				"from": {
+					"mode": "decimal"
+				},
+				"to": {
+					"mode": "numeric"
+				}
+			},
+			{
+				"from": {
+					"mode": "long"
+				},
+				"to": {
+					"mode": "bigint"
+				}
 			}
 		]
 	}
