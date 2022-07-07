@@ -79,7 +79,7 @@ module.exports = ({ _, wrap, assignTemplates, templates, commentIfDeactivated, w
 	const decorateDefault = (type, defaultValue) => {
 		const constantsValues = ['current_timestamp', 'null'];
 		if ((isString(type) || isDateTime(type)) && !constantsValues.includes(_.toLower(defaultValue))) {
-			return wrap(defaultValue, '$$', '$$');
+			return wrapComment(defaultValue);
 		} else {
 			return defaultValue;
 		}
