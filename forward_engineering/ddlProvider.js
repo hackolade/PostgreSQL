@@ -242,7 +242,10 @@ module.exports = (baseProvider, options, app) => {
 				triggers,
 			});
 
-			return [tableStatement, createTriggerStatements].map(_.trim).join('\n\n').trim() + '\n';
+			return commentIfDeactivated(
+				[tableStatement, createTriggerStatements].map(_.trim).join('\n\n').trim() + '\n',
+				{ isActivated }
+			);
 		},
 
 		convertColumnDefinition(columnDefinition) {
