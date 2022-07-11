@@ -60,6 +60,22 @@
 			},
 			{
 				"from": {
+					"mode": "dec"
+				},
+				"to": {
+					"mode": "numeric"
+				}
+			},
+			{
+				"from": {
+					"mode": "fixed"
+				},
+				"to": {
+					"mode": "numeric"
+				}
+			},
+			{
+				"from": {
 					"mode": "long"
 				},
 				"to": {
