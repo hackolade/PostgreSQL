@@ -44,6 +44,33 @@
 		"field": [
 			{
 				"from": {
+					"type": "nvarchar",
+					"mode": "nchar"
+				},
+				"to": {
+					"mode": "char"
+				}
+			},
+			{
+				"from": {
+					"type": "nvarchar",
+					"mode": "ntext"
+				},
+				"to": {
+					"mode": "text"
+				}
+			},
+			{
+				"from": {
+					"type": "varchar",
+					"mode": "tinytext"
+				},
+				"to": {
+					"mode": "text"
+				}
+			},
+			{
+				"from": {
 					"type": "nvarchar"
 				},
 				"to": {
