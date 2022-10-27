@@ -65,6 +65,24 @@
 		},
 		{
 			"schema": {
+				"mode": "timestamp"
+			},
+			"format": "YYYY-MM-DD hh:mm:ss.nnn"
+		},
+		{
+			"schema": {
+				"mode": "timestamp"
+			},
+			"format": "YYYY-MM-DD hh:mm:ss.nnnnnn"
+		},
+		{
+			"schema": {
+				"mode": "timestamp"
+			},
+			"format": "YYYY-MM-DD hh:mm:ss.nnnnnnnnn"
+		},
+		{
+			"schema": {
 				"mode": "interval"
 			},
 			"format": "PnYnMnDTnHnMnS"
