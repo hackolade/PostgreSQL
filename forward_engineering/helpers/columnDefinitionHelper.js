@@ -52,13 +52,13 @@ module.exports = ({ _, wrap, assignTemplates, templates, commentIfDeactivated, w
 
 	const decorateType = (type, columnDefinition) => {
 		if (canHaveLength(type) && _.isNumber(columnDefinition.length)) {
-			return addLength(type, columnDefinition.length);
+			type = addLength(type, columnDefinition.length);
 		} else if (canHavePrecision(type) && canHaveScale(type) && _.isNumber(columnDefinition.precision)) {
-			return addScalePrecision(type, columnDefinition.precision, columnDefinition.scale);
+			type = addScalePrecision(type, columnDefinition.precision, columnDefinition.scale);
 		} else if (canHavePrecision(type) && _.isNumber(columnDefinition.precision)) {
-			return addPrecision(type, columnDefinition.precision);
+			type = addPrecision(type, columnDefinition.precision);
 		} else if (canHaveTypeModifier(type)) {
-			return addTypeModifier({
+			type = addTypeModifier({
 				type,
 				typeModifier: columnDefinition.typeModifier,
 				srid: columnDefinition.srid,
@@ -67,7 +67,7 @@ module.exports = ({ _, wrap, assignTemplates, templates, commentIfDeactivated, w
 			canHaveTimePrecision(type) &&
 			(_.isNumber(columnDefinition.timePrecision) || columnDefinition.timezone)
 		) {
-			return addWithTimezone(addPrecision(type, columnDefinition.timePrecision), columnDefinition.timezone);
+			type = addWithTimezone(addPrecision(type, columnDefinition.timePrecision), columnDefinition.timezone);
 		}
 
 		return addArrayDecorator(type, columnDefinition.array_type);
