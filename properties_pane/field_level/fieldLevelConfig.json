@@ -630,6 +630,19 @@ making sure that you maintain a proper JSON format.
 				"propertyType": "group",
 				"propertyKeyword": "array_type",
 				"propertyTooltip": "Declaring the array number of dimensions is simply for documentation; it does not affect run-time behavior.",
+				"dependency": {
+					"type": "not",
+					"values": [
+						{
+							"key": "mode",
+							"value": [
+								"smallserial",
+								"serial",
+								"bigserial"
+							]
+						}
+					]
+				},
 				"structure": [
 					{
 						"propertyName": "Size limit",
@@ -4326,6 +4339,15 @@ making sure that you maintain a proper JSON format.
 				"propertyKeyword": "array_type",
 				"propertyTooltip": "Declaring the array number of dimensions is simply for documentation; it does not affect run-time behavior.",
 				"enableForReference": true,
+				"dependency": {
+					"type": "or",
+					"values": [
+						{
+							"key": "$ref",
+							"exist": true
+						}
+					]
+				},
 				"structure": [
 					{
 						"propertyName": "Size limit",
@@ -4376,6 +4398,15 @@ making sure that you maintain a proper JSON format.
 				"propertyKeyword": "array_type",
 				"propertyTooltip": "Declaring the array number of dimensions is simply for documentation; it does not affect run-time behavior.",
 				"enableForReference": true,
+				"dependency": {
+					"type": "or",
+					"values": [
+						{
+							"key": "$ref",
+							"exist": true
+						}
+					]
+				},
 				"structure": [
 					{
 						"propertyName": "Size limit",
@@ -4427,6 +4458,15 @@ making sure that you maintain a proper JSON format.
 				"propertyKeyword": "array_type",
 				"propertyTooltip": "Declaring the array number of dimensions is simply for documentation; it does not affect run-time behavior.",
 				"enableForReference": true,
+				"dependency": {
+					"type": "or",
+					"values": [
+						{
+							"key": "$ref",
+							"exist": true
+						}
+					]
+				},
 				"structure": [
 					{
 						"propertyName": "Size limit",
