@@ -3,6 +3,7 @@ const getGET_TABLE_INDEXES = postgresVersion => {
         SELECT indexname,
                index_method,
                index_unique,
+               index_indnullsnotdistinct,
                number_of_keys,
                where_expression,
                array_agg(attname
@@ -24,6 +25,7 @@ const getGET_TABLE_INDEXES = postgresVersion => {
                     c.relname AS indexname,
                     m.amname AS index_method,
                     indexes.indisunique AS index_unique,
+                    indexes.indnullsnotdistinct AS index_indnullsnotdistinct,
                     indexes.ord,
                     attribute.attname,
                      c.reloptions,
@@ -65,6 +67,7 @@ const getGET_TABLE_INDEXES = postgresVersion => {
         GROUP BY indexname,
                  index_method,
                  index_unique,
+                 index_indnullsnotdistinct,
                  reloptions,
                  number_of_keys,
                  where_expression,

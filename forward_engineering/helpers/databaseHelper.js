@@ -1,6 +1,6 @@
 module.exports = () => {
 	const getLocaleProperties = modelData => {
-		const isSupportsLocale = ['v13.x', 'v14.x'].includes(modelData.dbVersion);
+		const isSupportsLocale = ['v13.x', 'v14.x', 'v15.x'].includes(modelData.dbVersion);
 
 		if (isSupportsLocale && modelData.locale) {
 			return { locale: modelData.locale };

@@ -21,6 +21,7 @@ module.exports = (baseProvider, options, app) => {
 		getColumnsList,
 		getViewData,
 		wrapComment,
+		getDbVersion
 	} = require('./helpers/general')({
 		_,
 		divideIntoActivatedAndDeactivated,
@@ -275,12 +276,15 @@ module.exports = (baseProvider, options, app) => {
 		},
 
 		createIndex(tableName, index, dbData, isParentActivated = true) {
+			const isUnique = index.unique && index.index_method === 'btree';
 			const name = wrapInQuotes(index.indxName);
-			const unique = index.unique && index.index_method === 'btree' ? ' UNIQUE' : '';
+			const unique = isUnique ? ' UNIQUE' : '';
 			const concurrently = index.concurrently ? ' CONCURRENTLY' : '';
 			const ifNotExist = index.ifNotExist ? ' IF NOT EXISTS' : '';
 			const only = index.only ? ' ONLY' : '';
 			const using = index.index_method ? ` USING ${_.toUpper(index.index_method)}` : '';
+			const dbVersion = getDbVersion(_.get(dbData, 'dbVersion', ''));
+			const nullsDistinct = isUnique && index.nullsDistinct && dbVersion >= 15 ? `\n ${index.nullsDistinct}` : ''
 
 			const keys = getIndexKeys(
 				index.index_method === 'btree'
@@ -300,6 +304,7 @@ module.exports = (baseProvider, options, app) => {
 					using,
 					keys,
 					options,
+					nullsDistinct,
 					tableName: getNamePrefixedWithSchemaName(tableName, index.schemaName),
 				}),
 				{
@@ -609,12 +614,13 @@ module.exports = (baseProvider, options, app) => {
 				? getNamePrefixedWithSchemaName(partitionParent.collectionName, partitionParent.bucketName)
 				: '';
 			const triggers = hydrateTriggers(entityData, tableData.relatedSchemas);
+			const dbVersion = getDbVersion(_.get(tableData, 'dbData.dbVersion', ''));
 
 			return {
 				...tableData,
 				triggers,
 				partitionOf,
-				keyConstraints: keyHelper.getTableKeyConstraints(jsonSchema),
+				keyConstraints: keyHelper.getTableKeyConstraints(jsonSchema, dbVersion),
 				inherits: parentTables,
 				selectStatement: _.trim(detailsTab.selectStatement),
 				partitioning: _.assign({}, partitioning, { compositePartitionKey }),

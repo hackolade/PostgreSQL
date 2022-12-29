@@ -140,7 +140,7 @@ const getLimit = (count, recordSamplingSettings) => {
 	return Math.min(size, 100000);
 };
 
-const prepareTableConstraints = (constraintsResult, attributesWithPositions) => {
+const prepareTableConstraints = (constraintsResult, attributesWithPositions, tableIndexes) => {
 	return _.reduce(
 		constraintsResult,
 		(entityConstraints, constraint) => {
@@ -163,7 +163,7 @@ const prepareTableConstraints = (constraintsResult, attributesWithPositions) => 
 						...entityConstraints,
 						uniqueKey: [
 							...entityConstraints.uniqueKey,
-							getUniqueKeyConstraint(constraint, attributesWithPositions),
+							getUniqueKeyConstraint(constraint, attributesWithPositions, tableIndexes),
 						],
 					};
 				default:
@@ -187,13 +187,17 @@ const getPrimaryKeyConstraint = (constraint, tableColumns) => {
 	};
 };
 
-const getUniqueKeyConstraint = (constraint, tableColumns) => {
+const getUniqueKeyConstraint = (constraint, tableColumns, tableIndexes) => {
+	const indexWithConstraint = _.find(tableIndexes, index => index.indexname === constraint.constraint_name);
+	const nullsDistinct = indexWithConstraint?.index_indnullsnotdistinct ? 'NULLS NOT DISTINCT' : '';
+
 	return {
 		constraintName: constraint.constraint_name,
 		compositeUniqueKey: _.map(constraint.constraint_keys, getColumnNameByPosition(tableColumns)),
 		indexStorageParameters: _.join(constraint.storage_parameters, ','),
 		indexTablespace: constraint.tablespace,
 		indexComment: constraint.description,
+		...(nullsDistinct && { nullsDistinct })
 	};
 };
 
@@ -215,6 +219,8 @@ const prepareTableIndexes = tableIndexesResult => {
 			.map(column => _.pick(column, 'name'))
 			.value();
 
+		const nullsDistinct = indexData.index_indnullsnotdistinct ? 'NULLS NOT DISTINCT' : '';
+
 		const index = {
 			indxName: indexData.indexname,
 			index_method: indexData.index_method,
@@ -227,6 +233,7 @@ const prepareTableIndexes = tableIndexesResult => {
 				indexData.index_method === 'btree'
 					? columns
 					: _.map(columns, column => _.omit(column, 'sortOrder', 'nullsOrder')),
+			...(nullsDistinct && { nullsDistinct }),
 		};
 
 		return clearEmptyPropertiesInObject(index);

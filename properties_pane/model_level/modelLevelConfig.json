@@ -77,7 +77,8 @@ making sure that you maintain a proper JSON format.
 					"v11.x",
 					"v12.x",
 					"v13.x",
-					"v14.x"
+					"v14.x",
+					"v15.x"
 				],
 				"disabledOption": false
 			},
