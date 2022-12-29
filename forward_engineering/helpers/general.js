@@ -1,3 +1,5 @@
+const db = require("../../reverse_engineering/helpers/db");
+
 const POSTGRES_RESERVED_WORDS = [
 	'ALL',
 	'ANALYSE',
@@ -185,6 +187,12 @@ module.exports = ({ _, divideIntoActivatedAndDeactivated, commentIfDeactivated }
 
 	const wrapComment = comment => `E'${prepareComment(JSON.stringify(comment)).slice(1, -1)}'`;
 
+	const getDbVersion = (dbVersion = '') => {
+		const version = dbVersion.match(/\d+/);
+
+		return Number(_.get(version, [0], 0));
+	};
+
 	return {
 		getFunctionArguments,
 		getNamePrefixedWithSchemaName,
@@ -192,5 +200,6 @@ module.exports = ({ _, divideIntoActivatedAndDeactivated, commentIfDeactivated }
 		getColumnsList,
 		getViewData,
 		wrapComment,
+		getDbVersion,
 	};
 };

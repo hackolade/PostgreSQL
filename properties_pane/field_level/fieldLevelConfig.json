@@ -551,6 +551,17 @@ making sure that you maintain a proper JSON format.
 						"addTimestampButton": false,
 						"propertyType": "details",
 						"template": "textarea"
+					},
+					{
+						"propertyName": "Nulls Distinct",
+						"propertyKeyword": "nullsDistinct",
+						"propertyType": "select",
+						"defaultValue": "",
+						"options": [
+							"",
+							"NULLS DISTINCT",
+							"NULLS NOT DISTINCT"
+						]
 					}
 				]
 			},
@@ -1017,6 +1028,17 @@ making sure that you maintain a proper JSON format.
 						"addTimestampButton": false,
 						"propertyType": "details",
 						"template": "textarea"
+					},
+					{
+						"propertyName": "Nulls Distinct",
+						"propertyKeyword": "nullsDistinct",
+						"propertyType": "select",
+						"defaultValue": "",
+						"options": [
+							"",
+							"NULLS DISTINCT",
+							"NULLS NOT DISTINCT"
+						]
 					}
 				]
 			},
@@ -1438,6 +1460,17 @@ making sure that you maintain a proper JSON format.
 						"addTimestampButton": false,
 						"propertyType": "details",
 						"template": "textarea"
+					},
+					{
+						"propertyName": "Nulls Distinct",
+						"propertyKeyword": "nullsDistinct",
+						"propertyType": "select",
+						"defaultValue": "",
+						"options": [
+							"",
+							"NULLS DISTINCT",
+							"NULLS NOT DISTINCT"
+						]
 					}
 				]
 			},
@@ -1912,6 +1945,17 @@ making sure that you maintain a proper JSON format.
 						"addTimestampButton": false,
 						"propertyType": "details",
 						"template": "textarea"
+					},
+					{
+						"propertyName": "Nulls Distinct",
+						"propertyKeyword": "nullsDistinct",
+						"propertyType": "select",
+						"defaultValue": "",
+						"options": [
+							"",
+							"NULLS DISTINCT",
+							"NULLS NOT DISTINCT"
+						]
 					}
 				]
 			},
@@ -2375,6 +2419,17 @@ making sure that you maintain a proper JSON format.
 						"addTimestampButton": false,
 						"propertyType": "details",
 						"template": "textarea"
+					},
+					{
+						"propertyName": "Nulls Distinct",
+						"propertyKeyword": "nullsDistinct",
+						"propertyType": "select",
+						"defaultValue": "",
+						"options": [
+							"",
+							"NULLS DISTINCT",
+							"NULLS NOT DISTINCT"
+						]
 					}
 				]
 			},
@@ -2800,6 +2855,17 @@ making sure that you maintain a proper JSON format.
 						"addTimestampButton": false,
 						"propertyType": "details",
 						"template": "textarea"
+					},
+					{
+						"propertyName": "Nulls Distinct",
+						"propertyKeyword": "nullsDistinct",
+						"propertyType": "select",
+						"defaultValue": "",
+						"options": [
+							"",
+							"NULLS DISTINCT",
+							"NULLS NOT DISTINCT"
+						]
 					}
 				]
 			},
@@ -3330,6 +3396,17 @@ making sure that you maintain a proper JSON format.
 						"addTimestampButton": false,
 						"propertyType": "details",
 						"template": "textarea"
+					},
+					{
+						"propertyName": "Nulls Distinct",
+						"propertyKeyword": "nullsDistinct",
+						"propertyType": "select",
+						"defaultValue": "",
+						"options": [
+							"",
+							"NULLS DISTINCT",
+							"NULLS NOT DISTINCT"
+						]
 					}
 				]
 			},
@@ -3735,6 +3812,17 @@ making sure that you maintain a proper JSON format.
 						"addTimestampButton": false,
 						"propertyType": "details",
 						"template": "textarea"
+					},
+					{
+						"propertyName": "Nulls Distinct",
+						"propertyKeyword": "nullsDistinct",
+						"propertyType": "select",
+						"defaultValue": "",
+						"options": [
+							"",
+							"NULLS DISTINCT",
+							"NULLS NOT DISTINCT"
+						]
 					}
 				]
 			},
@@ -4161,6 +4249,17 @@ making sure that you maintain a proper JSON format.
 						"addTimestampButton": false,
 						"propertyType": "details",
 						"template": "textarea"
+					},
+					{
+						"propertyName": "Nulls Distinct",
+						"propertyKeyword": "nullsDistinct",
+						"propertyType": "select",
+						"defaultValue": "",
+						"options": [
+							"",
+							"NULLS DISTINCT",
+							"NULLS NOT DISTINCT"
+						]
 					}
 				]
 			},

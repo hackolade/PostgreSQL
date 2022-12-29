@@ -39,6 +39,7 @@ const getAddCollectionScript =
 			foreignKeyConstraints: [],
 			schemaData,
 			columnDefinitions,
+			dbData: { dbVersion },
 		};
 		const hydratedTable = ddlProvider.hydrateTable({ tableData, entityData: [jsonSchema], jsonSchema });
 

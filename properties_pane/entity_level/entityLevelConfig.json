@@ -818,6 +818,17 @@ making sure that you maintain a proper JSON format.
 						"addTimestampButton": false,
 						"propertyType": "details",
 						"template": "textarea"
+					},
+					{
+						"propertyName": "Nulls Distinct",
+						"propertyKeyword": "nullsDistinct",
+						"propertyType": "select",
+						"defaultValue": "",
+						"options": [
+							"",
+							"NULLS DISTINCT",
+							"NULLS NOT DISTINCT"
+						]
 					}
 				]
 			}
@@ -869,6 +880,30 @@ making sure that you maintain a proper JSON format.
 						"dependency": {
 							"type": "or",
 							"values": [
+								{
+									"key": "index_method",
+									"value": "btree"
+								}
+							]
+						}
+					},
+					{
+						"propertyName": "Nulls Distinct",
+						"propertyKeyword": "nullsDistinct",
+						"propertyType": "select",
+						"defaultValue": "",
+						"options": [
+							"",
+							"NULLS DISTINCT",
+							"NULLS NOT DISTINCT"
+						],
+						"dependency": {
+							"type": "and",
+							"values": [
+								{
+									"key": "unique",
+									"value": true
+								},
 								{
 									"key": "index_method",
 									"value": "btree"

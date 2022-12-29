@@ -33,9 +33,16 @@ module.exports = (_, clean) => {
 		return isPrimaryKey(column) && _.isEmpty(column.primaryKeyOptions);
 	};
 
-	const hydrateUniqueOptions = (options, columnName, isActivated, jsonSchema) =>
+	const getUniqueKeyType = (options, dbVersion) => {
+		const nullsDistinct = options['nullsDistinct'];
+		const nullsDistinctExist = dbVersion >= 15 && nullsDistinct;
+
+		return `UNIQUE${nullsDistinctExist ? ` ${nullsDistinct}` : ''}`
+	}
+
+	const hydrateUniqueOptions = ({ options, columnName, isActivated, jsonSchema, dbVersion }) =>
 		clean({
-			keyType: 'UNIQUE',
+			keyType: getUniqueKeyType(options, dbVersion),
 			name: options['constraintName'],
 			columns: [
 				{
@@ -47,6 +54,7 @@ module.exports = (_, clean) => {
 			storageParameters: options['indexStorageParameters'],
 			comment: options['indexComment'],
 			tablespace: options['indexTablespace'],
+			nullsDistinct: options['nullsDistinct'],
 		});
 
 	const hydratePrimaryKeyOptions = (options, columnName, isActivated, jsonSchema) =>
@@ -104,7 +112,7 @@ module.exports = (_, clean) => {
 		);
 	};
 
-	const getCompositeUniqueKeys = jsonSchema => {
+	const getCompositeUniqueKeys = (jsonSchema, dbVersion) => {
 		if (!Array.isArray(jsonSchema.uniqueKey)) {
 			return [];
 		}
@@ -112,7 +120,7 @@ module.exports = (_, clean) => {
 		return jsonSchema.uniqueKey.map(uniqueKey =>
 			!_.isEmpty(uniqueKey.compositeUniqueKey)
 				? {
-						...hydrateUniqueOptions(uniqueKey, null, null, jsonSchema),
+						...hydrateUniqueOptions({ options: uniqueKey, columnName: null, isActivated: null, jsonSchema, dbVersion }),
 						columns: getKeys(uniqueKey.compositeUniqueKey, jsonSchema),
 				  }
 				: {
@@ -122,7 +130,7 @@ module.exports = (_, clean) => {
 		);
 	};
 
-	const getTableKeyConstraints = jsonSchema => {
+	const getTableKeyConstraints = (jsonSchema, dbVersion) => {
 		if (!jsonSchema.properties) {
 			return [];
 		}
@@ -146,7 +154,7 @@ module.exports = (_, clean) => {
 				}
 
 				return schema.uniqueKeyOptions.map(uniqueKey =>
-					hydrateUniqueOptions(uniqueKey, name, schema.isActivated, jsonSchema),
+					hydrateUniqueOptions({ options: uniqueKey, columnName: name, isActivated: schema.isActivated, jsonSchema, dbVersion }),
 				);
 			}),
 		).filter(Boolean);
@@ -155,7 +163,7 @@ module.exports = (_, clean) => {
 			...primaryKeyConstraints,
 			...getCompositePrimaryKeys(jsonSchema),
 			...uniqueKeyConstraints,
-			...getCompositeUniqueKeys(jsonSchema),
+			...getCompositeUniqueKeys(jsonSchema, dbVersion),
 		];
 	};
 
