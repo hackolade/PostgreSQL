@@ -1,5 +1,3 @@
-const db = require("../../reverse_engineering/helpers/db");
-
 const POSTGRES_RESERVED_WORDS = [
 	'ALL',
 	'ANALYSE',
