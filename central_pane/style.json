@@ -3,5 +3,26 @@
 		"erd": {
 			"width": 300
 		}
+	},
+	"field": {
+		"erd": [
+			"keys",
+			"type",
+			[
+				{
+					"value": {
+						"template": "[{array_size_limit}]",
+						"defaultValue": "x",
+						"key": "array_type.*.array_size_limit"
+					},
+					"dependency": {
+						"key": "array_type",
+						"minLength": 1
+					}
+				}
+			],
+			"indexes",
+			"refType"
+		]
 	}
 }
