@@ -16,9 +16,19 @@
 						"key": "array_type.*.array_size_limit"
 					},
 					"dependency": {
-						"key": "array_type",
-						"minLength": 1
-					}
+						"type": "or",
+						"values": [
+							{
+								"key": "array_type",
+								"minLength": 1
+							},
+							{
+								"key": "array_size_limit",
+								"exist": true
+							}
+						]
+					},
+					"width": "auto"
 				}
 			],
 			"indexes",
