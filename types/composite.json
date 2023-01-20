@@ -3,10 +3,13 @@
     "erdAbbreviation": "<cmp>",
     "dtdAbbreviation": "{...}",
     "parentType": "document",
-    "hiddenOnEntity": [
-        "collection",
-        "view"
-    ],
+    "hiddenOnEntity": ["view"],
+	"dependency": {
+		"level": "parent",
+		"key": "type",
+		"value": "definitions"
+	},
+	"disabledTooltip": "For these datatypes, the PostgreSQL specification requires that you create first a UDT, then reference it in your model.",
     "defaultValues": {
         "properties": []
     }

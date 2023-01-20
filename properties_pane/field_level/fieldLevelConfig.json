@@ -4697,6 +4697,33 @@ making sure that you maintain a proper JSON format.
 				"propertyType": "text"
 			},
 			{
+				"propertyName": "Array type",
+				"propertyType": "group",
+				"propertyKeyword": "array_type",
+				"propertyTooltip": "Declaring the array number of dimensions is simply for documentation; it does not affect run-time behavior.",
+				"enableForReference": true,
+				"dependency": {
+					"type": "or",
+					"values": [
+						{
+							"key": "$ref",
+							"exist": true
+						}
+					]
+				},
+				"structure": [
+					{
+						"propertyName": "Size limit",
+						"propertyKeyword": "array_size_limit",
+						"propertyTooltip": "Declaring the array size is simply for documentation; it does not affect run-time behavior.",
+						"propertyType": "numeric",
+						"valueType": "number",
+						"minValue": 0,
+						"step": 1
+					}
+				]
+			},
+			{
 				"propertyName": "Not null",
 				"propertyKeyword": "required",
 				"enableForReference": true,
@@ -4742,7 +4769,6 @@ making sure that you maintain a proper JSON format.
 				"propertyType": "details",
 				"template": "textarea"
 			}
-		],
-		"___2": []
+		]
 	}
 }
