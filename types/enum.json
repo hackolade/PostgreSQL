@@ -3,7 +3,9 @@
 	"erdAbbreviation": "<enum>",
 	"dtdAbbreviation": "{enum}",
 	"parentType": "string",
-	"hiddenOnEntity": ["view"],
+	"hiddenOnEntity": [
+		"view"
+	],
 	"dependency": {
 		"level": "parent",
 		"key": "type",
