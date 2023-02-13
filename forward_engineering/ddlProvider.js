@@ -441,9 +441,10 @@ module.exports = (baseProvider, options, app) => {
 				? `check_option=${viewData.viewOptions?.check_option}`
 				: '';
 			const security_barrier = viewData.viewOptions?.security_barrier ? `security_barrier` : '';
+			const security_invoker = viewData.viewOptions?.security_invoker ? 'security_invoker' : '';
 			const withOptions =
-				check_option || security_barrier
-					? `\n\tWITH (${_.compact([check_option, security_barrier]).join(',')})`
+				check_option || security_barrier || security_invoker
+					? `\n\tWITH (${_.compact([check_option, security_barrier, security_invoker]).join(',')})`
 					: '';
 
 			const getCheckOption = viewData => {
