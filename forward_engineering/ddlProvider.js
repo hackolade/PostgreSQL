@@ -425,7 +425,7 @@ module.exports = (baseProvider, options, app) => {
 					? commentIfDeactivated(dividedColumns.deactivatedItems.join(',\n\t\t'), {
 							isActivated: false,
 							isPartOfLine: true,
-					  })
+						})
 					: '';
 				columnsAsString = dividedColumns.activatedItems.join(',\n\t\t') + deactivatedColumnsString;
 			}
@@ -435,15 +435,15 @@ module.exports = (baseProvider, options, app) => {
 				: assignTemplates(templates.viewSelectStatement, {
 						tableName: tables.join(', '),
 						keys: columnsAsString,
-				  });
+					});
 
 			const check_option = viewData.viewOptions?.check_option
 				? `check_option=${viewData.viewOptions?.check_option}`
 				: '';
 			const security_barrier = viewData.viewOptions?.security_barrier ? `security_barrier` : '';
-      		const dbVersionWhereSecurityInvokerAppeared = 15;
+					const dbVersionWhereSecurityInvokerAppeared = 15;
 			const security_invoker = viewData.viewOptions?.security_invoker &&
-      		getDbVersion(dbData.dbVersion) >= dbVersionWhereSecurityInvokerAppeared ? 'security_invoker' : '';
+					getDbVersion(dbData.dbVersion) >= dbVersionWhereSecurityInvokerAppeared ? 'security_invoker' : '';
 			const withOptions =
 				check_option || security_barrier || security_invoker
 					? `\n\tWITH (${_.compact([check_option, security_barrier, security_invoker]).join(',')})`
