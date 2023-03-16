@@ -116,7 +116,7 @@ module.exports = ({ _, divideIntoActivatedAndDeactivated, commentIfDeactivated }
 	};
 
 	const wrapInQuotes = name =>
-		/\s/.test(name) || _.includes(POSTGRES_RESERVED_WORDS, _.toUpper(name)) ? `"${name}"` : name;
+		/\s|\W/.test(name) || _.includes(POSTGRES_RESERVED_WORDS, _.toUpper(name)) ? `"${name}"` : name;
 
 	const columnMapToString = ({ name }) => wrapInQuotes(name);
 
