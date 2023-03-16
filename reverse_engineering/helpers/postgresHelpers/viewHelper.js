@@ -1,4 +1,4 @@
-const { clearEmptyPropertiesInObject } = require('./common');
+const { clearEmptyPropertiesInObject, wrapInQuotes } = require('./common');
 
 let _ = null;
 
@@ -20,7 +20,7 @@ const generateCreateViewScript = (viewName, viewData, viewDefinitionFallback = {
 		return '';
 	}
 
-	return `CREATE VIEW ${viewName} AS ${selectStatement}`;
+	return `CREATE VIEW ${wrapInQuotes(viewName)} AS ${selectStatement}`;
 };
 
 const prepareViewData = (viewData, viewOptions, triggers) => {
