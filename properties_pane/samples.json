@@ -1,0 +1,42 @@
+[
+	{
+		"validateAs": "number",
+		"constraintsFromField": {
+			"min": "minimum",
+			"exclusiveMin": "exclusiveMinimum",
+			"max": "maximum",
+			"exclusiveMax": "exclusiveMaximum",
+			"multipleOf": "multipleOf",
+			"divisibleBy": "divisibleBy"
+		},
+		"dependency": {
+			"type": "and",
+			"values": [
+				{
+					"key": "childType",
+					"value": "numeric"
+				},
+				{
+					"key": "default",
+					"valueType": "number"
+				}
+			]
+		}
+	},
+    {
+		"validateAs": "string",
+		"dependency": {
+			"type": "and",
+			"values": [
+				{
+					"key": "childType",
+					"value": "numeric"
+				},
+				{
+					"key": "default",
+					"valueType": "string"
+				}
+			]
+		}
+	}
+]
