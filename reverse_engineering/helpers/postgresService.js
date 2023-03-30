@@ -45,7 +45,7 @@ const {
 } = require('./postgresHelpers/viewHelper');
 const { setDependencies: setDependenciesInTriggerHelper, getTriggers } = require('./postgresHelpers/triggerHelper');
 const queryConstants = require('./queryConstants');
-const { reorganizePrimaryKeys } = require('./postgresHelpers/reorganizePrimaryKeys');
+const { reorganizeConstraints } = require('./postgresHelpers/reorganizeConstraints');
 
 let currentSshTunnel = null;
 let _ = null;
@@ -305,7 +305,7 @@ module.exports = {
 			targetAttributes = setSubtypeFromSampledJsonValues(targetAttributes, documents);
 		}
 
-		const { attributes, entityLevel: updatedEntityLevel } = reorganizePrimaryKeys(targetAttributes, entityLevel);
+		const { attributes, entityLevel: updatedEntityLevel } = reorganizeConstraints(targetAttributes, entityLevel);
 
 		return {
 			name: tableName,
