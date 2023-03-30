@@ -25,7 +25,7 @@ const setPrimaryKeyData = (attribute, primaryKey) => {
 		primaryKeyOptions: [
 			{
 				constraintName: primaryKey.constraintName,
-				indexInclude: primaryKey.include,
+				indexInclude: primaryKey.indexInclude,
 				indexStorageParameters: primaryKey.indexStorageParameters,
 				indexTablespace: primaryKey.indexTablespace,
 				indexComment: primaryKey.indexComment,

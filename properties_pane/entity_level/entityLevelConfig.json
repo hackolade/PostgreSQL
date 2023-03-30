@@ -188,12 +188,7 @@ making sure that you maintain a proper JSON format.
 						"propertyTooltip": "Choose the desired partition method",
 						"propertyType": "select",
 						"defaultValue": "",
-						"options": [
-							"",
-							"RANGE",
-							"LIST",
-							"HASH"
-						]
+						"options": ["", "RANGE", "LIST", "HASH"]
 					},
 					{
 						"propertyName": "Partition by",
@@ -201,10 +196,7 @@ making sure that you maintain a proper JSON format.
 						"propertyTooltip": "",
 						"propertyType": "select",
 						"defaultValue": "keys",
-						"options": [
-							"keys",
-							"expression"
-						]
+						"options": ["keys", "expression"]
 					},
 					{
 						"propertyName": "Partition key",
@@ -599,11 +591,7 @@ making sure that you maintain a proper JSON format.
 				"propertyTooltip": "Controls the behavior of temporary tables at the end of a transaction block can be controlled.",
 				"propertyType": "select",
 				"defaultValue": "PRESERVE ROWS",
-				"options": [
-					"PRESERVE ROWS",
-					"DELETE ROWS",
-					"DROP"
-				],
+				"options": ["PRESERVE ROWS", "DELETE ROWS", "DROP"],
 				"dependency": {
 					"key": "temporary",
 					"value": true
@@ -633,10 +621,7 @@ making sure that you maintain a proper JSON format.
 				"valueType": "string"
 			}
 		],
-		"columnsRatio": [
-			3.7,
-			5
-		]
+		"columnsRatio": [3.7, 5]
 	},
 	{
 		"lowerTab": "Composite keys",
@@ -668,7 +653,7 @@ making sure that you maintain a proper JSON format.
 									}
 								]
 							}
-						}, 
+						},
 						{
 							"tooltip": "Remove or update the existing composite primary key definition prior to unlock the possibility to create a new composite primary key definition for this table",
 							"dependency": {
@@ -698,7 +683,7 @@ making sure that you maintain a proper JSON format.
 					},
 					{
 						"propertyName": "Include non-key columns",
-						"propertyKeyword": "include",
+						"propertyKeyword": "indexInclude",
 						"propertyType": "fieldList",
 						"template": "orderedList",
 						"propertyTooltip": "The optional INCLUDE clause specifies a list of columns which will be included in the constraint as non-key columns."
@@ -792,7 +777,7 @@ making sure that you maintain a proper JSON format.
 					},
 					{
 						"propertyName": "Include non-key columns",
-						"propertyKeyword": "include",
+						"propertyKeyword": "indexInclude",
 						"propertyType": "fieldList",
 						"template": "orderedList",
 						"propertyTooltip": "The optional INCLUDE clause specifies a list of columns which will be included in the constraint as non-key columns."
@@ -824,11 +809,7 @@ making sure that you maintain a proper JSON format.
 						"propertyKeyword": "nullsDistinct",
 						"propertyType": "select",
 						"defaultValue": "",
-						"options": [
-							"",
-							"NULLS DISTINCT",
-							"NULLS NOT DISTINCT"
-						]
+						"options": ["", "NULLS DISTINCT", "NULLS NOT DISTINCT"]
 					}
 				]
 			}
@@ -862,14 +843,7 @@ making sure that you maintain a proper JSON format.
 						"propertyTooltip": "",
 						"propertyType": "select",
 						"defaultValue": "btree",
-						"options": [
-							"btree",
-							"hash",
-							"gist",
-							"spgist",
-							"gin",
-							"brin"
-						]
+						"options": ["btree", "hash", "gist", "spgist", "gin", "brin"]
 					},
 					{
 						"propertyName": "Unique",
@@ -892,11 +866,7 @@ making sure that you maintain a proper JSON format.
 						"propertyKeyword": "nullsDistinct",
 						"propertyType": "select",
 						"defaultValue": "",
-						"options": [
-							"",
-							"NULLS DISTINCT",
-							"NULLS NOT DISTINCT"
-						],
+						"options": ["", "NULLS DISTINCT", "NULLS NOT DISTINCT"],
 						"dependency": {
 							"type": "and",
 							"values": [
@@ -967,19 +937,12 @@ making sure that you maintain a proper JSON format.
 						"attributeList": {
 							"sortOrder": {
 								"propertyType": "select",
-								"options": [
-									"ASC",
-									"DESC"
-								],
+								"options": ["ASC", "DESC"],
 								"propertyTooltip": "Specifies sort order"
 							},
 							"nullsOrder": {
 								"propertyType": "select",
-								"options": [
-									"",
-									"NULLS FIRST",
-									"NULLS LAST"
-								],
+								"options": ["", "NULLS FIRST", "NULLS LAST"],
 								"propertyTooltip": "Specifies that nulls sort order"
 							},
 							"collation": {
@@ -1068,10 +1031,7 @@ making sure that you maintain a proper JSON format.
 						],
 						"dependency": {
 							"key": "index_method",
-							"value": [
-								"hash",
-								"spgist"
-							]
+							"value": ["hash", "spgist"]
 						}
 					},
 					{
@@ -1096,11 +1056,7 @@ making sure that you maintain a proper JSON format.
 								"propertyKeyword": "index_buffering",
 								"propertyType": "select",
 								"propertyTooltip": "Determines whether the buffering build technique is used to build the index.",
-								"options": [
-									"AUTO",
-									"OFF",
-									"ON"
-								],
+								"options": ["AUTO", "OFF", "ON"],
 								"defaultValue": "AUTO"
 							}
 						],
@@ -1294,11 +1250,7 @@ making sure that you maintain a proper JSON format.
 						"propertyKeyword": "triggerType",
 						"propertyTooltip": "Determines whether the function is called before, after, or instead of the event.",
 						"propertyType": "select",
-						"options": [
-							"BEFORE",
-							"AFTER",
-							"INSTEAD OF"
-						],
+						"options": ["BEFORE", "AFTER", "INSTEAD OF"],
 						"defaultValue": "AFTER"
 					},
 					{
@@ -1311,12 +1263,7 @@ making sure that you maintain a proper JSON format.
 								"propertyKeyword": "triggerEvent",
 								"propertyTooltip": "This specifies the event that will fire the trigger",
 								"propertyType": "select",
-								"options": [
-									"INSERT",
-									"UPDATE",
-									"DELETE",
-									"TRUNCATE"
-								]
+								"options": ["INSERT", "UPDATE", "DELETE", "TRUNCATE"]
 							}
 						]
 					},
@@ -1347,11 +1294,7 @@ making sure that you maintain a proper JSON format.
 						"propertyName": "Deferrable",
 						"propertyKeyword": "triggerTimeConstraintCheck",
 						"propertyType": "select",
-						"options": [
-							"",
-							"INITIALLY IMMEDIATE",
-							"INITIALLY DEFERRED"
-						],
+						"options": ["", "INITIALLY IMMEDIATE", "INITIALLY DEFERRED"],
 						"propertyTooltip": "If a constraint is deferrable, this clause specifies the default time to check the constraint. If the constraint is INITIALLY IMMEDIATE, it is checked after each statement. This is the default. If the constraint is INITIALLY DEFERRED, it is checked only at the end of the transaction.",
 						"dependency": {
 							"type": "and",
@@ -1398,10 +1341,7 @@ making sure that you maintain a proper JSON format.
 						"propertyKeyword": "triggerEachRowStatement",
 						"propertyType": "select",
 						"propertyTooltip": "This specifies whether the trigger function should be fired once for every row affected by the trigger event, or just once per SQL statement.",
-						"options": [
-							"FOR EACH STATEMENT",
-							"FOR EACH ROW"
-						],
+						"options": ["FOR EACH STATEMENT", "FOR EACH ROW"],
 						"dependency": {
 							"type": "not",
 							"values": {
