@@ -14,7 +14,11 @@ module.exports = (_, clean) => {
 	};
 
 	const isInlineUnique = column => {
-		return isUniqueKey(column) && _.isEmpty(column.uniqueKeyOptions);
+		return (
+			isUniqueKey(column) &&
+			((column.uniqueKeyOptions?.length === 1 && !_.first(column.uniqueKeyOptions)?.constraintName) ||
+				_.isEmpty(column.uniqueKeyOptions))
+		);
 	};
 
 	const isPrimaryKey = column => {
@@ -30,15 +34,15 @@ module.exports = (_, clean) => {
 	};
 
 	const isInlinePrimaryKey = column => {
-		return isPrimaryKey(column) && _.isEmpty(column.primaryKeyOptions);
+		return isPrimaryKey(column) && !_.first(column.primaryKeyOptions)?.constraintName;
 	};
 
 	const getUniqueKeyType = (options, dbVersion) => {
 		const nullsDistinct = options['nullsDistinct'];
 		const nullsDistinctExist = dbVersion >= 15 && nullsDistinct;
 
-		return `UNIQUE${nullsDistinctExist ? ` ${nullsDistinct}` : ''}`
-	}
+		return `UNIQUE${nullsDistinctExist ? ` ${nullsDistinct}` : ''}`;
+	};
 
 	const hydrateUniqueOptions = ({ options, columnName, isActivated, jsonSchema, dbVersion }) =>
 		clean({
@@ -120,7 +124,13 @@ module.exports = (_, clean) => {
 		return jsonSchema.uniqueKey.map(uniqueKey =>
 			!_.isEmpty(uniqueKey.compositeUniqueKey)
 				? {
-						...hydrateUniqueOptions({ options: uniqueKey, columnName: null, isActivated: null, jsonSchema, dbVersion }),
+						...hydrateUniqueOptions({
+							options: uniqueKey,
+							columnName: null,
+							isActivated: null,
+							jsonSchema,
+							dbVersion,
+						}),
 						columns: getKeys(uniqueKey.compositeUniqueKey, jsonSchema),
 				  }
 				: {
@@ -136,9 +146,7 @@ module.exports = (_, clean) => {
 		}
 
 		const primaryKeyConstraints = mapProperties(jsonSchema, ([name, schema]) => {
-			if (!isPrimaryKey(schema)) {
-				return;
-			} else if (_.isEmpty(schema.primaryKeyOptions)) {
+			if (!isPrimaryKey(schema) || isInlinePrimaryKey(schema)) {
 				return;
 			}
 
@@ -147,14 +155,18 @@ module.exports = (_, clean) => {
 
 		const uniqueKeyConstraints = _.flatten(
 			mapProperties(jsonSchema, ([name, schema]) => {
-				if (!isUniqueKey(schema)) {
-					return [];
-				} else if (_.isEmpty(schema.uniqueKeyOptions) || !Array.isArray(schema.uniqueKeyOptions)) {
+				if (!isUniqueKey(schema) || isInlineUnique(schema)) {
 					return [];
 				}
 
-				return schema.uniqueKeyOptions.map(uniqueKey =>
-					hydrateUniqueOptions({ options: uniqueKey, columnName: name, isActivated: schema.isActivated, jsonSchema, dbVersion }),
+				return (schema.uniqueKeyOptions || []).map(uniqueKey =>
+					hydrateUniqueOptions({
+						options: uniqueKey,
+						columnName: name,
+						isActivated: schema.isActivated,
+						jsonSchema,
+						dbVersion,
+					}),
 				);
 			}),
 		).filter(Boolean);
@@ -172,5 +184,7 @@ module.exports = (_, clean) => {
 		isInlineUnique,
 		isInlinePrimaryKey,
 		getKeys,
+		hydratePrimaryKeyOptions,
+		hydrateUniqueOptions,
 	};
 };
