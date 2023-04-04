@@ -421,8 +421,14 @@ const isSystemSchema = schema_name => {
 	return false;
 };
 
-const getGetIndexesQuery = postgreVersion => {
-	return postgreVersion === 10 ? queryConstants.GET_TABLE_INDEXES_V_10 : queryConstants.GET_TABLE_INDEXES;
+const getGetIndexesQuery = postgresVersion => {
+	if (postgresVersion === 10) {
+		return queryConstants.GET_TABLE_INDEXES_V_10;
+	} else if (postgresVersion > 15) {
+		return queryConstants.GET_TABLE_INDEXES_V_15;
+	} else {
+		return queryConstants.GET_TABLE_INDEXES;
+	}
 };
 
 const getGetFunctionsAdditionalDataQuery = postgreVersion => {
