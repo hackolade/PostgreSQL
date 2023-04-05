@@ -48,8 +48,10 @@ module.exports = ({
 
 	const createKeyConstraint = (templates, isParentActivated) => keyData => {
 		const constraintName = wrapInQuotes(_.trim(keyData.name));
-		const isAllColumnsDeactivated = checkAllKeysDeactivated(keyData.columns);
-		const columns = getColumnsList(keyData.columns, isAllColumnsDeactivated, isParentActivated);
+		const isAllColumnsDeactivated = checkAllKeysDeactivated(keyData.columns || []);
+		const columns = !_.isEmpty(keyData.columns)
+			? getColumnsList(keyData.columns, isAllColumnsDeactivated, isParentActivated)
+			: '';
 		const includeNonKey = keyData.include.length
 			? ` INCLUDE${getColumnsList(keyData.include, isAllColumnsDeactivated, isParentActivated)}`
 			: '';
@@ -68,7 +70,6 @@ module.exports = ({
 			isActivated: !isAllColumnsDeactivated,
 		};
 	};
-
 
 	const getConstraintsWarnings = (invalidConstraints = []) => {
 		if (_.isEmpty(invalidConstraints)) {
@@ -91,7 +92,7 @@ module.exports = ({
 		const foreignOnDelete = _.get(relationship, 'relationshipOnDelete', '');
 		const foreignOnUpdate = _.get(relationship, 'relationshipOnUpdate', '');
 		const foreignMatch = _.get(relationship, 'relationshipMatch', '');
-		return { foreignOnDelete, foreignOnUpdate, foreignMatch }
+		return { foreignOnDelete, foreignOnUpdate, foreignMatch };
 	};
 
 	return {

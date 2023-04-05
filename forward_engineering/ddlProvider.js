@@ -21,7 +21,7 @@ module.exports = (baseProvider, options, app) => {
 		getColumnsList,
 		getViewData,
 		wrapComment,
-		getDbVersion
+		getDbVersion,
 	} = require('./helpers/general')({
 		_,
 		divideIntoActivatedAndDeactivated,
@@ -245,15 +245,19 @@ module.exports = (baseProvider, options, app) => {
 
 			return commentIfDeactivated(
 				[tableStatement, createTriggerStatements].map(_.trim).join('\n\n').trim() + '\n',
-				{ isActivated }
+				{ isActivated },
 			);
 		},
 
 		convertColumnDefinition(columnDefinition) {
 			const type = replaceTypeByVersion(columnDefinition.type, columnDefinition.dbVersion);
 			const notNull = columnDefinition.nullable ? '' : ' NOT NULL';
-			const primaryKey = columnDefinition.primaryKey ? ' PRIMARY KEY' : '';
-			const uniqueKey = columnDefinition.unique ? ' UNIQUE' : '';
+			const primaryKey = columnDefinition.primaryKey
+				? ' ' + createKeyConstraint(templates, true)(columnDefinition.primaryKeyOptions).statement
+				: '';
+			const uniqueKey = columnDefinition.unique
+				? ' ' + createKeyConstraint(templates, true)(columnDefinition.uniqueKeyOptions).statement
+				: '';
 			const collation = columnDefinition.collationRule ? ` COLLATE "${columnDefinition.collationRule}"` : '';
 			const defaultValue = !_.isUndefined(columnDefinition.default)
 				? ' DEFAULT ' + decorateDefault(type, columnDefinition.default)
@@ -284,7 +288,7 @@ module.exports = (baseProvider, options, app) => {
 			const only = index.only ? ' ONLY' : '';
 			const using = index.index_method ? ` USING ${_.toUpper(index.index_method)}` : '';
 			const dbVersion = getDbVersion(_.get(dbData, 'dbVersion', ''));
-			const nullsDistinct = isUnique && index.nullsDistinct && dbVersion >= 15 ? `\n ${index.nullsDistinct}` : ''
+			const nullsDistinct = isUnique && index.nullsDistinct && dbVersion >= 15 ? `\n ${index.nullsDistinct}` : '';
 
 			const keys = getIndexKeys(
 				index.index_method === 'btree'
@@ -331,7 +335,7 @@ module.exports = (baseProvider, options, app) => {
 				foreignTableActivated,
 				foreignSchemaName,
 				primarySchemaName,
-				customProperties
+				customProperties,
 			},
 			dbData,
 			schemaData,
@@ -344,7 +348,8 @@ module.exports = (baseProvider, options, app) => {
 				primaryTableActivated &&
 				foreignTableActivated;
 
-			const { foreignOnDelete, foreignOnUpdate, foreignMatch } = additionalPropertiesForForeignKey(customProperties);
+			const { foreignOnDelete, foreignOnUpdate, foreignMatch } =
+				additionalPropertiesForForeignKey(customProperties);
 
 			const foreignKeyStatement = assignTemplates(templates.createForeignKeyConstraint, {
 				primaryTable: getNamePrefixedWithSchemaName(primaryTable, primarySchemaName || schemaData.schemaName),
@@ -386,7 +391,8 @@ module.exports = (baseProvider, options, app) => {
 				primaryTableActivated &&
 				foreignTableActivated;
 
-			const { foreignOnDelete, foreignOnUpdate, foreignMatch } = additionalPropertiesForForeignKey(customProperties);
+			const { foreignOnDelete, foreignOnUpdate, foreignMatch } =
+				additionalPropertiesForForeignKey(customProperties);
 
 			const foreignKeyStatement = assignTemplates(templates.createForeignKey, {
 				primaryTable: getNamePrefixedWithSchemaName(primaryTable, primarySchemaName || schemaData.schemaName),
@@ -425,7 +431,7 @@ module.exports = (baseProvider, options, app) => {
 					? commentIfDeactivated(dividedColumns.deactivatedItems.join(',\n\t\t'), {
 							isActivated: false,
 							isPartOfLine: true,
-						})
+					  })
 					: '';
 				columnsAsString = dividedColumns.activatedItems.join(',\n\t\t') + deactivatedColumnsString;
 			}
@@ -435,15 +441,18 @@ module.exports = (baseProvider, options, app) => {
 				: assignTemplates(templates.viewSelectStatement, {
 						tableName: tables.join(', '),
 						keys: columnsAsString,
-					});
+				  });
 
 			const check_option = viewData.viewOptions?.check_option
 				? `check_option=${viewData.viewOptions?.check_option}`
 				: '';
 			const security_barrier = viewData.viewOptions?.security_barrier ? `security_barrier` : '';
 			const dbVersionWhereSecurityInvokerAppeared = 15;
-			const security_invoker = viewData.viewOptions?.security_invoker &&
-			getDbVersion(dbData.dbVersion) >= dbVersionWhereSecurityInvokerAppeared ? 'security_invoker' : '';
+			const security_invoker =
+				viewData.viewOptions?.security_invoker &&
+				getDbVersion(dbData.dbVersion) >= dbVersionWhereSecurityInvokerAppeared
+					? 'security_invoker'
+					: '';
 			const withOptions =
 				check_option || security_barrier || security_invoker
 					? `\n\tWITH (${_.compact([check_option, security_barrier, security_invoker]).join(',')})`
@@ -518,7 +527,7 @@ module.exports = (baseProvider, options, app) => {
 			};
 		},
 
-		hydrateColumn({ columnDefinition, jsonSchema, schemaData, definitionJsonSchema = {} }) {
+		hydrateColumn({ columnDefinition, jsonSchema, schemaData, definitionJsonSchema = {}, parentJsonSchema }) {
 			const collationRule = _.includes(['char', 'varchar', 'text'], columnDefinition.type)
 				? jsonSchema.collationRule
 				: '';
@@ -527,12 +536,33 @@ module.exports = (baseProvider, options, app) => {
 			const timezone = _.includes(timeTypes, columnDefinition.type) ? jsonSchema.timezone : '';
 			const intervalOptions = columnDefinition.type === 'interval' ? jsonSchema.intervalOptions : '';
 			const dbVersion = schemaData.dbVersion;
+			const primaryKeyOptions = _.omit(
+				keyHelper.hydratePrimaryKeyOptions(
+					_.first(jsonSchema.primaryKeyOptions) || {},
+					columnDefinition.name,
+					columnDefinition.isActivated,
+					parentJsonSchema,
+				),
+				'columns',
+			);
+			const uniqueKeyOptions = _.omit(
+				keyHelper.hydrateUniqueOptions({
+					options: _.first(jsonSchema.uniqueKeyOptions) || {},
+					columnName: columnDefinition.name,
+					isActivated: columnDefinition.isActivated,
+					jsonSchema: parentJsonSchema,
+					dbVersion,
+				}),
+				'columns',
+			);
 
 			return {
 				name: columnDefinition.name,
 				type: columnDefinition.type,
 				primaryKey: keyHelper.isInlinePrimaryKey(jsonSchema),
+				primaryKeyOptions,
 				unique: keyHelper.isInlineUnique(jsonSchema),
+				uniqueKeyOptions,
 				nullable: columnDefinition.nullable,
 				default: columnDefinition.default,
 				comment: jsonSchema.refDescription || jsonSchema.description || definitionJsonSchema.description,
