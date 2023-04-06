@@ -25,7 +25,7 @@ const getGET_TABLE_INDEXES = postgresVersion => {
                     c.relname AS indexname,
                     m.amname AS index_method,
                     indexes.indisunique AS index_unique,
-                    indexes.indnullsnotdistinct AS index_indnullsnotdistinct,
+                    ${postgresVersion === 15 ? 'indexes.indnullsnotdistinct' : 'FALSE' } AS index_indnullsnotdistinct,
                     indexes.ord,
                     attribute.attname,
                      c.reloptions,
@@ -176,6 +176,7 @@ const queryConstants = {
 	        WHERE pcon.conrelid = $1;`,
 	GET_TABLE_INDEXES: getGET_TABLE_INDEXES(),
 	GET_TABLE_INDEXES_V_10: getGET_TABLE_INDEXES(10),
+        GET_TABLE_INDEXES_V_15: getGET_TABLE_INDEXES(15),
 	GET_TABLE_FOREIGN_KEYS: `
         SELECT pcon.conname AS relationship_name, 
                 pcon.conkey AS table_columns_positions,
