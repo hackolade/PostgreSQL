@@ -113,35 +113,62 @@ const getDeleteColumnScript = app => collection => {
 		.map(([name]) => `ALTER TABLE IF EXISTS ${fullName} DROP COLUMN IF EXISTS ${wrapInQuotes(name)};`);
 };
 
-const getModifyColumnScript = app => collection => {
-	const _ = app.require('lodash');
+const getFullTableName = (_) => (collection) => {
 	const { getEntityName } = require('../../utils/general')(_);
-	const { getNamePrefixedWithSchemaName, wrapInQuotes } = require('../general')({ _ });
+	const { getNamePrefixedWithSchemaName } = require('../general')({ _ });
 
 	const collectionSchema = { ...collection, ...(_.omit(collection?.role, 'properties') || {}) };
 	const tableName = getEntityName(collectionSchema);
 	const schemaName = collectionSchema.compMod?.keyspaceName;
-	const fullName = getNamePrefixedWithSchemaName(tableName, schemaName);
+	return getNamePrefixedWithSchemaName(tableName, schemaName);
+}
+
+const hasLengthChanged = (collection, fieldName) => {
+	const previousLength = collection.role.properties[fieldName]?.length;
+	const newLength = collection.role.compMod?.newProperties?.find(newProperty => newProperty.name === fieldName)?.length;
+	const missingValue = [previousLength, newLength].find(e => e === null || e === undefined);
+	return !missingValue && previousLength !== newLength;
+}
+
+const getUpdateTypesScripts = (_) => (collection) => {
+	const fullTableName = getFullTableName(_)(collection);
+	const { wrapInQuotes } = require('../general')({ _ });
+
+	const changeTypeScripts = _.toPairs(collection.properties)
+		.filter(([name, jsonSchema]) => {
+			const hasTypeChanged = checkFieldPropertiesChanged(jsonSchema.compMod, ['type', 'mode']);
+			if (!hasTypeChanged) {
+				const isNewLength = hasLengthChanged(collection, name);
+				return isNewLength;
+			}
+			return hasTypeChanged;
+		})
+		.map(
+			([name, jsonSchema]) =>
+				`ALTER TABLE IF EXISTS ${fullTableName} ALTER COLUMN ${wrapInQuotes(name)} SET DATA TYPE ${
+					jsonSchema.compMod.newField.mode || jsonSchema.compMod.newField.type
+				};`,
+		);
+	return [...changeTypeScripts];
+}
+
+const getModifyColumnScript = app => collection => {
+	const _ = app.require('lodash');
+
+	const fullTableName = getFullTableName(_)(collection);
 
 	const renameColumnScripts = _.values(collection.properties)
 		.filter(jsonSchema => checkFieldPropertiesChanged(jsonSchema.compMod, ['name']))
 		.map(
 			jsonSchema =>
-				`ALTER TABLE IF EXISTS ${fullName} RENAME COLUMN ${wrapInQuotes(
+				`ALTER TABLE IF EXISTS ${fullTableName} RENAME COLUMN ${wrapInQuotes(
 					jsonSchema.compMod.oldField.name,
 				)} TO ${wrapInQuotes(jsonSchema.compMod.newField.name)};`,
 		);
 
-	const changeTypeScripts = _.toPairs(collection.properties)
-		.filter(([name, jsonSchema]) => checkFieldPropertiesChanged(jsonSchema.compMod, ['type', 'mode']))
-		.map(
-			([name, jsonSchema]) =>
-				`ALTER TABLE IF EXISTS ${fullName} ALTER COLUMN ${wrapInQuotes(name)} SET DATA TYPE ${
-					jsonSchema.compMod.newField.mode || jsonSchema.compMod.newField.type
-				};`,
-		);
+	const updateTypeScripts = getUpdateTypesScripts(_)(collection);
 
-	return [...renameColumnScripts, ...changeTypeScripts];
+	return [...renameColumnScripts, ...updateTypeScripts];
 };
 
 module.exports = {
