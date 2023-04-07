@@ -535,7 +535,7 @@ module.exports = (baseProvider, options, app) => {
 			const timePrecision = _.includes(timeTypes, columnDefinition.type) ? jsonSchema.timePrecision : '';
 			const timezone = _.includes(timeTypes, columnDefinition.type) ? jsonSchema.timezone : '';
 			const intervalOptions = columnDefinition.type === 'interval' ? jsonSchema.intervalOptions : '';
-			const dbVersion = schemaData.dbVersion;
+			const dbVersion = getDbVersion(schemaData.dbVersion)
 			const primaryKeyOptions = _.omit(
 				keyHelper.hydratePrimaryKeyOptions(
 					_.first(jsonSchema.primaryKeyOptions) || {},
