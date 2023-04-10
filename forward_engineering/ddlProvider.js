@@ -1,6 +1,7 @@
 const defaultTypes = require('./configs/defaultTypes');
 const types = require('./configs/types');
 const templates = require('./configs/templates');
+const assignTemplates = require("./utils/assignTemplates");
 
 module.exports = (baseProvider, options, app) => {
 	const _ = app.require('lodash');
@@ -730,6 +731,28 @@ module.exports = (baseProvider, options, app) => {
 				columnName,
 				dataType: dataTypeString,
 			})
+		},
+
+		/**
+		 * @param tableName {string}
+		 * @param columnName {string}
+		 * */
+		setNotNullConstraint(tableName, columnName) {
+			return assignTemplates(templates.addNotNullConstraint, {
+				tableName,
+				columnName
+			});
+		},
+
+		/**
+		 * @param tableName {string}
+		 * @param columnName {string}
+		 * */
+		dropNotNullConstraint(tableName, columnName) {
+			return assignTemplates(templates.dropNotNullConstraint, {
+				tableName,
+				columnName
+			});
 		}
 	};
 };
