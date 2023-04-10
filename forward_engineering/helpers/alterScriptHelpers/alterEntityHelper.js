@@ -127,18 +127,18 @@ const extractNewPropertyByName = (collection, fieldName) => {
     return collection.role.compMod?.newProperties?.find(newProperty => newProperty.name === fieldName);
 }
 
-const hasLengthChanged = (collection, fieldName) => {
-    const oldProperty = collection.role.properties[fieldName];
-    const newProperty = extractNewPropertyByName(collection, fieldName);
+const hasLengthChanged = (collection, newFieldName, oldFieldName) => {
+    const oldProperty = collection.role.properties[oldFieldName];
+    const newProperty = extractNewPropertyByName(collection, newFieldName);
 
     const previousLength = oldProperty?.length;
     const newLength = newProperty?.length;
     return previousLength !== newLength;
 }
 
-const hasPrecisionOrScaleChanged = (collection, fieldName) => {
-    const oldProperty = collection.role.properties[fieldName];
-    const newProperty = extractNewPropertyByName(collection, fieldName);
+const hasPrecisionOrScaleChanged = (collection, newFieldName, oldFieldName) => {
+    const oldProperty = collection.role.properties[oldFieldName];
+    const newProperty = extractNewPropertyByName(collection, newFieldName);
 
     const previousPrecision = oldProperty?.precision;
     const newPrecision = newProperty?.precision;
@@ -156,8 +156,9 @@ const getUpdateTypesScripts = (_, ddlProvider) => (collection) => {
         .filter(([name, jsonSchema]) => {
             const hasTypeChanged = checkFieldPropertiesChanged(jsonSchema.compMod, ['type', 'mode']);
             if (!hasTypeChanged) {
-                const isNewLength = hasLengthChanged(collection, name);
-                const isNewPrecisionOrScale = hasPrecisionOrScaleChanged(collection, name);
+                const oldName = jsonSchema.compMod.oldField.name;
+                const isNewLength = hasLengthChanged(collection, name, oldName);
+                const isNewPrecisionOrScale = hasPrecisionOrScaleChanged(collection, name, oldName);
                 return isNewLength || isNewPrecisionOrScale;
             }
             return hasTypeChanged;
