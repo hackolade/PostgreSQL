@@ -124,10 +124,24 @@ const getFullTableName = (_) => (collection) => {
 }
 
 const hasLengthChanged = (collection, fieldName) => {
-	const previousLength = collection.role.properties[fieldName]?.length;
-	const newLength = collection.role.compMod?.newProperties?.find(newProperty => newProperty.name === fieldName)?.length;
-	const missingValue = [previousLength, newLength].find(e => e === null || e === undefined);
-	return !missingValue && previousLength !== newLength;
+	const oldProperty = collection.role.properties[fieldName];
+	const newProperty = collection.role.compMod?.newProperties?.find(newProperty => newProperty.name === fieldName);
+
+	const previousLength = oldProperty?.length;
+	const newLength = newProperty?.length;
+	return previousLength !== newLength;
+}
+
+const hasPrecisionOrScaleChanged = (collection, fieldName) => {
+	const oldProperty = collection.role.properties[fieldName];
+	const newProperty = collection.role.compMod?.newProperties?.find(newProperty => newProperty.name === fieldName);
+
+	const previousPrecision = oldProperty?.precision;
+	const newPrecision = newProperty?.precision;
+	const previousScale = oldProperty?.scale;
+	const newScale = newProperty?.scale;
+
+	return previousPrecision !== newPrecision || previousScale !== newScale;
 }
 
 const getUpdateTypesScripts = (_) => (collection) => {
@@ -139,7 +153,8 @@ const getUpdateTypesScripts = (_) => (collection) => {
 			const hasTypeChanged = checkFieldPropertiesChanged(jsonSchema.compMod, ['type', 'mode']);
 			if (!hasTypeChanged) {
 				const isNewLength = hasLengthChanged(collection, name);
-				return isNewLength;
+				const isNewPrecisionOrScale = hasPrecisionOrScaleChanged(collection, name);
+				return isNewLength || isNewPrecisionOrScale;
 			}
 			return hasTypeChanged;
 		})
