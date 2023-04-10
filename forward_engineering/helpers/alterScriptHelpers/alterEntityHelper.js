@@ -123,9 +123,13 @@ const getFullTableName = (_) => (collection) => {
 	return getNamePrefixedWithSchemaName(tableName, schemaName);
 }
 
+const extractNewPropertyByName = (collection, fieldName) => {
+	return collection.role.compMod?.newProperties?.find(newProperty => newProperty.name === fieldName);
+}
+
 const hasLengthChanged = (collection, fieldName) => {
 	const oldProperty = collection.role.properties[fieldName];
-	const newProperty = collection.role.compMod?.newProperties?.find(newProperty => newProperty.name === fieldName);
+	const newProperty = extractNewPropertyByName(collection, fieldName);
 
 	const previousLength = oldProperty?.length;
 	const newLength = newProperty?.length;
@@ -134,7 +138,7 @@ const hasLengthChanged = (collection, fieldName) => {
 
 const hasPrecisionOrScaleChanged = (collection, fieldName) => {
 	const oldProperty = collection.role.properties[fieldName];
-	const newProperty = collection.role.compMod?.newProperties?.find(newProperty => newProperty.name === fieldName);
+	const newProperty = extractNewPropertyByName(collection, fieldName);
 
 	const previousPrecision = oldProperty?.precision;
 	const newPrecision = newProperty?.precision;
@@ -144,7 +148,7 @@ const hasPrecisionOrScaleChanged = (collection, fieldName) => {
 	return previousPrecision !== newPrecision || previousScale !== newScale;
 }
 
-const getUpdateTypesScripts = (_) => (collection) => {
+const getUpdateTypesScripts = (_, ddlProvider) => (collection) => {
 	const fullTableName = getFullTableName(_)(collection);
 	const { wrapInQuotes } = require('../general')({ _ });
 
@@ -159,16 +163,20 @@ const getUpdateTypesScripts = (_) => (collection) => {
 			return hasTypeChanged;
 		})
 		.map(
-			([name, jsonSchema]) =>
-				`ALTER TABLE IF EXISTS ${fullTableName} ALTER COLUMN ${wrapInQuotes(name)} SET DATA TYPE ${
-					jsonSchema.compMod.newField.mode || jsonSchema.compMod.newField.type
-				};`,
+			([name, jsonSchema]) => {
+				const typeName = jsonSchema.compMod.newField.mode || jsonSchema.compMod.newField.type;
+				const columnName = wrapInQuotes(name);
+				const newProperty = extractNewPropertyByName(collection, name);
+				const typeConfig = _.pick(newProperty, ['length', 'precision', 'scale']);
+				return ddlProvider.alterColumnType(fullTableName, columnName, typeName, typeConfig);
+			}
 		);
 	return [...changeTypeScripts];
 }
 
 const getModifyColumnScript = app => collection => {
 	const _ = app.require('lodash');
+	const ddlProvider = require('../../ddlProvider')(null, null, app);
 
 	const fullTableName = getFullTableName(_)(collection);
 
@@ -181,7 +189,7 @@ const getModifyColumnScript = app => collection => {
 				)} TO ${wrapInQuotes(jsonSchema.compMod.newField.name)};`,
 		);
 
-	const updateTypeScripts = getUpdateTypesScripts(_)(collection);
+	const updateTypeScripts = getUpdateTypesScripts(_, ddlProvider)(collection);
 
 	return [...renameColumnScripts, ...updateTypeScripts];
 };

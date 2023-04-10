@@ -24,6 +24,8 @@ module.exports = {
 
 	createKeyConstraint: '${constraintName}${keyType}${columns}${includeNonKey}${storageParameters}${tablespace}',
 
+	alterColumnType: 'ALTER TABLE IF EXISTS ${tableName} ALTER COLUMN ${columnName} SET DATA TYPE ${dataType};',
+
 	createForeignKey:
 		'ALTER TABLE IF EXISTS ${foreignTable} ADD CONSTRAINT ${name} FOREIGN KEY (${foreignKey}) REFERENCES ${primaryTable}(${primaryKey})${match}${onDelete}${onUpdate};',
 

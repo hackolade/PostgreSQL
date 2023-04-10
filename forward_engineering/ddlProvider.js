@@ -704,5 +704,32 @@ module.exports = (baseProvider, options, app) => {
 		commentIfDeactivated(statement, data, isPartOfLine) {
 			return statement;
 		},
+
+		/**
+		 * @param tableName {string}
+		 * @param columnName {string}
+		 * @param dataType {string}
+		 * @param dataTypeProperties {{
+		 *     length?: number,
+		 *     scale?: number,
+		 *     precision?: number
+		 * }}
+		 * */
+		alterColumnType(tableName, columnName, dataType, dataTypeProperties) {
+			let dataTypeString = dataType;
+			if (dataTypeProperties.length) {
+				dataTypeString += `(${dataTypeProperties.length})`;
+			} else if (dataTypeProperties.precision && dataTypeProperties.scale) {
+				dataTypeString += `(${dataTypeProperties.precision}, ${dataTypeProperties.scale})`;
+			} else if (dataTypeProperties.precision) {
+				dataTypeString += `(${dataTypeProperties.precision}})`;
+			}
+
+			return assignTemplates(templates.alterColumnType, {
+				tableName,
+				columnName,
+				dataType: dataTypeString,
+			})
+		}
 	};
 };
