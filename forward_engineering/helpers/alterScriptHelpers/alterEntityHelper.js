@@ -195,22 +195,26 @@ const getModifyNonNullColumnsScripts = (_, ddlProvider) => (collection) => {
     return [...addNotNullConstraintsScript, ...removeNotNullConstraint];
 }
 
-const getModifyColumnScript = app => collection => {
-    const _ = app.require('lodash');
-    const {wrapInQuotes} = require('../general')({_});
-    const ddlProvider = require('../../ddlProvider')(null, null, app);
-
+const getRenameColumnScripts = (_, ddlProvider) => (collection) => {
     const fullTableName = getFullTableName(_)(collection);
+    const {wrapInQuotes} = require('../general')({_});
 
-    const renameColumnScripts = _.values(collection.properties)
+    return _.values(collection.properties)
         .filter(jsonSchema => checkFieldPropertiesChanged(jsonSchema.compMod, ['name']))
         .map(
-            jsonSchema =>
-                `ALTER TABLE IF EXISTS ${fullTableName} RENAME COLUMN ${wrapInQuotes(
-                        jsonSchema.compMod.oldField.name,
-                )} TO ${wrapInQuotes(jsonSchema.compMod.newField.name)};`,
+            jsonSchema => {
+                const oldColumnName = wrapInQuotes(jsonSchema.compMod.oldField.name);
+                const newColumnName = wrapInQuotes(jsonSchema.compMod.newField.name);
+                return ddlProvider.renameColumn(fullTableName, oldColumnName, newColumnName);
+            }
         );
+}
 
+const getModifyColumnScript = app => collection => {
+    const _ = app.require('lodash');
+    const ddlProvider = require('../../ddlProvider')(null, null, app);
+
+    const renameColumnScripts = getRenameColumnScripts(_, ddlProvider)(collection);
     const updateTypeScripts = getUpdateTypesScripts(_, ddlProvider)(collection);
     const modifyNotNullScripts = getModifyNonNullColumnsScripts(_, ddlProvider)(collection);
 

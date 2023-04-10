@@ -715,6 +715,7 @@ module.exports = (baseProvider, options, app) => {
 		 *     scale?: number,
 		 *     precision?: number
 		 * }}
+		 * @return string
 		 * */
 		alterColumnType(tableName, columnName, dataType, dataTypeProperties) {
 			let dataTypeString = dataType;
@@ -736,6 +737,7 @@ module.exports = (baseProvider, options, app) => {
 		/**
 		 * @param tableName {string}
 		 * @param columnName {string}
+		 * @return string
 		 * */
 		setNotNullConstraint(tableName, columnName) {
 			return assignTemplates(templates.addNotNullConstraint, {
@@ -747,12 +749,27 @@ module.exports = (baseProvider, options, app) => {
 		/**
 		 * @param tableName {string}
 		 * @param columnName {string}
+		 * @return string
 		 * */
 		dropNotNullConstraint(tableName, columnName) {
 			return assignTemplates(templates.dropNotNullConstraint, {
 				tableName,
 				columnName
 			});
-		}
+		},
+
+		/**
+		 * @param tableName {string}
+		 * @param oldColumnName {string}
+		 * @param newColumnName {string}
+		 * @return string
+		 * */
+		renameColumn(tableName, oldColumnName, newColumnName) {
+			return assignTemplates(templates.renameColumn, {
+				tableName,
+				oldColumnName,
+				newColumnName
+			});
+		},
 	};
 };
