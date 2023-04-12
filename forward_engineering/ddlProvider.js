@@ -1,6 +1,7 @@
 const defaultTypes = require('./configs/defaultTypes');
 const types = require('./configs/types');
 const templates = require('./configs/templates');
+const assignTemplates = require("./utils/assignTemplates");
 
 module.exports = (baseProvider, options, app) => {
 	const _ = app.require('lodash');
@@ -703,6 +704,72 @@ module.exports = (baseProvider, options, app) => {
 
 		commentIfDeactivated(statement, data, isPartOfLine) {
 			return statement;
+		},
+
+		/**
+		 * @param tableName {string}
+		 * @param columnName {string}
+		 * @param dataType {string}
+		 * @param dataTypeProperties {{
+		 *     length?: number,
+		 *     scale?: number,
+		 *     precision?: number
+		 * }}
+		 * @return string
+		 * */
+		alterColumnType(tableName, columnName, dataType, dataTypeProperties) {
+			let dataTypeString = dataType;
+			if (dataTypeProperties.length) {
+				dataTypeString += `(${dataTypeProperties.length})`;
+			} else if (dataTypeProperties.precision && dataTypeProperties.scale) {
+				dataTypeString += `(${dataTypeProperties.precision}, ${dataTypeProperties.scale})`;
+			} else if (dataTypeProperties.precision) {
+				dataTypeString += `(${dataTypeProperties.precision}})`;
+			}
+
+			return assignTemplates(templates.alterColumnType, {
+				tableName,
+				columnName,
+				dataType: dataTypeString,
+			})
+		},
+
+		/**
+		 * @param tableName {string}
+		 * @param columnName {string}
+		 * @return string
+		 * */
+		setNotNullConstraint(tableName, columnName) {
+			return assignTemplates(templates.addNotNullConstraint, {
+				tableName,
+				columnName
+			});
+		},
+
+		/**
+		 * @param tableName {string}
+		 * @param columnName {string}
+		 * @return string
+		 * */
+		dropNotNullConstraint(tableName, columnName) {
+			return assignTemplates(templates.dropNotNullConstraint, {
+				tableName,
+				columnName
+			});
+		},
+
+		/**
+		 * @param tableName {string}
+		 * @param oldColumnName {string}
+		 * @param newColumnName {string}
+		 * @return string
+		 * */
+		renameColumn(tableName, oldColumnName, newColumnName) {
+			return assignTemplates(templates.renameColumn, {
+				tableName,
+				oldColumnName,
+				newColumnName
+			});
 		},
 	};
 };

@@ -24,6 +24,14 @@ module.exports = {
 
 	createKeyConstraint: '${constraintName}${keyType}${columns}${includeNonKey}${storageParameters}${tablespace}',
 
+	alterColumnType: 'ALTER TABLE IF EXISTS ${tableName} ALTER COLUMN ${columnName} SET DATA TYPE ${dataType};',
+
+	addNotNullConstraint: 'ALTER TABLE IF EXISTS ${tableName} ALTER COLUMN ${columnName} SET NOT NULL;',
+
+	dropNotNullConstraint: 'ALTER TABLE IF EXISTS ${tableName} ALTER COLUMN ${columnName} DROP NOT NULL;',
+
+	renameColumn: 'ALTER TABLE IF EXISTS ${tableName} RENAME COLUMN ${oldColumnName} TO ${newColumnName};',
+
 	createForeignKey:
 		'ALTER TABLE IF EXISTS ${foreignTable} ADD CONSTRAINT ${name} FOREIGN KEY (${foreignKey}) REFERENCES ${primaryTable}(${primaryKey})${match}${onDelete}${onUpdate};',
 
