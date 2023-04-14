@@ -722,7 +722,7 @@ module.exports = (baseProvider, options, app) => {
 			if (dataTypeProperties.length) {
 				dataTypeString += `(${dataTypeProperties.length})`;
 			} else if (dataTypeProperties.precision && dataTypeProperties.scale) {
-				dataTypeString += `(${dataTypeProperties.precision}, ${dataTypeProperties.scale})`;
+				dataTypeString += `(${dataTypeProperties.precision},${dataTypeProperties.scale})`;
 			} else if (dataTypeProperties.precision) {
 				dataTypeString += `(${dataTypeProperties.precision}})`;
 			}
