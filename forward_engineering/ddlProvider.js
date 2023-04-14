@@ -724,7 +724,7 @@ module.exports = (baseProvider, options, app) => {
 			} else if (dataTypeProperties.precision && dataTypeProperties.scale) {
 				dataTypeString += `(${dataTypeProperties.precision},${dataTypeProperties.scale})`;
 			} else if (dataTypeProperties.precision) {
-				dataTypeString += `(${dataTypeProperties.precision}})`;
+				dataTypeString += `(${dataTypeProperties.precision})`;
 			}
 
 			return assignTemplates(templates.alterColumnType, {
