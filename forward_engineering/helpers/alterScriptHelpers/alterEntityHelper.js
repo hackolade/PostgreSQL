@@ -1,5 +1,28 @@
 const {checkFieldPropertiesChanged} = require('./common');
 
+/**
+ * @typedef {{
+ *     id: string,
+ *     chkConstrName: string,
+ *     constrExpression: string,
+ * }} CheckConstraint
+ *
+ * @typedef {{
+ *     old?: CheckConstraint,
+ *     new?: CheckConstraint
+ * }} CheckConstraintHistoryEntry
+ * */
+
+const getFullTableName = (_) => (collection) => {
+    const {getEntityName} = require('../../utils/general')(_);
+    const {getNamePrefixedWithSchemaName} = require('../general')({_});
+
+    const collectionSchema = {...collection, ...(_.omit(collection?.role, 'properties') || {})};
+    const tableName = getEntityName(collectionSchema);
+    const schemaName = collectionSchema.compMod?.keyspaceName;
+    return getNamePrefixedWithSchemaName(tableName, schemaName);
+}
+
 const getAddCollectionScript =
     ({app, dbVersion, modelDefinitions, internalDefinitions, externalDefinitions}) =>
         collection => {
@@ -48,16 +71,127 @@ const getAddCollectionScript =
 
 const getDeleteCollectionScript = app => collection => {
     const _ = app.require('lodash');
-    const {getEntityName} = require('../../utils/general')(_);
-    const {getNamePrefixedWithSchemaName} = require('../general')({_});
-
-    const jsonData = {...collection, ...(_.omit(collection?.role, 'properties') || {})};
-    const tableName = getEntityName(jsonData);
-    const schemaName = collection.compMod.keyspaceName;
-    const fullName = getNamePrefixedWithSchemaName(tableName, schemaName);
-
+    const fullName = getFullTableName(_)(collection);
     return `DROP TABLE IF EXISTS ${fullName};`;
 };
+
+/**
+ * @return {Map<string, CheckConstraintHistoryEntry>}
+ * */
+const mapCheckConstraintNamesToChangeHistory = (collection) => {
+    const out = new Map();
+    const checkConstraintHistory = collection?.compMod?.chkConstr;
+    if (!checkConstraintHistory) {
+        return out;
+    }
+    const newConstraints = checkConstraintHistory.new || [];
+    const oldConstraints = checkConstraintHistory.old || [];
+
+    /**
+     * @param constraints {Array<any>}
+     * @param constraintType {"new" | "old"}
+     * */
+    const fillConstraintHistoryMap = (constraints, constraintType) => {
+        for (const constraint of constraints) {
+            let existingHistoryEntry = out.get(constraint.chkConstrName);
+            if (!existingHistoryEntry) {
+                existingHistoryEntry = {"new": undefined, old: undefined};
+                out.set(constraint.chkConstrName, existingHistoryEntry);
+            }
+            existingHistoryEntry[constraintType] = constraint;
+        }
+    }
+
+    fillConstraintHistoryMap(newConstraints, 'new');
+    fillConstraintHistoryMap(oldConstraints, 'old');
+    return out;
+}
+
+/**
+ * @return {(constraintHistory: Map<string, CheckConstraintHistoryEntry>, collection: Object) => Array<string>}
+ * */
+const getDropCheckConstraintScripts = (_, ddlProvider) => (constraintHistory, collection) => {
+    const {wrapInQuotes} = require('../general')({_});
+
+    const fullTableName = getFullTableName(_)(collection);
+    return Array.from(constraintHistory.values())
+        .filter(historyEntry => historyEntry.old && !historyEntry.new)
+        .map(historyEntry => {
+            const wrappedConstraintName = wrapInQuotes(historyEntry.old.chkConstrName);
+            return ddlProvider.dropConstraint(fullTableName, wrappedConstraintName);
+        });
+}
+
+/**
+ * @return {(constraintHistory: Map<string, CheckConstraintHistoryEntry>, collection: Object) => Array<string>}
+ * */
+const getAddCheckConstraintScripts = (_, ddlProvider) => (constraintHistory, collection) => {
+    const {wrapInQuotes} = require('../general')({_});
+
+    const fullTableName = getFullTableName(_)(collection);
+    return Array.from(constraintHistory.values())
+        .filter(historyEntry => historyEntry.new && !historyEntry.old)
+        .map(historyEntry => {
+            const { chkConstrName, constrExpression } = historyEntry.new;
+            return ddlProvider.addCheckConstraint(fullTableName, wrapInQuotes(chkConstrName), constrExpression);
+        });
+}
+
+/**
+ * @return {(constraintHistory: Map<string, CheckConstraintHistoryEntry>, collection: Object) => Array<string>}
+ * */
+const getUpdateCheckConstraintScripts = (_, ddlProvider) => (constraintHistory, collection) => {
+    const {wrapInQuotes} = require('../general')({_});
+
+    const fullTableName = getFullTableName(_)(collection);
+    return Array.from(constraintHistory.values())
+        .filter(historyEntry => {
+            if (historyEntry.old && historyEntry.new) {
+                const oldExpression = historyEntry.old.constrExpression;
+                const newExpression = historyEntry.new.constrExpression;
+                return oldExpression !== newExpression;
+            }
+            return false;
+        })
+        .map(historyEntry => {
+            const { chkConstrName: oldConstrainName } = historyEntry.old;
+            const dropConstraintScript = ddlProvider.dropConstraint(fullTableName, wrapInQuotes(oldConstrainName));
+
+            const { chkConstrName: newConstrainName, constrExpression: newConstraintExpression } = historyEntry.new;
+            const addConstraintScript = ddlProvider.addCheckConstraint(fullTableName, wrapInQuotes(newConstrainName), newConstraintExpression);
+
+            return [dropConstraintScript, addConstraintScript];
+        })
+        .flat();
+}
+
+/**
+ * @return (collection: Object) => Array<string>
+ * */
+const getModifyCheckConstraintScripts = (_, ddlProvider) => (collection) => {
+    const constraintHistory = mapCheckConstraintNamesToChangeHistory(collection);
+
+    const addCheckConstraintScripts = getAddCheckConstraintScripts(_, ddlProvider)(constraintHistory, collection);
+    const dropCheckConstraintScripts = getDropCheckConstraintScripts(_, ddlProvider)(constraintHistory, collection);
+    const updateCheckConstraintScripts = getUpdateCheckConstraintScripts(_, ddlProvider)(constraintHistory, collection);
+
+    return [
+        ...addCheckConstraintScripts,
+        ...dropCheckConstraintScripts,
+        ...updateCheckConstraintScripts,
+    ]
+}
+
+/**
+ * @return (collection: Object) => Array<string>
+ * */
+const getModifyCollectionScript = (app) => (collection) => {
+    const _ = app.require('lodash');
+    const ddlProvider = require('../../ddlProvider')(null, null, app);
+
+    const modifyCheckConstraintScripts = getModifyCheckConstraintScripts(_, ddlProvider)(collection);
+    return [...modifyCheckConstraintScripts]
+}
 
 const getAddColumnScript =
     ({app, dbVersion, modelDefinitions, internalDefinitions, externalDefinitions}) =>
@@ -112,16 +246,6 @@ const getDeleteColumnScript = app => collection => {
         .filter(([name, jsonSchema]) => !jsonSchema.compMod)
         .map(([name]) => `ALTER TABLE IF EXISTS ${fullName} DROP COLUMN IF EXISTS ${wrapInQuotes(name)};`);
 };
-
-const getFullTableName = (_) => (collection) => {
-    const {getEntityName} = require('../../utils/general')(_);
-    const {getNamePrefixedWithSchemaName} = require('../general')({_});
-
-    const collectionSchema = {...collection, ...(_.omit(collection?.role, 'properties') || {})};
-    const tableName = getEntityName(collectionSchema);
-    const schemaName = collectionSchema.compMod?.keyspaceName;
-    return getNamePrefixedWithSchemaName(tableName, schemaName);
-}
 
 const extractNewPropertyByName = (collection, fieldName) => {
     return collection.role.compMod?.newProperties?.find(newProperty => newProperty.name === fieldName);
@@ -238,6 +362,7 @@ const getModifyColumnScript = app => collection => {
 module.exports = {
     getAddCollectionScript,
     getDeleteCollectionScript,
+    getModifyCollectionScript,
     getAddColumnScript,
     getDeleteColumnScript,
     getModifyColumnScript,
