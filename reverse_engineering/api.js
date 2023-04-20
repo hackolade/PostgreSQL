@@ -194,6 +194,10 @@ module.exports = {
 				})
 				.then(({ packages, relationships }) => ({ packages: orderPackages(packages), relationships }));
 
+			postgresLogger.info('The data is processed and sent to the application', {
+				packagesLength: packages?.length,
+				relationshipsLength: relationships?.length,
+			});
 			callback(null, packages, modelData, relationships);
 		} catch (error) {
 			logger.log('error', prepareError(error), 'Retrieve tables data');
