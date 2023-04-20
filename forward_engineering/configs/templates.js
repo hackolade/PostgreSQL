@@ -39,6 +39,8 @@ module.exports = {
 	createForeignKey:
 		'ALTER TABLE IF EXISTS ${foreignTable} ADD CONSTRAINT ${name} FOREIGN KEY (${foreignKey}) REFERENCES ${primaryTable}(${primaryKey})${match}${onDelete}${onUpdate};',
 
+	updateCommentOnTable: 'COMMENT ON TABLE ${tableName} IS ${comment};',
+
 	index:
 		'CREATE${unique} INDEX${concurrently}${ifNotExist} ${name}\n' +
 		' ON${only} ${tableName}${using}${keys}${nullsDistinct}${options};\n',

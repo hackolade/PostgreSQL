@@ -1,6 +1,7 @@
 const {checkFieldPropertiesChanged} = require('./common');
 const {getModifyCheckConstraintScripts} = require("./entityHelpers/checkConstraintHelper");
 const {getFullTableName} = require("./entityHelpers/ddlHelper");
+const {getModifyEntityCommentsScripts} = require("./entityHelpers/commentsHelper");
 
 const getAddCollectionScript =
     ({app, dbVersion, modelDefinitions, internalDefinitions, externalDefinitions}) =>
@@ -62,7 +63,11 @@ const getModifyCollectionScript = (app) => (collection) => {
     const ddlProvider = require('../../ddlProvider')(null, null, app);
 
     const modifyCheckConstraintScripts = getModifyCheckConstraintScripts(_, ddlProvider)(collection);
-    return [...modifyCheckConstraintScripts]
+    const modifyCommentScripts = getModifyEntityCommentsScripts(_, ddlProvider)(collection);
+    return [
+        ...modifyCheckConstraintScripts,
+        ...modifyCommentScripts
+    ];
 }
 
 const getAddColumnScript =

@@ -799,5 +799,30 @@ module.exports = (baseProvider, options, app) => {
 			};
 			return assignTemplates(templates.dropConstraint, templateConfig);
 		},
+
+		/**
+		 * @param tableName {string}
+		 * @param comment {string}
+		 * @return string
+		 * */
+		updateTableComment(tableName, comment) {
+			const templateConfig = {
+				tableName,
+				comment
+			}
+			return assignTemplates(templates.updateCommentOnTable, templateConfig);
+		},
+
+		/**
+		 * @param tableName {string}
+		 * @return string
+		 * */
+		dropTableComment(tableName) {
+			const templateConfig = {
+				tableName,
+				comment: 'NULL'
+			}
+			return assignTemplates(templates.updateCommentOnTable, templateConfig);
+		},
 	};
 };
