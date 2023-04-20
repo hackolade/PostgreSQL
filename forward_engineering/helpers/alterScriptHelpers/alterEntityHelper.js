@@ -4,6 +4,7 @@ const {getFullTableName} = require("./entityHelpers/ddlHelper");
 const {getModifyEntityCommentsScripts} = require("./entityHelpers/commentsHelper");
 const {getUpdateTypesScripts} = require("./columnHelpers/typeHelper");
 const {getModifyNonNullColumnsScripts} = require("./columnHelpers/nonNullConstraintHelper");
+const {getModifiedCommentOnColumnScripts} = require("./columnHelpers/commentsHelper");
 
 const getAddCollectionScript =
     ({app, dbVersion, modelDefinitions, internalDefinitions, externalDefinitions}) =>
@@ -148,11 +149,13 @@ const getModifyColumnScript = app => collection => {
     const renameColumnScripts = getRenameColumnScripts(_, ddlProvider)(collection);
     const updateTypeScripts = getUpdateTypesScripts(_, ddlProvider)(collection);
     const modifyNotNullScripts = getModifyNonNullColumnsScripts(_, ddlProvider)(collection);
+    const modifyCommentScripts = getModifiedCommentOnColumnScripts(_, ddlProvider)(collection);
 
     return [
         ...renameColumnScripts,
         ...updateTypeScripts,
-        ...modifyNotNullScripts
+        ...modifyNotNullScripts,
+        ...modifyCommentScripts,
     ];
 };
 

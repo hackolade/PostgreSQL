@@ -8,6 +8,14 @@ const getFullTableName = (_) => (collection) => {
     return getNamePrefixedWithSchemaName(tableName, schemaName);
 }
 
+const getFullColumnName = (_) => (collection, columnName) => {
+    const {wrapInQuotes} = require('../../general')({_});
+
+    const fullTableName = getFullTableName(_)(collection);
+    return `${fullTableName}.${wrapInQuotes(columnName)}`;
+}
+
 module.exports = {
-    getFullTableName
+    getFullTableName,
+    getFullColumnName,
 }

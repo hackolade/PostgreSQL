@@ -41,6 +41,8 @@ module.exports = {
 
 	updateCommentOnTable: 'COMMENT ON TABLE ${tableName} IS ${comment};',
 
+	updateCommentOnColumn: 'COMMENT ON COLUMN ${columnName} IS ${comment};',
+
 	index:
 		'CREATE${unique} INDEX${concurrently}${ifNotExist} ${name}\n' +
 		' ON${only} ${tableName}${using}${keys}${nullsDistinct}${options};\n',

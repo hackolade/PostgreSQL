@@ -824,5 +824,30 @@ module.exports = (baseProvider, options, app) => {
 			}
 			return assignTemplates(templates.updateCommentOnTable, templateConfig);
 		},
+
+		/**
+		 * @param columnName {string}
+		 * @param comment {string}
+		 * @return string
+		 * */
+		updateColumnComment(columnName, comment) {
+			const templateConfig = {
+				columnName,
+				comment
+			}
+			return assignTemplates(templates.updateCommentOnColumn, templateConfig);
+		},
+
+		/**
+		 * @param columnName {string}
+		 * @return string
+		 * */
+		dropColumnComment(columnName) {
+			const templateConfig = {
+				columnName,
+				comment: 'NULL'
+			}
+			return assignTemplates(templates.updateCommentOnColumn, templateConfig);
+		},
 	};
 };
