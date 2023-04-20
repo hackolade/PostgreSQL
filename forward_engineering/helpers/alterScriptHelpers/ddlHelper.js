@@ -1,6 +1,6 @@
 const getFullTableName = (_) => (collection) => {
-    const {getEntityName} = require('../../../utils/general')(_);
-    const {getNamePrefixedWithSchemaName} = require('../../general')({_});
+    const {getEntityName} = require('../../utils/general')(_);
+    const {getNamePrefixedWithSchemaName} = require('../general')({_});
 
     const collectionSchema = {...collection, ...(_.omit(collection?.role, 'properties') || {})};
     const tableName = getEntityName(collectionSchema);
@@ -9,7 +9,7 @@ const getFullTableName = (_) => (collection) => {
 }
 
 const getFullColumnName = (_) => (collection, columnName) => {
-    const {wrapInQuotes} = require('../../general')({_});
+    const {wrapInQuotes} = require('../general')({_});
 
     const fullTableName = getFullTableName(_)(collection);
     return `${fullTableName}.${wrapInQuotes(columnName)}`;

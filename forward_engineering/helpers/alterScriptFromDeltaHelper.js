@@ -21,18 +21,18 @@ const getComparisonModelCollection = collections => {
 		.find(collection => collection.collectionName === 'comparisonModelCollection');
 };
 
-const getAlterContainersScripts = collection => {
+const getAlterContainersScripts = ({ collection, app}) => {
 	const addedContainers = collection.properties?.containers?.properties?.added?.items;
 	const deletedContainers = collection.properties?.containers?.properties?.deleted?.items;
 
 	const addContainersScripts = []
 		.concat(addedContainers)
 		.filter(Boolean)
-		.map(container => getAddContainerScript(Object.keys(container.properties)[0]));
+		.map(container => getAddContainerScript(app)(Object.keys(container.properties)[0]));
 	const deleteContainersScripts = []
 		.concat(deletedContainers)
 		.filter(Boolean)
-		.map(container => getDeleteContainerScript(Object.keys(container.properties)[0]));
+		.map(container => getDeleteContainerScript(app)(Object.keys(container.properties)[0]));
 
 	return [].concat(addContainersScripts).concat(deleteContainersScripts);
 };

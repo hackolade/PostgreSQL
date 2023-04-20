@@ -1,4 +1,4 @@
-const {getFullTableName} = require("../entityHelpers/ddlHelper");
+const {getFullTableName} = require("../ddlHelper");
 const {checkFieldPropertiesChanged} = require("../common");
 
 const getRenameColumnScripts = (_, ddlProvider) => (collection) => {

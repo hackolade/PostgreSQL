@@ -1,4 +1,4 @@
-const {getFullTableName} = require("./ddlHelper");
+const {getFullTableName} = require("../ddlHelper");
 
 /**
  * @return (collection: Object) => string

@@ -1,4 +1,4 @@
-const {getFullColumnName} = require("../entityHelpers/ddlHelper");
+const {getFullColumnName} = require("../ddlHelper");
 
 const getUpdatedCommentOnColumnScripts = (_, ddlProvider) => (collection) => {
     const {wrapComment} = require('../../general')({_});

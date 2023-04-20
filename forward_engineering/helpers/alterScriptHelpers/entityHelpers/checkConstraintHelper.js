@@ -12,7 +12,7 @@
  * */
 
 
-const {getFullTableName} = require("./ddlHelper");
+const {getFullTableName} = require("../ddlHelper");
 /**
  * @return {Map<string, CheckConstraintHistoryEntry>}
  * */

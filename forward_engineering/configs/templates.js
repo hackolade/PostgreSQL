@@ -43,6 +43,12 @@ module.exports = {
 
 	updateCommentOnColumn: 'COMMENT ON COLUMN ${columnName} IS ${comment};',
 
+	updateCommentOnSchema: 'COMMENT ON SCHEMA ${schemaName} IS ${comment}',
+
+	createSchemaOnly: 'CREATE SCHEMA IF NOT EXISTS ${schemaName};',
+
+	dropSchema: 'DROP SCHEMA IF EXISTS ${schemaName};',
+
 	index:
 		'CREATE${unique} INDEX${concurrently}${ifNotExist} ${name}\n' +
 		' ON${only} ${tableName}${using}${keys}${nullsDistinct}${options};\n',

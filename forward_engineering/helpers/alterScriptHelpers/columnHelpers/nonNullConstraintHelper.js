@@ -1,4 +1,4 @@
-const {getFullTableName} = require("../entityHelpers/ddlHelper");
+const {getFullTableName} = require("../ddlHelper");
 
 const getModifyNonNullColumnsScripts = (_, ddlProvider) => (collection) => {
     const fullTableName = getFullTableName(_)(collection);

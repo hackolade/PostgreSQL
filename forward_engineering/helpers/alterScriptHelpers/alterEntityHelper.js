@@ -1,5 +1,5 @@
 const {getModifyCheckConstraintScripts} = require("./entityHelpers/checkConstraintHelper");
-const {getFullTableName} = require("./entityHelpers/ddlHelper");
+const {getFullTableName} = require("./ddlHelper");
 const {getModifyEntityCommentsScripts} = require("./entityHelpers/commentsHelper");
 const {getUpdateTypesScripts} = require("./columnHelpers/alterTypeHelper");
 const {getModifyNonNullColumnsScripts} = require("./columnHelpers/nonNullConstraintHelper");
