@@ -1,10 +1,10 @@
-const {checkFieldPropertiesChanged} = require('./common');
 const {getModifyCheckConstraintScripts} = require("./entityHelpers/checkConstraintHelper");
 const {getFullTableName} = require("./entityHelpers/ddlHelper");
 const {getModifyEntityCommentsScripts} = require("./entityHelpers/commentsHelper");
-const {getUpdateTypesScripts} = require("./columnHelpers/typeHelper");
+const {getUpdateTypesScripts} = require("./columnHelpers/alterTypeHelper");
 const {getModifyNonNullColumnsScripts} = require("./columnHelpers/nonNullConstraintHelper");
 const {getModifiedCommentOnColumnScripts} = require("./columnHelpers/commentsHelper");
+const {getRenameColumnScripts} = require("./columnHelpers/renameColumnHelper");
 
 const getAddCollectionScript =
     ({app, dbVersion, modelDefinitions, internalDefinitions, externalDefinitions}) =>
@@ -126,21 +126,6 @@ const getDeleteColumnScript = app => collection => {
         .filter(([name, jsonSchema]) => !jsonSchema.compMod)
         .map(([name]) => `ALTER TABLE IF EXISTS ${fullName} DROP COLUMN IF EXISTS ${wrapInQuotes(name)};`);
 };
-
-const getRenameColumnScripts = (_, ddlProvider) => (collection) => {
-    const fullTableName = getFullTableName(_)(collection);
-    const {wrapInQuotes} = require('../general')({_});
-
-    return _.values(collection.properties)
-        .filter(jsonSchema => checkFieldPropertiesChanged(jsonSchema.compMod, ['name']))
-        .map(
-            jsonSchema => {
-                const oldColumnName = wrapInQuotes(jsonSchema.compMod.oldField.name);
-                const newColumnName = wrapInQuotes(jsonSchema.compMod.newField.name);
-                return ddlProvider.renameColumn(fullTableName, oldColumnName, newColumnName);
-            }
-        );
-}
 
 const getModifyColumnScript = app => collection => {
     const _ = app.require('lodash');
