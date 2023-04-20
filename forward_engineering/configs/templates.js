@@ -43,7 +43,7 @@ module.exports = {
 
 	updateCommentOnColumn: 'COMMENT ON COLUMN ${columnName} IS ${comment};',
 
-	updateCommentOnSchema: 'COMMENT ON SCHEMA ${schemaName} IS ${comment}',
+	updateCommentOnSchema: 'COMMENT ON SCHEMA ${schemaName} IS ${comment};',
 
 	createSchemaOnly: 'CREATE SCHEMA IF NOT EXISTS ${schemaName};',
 

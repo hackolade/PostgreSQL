@@ -1,4 +1,4 @@
-const { getAddContainerScript, getDeleteContainerScript } = require('./alterScriptHelpers/alterContainerHelper');
+const { getAddContainerScript, getDeleteContainerScript, getModifyContainerScript} = require('./alterScriptHelpers/alterContainerHelper');
 const {
 	getAddCollectionScript,
 	getDeleteCollectionScript,
@@ -24,6 +24,7 @@ const getComparisonModelCollection = collections => {
 const getAlterContainersScripts = ({ collection, app}) => {
 	const addedContainers = collection.properties?.containers?.properties?.added?.items;
 	const deletedContainers = collection.properties?.containers?.properties?.deleted?.items;
+	const modifiedContainers = collection.properties?.containers?.properties?.modified?.items;
 
 	const addContainersScripts = []
 		.concat(addedContainers)
@@ -33,8 +34,17 @@ const getAlterContainersScripts = ({ collection, app}) => {
 		.concat(deletedContainers)
 		.filter(Boolean)
 		.map(container => getDeleteContainerScript(app)(Object.keys(container.properties)[0]));
+	const modifyContainersScripts = []
+		.concat(modifiedContainers)
+		.filter(Boolean)
+		.map(containerWrapper => Object.values(containerWrapper.properties)[0])
+		.map(container => getModifyContainerScript(app)(container))
 
-	return [].concat(addContainersScripts).concat(deleteContainersScripts);
+	return [
+		...addContainersScripts,
+		...deleteContainersScripts,
+		...modifyContainersScripts,
+	];
 };
 
 const getAlterCollectionsScripts = ({
