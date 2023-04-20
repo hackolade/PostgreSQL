@@ -45,6 +45,8 @@ module.exports = {
 
 	updateCommentOnSchema: 'COMMENT ON SCHEMA ${schemaName} IS ${comment};',
 
+	updateCommentOnView: 'COMMENT ON VIEW ${viewName} IS ${comment};',
+
 	createSchemaOnly: 'CREATE SCHEMA IF NOT EXISTS ${schemaName};',
 
 	dropSchema: 'DROP SCHEMA IF EXISTS ${schemaName};',
@@ -57,6 +59,8 @@ module.exports = {
 		'CREATE${orReplace}${temporary} VIEW ${name}${withOptions}\nAS ${selectStatement}${checkOption};\n\n${comment}\n',
 
 	viewSelectStatement: 'SELECT ${keys}\n\tFROM ${tableName}',
+
+	dropView: 'DROP VIEW IF EXISTS ${viewName};',
 
 	createFunction:
 		'CREATE${orReplace} FUNCTION ${name}\n' +

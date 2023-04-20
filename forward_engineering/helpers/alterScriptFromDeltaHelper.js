@@ -13,7 +13,7 @@ const {
 	getDeleteColumnFromTypeScript,
 	getModifyColumnOfTypeScript,
 } = require('./alterScriptHelpers/alterUdtHelper');
-const { getAddViewScript, getDeleteViewScript } = require('./alterScriptHelpers/alterViewHelper');
+const { getAddViewScript, getDeleteViewScript, getModifyViewScript} = require('./alterScriptHelpers/alterViewHelper');
 
 const getComparisonModelCollection = collections => {
 	return collections
@@ -118,7 +118,18 @@ const getAlterViewScripts = (collection, app) => {
 		.map(view => ({ ...view, ...(view.role || {}) }))
 		.map(getDeleteViewScript(app));
 
-	return [...deleteViewsScripts, ...createViewsScripts].map(script => script.trim());
+	const modifyViewsScripts = []
+		.concat(collection.properties?.views?.properties?.modified?.items)
+		.filter(Boolean)
+		.map(viewWrapper => Object.values(viewWrapper.properties)[0])
+		.map(view => ({ ...view, ...(view.role || {}) }))
+		.flatMap(view => getModifyViewScript(app)(view));
+
+	return [
+		...deleteViewsScripts,
+		...createViewsScripts,
+		...modifyViewsScripts,
+	].map(script => script.trim());
 };
 
 const getAlterModelDefinitionsScripts = ({

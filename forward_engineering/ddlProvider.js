@@ -491,6 +491,17 @@ module.exports = (baseProvider, options, app) => {
 			return [createViewScript, createTriggersStatements].map(_.trim).join('\n\n').trim() + '\n';
 		},
 
+		/**
+		 * @param viewName {string}
+		 * @return string
+		 * */
+		dropView(viewName) {
+			const templatesConfig = {
+				viewName,
+			}
+			return assignTemplates(templates.dropView, templatesConfig);
+		},
+
 		createViewIndex() {
 			return '';
 		},
@@ -873,6 +884,31 @@ module.exports = (baseProvider, options, app) => {
 				comment: 'NULL'
 			}
 			return assignTemplates(templates.updateCommentOnSchema, templateConfig);
+		},
+
+		/**
+		 * @param viewName {string}
+		 * @param comment {string}
+		 * @return string
+		 * */
+		updateViewComment(viewName, comment) {
+			const templateConfig = {
+				viewName,
+				comment
+			}
+			return assignTemplates(templates.updateCommentOnView, templateConfig);
+		},
+
+		/**
+		 * @param viewName {string}
+		 * @return string
+		 * */
+		dropViewComment(viewName) {
+			const templateConfig = {
+				viewName,
+				comment: 'NULL'
+			}
+			return assignTemplates(templates.updateCommentOnView, templateConfig);
 		},
 
 		/**
