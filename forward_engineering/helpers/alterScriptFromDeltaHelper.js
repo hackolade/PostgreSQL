@@ -4,7 +4,7 @@ const {
 	getDeleteCollectionScript,
 	getAddColumnScript,
 	getDeleteColumnScript,
-	getModifyColumnScript,
+	getModifyColumnScript, getModifyCollectionScript,
 } = require('./alterScriptHelpers/alterEntityHelper');
 const {
 	getDeleteUdtScript,
@@ -57,6 +57,12 @@ const getAlterCollectionsScripts = ({
 		.map(item => Object.values(item.properties)[0])
 		.filter(collection => collection.compMod?.deleted)
 		.map(getDeleteCollectionScript(app));
+	const modifyCollectionScripts = []
+		.concat(collection.properties?.entities?.properties?.modified?.items)
+		.filter(Boolean)
+		.map(item => Object.values(item.properties)[0])
+		.map(getModifyCollectionScript(app))
+		.flat();
 	const addColumnScripts = []
 		.concat(collection.properties?.entities?.properties?.added?.items)
 		.filter(Boolean)
@@ -79,6 +85,7 @@ const getAlterCollectionsScripts = ({
 	return [
 		...createCollectionsScripts,
 		...deleteCollectionScripts,
+		...modifyCollectionScripts,
 		...addColumnScripts,
 		...deleteColumnScripts,
 		...modifyColumnScript,
