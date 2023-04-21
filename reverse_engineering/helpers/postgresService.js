@@ -176,7 +176,13 @@ module.exports = {
 		return { views, tables, modelDefinitions: getJsonSchema(userDefinedTypes) };
 	},
 
-	async retrieveSchemaLevelData(schemaName) {
+	async retrieveSchemaLevelData(schemaName, ignoreUdfUdp) {
+		if (ignoreUdfUdp) {
+			logger.info('Functions and procedures ignored');
+
+			return { functions: [], procedures: [] };
+		}
+
 		logger.progress('Get Functions and Procedures', schemaName);
 
 		const schemaOid = (await db.queryTolerant(queryConstants.GET_NAMESPACE_OID, [schemaName], true))?.oid;
