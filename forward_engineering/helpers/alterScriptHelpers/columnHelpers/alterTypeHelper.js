@@ -1,5 +1,7 @@
 const {getFullTableName} = require("../ddlHelper");
 const {checkFieldPropertiesChanged} = require("../common");
+
+
 const hasLengthChanged = (collection, oldFieldName, currentJsonSchema) => {
     const oldProperty = collection.role.properties[oldFieldName];
 
