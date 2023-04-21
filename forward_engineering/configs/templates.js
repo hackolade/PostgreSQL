@@ -32,6 +32,10 @@ module.exports = {
 
 	renameColumn: 'ALTER TABLE IF EXISTS ${tableName} RENAME COLUMN ${oldColumnName} TO ${newColumnName};',
 
+	addCheckConstraint: 'ALTER TABLE IF EXISTS ${tableName} ADD CONSTRAINT ${constraintName} CHECK (${expression});',
+
+	dropConstraint: 'ALTER TABLE IF EXISTS ${tableName} DROP CONSTRAINT IF EXISTS ${constraintName};',
+
 	createForeignKey:
 		'ALTER TABLE IF EXISTS ${foreignTable} ADD CONSTRAINT ${name} FOREIGN KEY (${foreignKey}) REFERENCES ${primaryTable}(${primaryKey})${match}${onDelete}${onUpdate};',
 

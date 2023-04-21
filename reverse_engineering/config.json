@@ -20,6 +20,11 @@
 			"inputLabel": "Include partitions",
 			"inputTooltip": "Reverse-engineer all partitions as tables",
 			"inputKeyword": "includePartitions"
+		},
+		{
+			"inputLabel": "Ignore Functions, Procedures and Triggers",
+			"inputTooltip": "Ignore reverse-engineering of function, procedures and triggers",
+			"inputKeyword": "ignoreUdfUdpTriggers"
 		}
 	]
 }
