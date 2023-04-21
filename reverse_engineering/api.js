@@ -130,9 +130,11 @@ module.exports = {
 						collections[schemaName],
 						data.recordSamplingSettings,
 						data.includePartitions,
+						data.ignoreUdfUdpTriggers,
 					);
 					const { functions, procedures, triggers } = await postgresService.retrieveSchemaLevelData(
 						schemaName,
+						data.ignoreUdfUdpTriggers,
 					);
 
 					postgresLogger.progress('Schema reversed successfully', schemaName);
