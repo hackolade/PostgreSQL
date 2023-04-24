@@ -287,6 +287,12 @@ module.exports = {
 		const tableForeignKeys = await db.queryTolerant(queryConstants.GET_TABLE_FOREIGN_KEYS, [tableOid]);
 		const triggers = await this._getTriggers(schemaName, tableName, schemaOid, tableOid, ignoreUdfUdpTriggers);
 
+		logger.info('Table data retrieved', {
+			schemaName,
+			tableName,
+			columnTypes: tableColumns.map(column => column.data_type),
+		});
+
 		const partitioning = prepareTablePartition(partitionResult, tableColumns);
 		const tableLevelProperties = prepareTableLevelData(tableLevelData, tableToastOptions);
 		const description = getDescriptionFromResult(descriptionResult);
@@ -352,7 +358,7 @@ module.exports = {
 			tableOid,
 		]);
 
-		return _.map(tableColumns, (columnData, index) => {
+		return _.map(tableColumns, columnData => {
 			return {
 				...columnData,
 				...(_.find(tableColumnsAdditionalData, { name: columnData.column_name }) || {}),
@@ -368,13 +374,23 @@ module.exports = {
 			(await db.queryTolerant(queryConstants.GET_ROWS_COUNT(fullTableName), [], true))?.quantity || 0;
 		const limit = getLimit(quantity, recordSamplingSettings);
 
-		const jsonColumns = _.chain(attributes)
-			.filter(({ type }) => _.includes(['json', 'jsonb'], type))
-			.map('name')
-			.join(', ')
-			.value();
+		const jsonColumns = attributes.filter(({ type }) => _.includes(['json', 'jsonb'], type));
 
-		return await db.queryTolerant(queryConstants.GET_SAMPLED_DATA(fullTableName, jsonColumns), [limit]);
+		const jsonColumnsString = _.map(jsonColumns, 'name').join(', ');
+
+		const samplingDataSize = await db.queryTolerant(
+			queryConstants.GET_SAMPLED_DATA_SIZE(fullTableName, jsonColumnsString),
+			[limit],
+			true,
+		);
+
+		logger.info('Sampling table', {
+			tableName,
+			jsonColumnsNumber: jsonColumns.length,
+			samplingDataSize: samplingDataSize?._hackolade_tmp_sampling_tbl_size,
+		});
+
+		return await db.queryTolerant(queryConstants.GET_SAMPLED_DATA(fullTableName, jsonColumnsString), [limit]);
 	},
 
 	async _retrieveSingleViewData(schemaOid, schemaName, ignoreUdfUdpTriggers, viewName) {

@@ -154,6 +154,9 @@ const queryConstants = {
 	GET_DESCRIPTION_BY_OID: `SELECT obj_description($1)`,
 	GET_ROWS_COUNT: fullTableName => `SELECT COUNT(*) AS quantity FROM ${fullTableName};`,
 	GET_SAMPLED_DATA: (fullTableName, jsonColumns) => `SELECT ${jsonColumns} FROM ${fullTableName} LIMIT $1;`,
+        GET_SAMPLED_DATA_SIZE: (fullTableName, jsonColumns) => `
+        SELECT sum(pg_column_size(_hackolade_tmp_sampling_tbl.*)) AS _hackolade_tmp_sampling_tbl_size 
+        FROM (SELECT ${jsonColumns} FROM ${fullTableName} LIMIT $1) AS _hackolade_tmp_sampling_tbl;`,
 	GET_INHERITS_PARENT_TABLE_NAME: `
         SELECT pc.relname AS parent_table_name FROM pg_catalog.pg_inherits AS pi
 	        INNER JOIN pg_catalog.pg_class AS pc
