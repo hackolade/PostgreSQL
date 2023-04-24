@@ -15,7 +15,18 @@ const getFullColumnName = (_) => (collection, columnName) => {
     return `${fullTableName}.${wrapInQuotes(columnName)}`;
 }
 
+const getFullViewName = (_) => (view) => {
+    const {getViewName} = require('../../utils/general')(_);
+    const {getNamePrefixedWithSchemaName} = require('../general')({_});
+
+    const viewSchema = {...view, ...(_.omit(view?.role, 'properties') || {})};
+    const viewName = getViewName(viewSchema);
+    const schemaName = viewSchema.compMod?.keyspaceName;
+    return getNamePrefixedWithSchemaName(viewName, schemaName);
+}
+
 module.exports = {
     getFullTableName,
     getFullColumnName,
+    getFullViewName,
 }
