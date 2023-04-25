@@ -16,6 +16,10 @@ module.exports = _ => {
 		return (entityData && (entityData.code || entityData.collectionName)) || '';
 	};
 
+	const getViewName = view => {
+		return (view && (view.code || view.name)) || '';
+	};
+
 	const getDbData = containerData => {
 		return Object.assign({}, _.get(containerData, '[0]', {}), { name: getDbName(containerData) });
 	};
@@ -129,6 +133,7 @@ module.exports = _ => {
 		getDbName,
 		getDbData,
 		getEntityName,
+		getViewName,
 		getViewOn,
 		rejectRecursiveRelationships,
 		filterRecursiveRelationships,

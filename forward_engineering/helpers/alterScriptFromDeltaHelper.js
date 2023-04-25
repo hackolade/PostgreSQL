@@ -1,4 +1,4 @@
-const { getAddContainerScript, getDeleteContainerScript } = require('./alterScriptHelpers/alterContainerHelper');
+const { getAddContainerScript, getDeleteContainerScript, getModifyContainerScript} = require('./alterScriptHelpers/alterContainerHelper');
 const {
 	getAddCollectionScript,
 	getDeleteCollectionScript,
@@ -13,7 +13,7 @@ const {
 	getDeleteColumnFromTypeScript,
 	getModifyColumnOfTypeScript,
 } = require('./alterScriptHelpers/alterUdtHelper');
-const { getAddViewScript, getDeleteViewScript } = require('./alterScriptHelpers/alterViewHelper');
+const { getAddViewScript, getDeleteViewScript, getModifyViewScript} = require('./alterScriptHelpers/alterViewHelper');
 
 const getComparisonModelCollection = collections => {
 	return collections
@@ -21,20 +21,30 @@ const getComparisonModelCollection = collections => {
 		.find(collection => collection.collectionName === 'comparisonModelCollection');
 };
 
-const getAlterContainersScripts = collection => {
+const getAlterContainersScripts = ({ collection, app}) => {
 	const addedContainers = collection.properties?.containers?.properties?.added?.items;
 	const deletedContainers = collection.properties?.containers?.properties?.deleted?.items;
+	const modifiedContainers = collection.properties?.containers?.properties?.modified?.items;
 
 	const addContainersScripts = []
 		.concat(addedContainers)
 		.filter(Boolean)
-		.map(container => getAddContainerScript(Object.keys(container.properties)[0]));
+		.map(container => getAddContainerScript(app)(Object.keys(container.properties)[0]));
 	const deleteContainersScripts = []
 		.concat(deletedContainers)
 		.filter(Boolean)
-		.map(container => getDeleteContainerScript(Object.keys(container.properties)[0]));
+		.map(container => getDeleteContainerScript(app)(Object.keys(container.properties)[0]));
+	const modifyContainersScripts = []
+		.concat(modifiedContainers)
+		.filter(Boolean)
+		.map(containerWrapper => Object.values(containerWrapper.properties)[0])
+		.map(container => getModifyContainerScript(app)(container))
 
-	return [].concat(addContainersScripts).concat(deleteContainersScripts);
+	return [
+		...addContainersScripts,
+		...deleteContainersScripts,
+		...modifyContainersScripts,
+	];
 };
 
 const getAlterCollectionsScripts = ({
@@ -108,7 +118,18 @@ const getAlterViewScripts = (collection, app) => {
 		.map(view => ({ ...view, ...(view.role || {}) }))
 		.map(getDeleteViewScript(app));
 
-	return [...deleteViewsScripts, ...createViewsScripts].map(script => script.trim());
+	const modifyViewsScripts = []
+		.concat(collection.properties?.views?.properties?.modified?.items)
+		.filter(Boolean)
+		.map(viewWrapper => Object.values(viewWrapper.properties)[0])
+		.map(view => ({ ...view, ...(view.role || {}) }))
+		.flatMap(view => getModifyViewScript(app)(view));
+
+	return [
+		...deleteViewsScripts,
+		...createViewsScripts,
+		...modifyViewsScripts,
+	].map(script => script.trim());
 };
 
 const getAlterModelDefinitionsScripts = ({

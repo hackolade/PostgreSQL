@@ -39,6 +39,18 @@ module.exports = {
 	createForeignKey:
 		'ALTER TABLE IF EXISTS ${foreignTable} ADD CONSTRAINT ${name} FOREIGN KEY (${foreignKey}) REFERENCES ${primaryTable}(${primaryKey})${match}${onDelete}${onUpdate};',
 
+	updateCommentOnTable: 'COMMENT ON TABLE ${tableName} IS ${comment};',
+
+	updateCommentOnColumn: 'COMMENT ON COLUMN ${columnName} IS ${comment};',
+
+	updateCommentOnSchema: 'COMMENT ON SCHEMA ${schemaName} IS ${comment};',
+
+	updateCommentOnView: 'COMMENT ON VIEW ${viewName} IS ${comment};',
+
+	createSchemaOnly: 'CREATE SCHEMA IF NOT EXISTS ${schemaName};',
+
+	dropSchema: 'DROP SCHEMA IF EXISTS ${schemaName};',
+
 	index:
 		'CREATE${unique} INDEX${concurrently}${ifNotExist} ${name}\n' +
 		' ON${only} ${tableName}${using}${keys}${nullsDistinct}${options};\n',
@@ -47,6 +59,8 @@ module.exports = {
 		'CREATE${orReplace}${temporary} VIEW ${name}${withOptions}\nAS ${selectStatement}${checkOption};\n\n${comment}\n',
 
 	viewSelectStatement: 'SELECT ${keys}\n\tFROM ${tableName}',
+
+	dropView: 'DROP VIEW IF EXISTS ${viewName};',
 
 	createFunction:
 		'CREATE${orReplace} FUNCTION ${name}\n' +

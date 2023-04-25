@@ -25,7 +25,7 @@ module.exports = {
 			const internalDefinitions = JSON.parse(data.internalDefinitions);
 			const externalDefinitions = JSON.parse(data.externalDefinitions);
 			const dbVersion = data.modelData[0]?.dbVersion;
-			const containersScripts = getAlterContainersScripts(collection);
+			const containersScripts = getAlterContainersScripts({collection, app});
 			const collectionsScripts = getAlterCollectionsScripts({
 				collection,
 				app,

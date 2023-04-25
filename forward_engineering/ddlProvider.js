@@ -491,6 +491,17 @@ module.exports = (baseProvider, options, app) => {
 			return [createViewScript, createTriggersStatements].map(_.trim).join('\n\n').trim() + '\n';
 		},
 
+		/**
+		 * @param viewName {string}
+		 * @return string
+		 * */
+		dropView(viewName) {
+			const templatesConfig = {
+				viewName,
+			}
+			return assignTemplates(templates.dropView, templatesConfig);
+		},
+
 		createViewIndex() {
 			return '';
 		},
@@ -798,6 +809,128 @@ module.exports = (baseProvider, options, app) => {
 				constraintName,
 			};
 			return assignTemplates(templates.dropConstraint, templateConfig);
+		},
+
+		/**
+		 * @param tableName {string}
+		 * @param comment {string}
+		 * @return string
+		 * */
+		updateTableComment(tableName, comment) {
+			const templateConfig = {
+				tableName,
+				comment
+			}
+			return assignTemplates(templates.updateCommentOnTable, templateConfig);
+		},
+
+		/**
+		 * @param tableName {string}
+		 * @return string
+		 * */
+		dropTableComment(tableName) {
+			const templateConfig = {
+				tableName,
+				comment: 'NULL'
+			}
+			return assignTemplates(templates.updateCommentOnTable, templateConfig);
+		},
+
+		/**
+		 * @param columnName {string}
+		 * @param comment {string}
+		 * @return string
+		 * */
+		updateColumnComment(columnName, comment) {
+			const templateConfig = {
+				columnName,
+				comment
+			}
+			return assignTemplates(templates.updateCommentOnColumn, templateConfig);
+		},
+
+		/**
+		 * @param columnName {string}
+		 * @return string
+		 * */
+		dropColumnComment(columnName) {
+			const templateConfig = {
+				columnName,
+				comment: 'NULL'
+			}
+			return assignTemplates(templates.updateCommentOnColumn, templateConfig);
+		},
+
+		/**
+		 * @param schemaName {string}
+		 * @param comment {string}
+		 * @return string
+		 * */
+		updateSchemaComment(schemaName, comment) {
+			const templateConfig = {
+				schemaName,
+				comment
+			}
+			return assignTemplates(templates.updateCommentOnSchema, templateConfig);
+		},
+
+		/**
+		 * @param schemaName {string}
+		 * @return string
+		 * */
+		dropSchemaComment(schemaName) {
+			const templateConfig = {
+				schemaName,
+				comment: 'NULL'
+			}
+			return assignTemplates(templates.updateCommentOnSchema, templateConfig);
+		},
+
+		/**
+		 * @param viewName {string}
+		 * @param comment {string}
+		 * @return string
+		 * */
+		updateViewComment(viewName, comment) {
+			const templateConfig = {
+				viewName,
+				comment
+			}
+			return assignTemplates(templates.updateCommentOnView, templateConfig);
+		},
+
+		/**
+		 * @param viewName {string}
+		 * @return string
+		 * */
+		dropViewComment(viewName) {
+			const templateConfig = {
+				viewName,
+				comment: 'NULL'
+			}
+			return assignTemplates(templates.updateCommentOnView, templateConfig);
+		},
+
+		/**
+		 * @param schemaName {string}
+		 * @return string
+		 * */
+		createSchemaOnly(schemaName) {
+			const templateConfig = {
+				schemaName,
+			}
+			return assignTemplates(templates.createSchemaOnly, templateConfig);
+		},
+
+		/**
+		 * @param schemaName {string}
+		 * @return string
+		 * */
+		dropSchema(schemaName) {
+			const templateConfig = {
+				schemaName,
+			}
+			return assignTemplates(templates.dropSchema, templateConfig);
 		},
 	};
 };
