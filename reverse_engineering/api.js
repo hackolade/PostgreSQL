@@ -137,7 +137,7 @@ module.exports = {
 						data.ignoreUdfUdpTriggers,
 					);
 
-					postgresLogger.progress('Schema reversed successfully', schemaName);
+					postgresLogger.progress('Schema data fetched successfully', schemaName);
 
 					return {
 						schemaName,
