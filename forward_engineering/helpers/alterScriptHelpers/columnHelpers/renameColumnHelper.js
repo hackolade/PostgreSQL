@@ -1,7 +1,11 @@
 const {getFullTableName} = require("../ddlHelper");
 const {checkFieldPropertiesChanged} = require("../common");
+const {AlterScriptDto} = require("../types/AlterScriptDto");
 
-const getRenameColumnScripts = (_, ddlProvider) => (collection) => {
+/**
+ * @return {(collection: Object) => AlterScriptDto[]}
+ * */
+const getRenameColumnScriptDtos = (_, ddlProvider) => (collection) => {
     const fullTableName = getFullTableName(_)(collection);
     const {wrapInQuotes} = require('../../general')({_});
 
@@ -13,9 +17,10 @@ const getRenameColumnScripts = (_, ddlProvider) => (collection) => {
                 const newColumnName = wrapInQuotes(jsonSchema.compMod.newField.name);
                 return ddlProvider.renameColumn(fullTableName, oldColumnName, newColumnName);
             }
-        );
+        )
+        .map(script => AlterScriptDto.getInstance([script], true, false));
 }
 
 module.exports = {
-    getRenameColumnScripts
+    getRenameColumnScriptDtos
 }

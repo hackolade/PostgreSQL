@@ -1,52 +1,55 @@
 const {getFullTableName} = require("../ddlHelper");
+const {AlterScriptDto} = require("../types/AlterScriptDto");
 
 /**
- * @return (collection: Object) => string
+ * @return {(collection: Object) => AlterScriptDto}
  */
-const getUpdatedCommentOnCollectionScript = (_, ddlProvider) => (collection) => {
+const getUpdatedCommentOnCollectionScriptDto = (_, ddlProvider) => (collection) => {
     const {wrapComment} = require('../../general')({_});
 
     const descriptionInfo = collection?.role.compMod?.description;
     if (!descriptionInfo) {
-        return '';
+        return undefined;
     }
 
     const {old: oldComment, new: newComment} = descriptionInfo;
     if (!newComment || newComment === oldComment) {
-        return '';
+        return undefined;
     }
 
     const tableName = getFullTableName(_)(collection);
     const comment = wrapComment(newComment);
 
-    return ddlProvider.updateTableComment(tableName, comment);
+    const script = ddlProvider.updateTableComment(tableName, comment);
+    return AlterScriptDto.getInstance([script], true, false);
 }
 
 /**
- * @return (collection: Object) => string
+ * @return {(collection: Object) => AlterScriptDto}
  */
-const getDeletedCommentOnCollectionScript = (_, ddlProvider) => (collection) => {
+const getDeletedCommentOnCollectionScriptDto = (_, ddlProvider) => (collection) => {
     const descriptionInfo = collection?.role.compMod?.description;
     if (!descriptionInfo) {
-        return '';
+        return undefined;
     }
 
     const {old: oldComment, new: newComment} = descriptionInfo;
     if (!oldComment || newComment) {
-        return '';
+        return undefined;
     }
 
     const tableName = getFullTableName(_)(collection);
 
-    return ddlProvider.dropTableComment(tableName);
+    const script = ddlProvider.dropTableComment(tableName);
+    return AlterScriptDto.getInstance([script], true, true);
 }
 
 /**
- * @return {(collection: Object) => Array<string>}
+ * @return {(collection: Object) => Array<AlterScriptDto>}
  * */
-const getModifyEntityCommentsScripts = (_, ddlProvider) => collection => {
-    const updatedCommentScript = getUpdatedCommentOnCollectionScript(_, ddlProvider)(collection);
-    const deletedCommentScript = getDeletedCommentOnCollectionScript(_, ddlProvider)(collection);
+const getModifyEntityCommentsScriptDtos = (_, ddlProvider) => collection => {
+    const updatedCommentScript = getUpdatedCommentOnCollectionScriptDto(_, ddlProvider)(collection);
+    const deletedCommentScript = getDeletedCommentOnCollectionScriptDto(_, ddlProvider)(collection);
 
     return [
         updatedCommentScript,
@@ -55,5 +58,5 @@ const getModifyEntityCommentsScripts = (_, ddlProvider) => collection => {
 };
 
 module.exports = {
-    getModifyEntityCommentsScripts
+    getModifyEntityCommentsScriptDtos
 }

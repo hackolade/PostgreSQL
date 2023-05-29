@@ -1,8 +1,10 @@
-const {getModifyViewCommentsScripts} = require("./viewHelpers/commentsHelper");
+const {getModifyViewCommentsScriptDtos} = require("./viewHelpers/commentsHelper");
+const {AlterScriptDto} = require("./types/AlterScriptDto");
+
 /**
- * @return (view: Object) => string
+ * @return {(view: Object) => AlterScriptDto}
  * */
-const getAddViewScript = app => view => {
+const getAddViewScriptDto = app => view => {
 	const ddlProvider = require('../../ddlProvider')(null, null, app);
 
 	const viewData = {
@@ -12,37 +14,39 @@ const getAddViewScript = app => view => {
 	};
 	const hydratedView = ddlProvider.hydrateView({ viewData, entityData: [view] });
 
-	return ddlProvider.createView(hydratedView, {}, view.isActivated);
+	const script = ddlProvider.createView(hydratedView, {}, view.isActivated);
+	return AlterScriptDto.getInstance([script], true, false);
 };
 
 /**
- * @return (view: Object) => string
+ * @return {(view: Object) => AlterScriptDto}
  * */
-const getDeleteViewScript = app => view => {
+const getDeleteViewScriptDto = app => view => {
 	const _ = app.require('lodash');
 	const ddlProvider = require('../../ddlProvider')(null, null, app);
 	const { wrapInQuotes } = require('../general')({ _ });
 	const viewName = wrapInQuotes(view.code || view.name);
 
-	return ddlProvider.dropView(viewName);
+	const script = ddlProvider.dropView(viewName);
+	return AlterScriptDto.getInstance([script], true, true);
 };
 
 /**
- * @return (view: Object) => Array<string>
+ * @return {(view: Object) => AlterScriptDto[]}
  * */
-const getModifyViewScript = (app) => (view) => {
+const getModifyViewScriptDtos = (app) => (view) => {
 	const _ = app.require('lodash');
 	const ddlProvider = require('../../ddlProvider')(null, null, app);
 
-	const modifyCommentsScripts = getModifyViewCommentsScripts(_, ddlProvider)(view);
+	const modifyCommentsScriptDtos = getModifyViewCommentsScriptDtos(_, ddlProvider)(view);
 
 	return [
-		...modifyCommentsScripts,
+		...modifyCommentsScriptDtos,
 	];
 }
 
 module.exports = {
-	getAddViewScript,
-	getDeleteViewScript,
-	getModifyViewScript,
+	getAddViewScriptDto,
+	getDeleteViewScriptDto,
+	getModifyViewScriptDtos,
 };

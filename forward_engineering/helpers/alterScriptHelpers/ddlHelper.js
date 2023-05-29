@@ -25,8 +25,17 @@ const getFullViewName = (_) => (view) => {
     return getNamePrefixedWithSchemaName(viewName, schemaName);
 }
 
+/**
+ * @param udt {Object}
+ * @return {string}
+ * */
+const getUdtName = (udt) => {
+    return udt.code || udt.name;
+}
+
 module.exports = {
     getFullTableName,
     getFullColumnName,
     getFullViewName,
+    getUdtName,
 }

@@ -932,5 +932,120 @@ module.exports = (baseProvider, options, app) => {
 			}
 			return assignTemplates(templates.dropSchema, templateConfig);
 		},
+
+		/**
+		 * @param tableName {string}
+		 * @return string
+		 * */
+		dropTable(tableName) {
+			const templateConfig = {
+				tableName,
+			}
+			return assignTemplates(templates.dropTable, templateConfig);
+		},
+
+		/**
+		 * @param tableName {string}
+		 * @param columnDefinition {string}
+		 * @return string
+		 * */
+		addColumn(tableName, columnDefinition) {
+			const templateConfig = {
+				tableName,
+				columnDefinition,
+			}
+			return assignTemplates(templates.addColumn, templateConfig);
+		},
+
+		/**
+		 * @param tableName {string}
+		 * @param columnName {string}
+		 * @return string
+		 * */
+		dropColumn(tableName, columnName) {
+			const templateConfig = {
+				tableName,
+				columnName,
+			}
+			return assignTemplates(templates.dropColumn, templateConfig);
+		},
+
+		/**
+		 * @param udtName {string}
+		 * @return string
+		 * */
+		dropDomain(udtName,) {
+			const templateConfig = {
+				udtName,
+			}
+			return assignTemplates(templates.dropDomain, templateConfig);
+		},
+
+		/**
+		 * @param udtName {string}
+		 * @return string
+		 * */
+		dropType(udtName,) {
+			const templateConfig = {
+				udtName,
+			}
+			return assignTemplates(templates.dropType, templateConfig);
+		},
+
+		/**
+		 * @param udtName {string}
+		 * @param columnDefinition {string}
+		 * @return string
+		 * */
+		alterTypeAddAttribute(udtName, columnDefinition) {
+			const templateConfig = {
+				udtName,
+				columnDefinition,
+			}
+			return assignTemplates(templates.alterTypeAddAttribute, templateConfig);
+		},
+
+		/**
+		 * @param udtName {string}
+		 * @param attributeName {string}
+		 * @return string
+		 * */
+		alterTypeDropAttribute(udtName, attributeName) {
+			const templateConfig = {
+				udtName,
+				attributeName,
+			}
+			return assignTemplates(templates.alterTypeDropAttribute, templateConfig);
+		},
+
+		/**
+		 * @param udtName {string}
+		 * @param oldAttributeName {string}
+		 * @param newAttributeName {string}
+		 * @return string
+		 * */
+		alterTypeRenameAttribute(udtName, oldAttributeName, newAttributeName) {
+			const templateConfig = {
+				udtName,
+				oldAttributeName,
+				newAttributeName,
+			}
+			return assignTemplates(templates.alterTypeRenameAttribute, templateConfig);
+		},
+
+		/**
+		 * @param udtName {string}
+		 * @param attributeName {string}
+		 * @param newDataType {string}
+		 * @return string
+		 * */
+		alterTypeChangeAttributeType(udtName, attributeName, newDataType) {
+			const templateConfig = {
+				udtName,
+				attributeName,
+				newDataType,
+			}
+			return assignTemplates(templates.alterTypeChangeAttributeType, templateConfig);
+		},
 	};
 };

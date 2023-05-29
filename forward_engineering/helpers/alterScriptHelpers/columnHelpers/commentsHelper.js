@@ -1,6 +1,10 @@
 const {getFullColumnName} = require("../ddlHelper");
+const {AlterScriptDto} = require("../types/AlterScriptDto");
 
-const getUpdatedCommentOnColumnScripts = (_, ddlProvider) => (collection) => {
+/**
+ * @return {(collection: Object) => AlterScriptDto[]}
+ * */
+const getUpdatedCommentOnColumnScriptDtos = (_, ddlProvider) => (collection) => {
     const {wrapComment} = require('../../general')({_});
     return _.toPairs(collection.properties)
         .filter(([name, jsonSchema]) => {
@@ -14,10 +18,14 @@ const getUpdatedCommentOnColumnScripts = (_, ddlProvider) => (collection) => {
             const ddlComment = wrapComment(newComment);
             const columnName = getFullColumnName(_)(collection, name);
             return ddlProvider.updateColumnComment(columnName, ddlComment);
-        });
+        })
+        .map(script => AlterScriptDto.getInstance([script], true, false));
 }
 
-const getDeletedCommentOnColumnScripts = (_, ddlProvider) => (collection) => {
+/**
+ * @return {(collection: Object) => AlterScriptDto[]}
+ * */
+const getDeletedCommentOnColumnScriptDtos = (_, ddlProvider) => (collection) => {
     return _.toPairs(collection.properties)
         .filter(([name, jsonSchema]) => {
             const newComment = jsonSchema.description;
@@ -28,15 +36,19 @@ const getDeletedCommentOnColumnScripts = (_, ddlProvider) => (collection) => {
         .map(([name, jsonSchema]) => {
             const columnName = getFullColumnName(_)(collection, name);
             return ddlProvider.dropColumnComment(columnName);
-        });
+        })
+        .map(script => AlterScriptDto.getInstance([script], true, true));
 }
 
-const getModifiedCommentOnColumnScripts = (_, ddlProvider) => (collection) => {
-    const updatedCommentScripts = getUpdatedCommentOnColumnScripts(_, ddlProvider)(collection);
-    const deletedCommentScripts = getDeletedCommentOnColumnScripts(_, ddlProvider)(collection);
+/**
+ * @return {(collection: Object) => AlterScriptDto[]}
+ * */
+const getModifiedCommentOnColumnScriptDtos = (_, ddlProvider) => (collection) => {
+    const updatedCommentScripts = getUpdatedCommentOnColumnScriptDtos(_, ddlProvider)(collection);
+    const deletedCommentScripts = getDeletedCommentOnColumnScriptDtos(_, ddlProvider)(collection);
     return [...updatedCommentScripts, ...deletedCommentScripts];
 }
 
 module.exports = {
-    getModifiedCommentOnColumnScripts
+    getModifiedCommentOnColumnScriptDtos
 }

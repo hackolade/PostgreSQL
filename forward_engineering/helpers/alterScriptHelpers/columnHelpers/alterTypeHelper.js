@@ -1,7 +1,10 @@
 const {getFullTableName} = require("../ddlHelper");
 const {checkFieldPropertiesChanged} = require("../common");
+const {AlterScriptDto} = require("../types/AlterScriptDto");
 
-
+/**
+ * @return {boolean}
+ * */
 const hasLengthChanged = (collection, oldFieldName, currentJsonSchema) => {
     const oldProperty = collection.role.properties[oldFieldName];
 
@@ -10,6 +13,9 @@ const hasLengthChanged = (collection, oldFieldName, currentJsonSchema) => {
     return previousLength !== newLength;
 }
 
+/**
+ * @return {boolean}
+ * */
 const hasPrecisionOrScaleChanged = (collection, oldFieldName, currentJsonSchema) => {
     const oldProperty = collection.role.properties[oldFieldName];
 
@@ -21,11 +27,14 @@ const hasPrecisionOrScaleChanged = (collection, oldFieldName, currentJsonSchema)
     return previousPrecision !== newPrecision || previousScale !== newScale;
 }
 
-const getUpdateTypesScripts = (_, ddlProvider) => (collection) => {
+/**
+ * @return {(collection: Object) => AlterScriptDto[]}
+ * */
+const getUpdateTypesScriptDtos = (_, ddlProvider) => (collection) => {
     const fullTableName = getFullTableName(_)(collection);
     const {wrapInQuotes} = require('../../general')({_});
 
-    const changeTypeScripts = _.toPairs(collection.properties)
+    return _.toPairs(collection.properties)
         .filter(([name, jsonSchema]) => {
             const hasTypeChanged = checkFieldPropertiesChanged(jsonSchema.compMod, ['type', 'mode']);
             if (!hasTypeChanged) {
@@ -43,10 +52,10 @@ const getUpdateTypesScripts = (_, ddlProvider) => (collection) => {
                 const typeConfig = _.pick(jsonSchema, ['length', 'precision', 'scale']);
                 return ddlProvider.alterColumnType(fullTableName, columnName, typeName, typeConfig);
             }
-        );
-    return [...changeTypeScripts];
+        )
+        .map(script => AlterScriptDto.getInstance([script], true, false));
 }
 
 module.exports = {
-    getUpdateTypesScripts
+    getUpdateTypesScriptDtos
 }

@@ -13,6 +13,7 @@
 
 
 const {getFullTableName} = require("../ddlHelper");
+const {AlterScriptDto} = require("../types/AlterScriptDto");
 
 /**
  * @return {(collection: Object) => Array<CheckConstraintHistoryEntry>}
@@ -38,9 +39,9 @@ const mapCheckConstraintNamesToChangeHistory = (_) => (collection) => {
 }
 
 /**
- * @return {(constraintHistory: Array<CheckConstraintHistoryEntry>, fullTableName: string) => Array<string>}
+ * @return {(constraintHistory: Array<CheckConstraintHistoryEntry>, fullTableName: string) => Array<AlterScriptDto>}
  * */
-const getDropCheckConstraintScripts = (_, ddlProvider) => (constraintHistory, fullTableName) => {
+const getDropCheckConstraintScriptDtos = (_, ddlProvider) => (constraintHistory, fullTableName) => {
     const {wrapInQuotes} = require('../../general')({_});
 
     return constraintHistory
@@ -48,13 +49,14 @@ const getDropCheckConstraintScripts = (_, ddlProvider) => (constraintHistory, fu
         .map(historyEntry => {
             const wrappedConstraintName = wrapInQuotes(historyEntry.old.chkConstrName);
             return ddlProvider.dropConstraint(fullTableName, wrappedConstraintName);
-        });
+        })
+        .map(script => AlterScriptDto.getInstance([script], true, true));
 }
 
 /**
- * @return {(constraintHistory: Array<CheckConstraintHistoryEntry>, fullTableName: string) => Array<string>}
+ * @return {(constraintHistory: Array<CheckConstraintHistoryEntry>, fullTableName: string) => Array<AlterScriptDto>}
  * */
-const getAddCheckConstraintScripts = (_, ddlProvider) => (constraintHistory, fullTableName) => {
+const getAddCheckConstraintScriptDtos = (_, ddlProvider) => (constraintHistory, fullTableName) => {
     const {wrapInQuotes} = require('../../general')({_});
 
     return constraintHistory
@@ -62,13 +64,14 @@ const getAddCheckConstraintScripts = (_, ddlProvider) => (constraintHistory, ful
         .map(historyEntry => {
             const { chkConstrName, constrExpression } = historyEntry.new;
             return ddlProvider.addCheckConstraint(fullTableName, wrapInQuotes(chkConstrName), constrExpression);
-        });
+        })
+        .map(script => AlterScriptDto.getInstance([script], true, false));
 }
 
 /**
- * @return {(constraintHistory: Array<CheckConstraintHistoryEntry>, fullTableName: string) => Array<string>}
+ * @return {(constraintHistory: Array<CheckConstraintHistoryEntry>, fullTableName: string) => Array<AlterScriptDto>}
  * */
-const getUpdateCheckConstraintScripts = (_, ddlProvider) => (constraintHistory, fullTableName) => {
+const getUpdateCheckConstraintScriptDtos = (_, ddlProvider) => (constraintHistory, fullTableName) => {
     const {wrapInQuotes} = require('../../general')({_});
 
     return constraintHistory
@@ -87,21 +90,24 @@ const getUpdateCheckConstraintScripts = (_, ddlProvider) => (constraintHistory, 
             const { chkConstrName: newConstrainName, constrExpression: newConstraintExpression } = historyEntry.new;
             const addConstraintScript = ddlProvider.addCheckConstraint(fullTableName, wrapInQuotes(newConstrainName), newConstraintExpression);
 
-            return [dropConstraintScript, addConstraintScript];
+            return [
+                AlterScriptDto.getInstance([dropConstraintScript], true, true),
+                AlterScriptDto.getInstance([addConstraintScript], true, false),
+            ];
         })
         .flat();
 }
 
 /**
- * @return (collection: Object) => Array<string>
+ * @return {(collection: Object) => Array<AlterScriptDto>}
  * */
-const getModifyCheckConstraintScripts = (_, ddlProvider) => (collection) => {
+const getModifyCheckConstraintScriptDtos = (_, ddlProvider) => (collection) => {
     const fullTableName = getFullTableName(_)(collection);
     const constraintHistory = mapCheckConstraintNamesToChangeHistory(_)(collection);
 
-    const addCheckConstraintScripts = getAddCheckConstraintScripts(_, ddlProvider)(constraintHistory, fullTableName);
-    const dropCheckConstraintScripts = getDropCheckConstraintScripts(_, ddlProvider)(constraintHistory, fullTableName);
-    const updateCheckConstraintScripts = getUpdateCheckConstraintScripts(_, ddlProvider)(constraintHistory, fullTableName);
+    const addCheckConstraintScripts = getAddCheckConstraintScriptDtos(_, ddlProvider)(constraintHistory, fullTableName);
+    const dropCheckConstraintScripts = getDropCheckConstraintScriptDtos(_, ddlProvider)(constraintHistory, fullTableName);
+    const updateCheckConstraintScripts = getUpdateCheckConstraintScriptDtos(_, ddlProvider)(constraintHistory, fullTableName);
 
     return [
         ...addCheckConstraintScripts,
@@ -111,5 +117,5 @@ const getModifyCheckConstraintScripts = (_, ddlProvider) => (collection) => {
 }
 
 module.exports = {
-    getModifyCheckConstraintScripts
+    getModifyCheckConstraintScriptDtos
 }
