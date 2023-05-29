@@ -1,5 +1,4 @@
 const {getFullTableName} = require("../ddlHelper");
-const {checkFieldPropertiesChanged} = require("../common");
 const {AlterScriptDto} = require("../types/AlterScriptDto");
 
 /**
@@ -33,6 +32,7 @@ const hasPrecisionOrScaleChanged = (collection, oldFieldName, currentJsonSchema)
 const getUpdateTypesScriptDtos = (_, ddlProvider) => (collection) => {
     const fullTableName = getFullTableName(_)(collection);
     const {wrapInQuotes} = require('../../general')({_});
+    const {checkFieldPropertiesChanged} = require('../../../utils/general')(_);
 
     return _.toPairs(collection.properties)
         .filter(([name, jsonSchema]) => {

@@ -1,5 +1,4 @@
 const {getFullTableName} = require("../ddlHelper");
-const {checkFieldPropertiesChanged} = require("../common");
 const {AlterScriptDto} = require("../types/AlterScriptDto");
 
 /**
@@ -8,6 +7,7 @@ const {AlterScriptDto} = require("../types/AlterScriptDto");
 const getRenameColumnScriptDtos = (_, ddlProvider) => (collection) => {
     const fullTableName = getFullTableName(_)(collection);
     const {wrapInQuotes} = require('../../general')({_});
+    const {checkFieldPropertiesChanged} = require('../../../utils/general')(_);
 
     return _.values(collection.properties)
         .filter(jsonSchema => checkFieldPropertiesChanged(jsonSchema.compMod, ['name']))

@@ -1,4 +1,3 @@
-const {checkFieldPropertiesChanged} = require('./common');
 const {AlterScriptDto} = require("./types/AlterScriptDto");
 const {getUdtName} = require("./ddlHelper");
 
@@ -132,6 +131,7 @@ const getModifyColumnOfTypeScriptDto = app => udt => {
     const ddlProvider = require('../../ddlProvider')(null, null, app);
 
     const {wrapInQuotes} = require('../general')({_});
+    const {checkFieldPropertiesChanged} = require('../../utils/general')(_);
 
     const fullName = wrapInQuotes(udt.code || udt.name);
 

@@ -129,6 +129,10 @@ module.exports = _ => {
 		}
 	};
 
+	const checkFieldPropertiesChanged = (compMod, propertiesToCheck) => {
+		return propertiesToCheck.some(prop => compMod?.oldField[prop] !== compMod?.newField[prop]);
+	};
+
 	return {
 		getDbName,
 		getDbData,
@@ -145,5 +149,6 @@ module.exports = _ => {
 		divideIntoActivatedAndDeactivated,
 		commentIfDeactivated,
 		wrap,
+		checkFieldPropertiesChanged,
 	};
 };

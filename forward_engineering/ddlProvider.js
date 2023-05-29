@@ -1,7 +1,6 @@
 const defaultTypes = require('./configs/defaultTypes');
 const types = require('./configs/types');
-const templates = require('./configs/templates');
-const assignTemplates = require("./utils/assignTemplates");
+const templates = require('./ddlProvider/templates');
 
 module.exports = (baseProvider, options, app) => {
 	const _ = app.require('lodash');
