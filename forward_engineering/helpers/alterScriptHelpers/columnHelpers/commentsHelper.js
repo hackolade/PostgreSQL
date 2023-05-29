@@ -1,4 +1,3 @@
-const {getFullColumnName} = require("../ddlHelper");
 const {AlterScriptDto} = require("../types/AlterScriptDto");
 
 /**
@@ -6,6 +5,7 @@ const {AlterScriptDto} = require("../types/AlterScriptDto");
  * */
 const getUpdatedCommentOnColumnScriptDtos = (_, ddlProvider) => (collection) => {
     const {wrapComment} = require('../../general')({_});
+    const {getFullColumnName} = require('../../../utils/general')(_);
     return _.toPairs(collection.properties)
         .filter(([name, jsonSchema]) => {
             const newComment = jsonSchema.description;
@@ -16,7 +16,7 @@ const getUpdatedCommentOnColumnScriptDtos = (_, ddlProvider) => (collection) => 
         .map(([name, jsonSchema]) => {
             const newComment = jsonSchema.description;
             const ddlComment = wrapComment(newComment);
-            const columnName = getFullColumnName(_)(collection, name);
+            const columnName = getFullColumnName(collection, name);
             return ddlProvider.updateColumnComment(columnName, ddlComment);
         })
         .map(script => AlterScriptDto.getInstance([script], true, false));
@@ -26,6 +26,8 @@ const getUpdatedCommentOnColumnScriptDtos = (_, ddlProvider) => (collection) => 
  * @return {(collection: Object) => AlterScriptDto[]}
  * */
 const getDeletedCommentOnColumnScriptDtos = (_, ddlProvider) => (collection) => {
+    const {getFullColumnName} = require('../../../utils/general')(_);
+
     return _.toPairs(collection.properties)
         .filter(([name, jsonSchema]) => {
             const newComment = jsonSchema.description;
@@ -34,7 +36,7 @@ const getDeletedCommentOnColumnScriptDtos = (_, ddlProvider) => (collection) => 
             return oldComment && !newComment;
         })
         .map(([name, jsonSchema]) => {
-            const columnName = getFullColumnName(_)(collection, name);
+            const columnName = getFullColumnName(collection, name);
             return ddlProvider.dropColumnComment(columnName);
         })
         .map(script => AlterScriptDto.getInstance([script], true, true));

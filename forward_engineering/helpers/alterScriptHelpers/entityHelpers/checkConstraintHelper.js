@@ -12,7 +12,6 @@
  * */
 
 
-const {getFullTableName} = require("../ddlHelper");
 const {AlterScriptDto} = require("../types/AlterScriptDto");
 
 /**
@@ -102,7 +101,8 @@ const getUpdateCheckConstraintScriptDtos = (_, ddlProvider) => (constraintHistor
  * @return {(collection: Object) => Array<AlterScriptDto>}
  * */
 const getModifyCheckConstraintScriptDtos = (_, ddlProvider) => (collection) => {
-    const fullTableName = getFullTableName(_)(collection);
+    const {getFullTableName} = require('../../../utils/general')(_);
+    const fullTableName = getFullTableName(collection);
     const constraintHistory = mapCheckConstraintNamesToChangeHistory(_)(collection);
 
     const addCheckConstraintScripts = getAddCheckConstraintScriptDtos(_, ddlProvider)(constraintHistory, fullTableName);

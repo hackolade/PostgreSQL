@@ -1,10 +1,10 @@
-const {getFullTableName} = require("../ddlHelper");
 const {AlterScriptDto} = require("../types/AlterScriptDto");
 
 /**
  * @return {(collection: Object) => AlterScriptDto}
  */
 const getUpdatedCommentOnCollectionScriptDto = (_, ddlProvider) => (collection) => {
+    const {getFullTableName} = require('../../../utils/general')(_);
     const {wrapComment} = require('../../general')({_});
 
     const descriptionInfo = collection?.role.compMod?.description;
@@ -17,7 +17,7 @@ const getUpdatedCommentOnCollectionScriptDto = (_, ddlProvider) => (collection) 
         return undefined;
     }
 
-    const tableName = getFullTableName(_)(collection);
+    const tableName = getFullTableName(collection);
     const comment = wrapComment(newComment);
 
     const script = ddlProvider.updateTableComment(tableName, comment);
@@ -28,6 +28,8 @@ const getUpdatedCommentOnCollectionScriptDto = (_, ddlProvider) => (collection) 
  * @return {(collection: Object) => AlterScriptDto}
  */
 const getDeletedCommentOnCollectionScriptDto = (_, ddlProvider) => (collection) => {
+    const {getFullTableName} = require('../../../utils/general')(_);
+
     const descriptionInfo = collection?.role.compMod?.description;
     if (!descriptionInfo) {
         return undefined;
@@ -38,7 +40,7 @@ const getDeletedCommentOnCollectionScriptDto = (_, ddlProvider) => (collection) 
         return undefined;
     }
 
-    const tableName = getFullTableName(_)(collection);
+    const tableName = getFullTableName(collection);
 
     const script = ddlProvider.dropTableComment(tableName);
     return AlterScriptDto.getInstance([script], true, true);

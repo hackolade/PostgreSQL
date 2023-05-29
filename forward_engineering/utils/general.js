@@ -26,48 +26,6 @@ module.exports = _ => {
 
 	const getViewOn = viewData => _.get(viewData, '[0].viewOn');
 
-	const rejectRecursiveRelationships = foreignTableToRelationshipData => {
-		return Object.keys(foreignTableToRelationshipData).reduce((result, foreignTableId) => {
-			const tables = foreignTableToRelationshipData[foreignTableId].filter(item => {
-				const tables = foreignTableToRelationshipData[item.primaryTableId];
-
-				if (!Array.isArray(tables)) {
-					return true;
-				}
-
-				return !tables.some(
-					item => item.primaryTableId === foreignTableId && item.primaryTableId !== item.foreignTableId,
-				);
-			});
-
-			if (_.isEmpty(tables)) {
-				return result;
-			}
-
-			return Object.assign({}, result, {
-				[foreignTableId]: tables,
-			});
-		}, {});
-	};
-
-	const filterRecursiveRelationships = foreignTableToRelationshipData => {
-		return Object.keys(foreignTableToRelationshipData).reduce((result, foreignTableId) => {
-			const tables = foreignTableToRelationshipData[foreignTableId].filter(item => {
-				const tables = foreignTableToRelationshipData[item.primaryTableId];
-
-				if (!Array.isArray(tables)) {
-					return false;
-				}
-
-				return tables.some(
-					item => item.primaryTableId === foreignTableId && item.primaryTableId !== item.foreignTableId,
-				);
-			});
-
-			return result.concat(tables);
-		}, []);
-	};
-
 	const tab = (text, tab = '\t') => {
 		return text
 			.split('\n')
@@ -133,14 +91,45 @@ module.exports = _ => {
 		return propertiesToCheck.some(prop => compMod?.oldField[prop] !== compMod?.newField[prop]);
 	};
 
+	const getFullTableName = (collection) => {
+		const {getNamePrefixedWithSchemaName} = require('../helpers/general')({_});
+
+		const collectionSchema = {...collection, ...(_.omit(collection?.role, 'properties') || {})};
+		const tableName = getEntityName(collectionSchema);
+		const schemaName = collectionSchema.compMod?.keyspaceName;
+		return getNamePrefixedWithSchemaName(tableName, schemaName);
+	}
+
+	const getFullColumnName = (collection, columnName) => {
+		const {wrapInQuotes} = require('../helpers/general')({_});
+
+		const fullTableName = getFullTableName(collection);
+		return `${fullTableName}.${wrapInQuotes(columnName)}`;
+	}
+
+	const getFullViewName = (view) => {
+		const {getNamePrefixedWithSchemaName} = require('../helpers/general')({_});
+
+		const viewSchema = {...view, ...(_.omit(view?.role, 'properties') || {})};
+		const viewName = getViewName(viewSchema);
+		const schemaName = viewSchema.compMod?.keyspaceName;
+		return getNamePrefixedWithSchemaName(viewName, schemaName);
+	}
+
+	/**
+	 * @param udt {Object}
+	 * @return {string}
+	 * */
+	const getUdtName = (udt) => {
+		return udt.code || udt.name;
+	}
+
 	return {
 		getDbName,
 		getDbData,
 		getEntityName,
 		getViewName,
 		getViewOn,
-		rejectRecursiveRelationships,
-		filterRecursiveRelationships,
 		tab,
 		hasType,
 		clean,
@@ -150,5 +139,9 @@ module.exports = _ => {
 		commentIfDeactivated,
 		wrap,
 		checkFieldPropertiesChanged,
+		getFullTableName,
+		getFullColumnName,
+		getFullViewName,
+		getUdtName,
 	};
 };

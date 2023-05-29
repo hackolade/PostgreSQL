@@ -1,100 +1,4 @@
-const POSTGRES_RESERVED_WORDS = [
-	'ALL',
-	'ANALYSE',
-	'ANALYZE',
-	'AND',
-	'ANY',
-	'ARRAY',
-	'ASC',
-	'ASYMMETRIC',
-	'AUTHORIZATION',
-	'BINARY',
-	'BOTH',
-	'CASE',
-	'CAST',
-	'CHECK',
-	'COLLATE',
-	'COLUMN',
-	'CONCURRENTLY',
-	'CONSTRAINT',
-	'CREATE',
-	'CROSS',
-	'CURRENT_CATALOG',
-	'CURRENT_DATE',
-	'CURRENT_ROLE',
-	'CURRENT_SCHEMA',
-	'CURRENT_TIME',
-	'CURRENT_TIMESTAMP',
-	'CURRENT_USER',
-	'DEFAULT',
-	'DEFERRABLE',
-	'DESC',
-	'DISTINCT',
-	'DO',
-	'ELSE',
-	'END',
-	'EXCEPT',
-	'FALSE',
-	'FOR',
-	'FOREIGN',
-	'FREEZE',
-	'FROM',
-	'FULL',
-	'GRANT',
-	'GROUP',
-	'HAVING',
-	'ILIKE',
-	'IN',
-	'INITIALLY',
-	'INTERSECT',
-	'INTO',
-	'IS',
-	'ISNULL',
-	'JOIN',
-	'LATERAL',
-	'LEADING',
-	'LEFT',
-	'LIKE',
-	'LIMIT',
-	'LOCALTIME',
-	'LOCALTIMESTAMP',
-	'NATURAL',
-	'NOT',
-	'NULL',
-	'OFFSET',
-	'ON',
-	'ONLY',
-	'OR',
-	'ORDER',
-	'OUTER',
-	'OVERLAPS',
-	'PLACING',
-	'PRIMARY',
-	'REFERENCES',
-	'RETURNING',
-	'RIGHT',
-	'SELECT',
-	'SESSION_USER',
-	'SIMILAR',
-	'SOME',
-	'SYMMETRIC',
-	'TABLE',
-	'TABLESAMPLE',
-	'THEN',
-	'TO',
-	'TRAILING',
-	'TRUE',
-	'UNION',
-	'UNIQUE',
-	'USER',
-	'USING',
-	'VARIADIC',
-	'VERBOSE',
-	'WHEN',
-	'WHERE',
-	'WINDOW',
-	'WITH',
-];
+const {ReservedWordsAsArray} = require("../enums/reservedWords");
 
 const MUST_BE_ESCAPED = /\t|\n|'|\f|\r/gm;
 
@@ -116,7 +20,7 @@ module.exports = ({ _, divideIntoActivatedAndDeactivated, commentIfDeactivated }
 	};
 
 	const wrapInQuotes = name =>
-		/\s|\W/.test(name) || _.includes(POSTGRES_RESERVED_WORDS, _.toUpper(name)) ? `"${name}"` : name;
+		/\s|\W/.test(name) || _.includes(ReservedWordsAsArray, _.toUpper(name)) ? `"${name}"` : name;
 
 	const columnMapToString = ({ name }) => wrapInQuotes(name);
 
@@ -179,9 +83,8 @@ module.exports = ({ _, divideIntoActivatedAndDeactivated, commentIfDeactivated }
 		);
 	};
 
-	const prepareComment = (comment = '') => 
-		comment.replace(MUST_BE_ESCAPED, character => `${'\\'}${character}`);
-
+	const prepareComment = (comment = '') =>
+		comment.replace(MUST_BE_ESCAPED, character => `\\${character}`);
 
 	const wrapComment = comment => `E'${prepareComment(JSON.stringify(comment)).slice(1, -1)}'`;
 

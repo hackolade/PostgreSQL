@@ -1,5 +1,4 @@
 const {getModifyCheckConstraintScriptDtos} = require("./entityHelpers/checkConstraintHelper");
-const {getFullTableName} = require("./ddlHelper");
 const {getModifyEntityCommentsScriptDtos} = require("./entityHelpers/commentsHelper");
 const {getUpdateTypesScriptDtos} = require("./columnHelpers/alterTypeHelper");
 const {getModifyNonNullColumnsScriptDtos} = require("./columnHelpers/nonNullConstraintHelper");
@@ -64,7 +63,9 @@ const getAddCollectionScriptDto =
 const getDeleteCollectionScriptDto = app => collection => {
     const _ = app.require('lodash');
     const ddlProvider = require('../../ddlProvider')(null, null, app);
-    const fullName = getFullTableName(_)(collection);
+    const {getFullTableName} = require('../../utils/general')(_);
+
+    const fullName = getFullTableName(collection);
     const script = ddlProvider.dropTable(fullName);
     return AlterScriptDto.getInstance([script], true, true);
 };

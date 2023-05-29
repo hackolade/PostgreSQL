@@ -1,5 +1,4 @@
 const {AlterScriptDto} = require("./types/AlterScriptDto");
-const {getUdtName} = require("./ddlHelper");
 
 /**
  * @return {(jsonSchema: Object) => AlterScriptDto}
@@ -56,6 +55,7 @@ const getDeleteUdtScriptDto = app => udt => {
     const ddlProvider = require('../../ddlProvider')(null, null, app);
 
     const {wrapInQuotes} = require('../general')({_});
+    const {getUdtName} = require('../../utils/general')(_);
 
     const ddlUdtName = wrapInQuotes(getUdtName(udt));
     if (udt.type === 'domain') {
@@ -76,6 +76,7 @@ const getAddColumnToTypeScriptDtos =
             const _ = app.require('lodash');
             const {createColumnDefinitionBySchema} = require('./createColumnDefinition')(app);
             const {wrapInQuotes} = require('../general')({_});
+            const {getUdtName} = require('../../utils/general')(_);
             const ddlProvider = require('../../ddlProvider')(null, null, app);
             const {getDefinitionByReference} = app.require('@hackolade/ddl-fe-utils');
 
