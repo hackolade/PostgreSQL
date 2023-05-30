@@ -4,7 +4,7 @@ const {getUpdateTypesScriptDtos} = require("./columnHelpers/alterTypeHelper");
 const {getModifyNonNullColumnsScriptDtos} = require("./columnHelpers/nonNullConstraintHelper");
 const {getModifiedCommentOnColumnScriptDtos} = require("./columnHelpers/commentsHelper");
 const {getRenameColumnScriptDtos} = require("./columnHelpers/renameColumnHelper");
-const {AlterScriptDto} = require("./types/AlterScriptDto");
+const {AlterScriptDto} = require("../types/AlterScriptDto");
 
 
 /**
@@ -16,7 +16,7 @@ const getAddCollectionScriptDto =
             const _ = app.require('lodash');
             const {getEntityName} = require('../../utils/general')(_);
             const {createColumnDefinitionBySchema} = require('./createColumnDefinition')(app);
-            const ddlProvider = require('../../ddlProvider')(null, null, app);
+            const ddlProvider = require('../../ddlProvider/ddlProvider')(null, null, app);
             const {getDefinitionByReference} = app.require('@hackolade/ddl-fe-utils');
 
             const schemaName = collection.compMod.keyspaceName;
@@ -62,7 +62,7 @@ const getAddCollectionScriptDto =
  * */
 const getDeleteCollectionScriptDto = app => collection => {
     const _ = app.require('lodash');
-    const ddlProvider = require('../../ddlProvider')(null, null, app);
+    const ddlProvider = require('../../ddlProvider/ddlProvider')(null, null, app);
     const {getFullTableName} = require('../../utils/general')(_);
 
     const fullName = getFullTableName(collection);
@@ -75,7 +75,7 @@ const getDeleteCollectionScriptDto = app => collection => {
  * */
 const getModifyCollectionScriptDtos = (app) => (collection) => {
     const _ = app.require('lodash');
-    const ddlProvider = require('../../ddlProvider')(null, null, app);
+    const ddlProvider = require('../../ddlProvider/ddlProvider')(null, null, app);
 
     const modifyCheckConstraintScriptDtos = getModifyCheckConstraintScriptDtos(_, ddlProvider)(collection);
     const modifyCommentScriptDtos = getModifyEntityCommentsScriptDtos(_, ddlProvider)(collection);
@@ -94,7 +94,7 @@ const getAddColumnScriptDtos =
             const _ = app.require('lodash');
             const {getEntityName, getNamePrefixedWithSchemaName} = require('../../utils/general')(_);
             const {createColumnDefinitionBySchema} = require('./createColumnDefinition')(app);
-            const ddlProvider = require('../../ddlProvider')(null, null, app);
+            const ddlProvider = require('../../ddlProvider/ddlProvider')(null, null, app);
             const {getDefinitionByReference} = app.require('@hackolade/ddl-fe-utils');
 
             const collectionSchema = {...collection, ...(_.omit(collection?.role, 'properties') || {})};
@@ -132,7 +132,7 @@ const getAddColumnScriptDtos =
  * */
 const getDeleteColumnScriptDtos = app => collection => {
     const _ = app.require('lodash');
-    const ddlProvider = require('../../ddlProvider')(null, null, app);
+    const ddlProvider = require('../../ddlProvider/ddlProvider')(null, null, app);
     const {getEntityName, getNamePrefixedWithSchemaName, wrapInQuotes} = require('../../utils/general')(_);
 
     const collectionSchema = {...collection, ...(_.omit(collection?.role, 'properties') || {})};
@@ -154,7 +154,7 @@ const getDeleteColumnScriptDtos = app => collection => {
  * */
 const getModifyColumnScriptDtos = app => collection => {
     const _ = app.require('lodash');
-    const ddlProvider = require('../../ddlProvider')(null, null, app);
+    const ddlProvider = require('../../ddlProvider/ddlProvider')(null, null, app);
 
     const renameColumnScriptDtos = getRenameColumnScriptDtos(_, ddlProvider)(collection);
     const updateTypeScriptDtos = getUpdateTypesScriptDtos(_, ddlProvider)(collection);

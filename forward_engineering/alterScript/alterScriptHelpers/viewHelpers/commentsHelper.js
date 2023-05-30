@@ -1,4 +1,4 @@
-const {AlterScriptDto} = require("../types/AlterScriptDto");
+const {AlterScriptDto} = require("../../types/AlterScriptDto");
 
 const extractDescription = (view) => {
     return view?.role?.compMod?.description || {};

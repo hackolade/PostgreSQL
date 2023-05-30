@@ -1,4 +1,4 @@
-const {AlterScriptDto} = require("./types/AlterScriptDto");
+const {AlterScriptDto} = require("../types/AlterScriptDto");
 
 /**
  * @return {(jsonSchema: Object) => AlterScriptDto}
@@ -8,7 +8,7 @@ const getCreateUdtScriptDto =
         jsonSchema => {
             const _ = app.require('lodash');
             const {createColumnDefinitionBySchema} = require('./createColumnDefinition')(app);
-            const ddlProvider = require('../../ddlProvider')(null, null, app);
+            const ddlProvider = require('../../ddlProvider/ddlProvider')(null, null, app);
             const {getDefinitionByReference} = app.require('@hackolade/ddl-fe-utils');
 
             const schemaData = {dbVersion};
@@ -52,7 +52,7 @@ const getCreateUdtScriptDto =
  * */
 const getDeleteUdtScriptDto = app => udt => {
     const _ = app.require('lodash');
-    const ddlProvider = require('../../ddlProvider')(null, null, app);
+    const ddlProvider = require('../../ddlProvider/ddlProvider')(null, null, app);
 
     const {getUdtName, wrapInQuotes} = require('../../utils/general')(_);
 
@@ -75,7 +75,7 @@ const getAddColumnToTypeScriptDtos =
             const _ = app.require('lodash');
             const {createColumnDefinitionBySchema} = require('./createColumnDefinition')(app);
             const {getUdtName, wrapInQuotes} = require('../../utils/general')(_);
-            const ddlProvider = require('../../ddlProvider')(null, null, app);
+            const ddlProvider = require('../../ddlProvider/ddlProvider')(null, null, app);
             const {getDefinitionByReference} = app.require('@hackolade/ddl-fe-utils');
 
             const fullName = wrapInQuotes(getUdtName(udt));
@@ -110,7 +110,7 @@ const getAddColumnToTypeScriptDtos =
  * */
 const getDeleteColumnFromTypeScriptDtos = app => udt => {
     const _ = app.require('lodash');
-    const ddlProvider = require('../../ddlProvider')(null, null, app);
+    const ddlProvider = require('../../ddlProvider/ddlProvider')(null, null, app);
 
     const {wrapInQuotes} = require('../../utils/general')(_);
 
@@ -125,9 +125,9 @@ const getDeleteColumnFromTypeScriptDtos = app => udt => {
 /**
  * @return {(udt: Object) => AlterScriptDto[]}
  * */
-const getModifyColumnOfTypeScriptDto = app => udt => {
+const getModifyColumnOfTypeScriptDtos = app => udt => {
     const _ = app.require('lodash');
-    const ddlProvider = require('../../ddlProvider')(null, null, app);
+    const ddlProvider = require('../../ddlProvider/ddlProvider')(null, null, app);
 
     const {checkFieldPropertiesChanged, wrapInQuotes} = require('../../utils/general')(_);
 
@@ -159,5 +159,5 @@ module.exports = {
     getDeleteUdtScriptDto,
     getAddColumnToTypeScriptDtos,
     getDeleteColumnFromTypeScriptDtos,
-    getModifyColumnOfTypeScriptDto,
+    getModifyColumnOfTypeScriptDtos,
 };

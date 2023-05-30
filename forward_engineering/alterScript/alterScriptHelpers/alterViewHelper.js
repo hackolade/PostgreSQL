@@ -1,11 +1,11 @@
 const {getModifyViewCommentsScriptDtos} = require("./viewHelpers/commentsHelper");
-const {AlterScriptDto} = require("./types/AlterScriptDto");
+const {AlterScriptDto} = require("../types/AlterScriptDto");
 
 /**
  * @return {(view: Object) => AlterScriptDto}
  * */
 const getAddViewScriptDto = app => view => {
-	const ddlProvider = require('../../ddlProvider')(null, null, app);
+	const ddlProvider = require('../../ddlProvider/ddlProvider')(null, null, app);
 
 	const viewData = {
 		name: view.code || view.name,
@@ -23,7 +23,7 @@ const getAddViewScriptDto = app => view => {
  * */
 const getDeleteViewScriptDto = app => view => {
 	const _ = app.require('lodash');
-	const ddlProvider = require('../../ddlProvider')(null, null, app);
+	const ddlProvider = require('../../ddlProvider/ddlProvider')(null, null, app);
 	const { wrapInQuotes } = require('../../utils/general')(_);
 	const viewName = wrapInQuotes(view.code || view.name);
 
@@ -36,7 +36,7 @@ const getDeleteViewScriptDto = app => view => {
  * */
 const getModifyViewScriptDtos = (app) => (view) => {
 	const _ = app.require('lodash');
-	const ddlProvider = require('../../ddlProvider')(null, null, app);
+	const ddlProvider = require('../../ddlProvider/ddlProvider')(null, null, app);
 
 	const modifyCommentsScriptDtos = getModifyViewCommentsScriptDtos(_, ddlProvider)(view);
 

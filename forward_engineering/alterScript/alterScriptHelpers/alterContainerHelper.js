@@ -1,12 +1,12 @@
 const {getModifySchemaCommentsScriptDtos} = require("./containerHelpers/commentsHelper");
-const {AlterScriptDto} = require("./types/AlterScriptDto");
+const {AlterScriptDto} = require("../types/AlterScriptDto");
 
 /**
  * @return {(containerName: string) => AlterScriptDto}
  * */
 const getAddContainerScriptDto = (app) => (containerName) => {
 	const _ = app.require('lodash');
-	const ddlProvider = require('../../ddlProvider')(null, null, app);
+	const ddlProvider = require('../../ddlProvider/ddlProvider')(null, null, app);
 	const {wrapInQuotes} = require('../../utils/general')(_);
 	const script = ddlProvider.createSchemaOnly(wrapInQuotes(containerName));
 	return AlterScriptDto.getInstance([script], true, false);
@@ -17,7 +17,7 @@ const getAddContainerScriptDto = (app) => (containerName) => {
  * */
 const getDeleteContainerScriptDto = (app) => (containerName) => {
 	const _ = app.require('lodash');
-	const ddlProvider = require('../../ddlProvider')(null, null, app);
+	const ddlProvider = require('../../ddlProvider/ddlProvider')(null, null, app);
 	const {wrapInQuotes} = require('../../utils/general')(_);
 
 	const script = ddlProvider.dropSchema(wrapInQuotes(containerName));
@@ -29,7 +29,7 @@ const getDeleteContainerScriptDto = (app) => (containerName) => {
  * */
 const getModifyContainerScriptDtos = (app) => (container) => {
 	const _ = app.require('lodash');
-	const ddlProvider = require('../../ddlProvider')(null, null, app);
+	const ddlProvider = require('../../ddlProvider/ddlProvider')(null, null, app);
 
 	const modifyCommentScriptDtos = getModifySchemaCommentsScriptDtos(_, ddlProvider)(container);
 
