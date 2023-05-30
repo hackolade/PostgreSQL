@@ -7,6 +7,9 @@
  * the agreement/contract under which the software has been supplied.
  */
 
+const {ReservedWordsAsArray} = require("../enums/reservedWords");
+const MUST_BE_ESCAPED = /\t|\n|'|\f|\r/gm;
+
 module.exports = _ => {
 	const getDbName = containerData => {
 		return _.get(containerData, '[0].code') || _.get(containerData, '[0].name', '');
@@ -92,7 +95,7 @@ module.exports = _ => {
 	};
 
 	const getFullTableName = (collection) => {
-		const {getNamePrefixedWithSchemaName} = require('../helpers/general')({_});
+		const {getNamePrefixedWithSchemaName} = require('../utils/general')(_);
 
 		const collectionSchema = {...collection, ...(_.omit(collection?.role, 'properties') || {})};
 		const tableName = getEntityName(collectionSchema);
@@ -101,14 +104,14 @@ module.exports = _ => {
 	}
 
 	const getFullColumnName = (collection, columnName) => {
-		const {wrapInQuotes} = require('../helpers/general')({_});
+		const {wrapInQuotes} = require('../utils/general')(_);
 
 		const fullTableName = getFullTableName(collection);
 		return `${fullTableName}.${wrapInQuotes(columnName)}`;
 	}
 
 	const getFullViewName = (view) => {
-		const {getNamePrefixedWithSchemaName} = require('../helpers/general')({_});
+		const {getNamePrefixedWithSchemaName} = require('../utils/general')(_);
 
 		const viewSchema = {...view, ...(_.omit(view?.role, 'properties') || {})};
 		const viewName = getViewName(viewSchema);
@@ -123,6 +126,97 @@ module.exports = _ => {
 	const getUdtName = (udt) => {
 		return udt.code || udt.name;
 	}
+
+	const getDbVersion = (dbVersion = '') => {
+		const version = dbVersion.match(/\d+/);
+
+		return Number(_.get(version, [0], 0));
+	};
+
+	const prepareComment = (comment = '') =>
+		comment.replace(MUST_BE_ESCAPED, character => `\\${character}`);
+
+	const wrapComment = comment => `E'${prepareComment(JSON.stringify(comment)).slice(1, -1)}'`;
+
+	const getFunctionArguments = functionArguments => {
+		return _.map(functionArguments, arg => {
+			const defaultExpression = arg.defaultExpression ? `DEFAULT ${arg.defaultExpression}` : '';
+
+			return _.trim(`${arg.argumentMode} ${arg.argumentName || ''} ${arg.argumentType} ${defaultExpression}`);
+		}).join(', ');
+	};
+
+	const getNamePrefixedWithSchemaName = (name, schemaName) => {
+		if (schemaName) {
+			return `${wrapInQuotes(schemaName)}.${wrapInQuotes(name)}`;
+		}
+
+		return wrapInQuotes(name);
+	};
+
+	const wrapInQuotes = name =>
+		/\s|\W/.test(name) || _.includes(ReservedWordsAsArray, _.toUpper(name)) ? `"${name}"` : name;
+
+	const columnMapToString = ({ name }) => wrapInQuotes(name);
+
+	const getColumnsList = (columns, isAllColumnsDeactivated, isParentActivated, mapColumn = columnMapToString) => {
+		const dividedColumns = divideIntoActivatedAndDeactivated(columns, mapColumn);
+		const deactivatedColumnsAsString = dividedColumns?.deactivatedItems?.length
+			? commentIfDeactivated(dividedColumns.deactivatedItems.join(', '), {
+				isActivated: false,
+				isPartOfLine: true,
+			})
+			: '';
+
+		return !isAllColumnsDeactivated && isParentActivated
+			? ' (' + dividedColumns.activatedItems.join(', ') + deactivatedColumnsAsString + ')'
+			: ' (' + columns.map(mapColumn).join(', ') + ')';
+	};
+
+	const getKeyWithAlias = key => {
+		if (!key) {
+			return '';
+		}
+
+		if (key.alias) {
+			return `${wrapInQuotes(key.name)} as ${wrapInQuotes(key.alias)}`;
+		} else {
+			return wrapInQuotes(key.name);
+		}
+	};
+
+	const getViewData = keys => {
+		if (!Array.isArray(keys)) {
+			return { tables: [], columns: [] };
+		}
+
+		return keys.reduce(
+			(result, key) => {
+				if (!key.tableName) {
+					result.columns.push(getKeyWithAlias(key));
+
+					return result;
+				}
+
+				let tableName = wrapInQuotes(key.tableName);
+
+				if (!result.tables.includes(tableName)) {
+					result.tables.push(tableName);
+				}
+
+				result.columns.push({
+					statement: `${tableName}.${getKeyWithAlias(key)}`,
+					isActivated: key.isActivated,
+				});
+
+				return result;
+			},
+			{
+				tables: [],
+				columns: [],
+			},
+		);
+	};
 
 	return {
 		getDbName,
@@ -143,5 +237,12 @@ module.exports = _ => {
 		getFullColumnName,
 		getFullViewName,
 		getUdtName,
+		getDbVersion,
+		wrapComment,
+		getFunctionArguments,
+		getNamePrefixedWithSchemaName,
+		wrapInQuotes,
+		getColumnsList,
+		getViewData,
 	};
 };

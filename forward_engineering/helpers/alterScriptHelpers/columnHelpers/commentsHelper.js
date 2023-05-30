@@ -4,8 +4,7 @@ const {AlterScriptDto} = require("../types/AlterScriptDto");
  * @return {(collection: Object) => AlterScriptDto[]}
  * */
 const getUpdatedCommentOnColumnScriptDtos = (_, ddlProvider) => (collection) => {
-    const {wrapComment} = require('../../general')({_});
-    const {getFullColumnName} = require('../../../utils/general')(_);
+    const {getFullColumnName, wrapComment} = require('../../../utils/general')(_);
     return _.toPairs(collection.properties)
         .filter(([name, jsonSchema]) => {
             const newComment = jsonSchema.description;

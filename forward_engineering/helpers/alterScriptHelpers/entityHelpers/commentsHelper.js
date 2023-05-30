@@ -4,8 +4,7 @@ const {AlterScriptDto} = require("../types/AlterScriptDto");
  * @return {(collection: Object) => AlterScriptDto}
  */
 const getUpdatedCommentOnCollectionScriptDto = (_, ddlProvider) => (collection) => {
-    const {getFullTableName} = require('../../../utils/general')(_);
-    const {wrapComment} = require('../../general')({_});
+    const {getFullTableName, wrapComment} = require('../../../utils/general')(_);
 
     const descriptionInfo = collection?.role.compMod?.description;
     if (!descriptionInfo) {

@@ -7,7 +7,7 @@ const {AlterScriptDto} = require("./types/AlterScriptDto");
 const getAddContainerScriptDto = (app) => (containerName) => {
 	const _ = app.require('lodash');
 	const ddlProvider = require('../../ddlProvider')(null, null, app);
-	const {wrapInQuotes} = require('../general')({_});
+	const {wrapInQuotes} = require('../../utils/general')(_);
 	const script = ddlProvider.createSchemaOnly(wrapInQuotes(containerName));
 	return AlterScriptDto.getInstance([script], true, false);
 };
@@ -18,7 +18,7 @@ const getAddContainerScriptDto = (app) => (containerName) => {
 const getDeleteContainerScriptDto = (app) => (containerName) => {
 	const _ = app.require('lodash');
 	const ddlProvider = require('../../ddlProvider')(null, null, app);
-	const {wrapInQuotes} = require('../general')({_});
+	const {wrapInQuotes} = require('../../utils/general')(_);
 
 	const script = ddlProvider.dropSchema(wrapInQuotes(containerName));
 	return AlterScriptDto.getInstance([script], true, true);

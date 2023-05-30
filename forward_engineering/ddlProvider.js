@@ -12,21 +12,15 @@ module.exports = (baseProvider, options, app) => {
 		hasType,
 		wrap,
 		clean,
-	} = require('./utils/general')(_);
-	const assignTemplates = require('./utils/assignTemplates');
-	const {
+		wrapComment,
 		getFunctionArguments,
 		wrapInQuotes,
 		getNamePrefixedWithSchemaName,
 		getColumnsList,
 		getViewData,
-		wrapComment,
-		getDbVersion,
-	} = require('./helpers/general')({
-		_,
-		divideIntoActivatedAndDeactivated,
-		commentIfDeactivated,
-	});
+	} = require('./utils/general')(_);
+	const assignTemplates = require('./utils/assignTemplates');
+
 	const {
 		generateConstraintsString,
 		foreignKeysToString,
@@ -287,6 +281,7 @@ module.exports = (baseProvider, options, app) => {
 			const ifNotExist = index.ifNotExist ? ' IF NOT EXISTS' : '';
 			const only = index.only ? ' ONLY' : '';
 			const using = index.index_method ? ` USING ${_.toUpper(index.index_method)}` : '';
+			const { getDbVersion } = require('utils/general')(_);
 			const dbVersion = getDbVersion(_.get(dbData, 'dbVersion', ''));
 			const nullsDistinct = isUnique && index.nullsDistinct && dbVersion >= 15 ? `\n ${index.nullsDistinct}` : '';
 
@@ -448,6 +443,7 @@ module.exports = (baseProvider, options, app) => {
 				: '';
 			const security_barrier = viewData.viewOptions?.security_barrier ? `security_barrier` : '';
 			const dbVersionWhereSecurityInvokerAppeared = 15;
+			const { getDbVersion } = require('utils/general')(_);
 			const security_invoker =
 				viewData.viewOptions?.security_invoker &&
 				getDbVersion(dbData.dbVersion) >= dbVersionWhereSecurityInvokerAppeared
@@ -546,6 +542,7 @@ module.exports = (baseProvider, options, app) => {
 			const timePrecision = _.includes(timeTypes, columnDefinition.type) ? jsonSchema.timePrecision : '';
 			const timezone = _.includes(timeTypes, columnDefinition.type) ? jsonSchema.timezone : '';
 			const intervalOptions = columnDefinition.type === 'interval' ? jsonSchema.intervalOptions : '';
+			const { getDbVersion } = require('utils/general')(_);
 			const dbVersion = getDbVersion(schemaData.dbVersion)
 			const primaryKeyOptions = _.omit(
 				keyHelper.hydratePrimaryKeyOptions(
@@ -658,6 +655,7 @@ module.exports = (baseProvider, options, app) => {
 				? getNamePrefixedWithSchemaName(partitionParent.collectionName, partitionParent.bucketName)
 				: '';
 			const triggers = hydrateTriggers(entityData, tableData.relatedSchemas);
+			const { getDbVersion } = require('utils/general')(_);
 			const dbVersion = getDbVersion(_.get(tableData, 'dbData.dbVersion', ''));
 
 			return {

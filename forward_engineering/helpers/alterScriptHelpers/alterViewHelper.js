@@ -24,7 +24,7 @@ const getAddViewScriptDto = app => view => {
 const getDeleteViewScriptDto = app => view => {
 	const _ = app.require('lodash');
 	const ddlProvider = require('../../ddlProvider')(null, null, app);
-	const { wrapInQuotes } = require('../general')({ _ });
+	const { wrapInQuotes } = require('../../utils/general')(_);
 	const viewName = wrapInQuotes(view.code || view.name);
 
 	const script = ddlProvider.dropView(viewName);

@@ -41,7 +41,7 @@ const mapCheckConstraintNamesToChangeHistory = (_) => (collection) => {
  * @return {(constraintHistory: Array<CheckConstraintHistoryEntry>, fullTableName: string) => Array<AlterScriptDto>}
  * */
 const getDropCheckConstraintScriptDtos = (_, ddlProvider) => (constraintHistory, fullTableName) => {
-    const {wrapInQuotes} = require('../../general')({_});
+    const {wrapInQuotes} = require('../../../utils/general')(_);
 
     return constraintHistory
         .filter(historyEntry => historyEntry.old && !historyEntry.new)
@@ -56,7 +56,7 @@ const getDropCheckConstraintScriptDtos = (_, ddlProvider) => (constraintHistory,
  * @return {(constraintHistory: Array<CheckConstraintHistoryEntry>, fullTableName: string) => Array<AlterScriptDto>}
  * */
 const getAddCheckConstraintScriptDtos = (_, ddlProvider) => (constraintHistory, fullTableName) => {
-    const {wrapInQuotes} = require('../../general')({_});
+    const {wrapInQuotes} = require('../../../utils/general')(_);
 
     return constraintHistory
         .filter(historyEntry => historyEntry.new && !historyEntry.old)
@@ -71,7 +71,7 @@ const getAddCheckConstraintScriptDtos = (_, ddlProvider) => (constraintHistory, 
  * @return {(constraintHistory: Array<CheckConstraintHistoryEntry>, fullTableName: string) => Array<AlterScriptDto>}
  * */
 const getUpdateCheckConstraintScriptDtos = (_, ddlProvider) => (constraintHistory, fullTableName) => {
-    const {wrapInQuotes} = require('../../general')({_});
+    const {wrapInQuotes} = require('../../../utils/general')(_);
 
     return constraintHistory
         .filter(historyEntry => {
