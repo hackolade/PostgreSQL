@@ -6,8 +6,8 @@ const {AlterScriptDto} = require('./types/AlterScriptDto');
  * @return {(dtos: AlterScriptDto[], shouldApplyDropStatements: boolean) => string}
  * */
 const joinAlterScriptDtosIntoScript = (_) => (dtos, shouldApplyDropStatements) => {
-    const { commentIfDeactivated } = require('../utils/general')(_);
-    const script = dtos.map((dto) => {
+    const {commentIfDeactivated} = require('../utils/general')(_);
+    return dtos.map((dto) => {
         if (dto.isActivated === false) {
             return dto.scripts
                 .map((scriptDto) => commentIfDeactivated(scriptDto.script, {
@@ -29,8 +29,6 @@ const joinAlterScriptDtosIntoScript = (_) => (dtos, shouldApplyDropStatements) =
         .map((scriptLine) => scriptLine.trim())
         .filter(Boolean)
         .join('\n\n');
-
-    return script + '\n\n';
 }
 
 /**
