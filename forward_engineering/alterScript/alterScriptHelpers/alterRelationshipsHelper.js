@@ -1,8 +1,11 @@
 const {AlterScriptDto} = require("../types/AlterScriptDto");
+const {
+    AlterRelationshipDto
+} = require('../types/AlterRelationshipDto');
 
 
 /**
- * @param relationship {Object}
+ * @param relationship {AlterRelationshipDto}
  * @return string
  * */
 const getRelationshipName = (relationship) => {
@@ -10,35 +13,41 @@ const getRelationshipName = (relationship) => {
 }
 
 /**
- * @return {(relationship: Object) => string}
+ * @return {(relationship: AlterRelationshipDto) => string}
  * */
-const getAddSingleForeignKeyScript = (ddlProvider, _) => (relationship) => {
+const getFullChildTableName = (_) => (relationship) => {
+    const {getNamePrefixedWithSchemaName} = require('../../utils/general')(_);
     const compMod = relationship.role.compMod;
-    
-    // const parentDBName = replaceSpaceWithUnderscore(compMod.parent.bucketName);
-    // const parentEntityName = replaceSpaceWithUnderscore(compMod.parent.collectionName);
-    // const parentTableName = getFullEntityName(parentDBName, parentEntityName);
-    //
-    // const childDBName = replaceSpaceWithUnderscore(compMod.child.bucketName);
-    // const childEntityName = replaceSpaceWithUnderscore(compMod.child.collectionName);
-    // const childTableName = getFullEntityName(childDBName, childEntityName);
-    //
-    // const relationshipName = compMod.name?.new || getRelationshipName(relationship) || '';
-    //
-    // const addFkConstraintDto = {
-    //     childTableName,
-    //     fkConstraintName: prepareName(relationshipName),
-    //     childColumns: compMod.child.fieldNames.map(name => prepareName(name)),
-    //     parentTableName,
-    //     parentColumns: compMod.parent.fieldNames.map(name => prepareName(name)),
-    // };
-    // return ddlProvider.addFkConstraint(addFkConstraintDto);
 
-    return '';
+    const childBucketName = compMod.child.bucket.name;
+    const childEntityName = compMod.child.collection.name;
+    return getNamePrefixedWithSchemaName(childEntityName, childBucketName);
 }
 
 /**
- * @param relationship {Object}
+ * @return {(relationship: AlterRelationshipDto) => string}
+ * */
+const getAddSingleForeignKeyScript = (ddlProvider, _) => (relationship) => {
+    const compMod = relationship.role.compMod;
+
+    const relationshipName = compMod.name?.new || getRelationshipName(relationship) || '';
+
+    return ddlProvider.createForeignKey({
+        name: relationshipName,
+        foreignKey: compMod.child.collection.fkFields,
+        primaryKey: compMod.parent.collection.fkFields,
+        customProperties: compMod.customProperties?.new,
+        foreignTable: compMod.child.collection.name,
+        foreignSchemaName: compMod.child.bucket.name,
+        foreignTableActivated: compMod.child.collection.isActivated,
+        primaryTable: compMod.parent.collection.name,
+        primarySchemaName: compMod.parent.bucket.name,
+        primaryTableActivated: compMod.parent.collection.isActivated,
+    }).statement;
+}
+
+/**
+ * @param relationship {AlterRelationshipDto}
  * @return boolean
  * */
 const canRelationshipBeAdded = (relationship) => {
@@ -48,17 +57,17 @@ const canRelationshipBeAdded = (relationship) => {
     }
     return [
         (compMod.name?.new || getRelationshipName(relationship)),
-        compMod.parent?.bucketName,
-        compMod.parent?.collectionName,
-        compMod.parent?.fieldNames?.length,
-        compMod.child?.bucketName,
-        compMod.child?.collectionName,
-        compMod.child?.fieldNames?.length,
+        compMod.parent?.bucket,
+        compMod.parent?.collection,
+        compMod.parent?.collection?.fkFields?.length,
+        compMod.child?.bucket,
+        compMod.child?.collection,
+        compMod.child?.collection?.fkFields?.length,
     ].every(property => Boolean(property));
 }
 
 /**
- * @return {(addedRelationships: Array<Object>) => Array<AlterScriptDto>}
+ * @return {(addedRelationships: Array<AlterRelationshipDto>) => Array<AlterScriptDto>}
  * */
 const getAddForeignKeyScriptDtos = (ddlProvider, _) => (addedRelationships) => {
     return addedRelationships
@@ -73,21 +82,23 @@ const getAddForeignKeyScriptDtos = (ddlProvider, _) => (addedRelationships) => {
 }
 
 /**
- * @return {(relationship: Object) => string}
+ * @return {(relationship: AlterRelationshipDto) => string}
  * */
 const getDeleteSingleForeignKeyScript = (ddlProvider, _) => (relationship) => {
-    const { getNamePrefixedWithSchemaName, wrapInQuotes } = require('../../utils/general')(_);
+    const {wrapInQuotes} = require('../../utils/general')(_);
     const compMod = relationship.role.compMod;
 
-    const childBucketName = compMod.child.bucketName;
-    const childEntityName = compMod.child.collectionName;
-    const ddlChildEntityName = getNamePrefixedWithSchemaName(childEntityName, childBucketName);
+    const ddlChildEntityName = getFullChildTableName(_)(relationship);
 
     const relationshipName = compMod.name?.old || getRelationshipName(relationship) || '';
     const ddlRelationshipName = wrapInQuotes(relationshipName);
     return ddlProvider.dropForeignKey(ddlChildEntityName, ddlRelationshipName);
 }
 
+/**
+ * @param relationship {AlterRelationshipDto}
+ * @return {boolean}
+ * */
 const canRelationshipBeDeleted = (relationship) => {
     const compMod = relationship.role.compMod;
     if (!compMod) {
@@ -95,13 +106,13 @@ const canRelationshipBeDeleted = (relationship) => {
     }
     return [
         (compMod.name?.old || getRelationshipName(relationship)),
-        compMod.child?.bucketName,
-        compMod.child?.collectionName,
+        compMod.child?.bucket,
+        compMod.child?.collection,
     ].every(property => Boolean(property));
 }
 
 /**
- * @return {(deletedRelationships: Array<Object>) => Array<AlterScriptDto>}
+ * @return {(deletedRelationships: Array<AlterRelationshipDto>) => Array<AlterScriptDto>}
  * */
 const getDeleteForeignKeyScriptDtos = (ddlProvider, _) => (deletedRelationships) => {
     return deletedRelationships
@@ -116,7 +127,7 @@ const getDeleteForeignKeyScriptDtos = (ddlProvider, _) => (deletedRelationships)
 }
 
 /**
- * @return {(modifiedRelationships: Array<Object>) => Array<AlterScriptDto>}
+ * @return {(modifiedRelationships: Array<AlterRelationshipDto>) => Array<AlterScriptDto>}
  * */
 const getModifyForeignKeyScriptDtos = (ddlProvider, _) => (modifiedRelationships) => {
     return modifiedRelationships

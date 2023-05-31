@@ -55,6 +55,11 @@ module.exports = _ => {
 		return keys.every(key => _.get(key, 'isActivated', true));
 	};
 
+	/**
+	 * @param keys {Array<{
+	 *     isActivated: boolean,
+	 * }>}
+	 * */
 	const checkAllKeysDeactivated = keys => {
 		return keys.length ? keys.every(key => !_.get(key, 'isActivated', true)) : false;
 	};

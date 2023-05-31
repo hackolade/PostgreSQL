@@ -320,6 +320,36 @@ module.exports = (baseProvider, options, app) => {
 			});
 		},
 
+		/**
+		 * @param name {string}
+		 * @param isActivated {boolean}
+		 * @param customProperties {{
+		 *     relationshipOnDelete?: string,
+		 *     relationshipOnUpdate?: string,
+		 *     relationshipMatch?: string,
+		 * }}
+		 * @param primaryTableActivated {boolean}
+		 * @param foreignTableActivated {boolean}
+		 * @param foreignSchemaName {string}
+		 * @param primarySchemaName {string}
+		 * @param primaryTable {string}
+		 * @param primaryKey {Array<{
+		 *     isActivated: boolean,
+		 *     name: string,
+		 * }>}
+		 * @param foreignKey {Array<{
+		 *     isActivated: boolean,
+		 *     name: string,
+		 * }>}
+		 * @param schemaData {{
+		 *     schemaName: string
+		 * }}
+		 * @param dbData {any}
+		 * @return {{
+		 *     statement: string,
+		 *     isActivated: boolean,
+		 * }}
+		 * */
 		createForeignKeyConstraint(
 			{
 				name,
@@ -364,6 +394,37 @@ module.exports = (baseProvider, options, app) => {
 			};
 		},
 
+		/**
+		 * @param name {string}
+		 * @param isActivated {boolean}
+		 * @param customProperties {{
+		 *     relationshipOnDelete?: string,
+		 *     relationshipOnUpdate?: string,
+		 *     relationshipMatch?: string,
+		 * }}
+		 * @param primaryTableActivated {boolean}
+		 * @param foreignTableActivated {boolean}
+		 * @param foreignSchemaName {string}
+		 * @param foreignTable {string}
+		 * @param primarySchemaName {string}
+		 * @param primaryTable {string}
+		 * @param primaryKey {Array<{
+		 *     isActivated: boolean,
+		 *     name: string,
+		 * }>}
+		 * @param foreignKey {Array<{
+		 *     isActivated: boolean,
+		 *     name: string,
+		 * }>}
+		 * @param schemaData {{
+		 *     schemaName: string
+		 * }}
+		 * @param dbData {any}
+		 * @return {{
+		 *     statement: string,
+		 *     isActivated: boolean,
+		 * }}
+		 * */
 		createForeignKey(
 			{
 				name,
@@ -376,17 +437,19 @@ module.exports = (baseProvider, options, app) => {
 				foreignSchemaName,
 				primarySchemaName,
 				customProperties,
+				isActivated
 			},
 			dbData,
 			schemaData,
 		) {
 			const isAllPrimaryKeysDeactivated = checkAllKeysDeactivated(primaryKey);
 			const isAllForeignKeysDeactivated = checkAllKeysDeactivated(foreignKey);
-			const isActivated =
+			const isRelationshipActivated =
 				!isAllPrimaryKeysDeactivated &&
 				!isAllForeignKeysDeactivated &&
 				primaryTableActivated &&
-				foreignTableActivated;
+				foreignTableActivated &&
+				isActivated;
 
 			const { foreignOnDelete, foreignOnUpdate, foreignMatch } =
 				additionalPropertiesForForeignKey(customProperties);
@@ -395,8 +458,8 @@ module.exports = (baseProvider, options, app) => {
 				primaryTable: getNamePrefixedWithSchemaName(primaryTable, primarySchemaName || schemaData.schemaName),
 				foreignTable: getNamePrefixedWithSchemaName(foreignTable, foreignSchemaName || schemaData.schemaName),
 				name: name ? wrapInQuotes(name) : '',
-				foreignKey: isActivated ? foreignKeysToString(foreignKey) : foreignActiveKeysToString(foreignKey),
-				primaryKey: isActivated ? foreignKeysToString(primaryKey) : foreignActiveKeysToString(primaryKey),
+				foreignKey: isRelationshipActivated ? foreignKeysToString(foreignKey) : foreignActiveKeysToString(foreignKey),
+				primaryKey: isRelationshipActivated ? foreignKeysToString(primaryKey) : foreignActiveKeysToString(primaryKey),
 				onDelete: foreignOnDelete ? ` ON DELETE ${foreignOnDelete}` : '',
 				onUpdate: foreignOnUpdate ? ` ON UPDATE ${foreignOnUpdate}` : '',
 				match: foreignMatch ? ` MATCH ${foreignMatch}` : '',
@@ -404,7 +467,7 @@ module.exports = (baseProvider, options, app) => {
 
 			return {
 				statement: _.trim(foreignKeyStatement),
-				isActivated,
+				isActivated: isRelationshipActivated,
 			};
 		},
 
