@@ -1,7 +1,7 @@
 const {AlterScriptDto} = require("../types/AlterScriptDto");
 
 /**
- * @return {(jsonSchema: Object) => AlterScriptDto}
+ * @return {(jsonSchema: Object) => AlterScriptDto |  undefined}
  * */
 const getCreateUdtScriptDto =
     ({app, dbVersion, modelDefinitions, internalDefinitions, externalDefinitions}) =>
@@ -48,7 +48,7 @@ const getCreateUdtScriptDto =
 
 
 /**
- * @return {(udt: Object) => AlterScriptDto}
+ * @return {(udt: Object) => AlterScriptDto | undefined}
  * */
 const getDeleteUdtScriptDto = app => udt => {
     const _ = app.require('lodash');
@@ -102,7 +102,8 @@ const getAddColumnToTypeScriptDtos =
                 })
                 .map(ddlProvider.convertColumnDefinition)
                 .map(columnDefinition => ddlProvider.alterTypeAddAttribute(fullName, columnDefinition))
-                .map(script => AlterScriptDto.getInstance([script], true, false));
+                .map(script => AlterScriptDto.getInstance([script], true, false))
+                .filter(Boolean);
         };
 
 /**
@@ -119,7 +120,8 @@ const getDeleteColumnFromTypeScriptDtos = app => udt => {
     return _.toPairs(udt.properties)
         .filter(([name, jsonSchema]) => !jsonSchema.compMod)
         .map(([name]) => ddlProvider.alterTypeDropAttribute(fullName, wrapInQuotes(name)))
-        .map(script => AlterScriptDto.getInstance([script], true, true));
+        .map(script => AlterScriptDto.getInstance([script], true, true))
+        .filter(Boolean);
 };
 
 /**
@@ -151,7 +153,10 @@ const getModifyColumnOfTypeScriptDtos = app => udt => {
         })
         .map(script => AlterScriptDto.getInstance([script], true, false));
 
-    return [...renameColumnScripts, ...changeTypeScripts];
+    return [
+        ...renameColumnScripts,
+        ...changeTypeScripts
+    ].filter(Boolean);
 };
 
 module.exports = {

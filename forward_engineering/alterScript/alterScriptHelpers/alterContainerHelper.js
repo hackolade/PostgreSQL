@@ -2,7 +2,7 @@ const {getModifySchemaCommentsScriptDtos} = require("./containerHelpers/comments
 const {AlterScriptDto} = require("../types/AlterScriptDto");
 
 /**
- * @return {(containerName: string) => AlterScriptDto}
+ * @return {(containerName: string) => AlterScriptDto | undefined}
  * */
 const getAddContainerScriptDto = (app) => (containerName) => {
 	const _ = app.require('lodash');
@@ -13,7 +13,7 @@ const getAddContainerScriptDto = (app) => (containerName) => {
 };
 
 /**
- * @return {(containerName: string) => AlterScriptDto}
+ * @return {(containerName: string) => AlterScriptDto | undefined}
  * */
 const getDeleteContainerScriptDto = (app) => (containerName) => {
 	const _ = app.require('lodash');

@@ -1046,5 +1046,18 @@ module.exports = (baseProvider, options, app) => {
 			}
 			return assignTemplates(templates.alterTypeChangeAttributeType, templateConfig);
 		},
+
+		/**
+		 * @param tableName {string}
+		 * @param fkConstraintName {string}
+		 * @return string
+		 * */
+		dropForeignKey(tableName, fkConstraintName) {
+			const templateConfig = {
+				tableName,
+				fkConstraintName,
+			}
+			return assignTemplates(templates.dropForeignKey, templateConfig);
+		}
 	};
 };

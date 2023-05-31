@@ -8,7 +8,7 @@ const {AlterScriptDto} = require("../types/AlterScriptDto");
 
 
 /**
- * @return {(collection: Object) => AlterScriptDto}
+ * @return {(collection: Object) => AlterScriptDto | undefined}
  * */
 const getAddCollectionScriptDto =
     ({app, dbVersion, modelDefinitions, internalDefinitions, externalDefinitions}) =>
@@ -58,7 +58,7 @@ const getAddCollectionScriptDto =
         };
 
 /**
- * @return {(collection: Object) => AlterScriptDto}
+ * @return {(collection: Object) => AlterScriptDto | undefined}
  * */
 const getDeleteCollectionScriptDto = app => collection => {
     const _ = app.require('lodash');
@@ -82,7 +82,7 @@ const getModifyCollectionScriptDtos = (app) => (collection) => {
     return [
         ...modifyCheckConstraintScriptDtos,
         ...modifyCommentScriptDtos
-    ];
+    ].filter(Boolean);
 }
 
 /**
@@ -124,7 +124,8 @@ const getAddColumnScriptDtos =
                 })
                 .map(ddlProvider.convertColumnDefinition)
                 .map(columnDefinition => ddlProvider.addColumn(fullName, columnDefinition))
-                .map(addColumnScript => AlterScriptDto.getInstance([addColumnScript], true, false));
+                .map(addColumnScript => AlterScriptDto.getInstance([addColumnScript], true, false))
+                .filter(Boolean);
         };
 
 /**
@@ -146,7 +147,8 @@ const getDeleteColumnScriptDtos = app => collection => {
             const columnNameForDDL = wrapInQuotes(name);
             return ddlProvider.dropColumn(fullTableName, columnNameForDDL)
         })
-        .map(dropColumnScript => AlterScriptDto.getInstance([dropColumnScript], true, true));
+        .map(dropColumnScript => AlterScriptDto.getInstance([dropColumnScript], true, true))
+        .filter(Boolean);
 };
 
 /**
@@ -166,7 +168,7 @@ const getModifyColumnScriptDtos = app => collection => {
         ...updateTypeScriptDtos,
         ...modifyNotNullScriptDtos,
         ...modifyCommentScriptDtos,
-    ];
+    ].filter(Boolean);
 };
 
 module.exports = {

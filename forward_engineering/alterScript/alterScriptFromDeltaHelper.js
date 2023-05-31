@@ -23,9 +23,15 @@ const {
     getDeleteViewScriptDto,
     getModifyViewScriptDtos
 } = require('./alterScriptHelpers/alterViewHelper');
-const {AlterScriptDto} = require("./types/AlterScriptDto");
+const {
+    getModifyForeignKeyScriptDtos,
+    getDeleteForeignKeyScriptDtos,
+    getAddForeignKeyScriptDtos
+} = require("./alterScriptHelpers/alterRelationshipsHelper");
+const {AlterScriptDto, ModificationScript} = require("./types/AlterScriptDto");
 const {App, CoreData} = require("../types/coreApplicationTypes");
 const {InternalDefinitions, ModelDefinitions, ExternalDefinitions} = require("../types/coreApplicationDataTypes");
+
 
 /**
  * @param dto {{
@@ -57,7 +63,7 @@ const getAlterContainersScriptDtos = ({collection, app}) => {
         ...addContainersScriptDtos,
         ...deleteContainersScriptDtos,
         ...modifyContainersScriptDtos,
-    ];
+    ].filter(Boolean);
 };
 
 
@@ -73,13 +79,13 @@ const getAlterContainersScriptDtos = ({collection, app}) => {
  * @return {AlterScriptDto[]}
  * */
 const getAlterCollectionsScriptDtos = ({
-                                        collection,
-                                        app,
-                                        dbVersion,
-                                        modelDefinitions,
-                                        internalDefinitions,
-                                        externalDefinitions,
-                                    }) => {
+                                           collection,
+                                           app,
+                                           dbVersion,
+                                           modelDefinitions,
+                                           internalDefinitions,
+                                           externalDefinitions,
+                                       }) => {
     const createCollectionsScriptDtos = []
         .concat(collection.properties?.entities?.properties?.added?.items)
         .filter(Boolean)
@@ -123,7 +129,7 @@ const getAlterCollectionsScriptDtos = ({
         ...addColumnScriptDtos,
         ...deleteColumnScriptDtos,
         ...modifyColumnScriptDtos,
-    ];
+    ].filter(Boolean);
 };
 
 /**
@@ -158,7 +164,7 @@ const getAlterViewScriptDtos = (collection, app) => {
         ...deleteViewsScriptDtos,
         ...createViewsScriptDtos,
         ...modifyViewsScriptDtos,
-    ];
+    ].filter(Boolean);
 };
 
 /**
@@ -173,13 +179,13 @@ const getAlterViewScriptDtos = (collection, app) => {
  * @return {AlterScriptDto[]}
  * */
 const getAlterModelDefinitionsScriptDtos = ({
-                                             collection,
-                                             app,
-                                             dbVersion,
-                                             modelDefinitions,
-                                             internalDefinitions,
-                                             externalDefinitions,
-                                         }) => {
+                                                collection,
+                                                app,
+                                                dbVersion,
+                                                modelDefinitions,
+                                                internalDefinitions,
+                                                externalDefinitions,
+                                            }) => {
     const createUdtScriptDtos = []
         .concat(collection.properties?.modelDefinitions?.properties?.added?.items)
         .filter(Boolean)
@@ -228,8 +234,45 @@ const getAlterModelDefinitionsScriptDtos = ({
         ...addColumnScriptDtos,
         ...deleteColumnScriptDtos,
         ...modifyColumnScriptDtos,
-    ];
+    ].filter(Boolean);
 };
+
+/**
+ * @return Array<AlterScriptDto>
+ * */
+const getAlterRelationshipsScriptDtos = ({
+                                             collection,
+                                             app,
+                                         }) => {
+    const _ = app.require('lodash');
+    const ddlProvider = require('../ddlProvider/ddlProvider')(null, null, app);
+
+    const addedRelationships = []
+        .concat(collection.properties?.relationships?.properties?.added?.items)
+        .filter(Boolean)
+        .map(item => Object.values(item.properties)[0])
+        .filter(relationship => relationship?.role?.compMod?.created);
+    const deletedRelationships = []
+        .concat(collection.properties?.relationships?.properties?.deleted?.items)
+        .filter(Boolean)
+        .map(item => Object.values(item.properties)[0])
+        .filter(relationship => relationship?.role?.compMod?.deleted);
+    const modifiedRelationships = []
+        .concat(collection.properties?.relationships?.properties?.modified?.items)
+        .filter(Boolean)
+        .map(item => Object.values(item.properties)[0])
+        .filter(relationship => relationship?.role?.compMod?.modified);
+
+    const deleteFkScriptDtos = getDeleteForeignKeyScriptDtos(ddlProvider, _)(deletedRelationships);
+    const addFkScriptDtos = getAddForeignKeyScriptDtos(ddlProvider, _)(addedRelationships);
+    const modifiedFkScriptDtos = getModifyForeignKeyScriptDtos(ddlProvider, _)(modifiedRelationships);
+
+    return [
+        ...deleteFkScriptDtos,
+        ...addFkScriptDtos,
+        ...modifiedFkScriptDtos,
+    ].filter(Boolean);
+}
 
 /**
  * @param dto {AlterScriptDto}
@@ -239,6 +282,9 @@ const prettifyAlterScriptDto = (dto) => {
     if (!dto) {
         return undefined;
     }
+    /**
+     * @type {Array<ModificationScript>}
+     * */
     const nonEmptyScriptModificationDtos = dto.scripts
         .map((scriptDto) => ({
             ...scriptDto,
@@ -289,13 +335,16 @@ const getAlterScriptDtos = (data, app) => {
         internalDefinitions,
         externalDefinitions,
     });
+    const relationshipScriptDtos = getAlterRelationshipsScriptDtos({collection, app});
 
     return [
         ...containersScriptDtos,
         ...modelDefinitionsScriptDtos,
         ...collectionsScriptDtos,
         ...viewScriptDtos,
+        ...relationshipScriptDtos,
     ]
+        .filter(Boolean)
         .map((dto) => prettifyAlterScriptDto(dto))
         .filter(Boolean);
 };
