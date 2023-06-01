@@ -1,3 +1,6 @@
+const {AlterCollectionDto} = require('../../types/AlterCollectionDto');
+const {AlterScriptDto} = require("../../types/AlterScriptDto");
+
 /**
  * @typedef {{
  *     id: string,
@@ -11,11 +14,8 @@
  * }} CheckConstraintHistoryEntry
  * */
 
-
-const {AlterScriptDto} = require("../../types/AlterScriptDto");
-
 /**
- * @return {(collection: Object) => Array<CheckConstraintHistoryEntry>}
+ * @return {(collection: AlterCollectionDto) => Array<CheckConstraintHistoryEntry>}
  * */
 const mapCheckConstraintNamesToChangeHistory = (_) => (collection) => {
     const checkConstraintHistory = collection?.compMod?.chkConstr;
@@ -98,7 +98,7 @@ const getUpdateCheckConstraintScriptDtos = (_, ddlProvider) => (constraintHistor
 }
 
 /**
- * @return {(collection: Object) => Array<AlterScriptDto>}
+ * @return {(collection: AlterCollectionDto) => Array<AlterScriptDto>}
  * */
 const getModifyCheckConstraintScriptDtos = (_, ddlProvider) => (collection) => {
     const {getFullTableName} = require('../../../utils/general')(_);

@@ -5,10 +5,12 @@ const {getModifyNonNullColumnsScriptDtos} = require("./columnHelpers/nonNullCons
 const {getModifiedCommentOnColumnScriptDtos} = require("./columnHelpers/commentsHelper");
 const {getRenameColumnScriptDtos} = require("./columnHelpers/renameColumnHelper");
 const {AlterScriptDto} = require("../types/AlterScriptDto");
+const {AlterCollectionDto} = require('../types/AlterCollectionDto');
+const {getModifyPkConstraintsScriptDtos} = require("./entityHelpers/primaryKeyHelper");
 
 
 /**
- * @return {(collection: Object) => AlterScriptDto | undefined}
+ * @return {(collection: AlterCollectionDto) => AlterScriptDto | undefined}
  * */
 const getAddCollectionScriptDto =
     ({app, dbVersion, modelDefinitions, internalDefinitions, externalDefinitions}) =>
@@ -58,7 +60,7 @@ const getAddCollectionScriptDto =
         };
 
 /**
- * @return {(collection: Object) => AlterScriptDto | undefined}
+ * @return {(collection: AlterCollectionDto) => AlterScriptDto | undefined}
  * */
 const getDeleteCollectionScriptDto = app => collection => {
     const _ = app.require('lodash');
@@ -71,7 +73,7 @@ const getDeleteCollectionScriptDto = app => collection => {
 };
 
 /**
- * @return {(collection: Object) => AlterScriptDto[]}
+ * @return {(collection: AlterCollectionDto) => AlterScriptDto[]}
  * */
 const getModifyCollectionScriptDtos = (app) => (collection) => {
     const _ = app.require('lodash');
@@ -79,6 +81,7 @@ const getModifyCollectionScriptDtos = (app) => (collection) => {
 
     const modifyCheckConstraintScriptDtos = getModifyCheckConstraintScriptDtos(_, ddlProvider)(collection);
     const modifyCommentScriptDtos = getModifyEntityCommentsScriptDtos(_, ddlProvider)(collection);
+    const modifyPKConstraintDtos = getModifyPkConstraintsScriptDtos(_, ddlProvider)(collection);
     return [
         ...modifyCheckConstraintScriptDtos,
         ...modifyCommentScriptDtos

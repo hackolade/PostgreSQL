@@ -7,6 +7,8 @@
  * the agreement/contract under which the software has been supplied.
  */
 
+const {AlterCollectionDto, AlterCollectionRoleDto} = require('../alterScript/types/AlterCollectionDto');
+
 const {ReservedWordsAsArray} = require("../enums/reservedWords");
 const MUST_BE_ESCAPED = /\t|\n|'|\f|\r/gm;
 
@@ -39,6 +41,24 @@ module.exports = _ => {
 	const hasType = (types, type) => {
 		return Object.keys(types).map(_.toLower).includes(_.toLower(type));
 	};
+
+	/**
+	 * @param collection {AlterCollectionDto}
+	 * @return {AlterCollectionDto & AlterCollectionRoleDto}
+	 * */
+	const getSchemaOfAlterCollection = (collection) => {
+		return {...collection, ...(_.omit(collection?.role, 'properties') || {})};
+	}
+
+	/**
+	 * @param collectionSchema {AlterCollectionDto & AlterCollectionRoleDto}
+	 * @return {string}
+	 * */
+	const getFullCollectionName = (collectionSchema) => {
+		const collectionName = getEntityName(collectionSchema);
+		const bucketName = collectionSchema.compMod?.keyspaceName;
+		return getNamePrefixedWithSchemaName(collectionName, bucketName);
+	}
 
 	const clean = obj =>
 		Object.entries(obj)
@@ -100,8 +120,6 @@ module.exports = _ => {
 	};
 
 	const getFullTableName = (collection) => {
-		const {getNamePrefixedWithSchemaName} = require('../utils/general')(_);
-
 		const collectionSchema = {...collection, ...(_.omit(collection?.role, 'properties') || {})};
 		const tableName = getEntityName(collectionSchema);
 		const schemaName = collectionSchema.compMod?.keyspaceName;
@@ -116,8 +134,6 @@ module.exports = _ => {
 	}
 
 	const getFullViewName = (view) => {
-		const {getNamePrefixedWithSchemaName} = require('../utils/general')(_);
-
 		const viewSchema = {...view, ...(_.omit(view?.role, 'properties') || {})};
 		const viewName = getViewName(viewSchema);
 		const schemaName = viewSchema.compMod?.keyspaceName;
@@ -249,5 +265,7 @@ module.exports = _ => {
 		wrapInQuotes,
 		getColumnsList,
 		getViewData,
+		getSchemaOfAlterCollection,
+		getFullCollectionName
 	};
 };

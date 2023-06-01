@@ -1,7 +1,8 @@
 const {AlterScriptDto} = require("../../types/AlterScriptDto");
+const {AlterCollectionDto} = require('../../types/AlterCollectionDto');
 
 /**
- * @return {(collection: Object) => AlterScriptDto}
+ * @return {(collection: AlterCollectionDto) => AlterScriptDto}
  */
 const getUpdatedCommentOnCollectionScriptDto = (_, ddlProvider) => (collection) => {
     const {getFullTableName, wrapComment} = require('../../../utils/general')(_);
@@ -24,7 +25,7 @@ const getUpdatedCommentOnCollectionScriptDto = (_, ddlProvider) => (collection) 
 }
 
 /**
- * @return {(collection: Object) => AlterScriptDto}
+ * @return {(collection: AlterCollectionDto) => AlterScriptDto}
  */
 const getDeletedCommentOnCollectionScriptDto = (_, ddlProvider) => (collection) => {
     const {getFullTableName} = require('../../../utils/general')(_);
@@ -46,7 +47,7 @@ const getDeletedCommentOnCollectionScriptDto = (_, ddlProvider) => (collection) 
 }
 
 /**
- * @return {(collection: Object) => Array<AlterScriptDto>}
+ * @return {(collection: AlterCollectionDto) => Array<AlterScriptDto>}
  * */
 const getModifyEntityCommentsScriptDtos = (_, ddlProvider) => collection => {
     const updatedCommentScript = getUpdatedCommentOnCollectionScriptDto(_, ddlProvider)(collection);
