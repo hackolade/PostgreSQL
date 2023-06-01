@@ -25,9 +25,12 @@ const getFullChildTableName = (_) => (relationship) => {
 }
 
 /**
- * @return {(relationship: AlterRelationshipDto) => string}
+ * @return {(relationship: AlterRelationshipDto) => {
+ *     isActivated: boolean,
+ *     statement: string,
+ * }}
  * */
-const getAddSingleForeignKeyScript = (ddlProvider, _) => (relationship) => {
+const getAddSingleForeignKeyStatementDto = (ddlProvider, _) => (relationship) => {
     const compMod = relationship.role.compMod;
 
     const relationshipName = compMod.name?.new || getRelationshipName(relationship) || '';
@@ -43,7 +46,8 @@ const getAddSingleForeignKeyScript = (ddlProvider, _) => (relationship) => {
         primaryTable: compMod.parent.collection.name,
         primarySchemaName: compMod.parent.bucket.name,
         primaryTableActivated: compMod.parent.collection.isActivated,
-    }).statement;
+        isActivated: Boolean(relationship.role?.compMod?.isActivated?.new),
+    });
 }
 
 /**
@@ -73,18 +77,20 @@ const getAddForeignKeyScriptDtos = (ddlProvider, _) => (addedRelationships) => {
     return addedRelationships
         .filter((relationship) => canRelationshipBeAdded(relationship))
         .map(relationship => {
-            const script = getAddSingleForeignKeyScript(ddlProvider, _)(relationship);
-            const isActivated = Boolean(relationship.role?.compMod?.isActivated?.new);
-            return AlterScriptDto.getInstance([script], isActivated, false);
+            const scriptDto = getAddSingleForeignKeyStatementDto(ddlProvider, _)(relationship);
+            return AlterScriptDto.getInstance([scriptDto.statement], scriptDto.isActivated, false);
         })
         .filter(Boolean)
         .filter(res => res.scripts.some(scriptDto => Boolean(scriptDto.script)));
 }
 
 /**
- * @return {(relationship: AlterRelationshipDto) => string}
+ * @return {(relationship: AlterRelationshipDto) => {
+ *     isActivated: boolean,
+ *     statement: string,
+ * }}
  * */
-const getDeleteSingleForeignKeyScript = (ddlProvider, _) => (relationship) => {
+const getDeleteSingleForeignKeyStatementDto = (ddlProvider, _) => (relationship) => {
     const {wrapInQuotes} = require('../../utils/general')(_);
     const compMod = relationship.role.compMod;
 
@@ -92,7 +98,14 @@ const getDeleteSingleForeignKeyScript = (ddlProvider, _) => (relationship) => {
 
     const relationshipName = compMod.name?.old || getRelationshipName(relationship) || '';
     const ddlRelationshipName = wrapInQuotes(relationshipName);
-    return ddlProvider.dropForeignKey(ddlChildEntityName, ddlRelationshipName);
+    const statement = ddlProvider.dropForeignKey(ddlChildEntityName, ddlRelationshipName);
+
+    const isRelationshipActivated = Boolean(relationship.role?.compMod?.isActivated?.new);
+    const isChildTableActivated = compMod.child.collection.isActivated;
+    return {
+        statement,
+        isActivated: isRelationshipActivated && isChildTableActivated,
+    }
 }
 
 /**
@@ -118,9 +131,8 @@ const getDeleteForeignKeyScriptDtos = (ddlProvider, _) => (deletedRelationships)
     return deletedRelationships
         .filter((relationship) => canRelationshipBeDeleted(relationship))
         .map(relationship => {
-            const script = getDeleteSingleForeignKeyScript(ddlProvider, _)(relationship);
-            const isActivated = Boolean(relationship.role?.compMod?.isActivated?.new);
-            return AlterScriptDto.getInstance([script], isActivated, true);
+            const scriptDto = getDeleteSingleForeignKeyStatementDto(ddlProvider, _)(relationship);
+            return AlterScriptDto.getInstance([scriptDto.statement], scriptDto.isActivated, true);
         })
         .filter(Boolean)
         .filter(res => res.scripts.some(scriptDto => Boolean(scriptDto.script)));
@@ -133,10 +145,10 @@ const getModifyForeignKeyScriptDtos = (ddlProvider, _) => (modifiedRelationships
     return modifiedRelationships
         .filter(relationship => canRelationshipBeAdded(relationship) && canRelationshipBeDeleted(relationship))
         .map(relationship => {
-            const deleteScript = getDeleteSingleForeignKeyScript(ddlProvider, _)(relationship);
-            const addScript = getAddSingleForeignKeyScript(ddlProvider, _)(relationship);
-            const isActivated = Boolean(relationship.role?.compMod?.isActivated?.new);
-            return AlterScriptDto.getDropAndRecreateInstance(deleteScript, addScript, isActivated);
+            const deleteScriptDto = getDeleteSingleForeignKeyStatementDto(ddlProvider, _)(relationship);
+            const addScriptDto = getAddSingleForeignKeyStatementDto(ddlProvider, _)(relationship);
+            const isActivated = addScriptDto.isActivated && deleteScriptDto.isActivated;
+            return AlterScriptDto.getDropAndRecreateInstance(deleteScriptDto.statement, addScriptDto.statement, isActivated);
         })
         .filter(Boolean)
         .filter(res => res.scripts.some(scriptDto => Boolean(scriptDto.script)));
