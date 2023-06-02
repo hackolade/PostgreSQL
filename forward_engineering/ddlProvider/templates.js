@@ -41,7 +41,7 @@ module.exports = {
 
 	dropForeignKey: 'ALTER TABLE ${tableName} DROP CONSTRAINT ${fkConstraintName};',
 
-	addPkConstraint: 'ALTER TABLE IF EXISTS ${tableName} ADD CONSTRAINT ${constraintStatement}',
+	addPkConstraint: 'ALTER TABLE IF EXISTS ${tableName} ADD ${constraintStatement};',
 
 	dropTable: 'DROP TABLE IF EXISTS ${tableName};',
 

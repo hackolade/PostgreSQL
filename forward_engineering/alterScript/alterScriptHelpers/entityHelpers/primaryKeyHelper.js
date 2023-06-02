@@ -1,33 +1,10 @@
-const { AlterScriptDto } = require('../../types/AlterScriptDto');
+const {AlterScriptDto} = require('../../types/AlterScriptDto');
 const {
     AlterCollectionDto,
     AlterCollectionColumnDto,
     AlterCollectionRoleCompModPKDto,
     AlterCollectionColumnPrimaryKeyOptionDto
 } = require('../../types/AlterCollectionDto');
-
-
-/**
- * @return {(collection: AlterCollectionDto, guid: string) => AlterCollectionColumnDto | undefined}
- * */
-const getPropertyByGuid = (_) => (collection, guid) => {
-    const propertyInArray = _.toPairs(collection?.role?.properties)
-        .filter(([name, jsonSchema]) => jsonSchema.GUID === guid)
-        .map(([name, jsonSchema]) => jsonSchema);
-    if (!propertyInArray.length) {
-        return undefined;
-    }
-    return propertyInArray[0];
-}
-
-/**
- * @return {(collection: AlterCollectionDto, guids: string[]) => Array<AlterCollectionColumnDto>}
- * */
-const getPropertiesByGuids = (_) => (collection, guids) => {
-    return guids
-        .map(guid => getPropertyByGuid(_)(collection, guid))
-        .filter(Boolean);
-}
 
 /**
  * @return {(collection: AlterCollectionDto) => boolean}
@@ -47,11 +24,11 @@ const didCompositePkChange = (_) => (collection) => {
 }
 
 /**
- * @param wrapInQuotes {(s: string) => string}
- * @return {(entityName: string) => string}
+ * @param entityName {string}
+ * @return {string}
  * */
-const getDefaultConstraintName = (wrapInQuotes) => (entityName) => {
-    return wrapInQuotes(`${entityName}_pk`);
+const getDefaultConstraintName = (entityName) => {
+    return `${entityName}_pk`;
 }
 
 /**
@@ -116,7 +93,7 @@ const getDropCompositePkScripts = (_, ddlProvider) => (collection) => {
 
     return oldPrimaryKeys
         .map((oldPk) => {
-            let constraintName = getDefaultConstraintName(wrapInQuotes)(entityName);
+            let constraintName = getDefaultConstraintName(entityName);
             if (oldPk.constraintName) {
                 constraintName = wrapInQuotes(oldPk.constraintName);
             }
@@ -140,6 +117,97 @@ const getModifyCompositePkScripts = (_, ddlProvider) => (collection) => {
 }
 
 /**
+ * @param columnJsonSchema {AlterCollectionColumnDto}
+ * @param entityName {string}
+ * @return {string}
+ * */
+const getConstraintNameForRegularPk = (columnJsonSchema, entityName) => {
+    const constraintOptions = columnJsonSchema.primaryKeyOptions;
+    if (constraintOptions?.length && constraintOptions?.length > 0) {
+        /**
+         * @type {AlterCollectionColumnPrimaryKeyOptionDto}
+         * */
+        const constraintOption = constraintOptions[0];
+        if (constraintOption.constraintName) {
+            return constraintOption.constraintName;
+        }
+    }
+    return getDefaultConstraintName(entityName);
+}
+
+/**
+ * @param _
+ * @param wrapInQuotes {(s: string) => string }
+ * @return {(
+ *      name: string,
+ *      columnJsonSchema: AlterCollectionColumnDto,
+ *      entityName: string,
+ *      entityJsonSchema: AlterCollectionDto,
+ * ) => {
+ *         name: string,
+ *         keyType: string,
+ *         columns: Array<{
+ *      		isActivated: boolean,
+ *      		name: string,
+ *  	   }>,
+ *         include: Array<{
+ *              isActivated: boolean,
+ *              name: string,
+ *         }>,
+ *         storageParameters: string,
+ *         tablespace: string,
+ *      }
+ *  }
+ * */
+const getCreateRegularPKDDLProviderConfig = (_, wrapInQuotes) => (
+    columnName,
+    columnJsonSchema,
+    entityName,
+    entityJsonSchema
+) => {
+    const constraintName = getConstraintNameForRegularPk(columnJsonSchema, entityName);
+    const pkColumns = [{
+        name: wrapInQuotes(columnName),
+        isActivated: columnJsonSchema.isActivated,
+    }];
+
+    let storageParameters = '';
+    let indexTablespace = '';
+    let includeColumns = [];
+    const constraintOptions = columnJsonSchema.primaryKeyOptions;
+    if (constraintOptions?.length && constraintOptions?.length > 0) {
+        /**
+         * @type {AlterCollectionColumnPrimaryKeyOptionDto}
+         * */
+        const constraintOption = constraintOptions[0];
+        if (constraintOption.indexStorageParameters) {
+            storageParameters = constraintOption.indexStorageParameters;
+        }
+        if (constraintOption.indexTablespace) {
+            indexTablespace = constraintOption.indexTablespace;
+        }
+        if (constraintOption.indexInclude) {
+            includeColumns = _.toPairs(entityJsonSchema.properties)
+                .filter(([name, jsonSchema]) => Boolean(constraintOption.indexInclude.find(keyDto => keyDto.keyId === jsonSchema.id)))
+                .map(([name, jsonSchema]) => ({
+                    name,
+                    isActivated: jsonSchema.isActivated,
+                }));
+        }
+    }
+
+    return {
+        name: constraintName,
+        keyType: 'PRIMARY KEY',
+        columns: pkColumns,
+        include: includeColumns,
+        storageParameters,
+        tablespace: indexTablespace,
+    }
+}
+
+
+/**
  * @return {(collection: AlterCollectionDto) => Array<AlterScriptDto>}
  * */
 const getAddPkScripts = (_, ddlProvider) => (collection) => {
@@ -149,11 +217,10 @@ const getAddPkScripts = (_, ddlProvider) => (collection) => {
         getEntityName,
         wrapInQuotes
     } = require('../../../utils/general')(_);
-    const collectionSchema = getSchemaOfAlterCollection(collection);
 
+    const collectionSchema = getSchemaOfAlterCollection(collection);
     const fullTableName = getFullCollectionName(collectionSchema);
     const entityName = getEntityName(collectionSchema);
-    const constraintName = getDefaultConstraintName(wrapInQuotes)(entityName);
 
     return _.toPairs(collection.properties)
         .filter(([name, jsonSchema]) => {
@@ -163,21 +230,12 @@ const getAddPkScripts = (_, ddlProvider) => (collection) => {
             return isRegularPrimaryKey && !wasTheFieldAPrimaryKey;
         })
         .map(([name, jsonSchema]) => {
-            const pkColumns = [{
-                name: wrapInQuotes(name),
-                isActivated: jsonSchema.isActivated,
-            }]
-
+            const ddlConfig = getCreateRegularPKDDLProviderConfig(_, wrapInQuotes)(name, jsonSchema, entityName, collection);
             return ddlProvider.createKeyConstraint(
                 fullTableName,
                 collection.isActivated,
-                {
-                    name: constraintName,
-                    columns: pkColumns,
-                    include: [],
-                    storageParameters: '',
-                    tablespace: '',
-                });
+                ddlConfig
+            );
         })
         .map(scriptDto => AlterScriptDto.getInstance([scriptDto.statement], scriptDto.isActivated, false))
         .filter(Boolean);
@@ -208,18 +266,7 @@ const getDropPkScript = (_, ddlProvider) => (collection) => {
             return wasTheFieldARegularPrimaryKey && isNotAPrimaryKey;
         })
         .map(([name, jsonSchema]) => {
-            const constraintOptions = jsonSchema.primaryKeyOptions;
-            let constraintName = getDefaultConstraintName(wrapInQuotes)(entityName);
-            if (constraintOptions?.length && constraintOptions?.length > 0) {
-                /**
-                 * @type {AlterCollectionColumnPrimaryKeyOptionDto}
-                 * */
-                const constraintOption = constraintOptions[0];
-                if (constraintOption.constraintName) {
-                    constraintName = wrapInQuotes(constraintOption.constraintName);
-                }
-            }
-
+            const constraintName = wrapInQuotes(getConstraintNameForRegularPk(jsonSchema, entityName));
             return ddlProvider.dropPkConstraint(fullTableName, constraintName);
         })
         .map(scriptLine => AlterScriptDto.getInstance([scriptLine], collection.isActivated, true))
@@ -231,11 +278,11 @@ const getDropPkScript = (_, ddlProvider) => (collection) => {
  * */
 const getModifyPkScripts = (_, ddlProvider) => (collection) => {
     const dropPkScripts = getDropPkScript(_, ddlProvider)(collection);
-    // const addPkScripts = getAddPkScripts(_, ddlProvider)(collection);
+    const addPkScripts = getAddPkScripts(_, ddlProvider)(collection);
 
     return [
         ...dropPkScripts,
-        // ...addPkScripts,
+        ...addPkScripts,
     ].filter(Boolean);
 }
 

@@ -1,6 +1,7 @@
 const defaultTypes = require('../configs/defaultTypes');
 const types = require('../configs/types');
 const templates = require('./templates');
+const assignTemplates = require("../utils/assignTemplates");
 
 module.exports = (baseProvider, options, app) => {
 	const _ = app.require('lodash');
@@ -1126,6 +1127,7 @@ module.exports = (baseProvider, options, app) => {
 		 * @param isParentActivated {boolean}
 		 * @param keyData {{
 		 *         name: string,
+		 *         keyType: string,
 		 *         columns: Array<{
 		 *      		isActivated: boolean,
 		 *      		name: string,
@@ -1143,11 +1145,14 @@ module.exports = (baseProvider, options, app) => {
 		 * }}
 		 * */
 		createKeyConstraint(tableName, isParentActivated, keyData) {
-			const constraintStatement = createKeyConstraint(templates, isParentActivated)(keyData);
-			return assignTemplates(templates.addPkConstraint, {
-				constraintStatement,
-				tableName,
-			})
+			const constraintStatementDto = createKeyConstraint(templates, isParentActivated)(keyData);
+			return {
+				statement: assignTemplates(templates.addPkConstraint, {
+					constraintStatement: (constraintStatementDto.statement || '').trim(),
+					tableName,
+				}),
+				isActivated: constraintStatementDto.isActivated,
+			}
 		},
 
 		/**

@@ -52,6 +52,7 @@ module.exports = ({
      * @return {(
      *     keyData: {
      *         name: string,
+     *         keyType: string,
      *         columns: Array<{
      *      		isActivated: boolean,
      *      		name: string,

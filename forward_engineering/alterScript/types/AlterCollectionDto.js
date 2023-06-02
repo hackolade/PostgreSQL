@@ -40,6 +40,23 @@ class AlterCollectionColumnPrimaryKeyOptionDto {
      * @type {string}
      * */
     constraintName
+
+    /**
+     * @type {string}
+     * */
+    indexStorageParameters
+
+    /**
+     * @type {string}
+     * */
+    indexTablespace
+
+    /**
+     * @type {Array<{
+     *     keyId: string
+     * }>}
+     * */
+    indexInclude
 }
 
 class AlterCollectionColumnDto {
