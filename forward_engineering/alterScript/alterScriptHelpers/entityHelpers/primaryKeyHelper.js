@@ -1,5 +1,10 @@
 const { AlterScriptDto } = require('../../types/AlterScriptDto');
-const {AlterCollectionDto, AlterCollectionColumnDto,AlterCollectionRoleCompModPKDto} = require('../../types/AlterCollectionDto');
+const {
+    AlterCollectionDto,
+    AlterCollectionColumnDto,
+    AlterCollectionRoleCompModPKDto,
+    AlterCollectionColumnPrimaryKeyOptionDto
+} = require('../../types/AlterCollectionDto');
 
 
 /**
@@ -39,6 +44,14 @@ const didCompositePkChange = (_) => (collection) => {
     }
     const areKeyArraysEqual = _(oldPrimaryKeys).differenceWith(newPrimaryKeys, _.isEqual).isEmpty();
     return !areKeyArraysEqual;
+}
+
+/**
+ * @param wrapInQuotes {(s: string) => string}
+ * @return {(entityName: string) => string}
+ * */
+const getDefaultConstraintName = (wrapInQuotes) => (entityName) => {
+    return wrapInQuotes(`${entityName}_pk`);
 }
 
 /**
@@ -107,11 +120,17 @@ const getModifyCompositePkScripts = (_, ddlProvider) => (collection) => {
  * @return {(collection: AlterCollectionDto) => Array<AlterScriptDto>}
  * */
 const getAddPkScripts = (_, ddlProvider) => (collection) => {
-    const { getFullCollectionName, getSchemaOfAlterCollection } = require('../../../utils/general')(_);
+    const {
+        getFullCollectionName,
+        getSchemaOfAlterCollection,
+        getEntityName,
+        wrapInQuotes
+    } = require('../../../utils/general')(_);
     const collectionSchema = getSchemaOfAlterCollection(collection);
 
     const fullTableName = getFullCollectionName(collectionSchema);
-    const constraintName = getEntityNameFromCollection(collection) + '_pk';
+    const entityName = getEntityName(collectionSchema);
+    const constraintName = getDefaultConstraintName(wrapInQuotes)(entityName);
 
     return _.toPairs(collection.properties)
         .filter(([name, jsonSchema]) => {
@@ -121,19 +140,40 @@ const getAddPkScripts = (_, ddlProvider) => (collection) => {
             return isRegularPrimaryKey && !wasTheFieldAPrimaryKey;
         })
         .map(([name, jsonSchema]) => {
-            const nameForDDl = prepareName(name);
-            const columnNamesForDDL = [nameForDDl];
-            return ddlProvider.addPkConstraint(fullTableName, constraintName, columnNamesForDDL);
+            const pkColumns = [{
+                name: wrapInQuotes(name),
+                isActivated: jsonSchema.isActivated,
+            }]
+
+            return ddlProvider.createKeyConstraint(
+                fullTableName,
+                collection.isActivated,
+                {
+                    name: constraintName,
+                    columns: pkColumns,
+                    include: [],
+                    storageParameters: '',
+                    tablespace: '',
+                });
         })
-        .map(scriptLine => AlterScriptDto.getInstance([scriptLine], collection.isActivated, false))
+        .map(scriptDto => AlterScriptDto.getInstance([scriptDto.statement], scriptDto.isActivated, false))
         .filter(Boolean);
 }
 
 /**
  * @return {(collection: AlterCollectionDto) => Array<AlterScriptDto>}
  * */
-const getDropPkScripts = (_, ddlProvider) => (collection) => {
-    const fullTableName = generateFullEntityName(collection);
+const getDropPkScript = (_, ddlProvider) => (collection) => {
+    const {
+        getFullCollectionName,
+        getSchemaOfAlterCollection,
+        getEntityName,
+        wrapInQuotes
+    } = require('../../../utils/general')(_);
+
+    const collectionSchema = getSchemaOfAlterCollection(collection);
+    const fullTableName = getFullCollectionName(collectionSchema);
+    const entityName = getEntityName(collectionSchema);
 
     return _.toPairs(collection.properties)
         .filter(([name, jsonSchema]) => {
@@ -145,7 +185,19 @@ const getDropPkScripts = (_, ddlProvider) => (collection) => {
             return wasTheFieldARegularPrimaryKey && isNotAPrimaryKey;
         })
         .map(([name, jsonSchema]) => {
-            return ddlProvider.dropConstraint(fullTableName, );
+            const constraintOptions = jsonSchema.primaryKeyOptions;
+            let constraintName = getDefaultConstraintName(wrapInQuotes)(entityName);
+            if (constraintOptions?.length && constraintOptions?.length > 0) {
+                /**
+                 * @type {AlterCollectionColumnPrimaryKeyOptionDto}
+                 * */
+                const constraintOption = constraintOptions[0];
+                if (constraintOption.constraintName) {
+                    constraintName = wrapInQuotes(constraintOption.constraintName);
+                }
+            }
+
+            return ddlProvider.dropPkConstraint(fullTableName, constraintName);
         })
         .map(scriptLine => AlterScriptDto.getInstance([scriptLine], collection.isActivated, true))
         .filter(Boolean);
@@ -155,7 +207,7 @@ const getDropPkScripts = (_, ddlProvider) => (collection) => {
  * @return {(collection: AlterCollectionDto) => Array<AlterScriptDto>}
  * */
 const getModifyPkScripts = (_, ddlProvider) => (collection) => {
-    const dropPkScripts = getDropPkScripts(_, ddlProvider)(collection);
+    const dropPkScripts = getDropPkScript(_, ddlProvider)(collection);
     const addPkScripts = getAddPkScripts(_, ddlProvider)(collection);
 
     return [
@@ -168,11 +220,11 @@ const getModifyPkScripts = (_, ddlProvider) => (collection) => {
  * @return {(collection: AlterCollectionDto) => Array<AlterScriptDto>}
  * */
 const getModifyPkConstraintsScriptDtos = (_, ddlProvider) => (collection) => {
-    const modifyCompositePkScripts = getModifyCompositePkScripts(_, ddlProvider)(collection);
+    // const modifyCompositePkScripts = getModifyCompositePkScripts(_, ddlProvider)(collection);
     const modifyPkScripts = getModifyPkScripts(_, ddlProvider)(collection);
 
     return [
-        ...modifyCompositePkScripts,
+        // ...modifyCompositePkScripts,
         ...modifyPkScripts,
     ].filter(Boolean);
 }

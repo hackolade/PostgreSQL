@@ -30,6 +30,18 @@ class AlterCollectionColumnCompModDto {
 
 }
 
+class AlterCollectionColumnPrimaryKeyOptionDto {
+    /**
+     * @type {string}
+     * */
+    id
+
+    /**
+     * @type {string}
+     * */
+    constraintName
+}
+
 class AlterCollectionColumnDto {
     /**
      * @type {string}
@@ -85,6 +97,11 @@ class AlterCollectionColumnDto {
      * @type {boolean}
      */
     compositeUniqueKey
+
+    /**
+     * @type {Array<AlterCollectionColumnPrimaryKeyOptionDto> | undefined}
+     * */
+    primaryKeyOptions
 
     /**
      * @type {boolean}

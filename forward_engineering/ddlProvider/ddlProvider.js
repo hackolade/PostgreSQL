@@ -1119,6 +1119,47 @@ module.exports = (baseProvider, options, app) => {
 				fkConstraintName,
 			}
 			return assignTemplates(templates.dropForeignKey, templateConfig);
-		}
+		},
+
+		/**
+		 * @param tableName {string}
+		 * @param isParentActivated {boolean}
+		 * @param keyData {{
+		 *         name: string,
+		 *         columns: Array<{
+		 *      		isActivated: boolean,
+		 *      		name: string,
+		 *  	   }>,
+		 *         include: Array<{
+		 *              isActivated: boolean,
+		 *              name: string,
+		 *         }>,
+		 *         storageParameters: string,
+		 *         tablespace: string,
+		 * }}
+		 * @return {{
+		 *     statement: string,
+		 *     isActivated: boolean,
+		 * }}
+		 * */
+		createKeyConstraint(tableName, isParentActivated, keyData) {
+			const constraintStatement = createKeyConstraint(templates, isParentActivated)(keyData);
+			return assignTemplates(templates.addPkConstraint, {
+				constraintStatement,
+				tableName,
+			})
+		},
+
+		/**
+		 * @param tableName {string}
+		 * @param constraintName {string}
+		 * */
+		dropPkConstraint(tableName, constraintName) {
+			const templatesConfig = {
+				tableName,
+				constraintName,
+			}
+			return assignTemplates(templates.dropConstraint, templatesConfig);
+		},
 	};
 };
