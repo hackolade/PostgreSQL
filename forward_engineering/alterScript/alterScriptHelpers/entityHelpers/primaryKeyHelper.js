@@ -32,37 +32,118 @@ const getDefaultConstraintName = (entityName) => {
 }
 
 /**
+ * @param primaryKey {AlterCollectionRoleCompModPKDto}
+ * @param entityName {string}
+ * @return {string}
+ * */
+const getConstraintNameForCompositePk = (primaryKey, entityName) => {
+    if (primaryKey.constraintName) {
+        return primaryKey.constraintName;
+    }
+    return getDefaultConstraintName(entityName);
+}
+
+/**
+ * @param _
+ * @param wrapInQuotes {(s: string) => string }
+ * @return {(
+ *      primaryKey: AlterCollectionRoleCompModPKDto,
+ *      entityName: string,
+ *      entityJsonSchema: AlterCollectionDto,
+ * ) => {
+ *         name: string,
+ *         keyType: string,
+ *         columns: Array<{
+ *      		isActivated: boolean,
+ *      		name: string,
+ *  	   }>,
+ *         include: Array<{
+ *              isActivated: boolean,
+ *              name: string,
+ *         }>,
+ *         storageParameters: string,
+ *         tablespace: string,
+ *      }
+ *  }
+ * */
+const getCreateCompositePKDDLProviderConfig = (_) => (
+    primaryKey,
+    entityName,
+    entity
+) => {
+    const constraintName = getConstraintNameForCompositePk(primaryKey, entityName);
+    const pkColumns = _.toPairs(entity.properties)
+        .filter(([name, jsonSchema]) => Boolean(primaryKey.compositePrimaryKey.find(keyDto => keyDto.keyId === jsonSchema.GUID)))
+        .map(([name, jsonSchema]) => ({
+            name,
+            isActivated: jsonSchema.isActivated,
+        }));
+
+    let storageParameters = '';
+    let indexTablespace = '';
+    let includeColumns = [];
+    if (primaryKey.indexStorageParameters) {
+        storageParameters = primaryKey.indexStorageParameters;
+    }
+    if (primaryKey.indexTablespace) {
+        indexTablespace = primaryKey.indexTablespace;
+    }
+    if (primaryKey.indexInclude) {
+        includeColumns = _.toPairs(entity.role.properties)
+            .filter(([name, jsonSchema]) => Boolean(primaryKey.indexInclude.find(keyDto => keyDto.keyId === jsonSchema.GUID)))
+            .map(([name, jsonSchema]) => ({
+                name,
+                isActivated: jsonSchema.isActivated,
+            }));
+    }
+
+    return {
+        name: constraintName,
+        keyType: 'PRIMARY KEY',
+        columns: pkColumns,
+        include: includeColumns,
+        storageParameters,
+        tablespace: indexTablespace,
+    }
+}
+
+/**
  * @return {(collection: AlterCollectionDto) => Array<AlterScriptDto>}
  * */
 const getAddCompositePkScripts = (_, ddlProvider) => (collection) => {
-    // const didPkChange = didCompositePkChange(_)(collection);
-    // if (!didPkChange) {
-    //     return []
-    // }
-    // const fullTableName = generateFullEntityName(collection);
-    // const constraintName = getEntityNameFromCollection(collection) + '_pk';
-    // const pkDto = collection?.role?.compMod?.primaryKey || {};
-    // const newPrimaryKeys = pkDto.new || [];
-    //
-    // return newPrimaryKeys
-    //     .map((newPk) => {
-    //         /**
-    //          * @type {Array<AlterCollectionRoleCompModPKDto>}
-    //          * */
-    //         const compositePrimaryKey = newPk.compositePrimaryKey || [];
-    //         const guidsOfColumnsInPk = compositePrimaryKey.map((compositePkEntry) => compositePkEntry.keyId);
-    //         const columnsInPk = getPropertiesByGuids(_)(collection, guidsOfColumnsInPk);
-    //         const columnNamesForDDL = columnsInPk.map(column => prepareName(column.compMod.newField.name));
-    //         if (!columnNamesForDDL.length) {
-    //             return undefined;
-    //         }
-    //         return ddlProvider.addPkConstraint(fullTableName, constraintName, columnNamesForDDL);
-    //     })
-    //     .filter(Boolean)
-    //     .map(scriptLine => AlterScriptDto.getInstance([scriptLine], collection.isActivated, false))
-    //     .filter(Boolean);
+    const {
+        getFullCollectionName,
+        getSchemaOfAlterCollection,
+        getEntityName,
+    } = require('../../../utils/general')(_);
 
-    return [];
+    const didPkChange = didCompositePkChange(_)(collection);
+    if (!didPkChange) {
+        return []
+    }
+
+    const collectionSchema = getSchemaOfAlterCollection(collection);
+    const fullTableName = getFullCollectionName(collectionSchema);
+    const entityName = getEntityName(collectionSchema);
+
+    const pkDto = collection?.role?.compMod?.primaryKey || {};
+    /**
+     * @type {Array<AlterCollectionRoleCompModPKDto>}
+     * */
+    const newPrimaryKeys = pkDto.new || [];
+
+    return newPrimaryKeys
+        .map((newPk) => {
+            const ddlConfig = getCreateCompositePKDDLProviderConfig(_)(newPk, entityName, collection);
+            return ddlProvider.createKeyConstraint(
+                fullTableName,
+                collection.isActivated,
+                ddlConfig
+            );
+        })
+        .filter(Boolean)
+        .map(scriptDto => AlterScriptDto.getInstance([scriptDto.statement], scriptDto.isActivated, false))
+        .filter(Boolean);
 }
 
 /**
@@ -108,11 +189,11 @@ const getDropCompositePkScripts = (_, ddlProvider) => (collection) => {
  * */
 const getModifyCompositePkScripts = (_, ddlProvider) => (collection) => {
     const dropCompositePkScripts = getDropCompositePkScripts(_, ddlProvider)(collection);
-    // const addCompositePkScripts = getAddCompositePkScripts(_, ddlProvider)(collection);
+    const addCompositePkScripts = getAddCompositePkScripts(_, ddlProvider)(collection);
 
     return [
         ...dropCompositePkScripts,
-        // ...addCompositePkScripts,
+        ...addCompositePkScripts,
     ].filter(Boolean);
 }
 
@@ -137,7 +218,6 @@ const getConstraintNameForRegularPk = (columnJsonSchema, entityName) => {
 
 /**
  * @param _
- * @param wrapInQuotes {(s: string) => string }
  * @return {(
  *      name: string,
  *      columnJsonSchema: AlterCollectionColumnDto,
@@ -159,15 +239,15 @@ const getConstraintNameForRegularPk = (columnJsonSchema, entityName) => {
  *      }
  *  }
  * */
-const getCreateRegularPKDDLProviderConfig = (_, wrapInQuotes) => (
+const getCreateRegularPKDDLProviderConfig = (_) => (
     columnName,
     columnJsonSchema,
     entityName,
-    entityJsonSchema
+    entity
 ) => {
     const constraintName = getConstraintNameForRegularPk(columnJsonSchema, entityName);
     const pkColumns = [{
-        name: wrapInQuotes(columnName),
+        name: columnName,
         isActivated: columnJsonSchema.isActivated,
     }];
 
@@ -187,8 +267,8 @@ const getCreateRegularPKDDLProviderConfig = (_, wrapInQuotes) => (
             indexTablespace = constraintOption.indexTablespace;
         }
         if (constraintOption.indexInclude) {
-            includeColumns = _.toPairs(entityJsonSchema.properties)
-                .filter(([name, jsonSchema]) => Boolean(constraintOption.indexInclude.find(keyDto => keyDto.keyId === jsonSchema.id)))
+            includeColumns = _.toPairs(entity.role.properties)
+                .filter(([name, jsonSchema]) => Boolean(constraintOption.indexInclude.find(keyDto => keyDto.keyId === jsonSchema.GUID)))
                 .map(([name, jsonSchema]) => ({
                     name,
                     isActivated: jsonSchema.isActivated,
@@ -215,7 +295,6 @@ const getAddPkScripts = (_, ddlProvider) => (collection) => {
         getFullCollectionName,
         getSchemaOfAlterCollection,
         getEntityName,
-        wrapInQuotes
     } = require('../../../utils/general')(_);
 
     const collectionSchema = getSchemaOfAlterCollection(collection);
@@ -230,7 +309,7 @@ const getAddPkScripts = (_, ddlProvider) => (collection) => {
             return isRegularPrimaryKey && !wasTheFieldAPrimaryKey;
         })
         .map(([name, jsonSchema]) => {
-            const ddlConfig = getCreateRegularPKDDLProviderConfig(_, wrapInQuotes)(name, jsonSchema, entityName, collection);
+            const ddlConfig = getCreateRegularPKDDLProviderConfig(_)(name, jsonSchema, entityName, collection);
             return ddlProvider.createKeyConstraint(
                 fullTableName,
                 collection.isActivated,

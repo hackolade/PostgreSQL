@@ -154,12 +154,7 @@ class AlterCollectionRoleDefinitionDto {
     properties
 }
 
-class AlterCollectionRoleCompModPKDto {
-
-    /**
-     * @type {string}
-     * */
-    id
+class AlterCollectionRoleCompModPKDto extends AlterCollectionColumnPrimaryKeyOptionDto{
 
     /**
      * @type {Array<{
@@ -169,20 +164,6 @@ class AlterCollectionRoleCompModPKDto {
      * */
     compositePrimaryKey
 
-    /**
-     * @type {string | undefined}
-     * */
-    constraintName
-
-    /**
-     * @type {string | undefined}
-     * */
-    indexStorageParameters
-
-    /**
-     * @type {string | undefined}
-     * */
-    indexTablespace
 }
 
 class AlterCollectionRoleCompModDto {
@@ -243,7 +224,7 @@ class AlterCollectionRoleCompModDto {
     /**
      * @type {{
      *     new: Array<AlterCollectionRoleCompModPKDto>,
-     *     old:  Array<AlterCollectionRoleCompModPKDto>,
+     *     old: Array<AlterCollectionRoleCompModPKDto>,
      * }}
      */
     primaryKey
