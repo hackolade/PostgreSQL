@@ -58,47 +58,70 @@ const getDefaultConstraintName = (wrapInQuotes) => (entityName) => {
  * @return {(collection: AlterCollectionDto) => Array<AlterScriptDto>}
  * */
 const getAddCompositePkScripts = (_, ddlProvider) => (collection) => {
-    const didPkChange = didCompositePkChange(_)(collection);
-    if (!didPkChange) {
-        return []
-    }
-    const fullTableName = generateFullEntityName(collection);
-    const constraintName = getEntityNameFromCollection(collection) + '_pk';
-    const pkDto = collection?.role?.compMod?.primaryKey || {};
-    const newPrimaryKeys = pkDto.new || [];
+    // const didPkChange = didCompositePkChange(_)(collection);
+    // if (!didPkChange) {
+    //     return []
+    // }
+    // const fullTableName = generateFullEntityName(collection);
+    // const constraintName = getEntityNameFromCollection(collection) + '_pk';
+    // const pkDto = collection?.role?.compMod?.primaryKey || {};
+    // const newPrimaryKeys = pkDto.new || [];
+    //
+    // return newPrimaryKeys
+    //     .map((newPk) => {
+    //         /**
+    //          * @type {Array<AlterCollectionRoleCompModPKDto>}
+    //          * */
+    //         const compositePrimaryKey = newPk.compositePrimaryKey || [];
+    //         const guidsOfColumnsInPk = compositePrimaryKey.map((compositePkEntry) => compositePkEntry.keyId);
+    //         const columnsInPk = getPropertiesByGuids(_)(collection, guidsOfColumnsInPk);
+    //         const columnNamesForDDL = columnsInPk.map(column => prepareName(column.compMod.newField.name));
+    //         if (!columnNamesForDDL.length) {
+    //             return undefined;
+    //         }
+    //         return ddlProvider.addPkConstraint(fullTableName, constraintName, columnNamesForDDL);
+    //     })
+    //     .filter(Boolean)
+    //     .map(scriptLine => AlterScriptDto.getInstance([scriptLine], collection.isActivated, false))
+    //     .filter(Boolean);
 
-    return newPrimaryKeys
-        .map((newPk) => {
-            /**
-             * @type {Array<AlterCollectionRoleCompModPKDto>}
-             * */
-            const compositePrimaryKey = newPk.compositePrimaryKey || [];
-            const guidsOfColumnsInPk = compositePrimaryKey.map((compositePkEntry) => compositePkEntry.keyId);
-            const columnsInPk = getPropertiesByGuids(_)(collection, guidsOfColumnsInPk);
-            const columnNamesForDDL = columnsInPk.map(column => prepareName(column.compMod.newField.name));
-            if (!columnNamesForDDL.length) {
-                return undefined;
-            }
-            return ddlProvider.addPkConstraint(fullTableName, constraintName, columnNamesForDDL);
-        })
-        .filter(Boolean)
-        .map(scriptLine => AlterScriptDto.getInstance([scriptLine], collection.isActivated, false))
-        .filter(Boolean);
+    return [];
 }
 
 /**
  * @return {(collection: AlterCollectionDto) => Array<AlterScriptDto>}
  * */
 const getDropCompositePkScripts = (_, ddlProvider) => (collection) => {
+    const {
+        getFullCollectionName,
+        getSchemaOfAlterCollection,
+        getEntityName,
+        wrapInQuotes
+    } = require('../../../utils/general')(_);
+
     const didPkChange = didCompositePkChange(_)(collection);
     if (!didPkChange) {
-        return []
+        return [];
     }
-    const fullTableName = generateFullEntityName(collection);
+
+    const collectionSchema = getSchemaOfAlterCollection(collection);
+    const fullTableName = getFullCollectionName(collectionSchema);
+    const entityName = getEntityName(collectionSchema);
+
     const pkDto = collection?.role?.compMod?.primaryKey || {};
+    /**
+     * @type {AlterCollectionRoleCompModPKDto[]}
+     * */
     const oldPrimaryKeys = pkDto.old || [];
+
     return oldPrimaryKeys
-        .map(oldPk => ddlProvider.dropPkConstraint(fullTableName))
+        .map((oldPk) => {
+            let constraintName = getDefaultConstraintName(wrapInQuotes)(entityName);
+            if (oldPk.constraintName) {
+                constraintName = wrapInQuotes(oldPk.constraintName);
+            }
+            return ddlProvider.dropPkConstraint(fullTableName, constraintName);
+        })
         .map(scriptLine => AlterScriptDto.getInstance([scriptLine], collection.isActivated, true))
         .filter(Boolean);
 }
@@ -108,11 +131,11 @@ const getDropCompositePkScripts = (_, ddlProvider) => (collection) => {
  * */
 const getModifyCompositePkScripts = (_, ddlProvider) => (collection) => {
     const dropCompositePkScripts = getDropCompositePkScripts(_, ddlProvider)(collection);
-    const addCompositePkScripts = getAddCompositePkScripts(_, ddlProvider)(collection);
+    // const addCompositePkScripts = getAddCompositePkScripts(_, ddlProvider)(collection);
 
     return [
         ...dropCompositePkScripts,
-        ...addCompositePkScripts,
+        // ...addCompositePkScripts,
     ].filter(Boolean);
 }
 
@@ -208,11 +231,11 @@ const getDropPkScript = (_, ddlProvider) => (collection) => {
  * */
 const getModifyPkScripts = (_, ddlProvider) => (collection) => {
     const dropPkScripts = getDropPkScript(_, ddlProvider)(collection);
-    const addPkScripts = getAddPkScripts(_, ddlProvider)(collection);
+    // const addPkScripts = getAddPkScripts(_, ddlProvider)(collection);
 
     return [
         ...dropPkScripts,
-        ...addPkScripts,
+        // ...addPkScripts,
     ].filter(Boolean);
 }
 
@@ -220,11 +243,11 @@ const getModifyPkScripts = (_, ddlProvider) => (collection) => {
  * @return {(collection: AlterCollectionDto) => Array<AlterScriptDto>}
  * */
 const getModifyPkConstraintsScriptDtos = (_, ddlProvider) => (collection) => {
-    // const modifyCompositePkScripts = getModifyCompositePkScripts(_, ddlProvider)(collection);
+    const modifyCompositePkScripts = getModifyCompositePkScripts(_, ddlProvider)(collection);
     const modifyPkScripts = getModifyPkScripts(_, ddlProvider)(collection);
 
     return [
-        // ...modifyCompositePkScripts,
+        ...modifyCompositePkScripts,
         ...modifyPkScripts,
     ].filter(Boolean);
 }

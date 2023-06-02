@@ -142,7 +142,30 @@ class AlterCollectionRoleCompModPKDto {
     /**
      * @type {string}
      * */
-    keyId
+    id
+
+    /**
+     * @type {Array<{
+     *   type: string,
+     *   keyId: string,
+     * }>}
+     * */
+    compositePrimaryKey
+
+    /**
+     * @type {string | undefined}
+     * */
+    constraintName
+
+    /**
+     * @type {string | undefined}
+     * */
+    indexStorageParameters
+
+    /**
+     * @type {string | undefined}
+     * */
+    indexTablespace
 }
 
 class AlterCollectionRoleCompModDto {
@@ -202,12 +225,8 @@ class AlterCollectionRoleCompModDto {
 
     /**
      * @type {{
-     *     new: Array<{
-     *         compositePrimaryKey: AlterCollectionRoleCompModPKDto[],
-     *     }>,
-     *     old:  Array<{
-     *         compositePrimaryKey: AlterCollectionRoleCompModPKDto[],
-     *     }>,
+     *     new: Array<AlterCollectionRoleCompModPKDto>,
+     *     old:  Array<AlterCollectionRoleCompModPKDto>,
      * }}
      */
     primaryKey

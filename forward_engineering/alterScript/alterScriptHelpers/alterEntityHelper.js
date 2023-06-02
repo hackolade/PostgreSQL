@@ -84,7 +84,8 @@ const getModifyCollectionScriptDtos = (app) => (collection) => {
     const modifyPKConstraintDtos = getModifyPkConstraintsScriptDtos(_, ddlProvider)(collection);
     return [
         ...modifyCheckConstraintScriptDtos,
-        ...modifyCommentScriptDtos
+        ...modifyCommentScriptDtos,
+        ...modifyPKConstraintDtos
     ].filter(Boolean);
 }
 
