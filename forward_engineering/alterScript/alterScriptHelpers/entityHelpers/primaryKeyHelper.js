@@ -45,7 +45,6 @@ const getConstraintNameForCompositePk = (primaryKey, entityName) => {
 
 /**
  * @param _
- * @param wrapInQuotes {(s: string) => string }
  * @return {(
  *      primaryKey: AlterCollectionRoleCompModPKDto,
  *      entityName: string,
@@ -72,7 +71,7 @@ const getCreateCompositePKDDLProviderConfig = (_) => (
     entity
 ) => {
     const constraintName = getConstraintNameForCompositePk(primaryKey, entityName);
-    const pkColumns = _.toPairs(entity.properties)
+    const pkColumns = _.toPairs(entity.role.properties)
         .filter(([name, jsonSchema]) => Boolean(primaryKey.compositePrimaryKey.find(keyDto => keyDto.keyId === jsonSchema.GUID)))
         .map(([name, jsonSchema]) => ({
             name,
