@@ -287,6 +287,49 @@ const getCreateRegularPKDDLProviderConfig = (_) => (
 
 
 /**
+ * @return {(columnJsonSchema: AlterCollectionColumnDto, collection: AlterCollectionDto) => boolean}
+ * */
+const wasFieldChangedToBeARegularPk = (_) => (columnJsonSchema, collection) => {
+    const oldName = columnJsonSchema.compMod.oldField.name;
+
+    const isRegularPrimaryKey = columnJsonSchema.primaryKey && !columnJsonSchema.compositePrimaryKey;
+    const wasTheFieldAPrimaryKey = Boolean(collection.role.properties[oldName]?.primaryKey);
+    return isRegularPrimaryKey && !wasTheFieldAPrimaryKey;
+}
+
+/**
+ * @return {(columnJsonSchema: AlterCollectionColumnDto, collection: AlterCollectionDto) => boolean}
+ * */
+const isFieldNoLongerARegularPk = (_) => (columnJsonSchema, collection) => {
+    const oldName = columnJsonSchema.compMod.oldField.name;
+
+    const oldJsonSchema = collection.role.properties[oldName];
+    const wasTheFieldARegularPrimaryKey = oldJsonSchema?.primaryKey && !oldJsonSchema?.compositePrimaryKey;
+
+    const isNotAPrimaryKey = !columnJsonSchema.primaryKey && !columnJsonSchema.compositePrimaryKey;
+    return wasTheFieldARegularPrimaryKey && isNotAPrimaryKey;
+}
+
+/**
+ * @return {(columnJsonSchema: AlterCollectionColumnDto, collection: AlterCollectionDto) => boolean}
+ * */
+const wasRegularPkModified = (_) => (columnJsonSchema, collection) => {
+    const oldName = columnJsonSchema.compMod.oldField.name;
+    const oldJsonSchema = collection.role.properties[oldName];
+
+    const isRegularPrimaryKey = columnJsonSchema.primaryKey && !columnJsonSchema.compositePrimaryKey;
+    const wasTheFieldARegularPrimaryKey = oldJsonSchema?.primaryKey && !oldJsonSchema?.compositePrimaryKey;
+
+    if (!(isRegularPrimaryKey && wasTheFieldARegularPrimaryKey)) {
+        return false;
+    }
+    const constraintOptions = columnJsonSchema.primaryKeyOptions;
+    const oldConstraintOptions = oldJsonSchema?.primaryKeyOptions;
+    const areOptionsEqual = _(oldConstraintOptions).differenceWith(constraintOptions, _.isEqual).isEmpty();
+    return !areOptionsEqual;
+}
+
+/**
  * @return {(collection: AlterCollectionDto) => Array<AlterScriptDto>}
  * */
 const getAddPkScripts = (_, ddlProvider) => (collection) => {
@@ -302,10 +345,7 @@ const getAddPkScripts = (_, ddlProvider) => (collection) => {
 
     return _.toPairs(collection.properties)
         .filter(([name, jsonSchema]) => {
-            const isRegularPrimaryKey = jsonSchema.primaryKey && !jsonSchema.compositePrimaryKey;
-            const oldName = jsonSchema.compMod.oldField.name;
-            const wasTheFieldAPrimaryKey = Boolean(collection.role.properties[oldName]?.primaryKey);
-            return isRegularPrimaryKey && !wasTheFieldAPrimaryKey;
+            return wasFieldChangedToBeARegularPk(_)(jsonSchema, collection) || wasRegularPkModified(_)(jsonSchema, collection);
         })
         .map(([name, jsonSchema]) => {
             const ddlConfig = getCreateRegularPKDDLProviderConfig(_)(name, jsonSchema, entityName, collection);
@@ -336,15 +376,12 @@ const getDropPkScript = (_, ddlProvider) => (collection) => {
 
     return _.toPairs(collection.properties)
         .filter(([name, jsonSchema]) => {
-            const oldName = jsonSchema.compMod.oldField.name;
-            const oldJsonSchema = collection.role.properties[oldName];
-            const wasTheFieldARegularPrimaryKey = oldJsonSchema?.primaryKey && !oldJsonSchema?.compositePrimaryKey;
-
-            const isNotAPrimaryKey = !jsonSchema.primaryKey && !jsonSchema.compositePrimaryKey;
-            return wasTheFieldARegularPrimaryKey && isNotAPrimaryKey;
+            return isFieldNoLongerARegularPk(_)(jsonSchema, collection) || wasRegularPkModified(_)(jsonSchema, collection);
         })
         .map(([name, jsonSchema]) => {
-            const constraintName = wrapInQuotes(getConstraintNameForRegularPk(jsonSchema, entityName));
+            const oldName = jsonSchema.compMod.oldField.name;
+            const oldJsonSchema = collection.role.properties[oldName];
+            const constraintName = wrapInQuotes(getConstraintNameForRegularPk(oldJsonSchema, entityName));
             return ddlProvider.dropPkConstraint(fullTableName, constraintName);
         })
         .map(scriptLine => AlterScriptDto.getInstance([scriptLine], collection.isActivated, true))
