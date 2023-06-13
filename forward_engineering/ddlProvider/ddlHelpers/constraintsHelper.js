@@ -83,7 +83,7 @@ module.exports = ({
 
         return {
             statement: assignTemplates(templates.createKeyConstraint, {
-                constraintName: keyData.name ? `CONSTRAINT ${wrapInQuotes(constraintName)} ` : '',
+                constraintName: keyData.name ? `CONSTRAINT ${constraintName} ` : '',
                 keyType: keyData.keyType,
                 columns,
                 includeNonKey,

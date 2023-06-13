@@ -173,7 +173,7 @@ const getDropCompositePkScripts = (_, ddlProvider) => (collection) => {
 
     return oldPrimaryKeys
         .map((oldPk) => {
-            let constraintName = getDefaultConstraintName(entityName);
+            let constraintName = wrapInQuotes(getDefaultConstraintName(entityName));
             if (oldPk.constraintName) {
                 constraintName = wrapInQuotes(oldPk.constraintName);
             }
