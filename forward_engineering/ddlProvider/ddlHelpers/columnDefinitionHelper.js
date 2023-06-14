@@ -1,4 +1,4 @@
-module.exports = ({ _, wrap, assignTemplates, templates, commentIfDeactivated, wrapComment, wrapInQuotes }) => {
+module.exports = ({ _, assignTemplates, templates, commentIfDeactivated, wrapComment, wrapInQuotes }) => {
 	const addLength = (type, length) => {
 		return `${type}(${length})`;
 	};
