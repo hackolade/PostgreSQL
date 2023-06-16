@@ -300,18 +300,89 @@ const wasFieldChangedToBeARegularPk = (_) => (columnJsonSchema, collection) => {
     const isRegularPrimaryKey = columnJsonSchema.primaryKey && !columnJsonSchema.compositePrimaryKey;
     const wasTheFieldAnyPrimaryKey = Boolean(oldColumnJsonSchema?.primaryKey);
 
+    return isRegularPrimaryKey && !wasTheFieldAnyPrimaryKey;
+}
+
+/**
+ * @param optionHolder {AlterCollectionColumnPrimaryKeyOptionDto}
+ * @return {<Partial<AlterCollectionColumnPrimaryKeyOptionDto>}
+ * */
+const extractOptionsForComparison = (optionHolder) => {
+    return {
+        constraintName: optionHolder.constraintName,
+        indexStorageParameters: optionHolder.indexStorageParameters,
+        indexTablespace: optionHolder.indexTablespace,
+        indexInclude: optionHolder.indexInclude,
+    }
+}
+
+/**
+ * @param columnJsonSchema {AlterCollectionColumnDto}
+ * @return {Array<Partial<AlterCollectionColumnPrimaryKeyOptionDto>>}
+ * */
+const getCustomPropertiesOfRegularPkForComparison = (columnJsonSchema) => {
+    /**
+     * @type {Array<AlterCollectionColumnPrimaryKeyOptionDto>}
+     * */
+    const constraintOptions = columnJsonSchema.primaryKeyOptions || [];
+    return constraintOptions
+        .map(option => extractOptionsForComparison(option));
+}
+
+/**
+ * @param compositePk {AlterCollectionRoleCompModPKDto}
+ * @return {Array<Partial<AlterCollectionColumnPrimaryKeyOptionDto>>}
+ * */
+const getCustomPropertiesOfCompositePkForComparison = (compositePk) => {
+    const optionsForComparison = extractOptionsForComparison(compositePk);
+    return [optionsForComparison]
+        .filter(o => Object.values(o).some(Boolean));
+}
+
+/**
+ * @return {(columnJsonSchema: AlterCollectionColumnDto, collection: AlterCollectionDto) => boolean}
+ * */
+const wasPkChangedInTransitionFromCompositeToRegular = (_) => (columnJsonSchema, collection) => {
+    const oldName = columnJsonSchema.compMod.oldField.name;
+    const oldColumnJsonSchema = collection.role.properties[oldName];
+
+    const isRegularPrimaryKey = columnJsonSchema.primaryKey && !columnJsonSchema.compositePrimaryKey;
+    const wasTheFieldAnyPrimaryKey = Boolean(oldColumnJsonSchema?.primaryKey);
+
+    if (!(isRegularPrimaryKey && wasTheFieldAnyPrimaryKey)) {
+        return false;
+    }
+
     /**
      * @type {AlterCollectionRoleCompModPrimaryKey}
      * */
     const pkDto = collection?.role?.compMod?.primaryKey || {};
     const newPrimaryKeys = pkDto.new || [];
+    /**
+     * @type {AlterCollectionRoleCompModPKDto[]}
+     * */
     const oldPrimaryKeys = pkDto.old || [];
     const wasTheFieldACompositePrimaryKey = oldPrimaryKeys.some(compPk => compPk.compositePrimaryKey.some((pk) => pk.keyId === oldColumnJsonSchema.GUID));
     const isTheFieldACompositePrimaryKey = newPrimaryKeys.some(compPk => compPk.compositePrimaryKey.some((pk) => pk.keyId === columnJsonSchema.GUID));
 
     const wasCompositePkRemoved = wasTheFieldACompositePrimaryKey && !isTheFieldACompositePrimaryKey;
 
-    return isRegularPrimaryKey && (wasCompositePkRemoved || !wasTheFieldAnyPrimaryKey);
+    if (isRegularPrimaryKey && wasCompositePkRemoved) {
+        // return compare custom properties and amount of columns.
+        // If there was a transition and amount of composite PK columns is not equal
+        // to amount of regular pk columns, we must recreate PK
+        const constraintOptions = getCustomPropertiesOfRegularPkForComparison(columnJsonSchema);
+        return oldPrimaryKeys.some((oldCompositePk) => {
+            if (oldCompositePk.compositePrimaryKey.length !== 1) {
+                return true;
+            }
+            const oldCompositePkAsRegularPkOptions = getCustomPropertiesOfCompositePkForComparison(oldCompositePk);
+            const areOptionsEqual = _(oldCompositePkAsRegularPkOptions).differenceWith(constraintOptions, _.isEqual).isEmpty();
+            return !areOptionsEqual;
+        });
+    }
+
+    return false;
 }
 
 /**
@@ -323,8 +394,8 @@ const isFieldNoLongerARegularPk = (_) => (columnJsonSchema, collection) => {
     const oldJsonSchema = collection.role.properties[oldName];
     const wasTheFieldARegularPrimaryKey = oldJsonSchema?.primaryKey && !oldJsonSchema?.compositePrimaryKey;
 
-    const isNotAPrimaryKey = !columnJsonSchema.primaryKey && !columnJsonSchema.compositePrimaryKey;
-    return wasTheFieldARegularPrimaryKey && isNotAPrimaryKey;
+    const isNotAnyPrimaryKey = !columnJsonSchema.primaryKey && !columnJsonSchema.compositePrimaryKey;
+    return wasTheFieldARegularPrimaryKey && isNotAnyPrimaryKey;
 }
 
 /**
@@ -332,7 +403,7 @@ const isFieldNoLongerARegularPk = (_) => (columnJsonSchema, collection) => {
  * */
 const wasRegularPkModified = (_) => (columnJsonSchema, collection) => {
     const oldName = columnJsonSchema.compMod.oldField.name;
-    const oldJsonSchema = collection.role.properties[oldName];
+    const oldJsonSchema = collection.role.properties[oldName] || {};
 
     const isRegularPrimaryKey = columnJsonSchema.primaryKey && !columnJsonSchema.compositePrimaryKey;
     const wasTheFieldARegularPrimaryKey = oldJsonSchema?.primaryKey && !oldJsonSchema?.compositePrimaryKey;
@@ -340,8 +411,8 @@ const wasRegularPkModified = (_) => (columnJsonSchema, collection) => {
     if (!(isRegularPrimaryKey && wasTheFieldARegularPrimaryKey)) {
         return false;
     }
-    const constraintOptions = columnJsonSchema.primaryKeyOptions;
-    const oldConstraintOptions = oldJsonSchema?.primaryKeyOptions;
+    const constraintOptions = getCustomPropertiesOfRegularPkForComparison(columnJsonSchema);
+    const oldConstraintOptions = getCustomPropertiesOfRegularPkForComparison(oldJsonSchema);
     const areOptionsEqual = _(oldConstraintOptions).differenceWith(constraintOptions, _.isEqual).isEmpty();
     return !areOptionsEqual;
 }
@@ -362,7 +433,9 @@ const getAddPkScripts = (_, ddlProvider) => (collection) => {
 
     return _.toPairs(collection.properties)
         .filter(([name, jsonSchema]) => {
-            return wasFieldChangedToBeARegularPk(_)(jsonSchema, collection) || wasRegularPkModified(_)(jsonSchema, collection);
+            return wasFieldChangedToBeARegularPk(_)(jsonSchema, collection)
+                || wasPkChangedInTransitionFromCompositeToRegular(_)(jsonSchema, collection)
+                || wasRegularPkModified(_)(jsonSchema, collection);
         })
         .map(([name, jsonSchema]) => {
             const ddlConfig = getCreateRegularPKDDLProviderConfig(_)(name, jsonSchema, entityName, collection);
@@ -393,7 +466,9 @@ const getDropPkScript = (_, ddlProvider) => (collection) => {
 
     return _.toPairs(collection.properties)
         .filter(([name, jsonSchema]) => {
-            return isFieldNoLongerARegularPk(_)(jsonSchema, collection) || wasRegularPkModified(_)(jsonSchema, collection);
+            return isFieldNoLongerARegularPk(_)(jsonSchema, collection)
+                || wasPkChangedInTransitionFromCompositeToRegular(_)(jsonSchema, collection)
+                || wasRegularPkModified(_)(jsonSchema, collection);
         })
         .map(([name, jsonSchema]) => {
             const oldName = jsonSchema.compMod.oldField.name;
