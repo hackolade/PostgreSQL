@@ -3,13 +3,17 @@ const {
     AlterCollectionDto,
     AlterCollectionColumnDto,
     AlterCollectionRoleCompModPKDto,
-    AlterCollectionColumnPrimaryKeyOptionDto
+    AlterCollectionColumnPrimaryKeyOptionDto,
+    AlterCollectionRoleCompModPrimaryKey
 } = require('../../types/AlterCollectionDto');
 
 /**
  * @return {(collection: AlterCollectionDto) => boolean}
  * */
 const didCompositePkChange = (_) => (collection) => {
+    /**
+     * @type {AlterCollectionRoleCompModPrimaryKey}
+     * */
     const pkDto = collection?.role?.compMod?.primaryKey || {};
     const newPrimaryKeys = pkDto.new || [];
     const oldPrimaryKeys = pkDto.old || [];
@@ -291,10 +295,23 @@ const getCreateRegularPKDDLProviderConfig = (_) => (
  * */
 const wasFieldChangedToBeARegularPk = (_) => (columnJsonSchema, collection) => {
     const oldName = columnJsonSchema.compMod.oldField.name;
+    const oldColumnJsonSchema = collection.role.properties[oldName];
 
     const isRegularPrimaryKey = columnJsonSchema.primaryKey && !columnJsonSchema.compositePrimaryKey;
-    const wasTheFieldAPrimaryKey = Boolean(collection.role.properties[oldName]?.primaryKey);
-    return isRegularPrimaryKey && !wasTheFieldAPrimaryKey;
+    const wasTheFieldAnyPrimaryKey = Boolean(oldColumnJsonSchema?.primaryKey);
+
+    /**
+     * @type {AlterCollectionRoleCompModPrimaryKey}
+     * */
+    const pkDto = collection?.role?.compMod?.primaryKey || {};
+    const newPrimaryKeys = pkDto.new || [];
+    const oldPrimaryKeys = pkDto.old || [];
+    const wasTheFieldACompositePrimaryKey = oldPrimaryKeys.some(compPk => compPk.compositePrimaryKey.some((pk) => pk.keyId === oldColumnJsonSchema.GUID));
+    const isTheFieldACompositePrimaryKey = newPrimaryKeys.some(compPk => compPk.compositePrimaryKey.some((pk) => pk.keyId === columnJsonSchema.GUID));
+
+    const wasCompositePkRemoved = wasTheFieldACompositePrimaryKey && !isTheFieldACompositePrimaryKey;
+
+    return isRegularPrimaryKey && (wasCompositePkRemoved || !wasTheFieldAnyPrimaryKey);
 }
 
 /**
