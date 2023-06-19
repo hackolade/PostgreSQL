@@ -42,6 +42,17 @@ class PkTransitionDto {
         }
     }
 
+    /**
+     * @param wasPkChangedInTransition {boolean}
+     * @return {PkTransitionDto}
+     * */
+    static transition(wasPkChangedInTransition) {
+        return {
+            didTransitionHappen: false,
+            wasPkChangedInTransition
+        }
+    }
+
 }
 
 /**
@@ -125,10 +136,7 @@ const wasCompositePkChangedInTransitionFromCompositeToRegular = (_) => (collecti
         return _(oldCompositePkAsRegularPkOptions).differenceWith(constraintOptions, _.isEqual).isEmpty();
     });
 
-    return {
-        didTransitionHappen: true,
-        wasPkChangedInTransition: !areOptionsEqual,
-    }
+    return PkTransitionDto.transition(!areOptionsEqual);
 }
 
 /**
@@ -168,10 +176,7 @@ const wasCompositePkChangedInTransitionFromRegularToComposite = (_) => (collecti
         return _(oldCompositePkAsRegularPkOptions).differenceWith(constraintOptions, _.isEqual).isEmpty();
     });
 
-    return {
-        didTransitionHappen: true,
-        wasPkChangedInTransition: !areOptionsEqual,
-    }
+    return PkTransitionDto.transition(!areOptionsEqual);
 }
 
 /**
@@ -497,10 +502,7 @@ const wasRegularPkChangedInTransitionFromCompositeToRegular = (_) => (columnJson
             const oldCompositePkAsRegularPkOptions = getCustomPropertiesOfCompositePkForComparisonWithRegularPkOptions(oldCompositePk);
             return _(oldCompositePkAsRegularPkOptions).differenceWith(constraintOptions, _.isEqual).isEmpty();
         });
-        return {
-            didTransitionHappen: true,
-            wasPkChangedInTransition: !areOptionsEqual,
-        }
+        return PkTransitionDto.transition(!areOptionsEqual);
     }
 
     return PkTransitionDto.noTransition();
@@ -546,10 +548,7 @@ const wasRegularPkChangedInTransitionFromRegularToComposite = (_) => (columnJson
             const oldCompositePkAsRegularPkOptions = getCustomPropertiesOfCompositePkForComparisonWithRegularPkOptions(oldCompositePk);
             return _(oldCompositePkAsRegularPkOptions).differenceWith(constraintOptions, _.isEqual).isEmpty();
         });
-        return {
-            didTransitionHappen: true,
-            wasPkChangedInTransition: !areOptionsEqual,
-        }
+        return PkTransitionDto.transition(!areOptionsEqual);
     }
 
     return PkTransitionDto.noTransition();
