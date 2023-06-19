@@ -33,6 +33,15 @@ class PkTransitionDto {
      * */
     wasPkChangedInTransition
 
+    /**
+     * @return {PkTransitionDto}
+     * */
+    static noTransition() {
+        return {
+            didTransitionHappen: false,
+        }
+    }
+
 }
 
 /**
@@ -83,9 +92,6 @@ const getCustomPropertiesOfCompositePkForComparisonWithRegularPkOptions = (compo
  * @return {(collection: AlterCollectionDto) => PkTransitionDto}
  * */
 const wasCompositePkChangedInTransitionFromCompositeToRegular = (_) => (collection) => {
-    const noTransition = {
-        didTransitionHappen: false,
-    }
     /**
      * @type {AlterCollectionRoleCompModPrimaryKey}
      * */
@@ -98,17 +104,17 @@ const wasCompositePkChangedInTransitionFromCompositeToRegular = (_) => (collecti
     if (idsOfColumns.length !== amountOfColumnsInRegularPk) {
         // We return false, because it wouldn't count as transition between regular PK and composite PK
         // if composite PK did not constraint exactly 1 column
-        return noTransition;
+        return PkTransitionDto.noTransition();
     }
     const idOfPkColumn = idsOfColumns[0];
     const newColumnJsonSchema = Object.values(collection.properties)
         .find(columnJsonSchema => columnJsonSchema.GUID === idOfPkColumn);
     if (!newColumnJsonSchema) {
-        return noTransition;
+        return PkTransitionDto.noTransition();
     }
     const isNewColumnARegularPrimaryKey = newColumnJsonSchema?.primaryKey && !newColumnJsonSchema?.compositePrimaryKey;
     if (!isNewColumnARegularPrimaryKey) {
-        return noTransition;
+        return PkTransitionDto.noTransition();
     }
     const constraintOptions = getCustomPropertiesOfRegularPkForComparisonWithRegularPkOptions(newColumnJsonSchema);
     const areOptionsEqual = oldPrimaryKeys.some((compositePk) => {
@@ -129,9 +135,6 @@ const wasCompositePkChangedInTransitionFromCompositeToRegular = (_) => (collecti
  * @return {(collection: AlterCollectionDto) => PkTransitionDto}
  * */
 const wasCompositePkChangedInTransitionFromRegularToComposite = (_) => (collection) => {
-    const noTransition = {
-        didTransitionHappen: false,
-    }
     /**
      * @type {AlterCollectionRoleCompModPrimaryKey}
      * */
@@ -144,17 +147,17 @@ const wasCompositePkChangedInTransitionFromRegularToComposite = (_) => (collecti
     if (idsOfColumns.length !== amountOfColumnsInRegularPk) {
         // We return false, because it wouldn't count as transition between regular PK and composite PK
         // if composite PK does not constraint exactly 1 column
-        return noTransition;
+        return PkTransitionDto.noTransition();
     }
     const idOfPkColumn = idsOfColumns[0];
     const oldColumnJsonSchema = Object.values(collection.role.properties)
         .find(columnJsonSchema => columnJsonSchema.GUID === idOfPkColumn);
     if (!oldColumnJsonSchema) {
-        return noTransition;
+        return PkTransitionDto.noTransition();
     }
     const isOldColumnARegularPrimaryKey = oldColumnJsonSchema?.primaryKey && !oldColumnJsonSchema?.compositePrimaryKey;
     if (!isOldColumnARegularPrimaryKey) {
-        return noTransition;
+        return PkTransitionDto.noTransition();
     }
     const constraintOptions = getCustomPropertiesOfRegularPkForComparisonWithRegularPkOptions(oldColumnJsonSchema);
     const areOptionsEqual = newPrimaryKeys.some((compositePk) => {
@@ -458,9 +461,6 @@ const wasFieldChangedToBeARegularPk = (_) => (columnJsonSchema, collection) => {
  * @return {(columnJsonSchema: AlterCollectionColumnDto, collection: AlterCollectionDto) => PkTransitionDto}
  * */
 const wasRegularPkChangedInTransitionFromCompositeToRegular = (_) => (columnJsonSchema, collection) => {
-    const noTransition = {
-        didTransitionHappen: false,
-    }
     const oldName = columnJsonSchema.compMod.oldField.name;
     const oldColumnJsonSchema = collection.role.properties[oldName];
 
@@ -468,7 +468,7 @@ const wasRegularPkChangedInTransitionFromCompositeToRegular = (_) => (columnJson
     const wasTheFieldAnyPrimaryKey = Boolean(oldColumnJsonSchema?.primaryKey);
 
     if (!(isRegularPrimaryKey && wasTheFieldAnyPrimaryKey)) {
-        return noTransition;
+        return PkTransitionDto.noTransition();
     }
 
     /**
@@ -503,16 +503,13 @@ const wasRegularPkChangedInTransitionFromCompositeToRegular = (_) => (columnJson
         }
     }
 
-    return noTransition;
+    return PkTransitionDto.noTransition();
 }
 
 /**
  * @return {(columnJsonSchema: AlterCollectionColumnDto, collection: AlterCollectionDto) => PkTransitionDto}
  * */
 const wasRegularPkChangedInTransitionFromRegularToComposite = (_) => (columnJsonSchema, collection) => {
-    const noTransition = {
-        didTransitionHappen: false,
-    }
     const oldName = columnJsonSchema.compMod.oldField.name;
     const oldColumnJsonSchema = collection.role.properties[oldName];
 
@@ -520,7 +517,7 @@ const wasRegularPkChangedInTransitionFromRegularToComposite = (_) => (columnJson
     const isTheFieldAnyPrimaryKey = Boolean(columnJsonSchema?.primaryKey);
 
     if (!(wasRegularPrimaryKey && isTheFieldAnyPrimaryKey)) {
-        return noTransition;
+        return PkTransitionDto.noTransition();
     }
 
     /**
@@ -555,7 +552,7 @@ const wasRegularPkChangedInTransitionFromRegularToComposite = (_) => (columnJson
         }
     }
 
-    return noTransition;
+    return PkTransitionDto.noTransition();
 }
 
 /**
