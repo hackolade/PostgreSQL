@@ -53,7 +53,8 @@ class AlterCollectionColumnPrimaryKeyOptionDto {
 
     /**
      * @type {Array<{
-     *     keyId: string
+     *     keyId: string,
+     *     type?: string,
      * }>}
      * */
     indexInclude

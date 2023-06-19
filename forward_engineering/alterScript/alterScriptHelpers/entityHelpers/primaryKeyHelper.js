@@ -7,6 +7,162 @@ const {
     AlterCollectionRoleCompModPrimaryKey
 } = require('../../types/AlterCollectionDto');
 
+class PkTransitionDto {
+
+    /**
+     * @type {boolean}
+     * */
+    didTransitionHappen
+
+    /**
+     * @type {boolean | undefined}
+     * */
+    wasPkChangedInTransition
+
+}
+
+/**
+ * @param optionHolder {AlterCollectionColumnPrimaryKeyOptionDto}
+ * @return {<Partial<AlterCollectionColumnPrimaryKeyOptionDto>}
+ * */
+const extractOptionsForComparisonWithRegularPkOptions = (optionHolder) => {
+    return {
+        constraintName: optionHolder.constraintName,
+        indexStorageParameters: optionHolder.indexStorageParameters,
+        indexTablespace: optionHolder.indexTablespace,
+        indexInclude: optionHolder.indexInclude?.map(e => {
+            const indexIncludeEntry = {
+                keyId: e.keyId,
+            }
+            if (e.type) {
+                indexIncludeEntry.type = e.type;
+            }
+            return indexIncludeEntry;
+        }),
+    }
+}
+
+/**
+ * @param columnJsonSchema {AlterCollectionColumnDto}
+ * @return {Array<Partial<AlterCollectionColumnPrimaryKeyOptionDto>>}
+ * */
+const getCustomPropertiesOfRegularPkForComparisonWithRegularPkOptions = (columnJsonSchema) => {
+    /**
+     * @type {Array<AlterCollectionColumnPrimaryKeyOptionDto>}
+     * */
+    const constraintOptions = columnJsonSchema.primaryKeyOptions || [];
+    return constraintOptions
+        .map(option => extractOptionsForComparisonWithRegularPkOptions(option));
+}
+
+/**
+ * @param compositePk {AlterCollectionRoleCompModPKDto}
+ * @return {Array<Partial<AlterCollectionColumnPrimaryKeyOptionDto>>}
+ * */
+const getCustomPropertiesOfCompositePkForComparisonWithRegularPkOptions = (compositePk) => {
+    const optionsForComparison = extractOptionsForComparisonWithRegularPkOptions(compositePk);
+    return [optionsForComparison]
+        .filter(o => Object.values(o).some(Boolean));
+}
+
+/**
+ * @return {(collection: AlterCollectionDto) => PkTransitionDto}
+ * */
+const wasCompositePkChangedInTransitionFromCompositeToRegular = (_) => (collection) => {
+    /**
+     * @type {AlterCollectionRoleCompModPrimaryKey}
+     * */
+    const pkDto = collection?.role?.compMod?.primaryKey || {};
+    /**
+     * @type {AlterCollectionRoleCompModPKDto[]}
+     * */
+    const oldPrimaryKeys = pkDto.old || [];
+    const idsOfColumns = oldPrimaryKeys.flatMap(pk => pk.compositePrimaryKey.map(dto => dto.keyId))
+    if (idsOfColumns.length !== 1) {
+        // We return false, because it wouldn't count as transition between regular PK and composite PK
+        // if composite PK did not constraint exactly 1 column
+        return {
+            didTransitionHappen: false,
+        };
+    }
+    const idOfPkColumn = idsOfColumns[0];
+    const newColumnJsonSchema = Object.values(collection.properties)
+        .find(columnJsonSchema => columnJsonSchema.GUID === idOfPkColumn);
+    if (!newColumnJsonSchema) {
+        return {
+            didTransitionHappen: false,
+        };
+    }
+    const isNewColumnARegularPrimaryKey = newColumnJsonSchema?.primaryKey && !newColumnJsonSchema?.compositePrimaryKey;
+    if (!isNewColumnARegularPrimaryKey) {
+        return {
+            didTransitionHappen: false,
+        };
+    }
+    const constraintOptions = getCustomPropertiesOfRegularPkForComparisonWithRegularPkOptions(newColumnJsonSchema);
+    const areOptionsEqual = oldPrimaryKeys.some((compositePk) => {
+        if (compositePk.compositePrimaryKey.length !== 1) {
+            return false;
+        }
+        const oldCompositePkAsRegularPkOptions = getCustomPropertiesOfCompositePkForComparisonWithRegularPkOptions(compositePk);
+        return _(oldCompositePkAsRegularPkOptions).differenceWith(constraintOptions, _.isEqual).isEmpty();
+    });
+
+    return {
+        didTransitionHappen: true,
+        wasPkChangedInTransition: !areOptionsEqual,
+    }
+}
+
+/**
+ * @return {(collection: AlterCollectionDto) => PkTransitionDto}
+ * */
+const wasCompositePkChangedInTransitionFromRegularToComposite = (_) => (collection) => {
+    /**
+     * @type {AlterCollectionRoleCompModPrimaryKey}
+     * */
+    const pkDto = collection?.role?.compMod?.primaryKey || {};
+    /**
+     * @type {AlterCollectionRoleCompModPKDto[]}
+     * */
+    const newPrimaryKeys = pkDto.new || [];
+    const idsOfColumns = newPrimaryKeys.flatMap(pk => pk.compositePrimaryKey.map(dto => dto.keyId))
+    if (idsOfColumns.length !== 1) {
+        // We return false, because it wouldn't count as transition between regular PK and composite PK
+        // if composite PK did not constraint exactly 1 column
+        return {
+            didTransitionHappen: false,
+        };
+    }
+    const idOfPkColumn = idsOfColumns[0];
+    const oldColumnJsonSchema = Object.values(collection.role.properties)
+        .find(columnJsonSchema => columnJsonSchema.GUID === idOfPkColumn);
+    if (!oldColumnJsonSchema) {
+        return {
+            didTransitionHappen: false,
+        };
+    }
+    const isOldColumnARegularPrimaryKey = oldColumnJsonSchema?.primaryKey && !oldColumnJsonSchema?.compositePrimaryKey;
+    if (!isOldColumnARegularPrimaryKey) {
+        return {
+            didTransitionHappen: false,
+        };
+    }
+    const constraintOptions = getCustomPropertiesOfRegularPkForComparisonWithRegularPkOptions(oldColumnJsonSchema);
+    const areOptionsEqual = newPrimaryKeys.some((compositePk) => {
+        if (compositePk.compositePrimaryKey.length !== 1) {
+            return false;
+        }
+        const oldCompositePkAsRegularPkOptions = getCustomPropertiesOfCompositePkForComparisonWithRegularPkOptions(compositePk);
+        return _(oldCompositePkAsRegularPkOptions).differenceWith(constraintOptions, _.isEqual).isEmpty();
+    });
+
+    return {
+        didTransitionHappen: true,
+        wasPkChangedInTransition: !areOptionsEqual,
+    }
+}
+
 /**
  * @return {(collection: AlterCollectionDto) => boolean}
  * */
@@ -17,11 +173,19 @@ const didCompositePkChange = (_) => (collection) => {
     const pkDto = collection?.role?.compMod?.primaryKey || {};
     const newPrimaryKeys = pkDto.new || [];
     const oldPrimaryKeys = pkDto.old || [];
-    if (newPrimaryKeys.length !== oldPrimaryKeys.length) {
-        return true;
-    }
     if (newPrimaryKeys.length === 0 && oldPrimaryKeys.length === 0) {
         return false;
+    }
+    const transitionToRegularDto = wasCompositePkChangedInTransitionFromCompositeToRegular(_)(collection);
+    if (transitionToRegularDto.didTransitionHappen) {
+        return transitionToRegularDto.wasPkChangedInTransition;
+    }
+    const transitionToCompositeDto = wasCompositePkChangedInTransitionFromRegularToComposite(_)(collection);
+    if (transitionToCompositeDto.didTransitionHappen) {
+        return transitionToCompositeDto.wasPkChangedInTransition;
+    }
+    if (newPrimaryKeys.length !== oldPrimaryKeys.length) {
+        return true;
     }
     const areKeyArraysEqual = _(oldPrimaryKeys).differenceWith(newPrimaryKeys, _.isEqual).isEmpty();
     return !areKeyArraysEqual;
@@ -304,45 +468,9 @@ const wasFieldChangedToBeARegularPk = (_) => (columnJsonSchema, collection) => {
 }
 
 /**
- * @param optionHolder {AlterCollectionColumnPrimaryKeyOptionDto}
- * @return {<Partial<AlterCollectionColumnPrimaryKeyOptionDto>}
+ * @return {(columnJsonSchema: AlterCollectionColumnDto, collection: AlterCollectionDto) => PkTransitionDto}
  * */
-const extractOptionsForComparison = (optionHolder) => {
-    return {
-        constraintName: optionHolder.constraintName,
-        indexStorageParameters: optionHolder.indexStorageParameters,
-        indexTablespace: optionHolder.indexTablespace,
-        indexInclude: optionHolder.indexInclude,
-    }
-}
-
-/**
- * @param columnJsonSchema {AlterCollectionColumnDto}
- * @return {Array<Partial<AlterCollectionColumnPrimaryKeyOptionDto>>}
- * */
-const getCustomPropertiesOfRegularPkForComparison = (columnJsonSchema) => {
-    /**
-     * @type {Array<AlterCollectionColumnPrimaryKeyOptionDto>}
-     * */
-    const constraintOptions = columnJsonSchema.primaryKeyOptions || [];
-    return constraintOptions
-        .map(option => extractOptionsForComparison(option));
-}
-
-/**
- * @param compositePk {AlterCollectionRoleCompModPKDto}
- * @return {Array<Partial<AlterCollectionColumnPrimaryKeyOptionDto>>}
- * */
-const getCustomPropertiesOfCompositePkForComparison = (compositePk) => {
-    const optionsForComparison = extractOptionsForComparison(compositePk);
-    return [optionsForComparison]
-        .filter(o => Object.values(o).some(Boolean));
-}
-
-/**
- * @return {(columnJsonSchema: AlterCollectionColumnDto, collection: AlterCollectionDto) => boolean}
- * */
-const wasPkChangedInTransitionFromCompositeToRegular = (_) => (columnJsonSchema, collection) => {
+const wasRegularPkChangedInTransitionFromCompositeToRegular = (_) => (columnJsonSchema, collection) => {
     const oldName = columnJsonSchema.compMod.oldField.name;
     const oldColumnJsonSchema = collection.role.properties[oldName];
 
@@ -350,7 +478,9 @@ const wasPkChangedInTransitionFromCompositeToRegular = (_) => (columnJsonSchema,
     const wasTheFieldAnyPrimaryKey = Boolean(oldColumnJsonSchema?.primaryKey);
 
     if (!(isRegularPrimaryKey && wasTheFieldAnyPrimaryKey)) {
-        return false;
+        return {
+            didTransitionHappen: false,
+        };
     }
 
     /**
@@ -371,19 +501,78 @@ const wasPkChangedInTransitionFromCompositeToRegular = (_) => (columnJsonSchema,
         // return compare custom properties and amount of columns.
         // If there was a transition and amount of composite PK columns is not equal
         // to amount of regular pk columns, we must recreate PK
-        const constraintOptions = getCustomPropertiesOfRegularPkForComparison(columnJsonSchema);
-        return oldPrimaryKeys.some((oldCompositePk) => {
+        const constraintOptions = getCustomPropertiesOfRegularPkForComparisonWithRegularPkOptions(columnJsonSchema);
+        const areOptionsEqual = oldPrimaryKeys.some((oldCompositePk) => {
             if (oldCompositePk.compositePrimaryKey.length !== 1) {
-                return true;
+                return false;
             }
-            const oldCompositePkAsRegularPkOptions = getCustomPropertiesOfCompositePkForComparison(oldCompositePk);
-            const areOptionsEqual = _(oldCompositePkAsRegularPkOptions).differenceWith(constraintOptions, _.isEqual).isEmpty();
-            return !areOptionsEqual;
+            const oldCompositePkAsRegularPkOptions = getCustomPropertiesOfCompositePkForComparisonWithRegularPkOptions(oldCompositePk);
+            return _(oldCompositePkAsRegularPkOptions).differenceWith(constraintOptions, _.isEqual).isEmpty();
         });
+        return {
+            didTransitionHappen: true,
+            wasPkChangedInTransition: !areOptionsEqual,
+        }
     }
 
-    return false;
+    return {
+        didTransitionHappen: false,
+    };
 }
+
+/**
+ * @return {(columnJsonSchema: AlterCollectionColumnDto, collection: AlterCollectionDto) => PkTransitionDto}
+ * */
+const wasRegularPkChangedInTransitionFromRegularToComposite = (_) => (columnJsonSchema, collection) => {
+    const oldName = columnJsonSchema.compMod.oldField.name;
+    const oldColumnJsonSchema = collection.role.properties[oldName];
+
+    const wasRegularPrimaryKey = oldColumnJsonSchema.primaryKey && !oldColumnJsonSchema.compositePrimaryKey;
+    const isTheFieldAnyPrimaryKey = Boolean(columnJsonSchema?.primaryKey);
+
+    if (!(wasRegularPrimaryKey && isTheFieldAnyPrimaryKey)) {
+        return {
+            didTransitionHappen: false,
+        };
+    }
+
+    /**
+     * @type {AlterCollectionRoleCompModPrimaryKey}
+     * */
+    const pkDto = collection?.role?.compMod?.primaryKey || {};
+    const newPrimaryKeys = pkDto.new || [];
+    /**
+     * @type {AlterCollectionRoleCompModPKDto[]}
+     * */
+    const oldPrimaryKeys = pkDto.old || [];
+    const wasTheFieldACompositePrimaryKey = oldPrimaryKeys.some(compPk => compPk.compositePrimaryKey.some((pk) => pk.keyId === oldColumnJsonSchema.GUID));
+    const isTheFieldACompositePrimaryKey = newPrimaryKeys.some(compPk => compPk.compositePrimaryKey.some((pk) => pk.keyId === columnJsonSchema.GUID));
+
+    const wasCompositePkAdded = isTheFieldACompositePrimaryKey && !wasTheFieldACompositePrimaryKey;
+
+    if (wasRegularPrimaryKey && wasCompositePkAdded) {
+        // return compare custom properties and amount of columns.
+        // If there was a transition and amount of composite PK columns is not equal
+        // to amount of regular pk columns, we must recreate PK
+        const constraintOptions = getCustomPropertiesOfRegularPkForComparisonWithRegularPkOptions(oldColumnJsonSchema);
+        const areOptionsEqual = newPrimaryKeys.some((oldCompositePk) => {
+            if (oldCompositePk.compositePrimaryKey.length !== 1) {
+                return false;
+            }
+            const oldCompositePkAsRegularPkOptions = getCustomPropertiesOfCompositePkForComparisonWithRegularPkOptions(oldCompositePk);
+            return _(oldCompositePkAsRegularPkOptions).differenceWith(constraintOptions, _.isEqual).isEmpty();
+        });
+        return {
+            didTransitionHappen: true,
+            wasPkChangedInTransition: !areOptionsEqual,
+        }
+    }
+
+    return {
+        didTransitionHappen: false,
+    };
+}
+
 
 /**
  * @return {(columnJsonSchema: AlterCollectionColumnDto, collection: AlterCollectionDto) => boolean}
@@ -411,8 +600,8 @@ const wasRegularPkModified = (_) => (columnJsonSchema, collection) => {
     if (!(isRegularPrimaryKey && wasTheFieldARegularPrimaryKey)) {
         return false;
     }
-    const constraintOptions = getCustomPropertiesOfRegularPkForComparison(columnJsonSchema);
-    const oldConstraintOptions = getCustomPropertiesOfRegularPkForComparison(oldJsonSchema);
+    const constraintOptions = getCustomPropertiesOfRegularPkForComparisonWithRegularPkOptions(columnJsonSchema);
+    const oldConstraintOptions = getCustomPropertiesOfRegularPkForComparisonWithRegularPkOptions(oldJsonSchema);
     const areOptionsEqual = _(oldConstraintOptions).differenceWith(constraintOptions, _.isEqual).isEmpty();
     return !areOptionsEqual;
 }
@@ -433,9 +622,14 @@ const getAddPkScripts = (_, ddlProvider) => (collection) => {
 
     return _.toPairs(collection.properties)
         .filter(([name, jsonSchema]) => {
-            return wasFieldChangedToBeARegularPk(_)(jsonSchema, collection)
-                || wasPkChangedInTransitionFromCompositeToRegular(_)(jsonSchema, collection)
-                || wasRegularPkModified(_)(jsonSchema, collection);
+            if (wasFieldChangedToBeARegularPk(_)(jsonSchema, collection)) {
+                return true;
+            }
+            const transitionToRegularDto = wasRegularPkChangedInTransitionFromCompositeToRegular(_)(jsonSchema, collection);
+            if (transitionToRegularDto.didTransitionHappen) {
+                return transitionToRegularDto.wasPkChangedInTransition;
+            }
+            return wasRegularPkModified(_)(jsonSchema, collection);
         })
         .map(([name, jsonSchema]) => {
             const ddlConfig = getCreateRegularPKDDLProviderConfig(_)(name, jsonSchema, entityName, collection);
@@ -466,9 +660,14 @@ const getDropPkScript = (_, ddlProvider) => (collection) => {
 
     return _.toPairs(collection.properties)
         .filter(([name, jsonSchema]) => {
-            return isFieldNoLongerARegularPk(_)(jsonSchema, collection)
-                || wasPkChangedInTransitionFromCompositeToRegular(_)(jsonSchema, collection)
-                || wasRegularPkModified(_)(jsonSchema, collection);
+            if (isFieldNoLongerARegularPk(_)(jsonSchema, collection)) {
+                return true;
+            }
+            const transitionToRegularDto = wasRegularPkChangedInTransitionFromCompositeToRegular(_)(jsonSchema, collection);
+            if (transitionToRegularDto.didTransitionHappen) {
+                return transitionToRegularDto.wasPkChangedInTransition;
+            }
+            return wasRegularPkModified(_)(jsonSchema, collection);
         })
         .map(([name, jsonSchema]) => {
             const oldName = jsonSchema.compMod.oldField.name;
