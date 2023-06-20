@@ -102,15 +102,7 @@ const extractOptionsForComparisonWithRegularPkOptions = (optionHolder) => {
         constraintName: optionHolder.constraintName,
         indexStorageParameters: optionHolder.indexStorageParameters,
         indexTablespace: optionHolder.indexTablespace,
-        indexInclude: optionHolder.indexInclude?.map(e => {
-            const indexIncludeEntry = {
-                keyId: e.keyId,
-            }
-            if (e.type) {
-                indexIncludeEntry.type = e.type;
-            }
-            return indexIncludeEntry;
-        }),
+        indexInclude: optionHolder.indexInclude,
     }
 }
 
