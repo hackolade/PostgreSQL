@@ -48,7 +48,7 @@ class PkTransitionDto {
      * */
     static transition(wasPkChangedInTransition) {
         return {
-            didTransitionHappen: false,
+            didTransitionHappen: true,
             wasPkChangedInTransition
         }
     }
