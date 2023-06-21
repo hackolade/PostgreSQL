@@ -90,7 +90,7 @@ class PkScriptModificationDto {
  * @return {string}
  * */
 const getDefaultConstraintName = (entityName) => {
-    return `${entityName}_pk`;
+    return `${entityName}_pkey`;
 }
 
 /**
