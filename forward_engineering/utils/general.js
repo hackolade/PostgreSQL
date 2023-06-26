@@ -92,6 +92,9 @@ module.exports = _ => {
 	};
 
 	const commentIfDeactivated = (statement, { isActivated, isPartOfLine, inlineComment = '--' }) => {
+		if (!statement) {
+			return '';
+		}
 		if (isActivated !== false) {
 			return statement;
 		}
