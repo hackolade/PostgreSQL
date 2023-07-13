@@ -24,7 +24,7 @@ const {
 	prepareTablePartition,
 	checkHaveJsonTypes,
 	prepareTableConstraints,
-	getLimit,
+	getSampleDocSize,
 	prepareTableLevelData,
 	prepareTableIndexes,
 	prepareTableInheritance,
@@ -372,7 +372,7 @@ module.exports = {
 		const fullTableName = `${schemaName}.${tableName}`;
 		const quantity =
 			(await db.queryTolerant(queryConstants.GET_ROWS_COUNT(fullTableName), [], true))?.quantity || 0;
-		const limit = getLimit(quantity, recordSamplingSettings);
+		const limit = getSampleDocSize(quantity, recordSamplingSettings);
 
 		const jsonColumns = attributes.filter(({ type }) => _.includes(['json', 'jsonb'], type));
 
