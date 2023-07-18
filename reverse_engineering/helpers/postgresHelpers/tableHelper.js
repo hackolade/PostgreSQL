@@ -131,13 +131,14 @@ const checkHaveJsonTypes = columns => {
 	return _.find(columns, { type: 'json' });
 };
 
-const getLimit = (count, recordSamplingSettings) => {
-	const per = recordSamplingSettings.relative.value;
-	const size =
-		recordSamplingSettings.active === 'absolute'
-			? recordSamplingSettings.absolute.value
-			: Math.round((count / 100) * per);
-	return Math.min(size, 100000);
+const getSampleDocSize = (count, recordSamplingSettings) => {
+	if (recordSamplingSettings.active === 'absolute') {
+		return Number(recordSamplingSettings.absolute.value);
+	}
+
+	const limit = Math.ceil((count * recordSamplingSettings.relative.value) / 100);
+
+	return Math.min(limit, recordSamplingSettings.maxValue);
 };
 
 const prepareTableConstraints = (constraintsResult, attributesWithPositions, tableIndexes) => {
@@ -355,6 +356,6 @@ module.exports = {
 	prepareTableConstraints,
 	prepareTableLevelData,
 	prepareTableIndexes,
-	getLimit,
+	getSampleDocSize,
 	prepareTableInheritance,
 };
