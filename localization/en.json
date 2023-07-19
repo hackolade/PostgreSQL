@@ -54,6 +54,7 @@
 	"PROPERTIES_PANE___NORMALIZATION": "Normalization",
 	"PROPERTIES_PANE___NAME": "Business Name",
 	"PROPERTIES_PANE___CODE": "Technical name",
+	"PROPERTIES_PANE___DESCRIPTIONS": "comments",
 	"CENTRAL_PANE___TAB_MONGODB_VIEW_SCRIPT": "Create View Script",
 	"CONTEXT_MENU___ADD_BUCKET": "Add schema",
 	"CONTEXT_MENU___ADD_COLLECTION": "Add table",
