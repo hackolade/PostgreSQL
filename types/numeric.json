@@ -34,9 +34,21 @@
 		},
 		{
 			"schema": {
+				"mode": "smallint"
+			},
+			"mode": "smallint"
+		},
+		{
+			"schema": {
 				"mode": "integer"
 			},
 			"capacity": 4
+		},
+		{
+			"schema": {
+				"mode": "integer"
+			},
+			"mode": "integer"
 		},
 		{
 			"schema": {
