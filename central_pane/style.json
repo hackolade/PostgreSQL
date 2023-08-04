@@ -25,6 +25,16 @@
 							{
 								"key": "array_size_limit",
 								"exist": true
+							},
+							{
+								"level": "definition",
+								"key": "array_type",
+								"minLength": 1
+							},
+							{
+								"level": "definition",
+								"key": "array_size_limit",
+								"exist": true
 							}
 						]
 					},
