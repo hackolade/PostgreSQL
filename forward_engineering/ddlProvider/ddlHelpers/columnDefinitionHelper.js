@@ -76,9 +76,9 @@ module.exports = ({ _, assignTemplates, templates, commentIfDeactivated, wrapCom
 	const isString = type => ['char', 'varchar', 'text', 'bit', 'varbit'].includes(type);
 	const isDateTime = type => ['date', 'time', 'timestamp', 'interval'].includes(type);
 
-	const decorateDefault = (type, defaultValue) => {
+	const decorateDefault = (type, defaultValue, isArrayType) => {
 		const constantsValues = ['current_timestamp', 'null'];
-		if ((isString(type) || isDateTime(type)) && !constantsValues.includes(_.toLower(defaultValue))) {
+		if ((isString(type) || isDateTime(type)) && !constantsValues.includes(_.toLower(defaultValue)) && !isArrayType) {
 			return wrapComment(defaultValue);
 		} else {
 			return defaultValue;

@@ -254,8 +254,9 @@ module.exports = (baseProvider, options, app) => {
 				? ' ' + createKeyConstraint(templates, true)(columnDefinition.uniqueKeyOptions).statement
 				: '';
 			const collation = columnDefinition.collationRule ? ` COLLATE "${columnDefinition.collationRule}"` : '';
+			const isArrayType = Array.isArray(columnDefinition.array_type) && columnDefinition.array_type.length > 0;
 			const defaultValue = !_.isUndefined(columnDefinition.default)
-				? ' DEFAULT ' + decorateDefault(type, columnDefinition.default)
+				? ' DEFAULT ' + decorateDefault(type, columnDefinition.default, isArrayType)
 				: '';
 
 			return commentIfDeactivated(
