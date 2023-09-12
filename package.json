@@ -22,7 +22,7 @@
         },
         "features": {
             "nestedCollections": false,
-            "disablePatternField": false,
+            "disablePatternField": true,
             "disableMultipleTypes": true,
             "enableForwardEngineering": true,
             "disableReverseEngineering": false,
