@@ -261,7 +261,11 @@ making sure that you maintain a proper JSON format.
 				"propertyTooltip": "\nIf the constraint is INITIALLY IMMEDIATE, it is checked after each statement. This is the default. If the constraint is INITIALLY DEFERRED, it is checked only at the end of the transaction",
 				"propertyType": "select",
 				"defaultValue": "",
-				"options": ["", "INITIALLY IMMEDIATE", "INITIALLY DEFERRED"]
+				"options": ["", "INITIALLY IMMEDIATE", "INITIALLY DEFERRED"]б
+				"dependency": {
+					"key": "customProperties.deferrable",
+					"value": "DEFERRABLE"
+				}
 			}
 		]
 	}
