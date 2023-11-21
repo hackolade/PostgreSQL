@@ -329,6 +329,8 @@ module.exports = (baseProvider, options, app) => {
 		 *     relationshipOnDelete?: string,
 		 *     relationshipOnUpdate?: string,
 		 *     relationshipMatch?: string,
+		 *     deferrable?: "" | "DEFERRABLE" | "NOT DEFERRABLE",
+		 *     deferrableConstraintCheckTime?: "" | "INITIALLY IMMEDIATE" | "INITIALLY DEFERRED",
 		 * }}
 		 * @param primaryTableActivated {boolean}
 		 * @param foreignTableActivated {boolean}
@@ -376,7 +378,7 @@ module.exports = (baseProvider, options, app) => {
 				primaryTableActivated &&
 				foreignTableActivated;
 
-			const { foreignOnDelete, foreignOnUpdate, foreignMatch } =
+			const { foreignOnDelete, foreignOnUpdate, foreignMatch, deferrable, deferrableConstraintCheckTime } =
 				additionalPropertiesForForeignKey(customProperties);
 
 			const foreignKeyStatement = assignTemplates(templates.createForeignKeyConstraint, {
@@ -387,6 +389,9 @@ module.exports = (baseProvider, options, app) => {
 				onDelete: foreignOnDelete ? ` ON DELETE ${foreignOnDelete}` : '',
 				onUpdate: foreignOnUpdate ? ` ON UPDATE ${foreignOnUpdate}` : '',
 				match: foreignMatch ? ` MATCH ${foreignMatch}` : '',
+				deferrable: deferrable ? ` ${deferrable}` : '',
+				deferrableConstraintCheckTime: deferrable === 'DEFERRABLE' && deferrableConstraintCheckTime
+					? ` ${deferrableConstraintCheckTime}` : '',
 			});
 
 			return {
@@ -451,7 +456,7 @@ module.exports = (baseProvider, options, app) => {
 				primaryTableActivated &&
 				foreignTableActivated;
 
-			const { foreignOnDelete, foreignOnUpdate, foreignMatch } =
+			const { foreignOnDelete, foreignOnUpdate, foreignMatch, deferrable, deferrableConstraintCheckTime } =
 				additionalPropertiesForForeignKey(customProperties);
 
 			const foreignKeyStatement = assignTemplates(templates.createForeignKey, {
@@ -463,6 +468,9 @@ module.exports = (baseProvider, options, app) => {
 				onDelete: foreignOnDelete ? ` ON DELETE ${foreignOnDelete}` : '',
 				onUpdate: foreignOnUpdate ? ` ON UPDATE ${foreignOnUpdate}` : '',
 				match: foreignMatch ? ` MATCH ${foreignMatch}` : '',
+				deferrable: deferrable ? ` ${deferrable}` : '',
+				deferrableConstraintCheckTime: deferrable === 'DEFERRABLE' && deferrableConstraintCheckTime
+					? ` ${deferrableConstraintCheckTime}` : '',
 			});
 
 			return {

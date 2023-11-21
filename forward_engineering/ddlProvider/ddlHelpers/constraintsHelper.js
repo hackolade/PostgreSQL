@@ -111,11 +111,29 @@ module.exports = ({
         );
     };
 
-    const additionalPropertiesForForeignKey = relationship => {
-        const foreignOnDelete = _.get(relationship, 'relationshipOnDelete', '');
-        const foreignOnUpdate = _.get(relationship, 'relationshipOnUpdate', '');
-        const foreignMatch = _.get(relationship, 'relationshipMatch', '');
-        return {foreignOnDelete, foreignOnUpdate, foreignMatch};
+    /**
+     * @param relationshipCustomProperties {{
+     *     relationshipOnDelete?: string,
+     *     relationshipOnUpdate?: string,
+     *     relationshipMatch?: string,
+     *     deferrable?: "" | "DEFERRABLE" | "NOT DEFERRABLE",
+     *     deferrableConstraintCheckTime?: "" | "INITIALLY IMMEDIATE" | "INITIALLY DEFERRED",
+     * }}
+     * @return {{
+     *     relationshipOnDelete: string,
+     *     relationshipOnUpdate: string,
+     *     relationshipMatch: string,
+     *     deferrable: string,
+     *     deferrableConstraintCheckTime: string,
+     * }}
+     * */
+    const additionalPropertiesForForeignKey = relationshipCustomProperties => {
+        const foreignOnDelete = _.get(relationshipCustomProperties, 'relationshipOnDelete', '');
+        const foreignOnUpdate = _.get(relationshipCustomProperties, 'relationshipOnUpdate', '');
+        const foreignMatch = _.get(relationshipCustomProperties, 'relationshipMatch', '');
+        const deferrable = _.get(relationshipCustomProperties, 'deferrable', '');
+        const deferrableConstraintCheckTime = _.get(relationshipCustomProperties, 'deferrableConstraintCheckTime', '');
+        return {foreignOnDelete, foreignOnUpdate, foreignMatch, deferrable, deferrableConstraintCheckTime};
     };
 
     return {
