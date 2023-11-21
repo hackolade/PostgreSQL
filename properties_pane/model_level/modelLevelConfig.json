@@ -2,9 +2,9 @@
 * Copyright © 2016-2017 by IntegrIT S.A. dba Hackolade.  All rights reserved.
 *
 * The copyright to the computer software herein is the property of IntegrIT S.A.
-* The software may be used and/or copied only with the written permission of 
-* IntegrIT S.A. or in accordance with the terms and conditions stipulated in 
-* the agreement/contract under which the software has been supplied. 
+* The software may be used and/or copied only with the written permission of
+* IntegrIT S.A. or in accordance with the terms and conditions stipulated in
+* the agreement/contract under which the software has been supplied.
 
 In order to define custom properties for any object's properties pane, you may copy/paste from the following,
 making sure that you maintain a proper JSON format.
@@ -246,6 +246,22 @@ making sure that you maintain a proper JSON format.
 					"PARTIAL",
 					"FULL"
 				]
+			},
+			{
+				"propertyName": "Deferrable",
+				"propertyKeyword": "deferrable",
+				"propertyTooltip": "\nA constraint that is not deferrable will be checked immediately after every command. Checking of constraints that are deferrable can be postponed until the end of the transaction",
+				"propertyType": "select",
+				"defaultValue": "",
+				"options": ["", "DEFERRABLE", "NOT DEFERRABLE"]
+			},
+			{
+				"propertyName": "Check time",
+				"propertyKeyword": "deferrableConstraintCheckTime",
+				"propertyTooltip": "\nIf the constraint is INITIALLY IMMEDIATE, it is checked after each statement. This is the default. If the constraint is INITIALLY DEFERRED, it is checked only at the end of the transaction",
+				"propertyType": "select",
+				"defaultValue": "",
+				"options": ["", "INITIALLY IMMEDIATE", "INITIALLY DEFERRED"]
 			}
 		]
 	}

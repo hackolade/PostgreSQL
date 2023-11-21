@@ -447,6 +447,26 @@ making sure that you maintain a proper JSON format.
 						"propertyType": "text"
 					},
 					{
+						"propertyName": "Deferrable",
+						"propertyKeyword": "deferrable",
+						"propertyTooltip": "\nA constraint that is not deferrable will be checked immediately after every command. Checking of constraints that are deferrable can be postponed until the end of the transaction",
+						"propertyType": "select",
+						"defaultValue": "",
+						"options": ["", "DEFERRABLE", "NOT DEFERRABLE"]
+					},
+					{
+						"propertyName": "Check time",
+						"propertyKeyword": "deferrableConstraintCheckTime",
+						"propertyTooltip": "\nIf the constraint is INITIALLY IMMEDIATE, it is checked after each statement. This is the default. If the constraint is INITIALLY DEFERRED, it is checked only at the end of the transaction",
+						"propertyType": "select",
+						"defaultValue": "",
+						"options": ["", "INITIALLY IMMEDIATE", "INITIALLY DEFERRED"],
+						"dependency": {
+							"key": "deferrable",
+							"value": "DEFERRABLE"
+						}
+					},
+					{
 						"propertyName": "Comment",
 						"propertyKeyword": "indexComment",
 						"propertyTooltip": "comment",
@@ -569,6 +589,26 @@ making sure that you maintain a proper JSON format.
 						"propertyName": "Tablespace",
 						"propertyKeyword": "indexTablespace",
 						"propertyType": "text"
+					},
+					{
+						"propertyName": "Deferrable",
+						"propertyKeyword": "deferrable",
+						"propertyTooltip": "\nA constraint that is not deferrable will be checked immediately after every command. Checking of constraints that are deferrable can be postponed until the end of the transaction",
+						"propertyType": "select",
+						"defaultValue": "",
+						"options": ["", "DEFERRABLE", "NOT DEFERRABLE"]
+					},
+					{
+						"propertyName": "Check time",
+						"propertyKeyword": "deferrableConstraintCheckTime",
+						"propertyTooltip": "\nIf the constraint is INITIALLY IMMEDIATE, it is checked after each statement. This is the default. If the constraint is INITIALLY DEFERRED, it is checked only at the end of the transaction",
+						"propertyType": "select",
+						"defaultValue": "",
+						"options": ["", "INITIALLY IMMEDIATE", "INITIALLY DEFERRED"],
+						"dependency": {
+							"key": "deferrable",
+							"value": "DEFERRABLE"
+						}
 					},
 					{
 						"propertyName": "Comment",
@@ -924,6 +964,26 @@ making sure that you maintain a proper JSON format.
 						"propertyType": "text"
 					},
 					{
+						"propertyName": "Deferrable",
+						"propertyKeyword": "deferrable",
+						"propertyTooltip": "\nA constraint that is not deferrable will be checked immediately after every command. Checking of constraints that are deferrable can be postponed until the end of the transaction",
+						"propertyType": "select",
+						"defaultValue": "",
+						"options": ["", "DEFERRABLE", "NOT DEFERRABLE"]
+					},
+					{
+						"propertyName": "Check time",
+						"propertyKeyword": "deferrableConstraintCheckTime",
+						"propertyTooltip": "\nIf the constraint is INITIALLY IMMEDIATE, it is checked after each statement. This is the default. If the constraint is INITIALLY DEFERRED, it is checked only at the end of the transaction",
+						"propertyType": "select",
+						"defaultValue": "",
+						"options": ["", "INITIALLY IMMEDIATE", "INITIALLY DEFERRED"],
+						"dependency": {
+							"key": "deferrable",
+							"value": "DEFERRABLE"
+						}
+					},
+					{
 						"propertyName": "Comment",
 						"propertyKeyword": "indexComment",
 						"propertyTooltip": "comment",
@@ -1046,6 +1106,26 @@ making sure that you maintain a proper JSON format.
 						"propertyName": "Tablespace",
 						"propertyKeyword": "indexTablespace",
 						"propertyType": "text"
+					},
+					{
+						"propertyName": "Deferrable",
+						"propertyKeyword": "deferrable",
+						"propertyTooltip": "\nA constraint that is not deferrable will be checked immediately after every command. Checking of constraints that are deferrable can be postponed until the end of the transaction",
+						"propertyType": "select",
+						"defaultValue": "",
+						"options": ["", "DEFERRABLE", "NOT DEFERRABLE"]
+					},
+					{
+						"propertyName": "Check time",
+						"propertyKeyword": "deferrableConstraintCheckTime",
+						"propertyTooltip": "\nIf the constraint is INITIALLY IMMEDIATE, it is checked after each statement. This is the default. If the constraint is INITIALLY DEFERRED, it is checked only at the end of the transaction",
+						"propertyType": "select",
+						"defaultValue": "",
+						"options": ["", "INITIALLY IMMEDIATE", "INITIALLY DEFERRED"],
+						"dependency": {
+							"key": "deferrable",
+							"value": "DEFERRABLE"
+						}
 					},
 					{
 						"propertyName": "Comment",
@@ -1356,6 +1436,26 @@ making sure that you maintain a proper JSON format.
 						"propertyType": "text"
 					},
 					{
+						"propertyName": "Deferrable",
+						"propertyKeyword": "deferrable",
+						"propertyTooltip": "\nA constraint that is not deferrable will be checked immediately after every command. Checking of constraints that are deferrable can be postponed until the end of the transaction",
+						"propertyType": "select",
+						"defaultValue": "",
+						"options": ["", "DEFERRABLE", "NOT DEFERRABLE"]
+					},
+					{
+						"propertyName": "Check time",
+						"propertyKeyword": "deferrableConstraintCheckTime",
+						"propertyTooltip": "\nIf the constraint is INITIALLY IMMEDIATE, it is checked after each statement. This is the default. If the constraint is INITIALLY DEFERRED, it is checked only at the end of the transaction",
+						"propertyType": "select",
+						"defaultValue": "",
+						"options": ["", "INITIALLY IMMEDIATE", "INITIALLY DEFERRED"],
+						"dependency": {
+							"key": "deferrable",
+							"value": "DEFERRABLE"
+						}
+					},
+					{
 						"propertyName": "Comment",
 						"propertyKeyword": "indexComment",
 						"propertyTooltip": "comment",
@@ -1478,6 +1578,26 @@ making sure that you maintain a proper JSON format.
 						"propertyName": "Tablespace",
 						"propertyKeyword": "indexTablespace",
 						"propertyType": "text"
+					},
+					{
+						"propertyName": "Deferrable",
+						"propertyKeyword": "deferrable",
+						"propertyTooltip": "\nA constraint that is not deferrable will be checked immediately after every command. Checking of constraints that are deferrable can be postponed until the end of the transaction",
+						"propertyType": "select",
+						"defaultValue": "",
+						"options": ["", "DEFERRABLE", "NOT DEFERRABLE"]
+					},
+					{
+						"propertyName": "Check time",
+						"propertyKeyword": "deferrableConstraintCheckTime",
+						"propertyTooltip": "\nIf the constraint is INITIALLY IMMEDIATE, it is checked after each statement. This is the default. If the constraint is INITIALLY DEFERRED, it is checked only at the end of the transaction",
+						"propertyType": "select",
+						"defaultValue": "",
+						"options": ["", "INITIALLY IMMEDIATE", "INITIALLY DEFERRED"],
+						"dependency": {
+							"key": "deferrable",
+							"value": "DEFERRABLE"
+						}
 					},
 					{
 						"propertyName": "Comment",
@@ -1841,6 +1961,26 @@ making sure that you maintain a proper JSON format.
 						"propertyType": "text"
 					},
 					{
+						"propertyName": "Deferrable",
+						"propertyKeyword": "deferrable",
+						"propertyTooltip": "\nA constraint that is not deferrable will be checked immediately after every command. Checking of constraints that are deferrable can be postponed until the end of the transaction",
+						"propertyType": "select",
+						"defaultValue": "",
+						"options": ["", "DEFERRABLE", "NOT DEFERRABLE"]
+					},
+					{
+						"propertyName": "Check time",
+						"propertyKeyword": "deferrableConstraintCheckTime",
+						"propertyTooltip": "\nIf the constraint is INITIALLY IMMEDIATE, it is checked after each statement. This is the default. If the constraint is INITIALLY DEFERRED, it is checked only at the end of the transaction",
+						"propertyType": "select",
+						"defaultValue": "",
+						"options": ["", "INITIALLY IMMEDIATE", "INITIALLY DEFERRED"],
+						"dependency": {
+							"key": "deferrable",
+							"value": "DEFERRABLE"
+						}
+					},
+					{
 						"propertyName": "Comment",
 						"propertyKeyword": "indexComment",
 						"propertyTooltip": "comment",
@@ -1963,6 +2103,26 @@ making sure that you maintain a proper JSON format.
 						"propertyName": "Tablespace",
 						"propertyKeyword": "indexTablespace",
 						"propertyType": "text"
+					},
+					{
+						"propertyName": "Deferrable",
+						"propertyKeyword": "deferrable",
+						"propertyTooltip": "\nA constraint that is not deferrable will be checked immediately after every command. Checking of constraints that are deferrable can be postponed until the end of the transaction",
+						"propertyType": "select",
+						"defaultValue": "",
+						"options": ["", "DEFERRABLE", "NOT DEFERRABLE"]
+					},
+					{
+						"propertyName": "Check time",
+						"propertyKeyword": "deferrableConstraintCheckTime",
+						"propertyTooltip": "\nIf the constraint is INITIALLY IMMEDIATE, it is checked after each statement. This is the default. If the constraint is INITIALLY DEFERRED, it is checked only at the end of the transaction",
+						"propertyType": "select",
+						"defaultValue": "",
+						"options": ["", "INITIALLY IMMEDIATE", "INITIALLY DEFERRED"],
+						"dependency": {
+							"key": "deferrable",
+							"value": "DEFERRABLE"
+						}
 					},
 					{
 						"propertyName": "Comment",
@@ -2315,6 +2475,26 @@ making sure that you maintain a proper JSON format.
 						"propertyType": "text"
 					},
 					{
+						"propertyName": "Deferrable",
+						"propertyKeyword": "deferrable",
+						"propertyTooltip": "\nA constraint that is not deferrable will be checked immediately after every command. Checking of constraints that are deferrable can be postponed until the end of the transaction",
+						"propertyType": "select",
+						"defaultValue": "",
+						"options": ["", "DEFERRABLE", "NOT DEFERRABLE"]
+					},
+					{
+						"propertyName": "Check time",
+						"propertyKeyword": "deferrableConstraintCheckTime",
+						"propertyTooltip": "\nIf the constraint is INITIALLY IMMEDIATE, it is checked after each statement. This is the default. If the constraint is INITIALLY DEFERRED, it is checked only at the end of the transaction",
+						"propertyType": "select",
+						"defaultValue": "",
+						"options": ["", "INITIALLY IMMEDIATE", "INITIALLY DEFERRED"],
+						"dependency": {
+							"key": "deferrable",
+							"value": "DEFERRABLE"
+						}
+					},
+					{
 						"propertyName": "Comment",
 						"propertyKeyword": "indexComment",
 						"propertyTooltip": "comment",
@@ -2437,6 +2617,26 @@ making sure that you maintain a proper JSON format.
 						"propertyName": "Tablespace",
 						"propertyKeyword": "indexTablespace",
 						"propertyType": "text"
+					},
+					{
+						"propertyName": "Deferrable",
+						"propertyKeyword": "deferrable",
+						"propertyTooltip": "\nA constraint that is not deferrable will be checked immediately after every command. Checking of constraints that are deferrable can be postponed until the end of the transaction",
+						"propertyType": "select",
+						"defaultValue": "",
+						"options": ["", "DEFERRABLE", "NOT DEFERRABLE"]
+					},
+					{
+						"propertyName": "Check time",
+						"propertyKeyword": "deferrableConstraintCheckTime",
+						"propertyTooltip": "\nIf the constraint is INITIALLY IMMEDIATE, it is checked after each statement. This is the default. If the constraint is INITIALLY DEFERRED, it is checked only at the end of the transaction",
+						"propertyType": "select",
+						"defaultValue": "",
+						"options": ["", "INITIALLY IMMEDIATE", "INITIALLY DEFERRED"],
+						"dependency": {
+							"key": "deferrable",
+							"value": "DEFERRABLE"
+						}
 					},
 					{
 						"propertyName": "Comment",
@@ -2751,6 +2951,26 @@ making sure that you maintain a proper JSON format.
 						"propertyType": "text"
 					},
 					{
+						"propertyName": "Deferrable",
+						"propertyKeyword": "deferrable",
+						"propertyTooltip": "\nA constraint that is not deferrable will be checked immediately after every command. Checking of constraints that are deferrable can be postponed until the end of the transaction",
+						"propertyType": "select",
+						"defaultValue": "",
+						"options": ["", "DEFERRABLE", "NOT DEFERRABLE"]
+					},
+					{
+						"propertyName": "Check time",
+						"propertyKeyword": "deferrableConstraintCheckTime",
+						"propertyTooltip": "\nIf the constraint is INITIALLY IMMEDIATE, it is checked after each statement. This is the default. If the constraint is INITIALLY DEFERRED, it is checked only at the end of the transaction",
+						"propertyType": "select",
+						"defaultValue": "",
+						"options": ["", "INITIALLY IMMEDIATE", "INITIALLY DEFERRED"],
+						"dependency": {
+							"key": "deferrable",
+							"value": "DEFERRABLE"
+						}
+					},
+					{
 						"propertyName": "Comment",
 						"propertyKeyword": "indexComment",
 						"propertyTooltip": "comment",
@@ -2873,6 +3093,26 @@ making sure that you maintain a proper JSON format.
 						"propertyName": "Tablespace",
 						"propertyKeyword": "indexTablespace",
 						"propertyType": "text"
+					},
+					{
+						"propertyName": "Deferrable",
+						"propertyKeyword": "deferrable",
+						"propertyTooltip": "\nA constraint that is not deferrable will be checked immediately after every command. Checking of constraints that are deferrable can be postponed until the end of the transaction",
+						"propertyType": "select",
+						"defaultValue": "",
+						"options": ["", "DEFERRABLE", "NOT DEFERRABLE"]
+					},
+					{
+						"propertyName": "Check time",
+						"propertyKeyword": "deferrableConstraintCheckTime",
+						"propertyTooltip": "\nIf the constraint is INITIALLY IMMEDIATE, it is checked after each statement. This is the default. If the constraint is INITIALLY DEFERRED, it is checked only at the end of the transaction",
+						"propertyType": "select",
+						"defaultValue": "",
+						"options": ["", "INITIALLY IMMEDIATE", "INITIALLY DEFERRED"],
+						"dependency": {
+							"key": "deferrable",
+							"value": "DEFERRABLE"
+						}
 					},
 					{
 						"propertyName": "Comment",
@@ -3292,6 +3532,26 @@ making sure that you maintain a proper JSON format.
 						"propertyType": "text"
 					},
 					{
+						"propertyName": "Deferrable",
+						"propertyKeyword": "deferrable",
+						"propertyTooltip": "\nA constraint that is not deferrable will be checked immediately after every command. Checking of constraints that are deferrable can be postponed until the end of the transaction",
+						"propertyType": "select",
+						"defaultValue": "",
+						"options": ["", "DEFERRABLE", "NOT DEFERRABLE"]
+					},
+					{
+						"propertyName": "Check time",
+						"propertyKeyword": "deferrableConstraintCheckTime",
+						"propertyTooltip": "\nIf the constraint is INITIALLY IMMEDIATE, it is checked after each statement. This is the default. If the constraint is INITIALLY DEFERRED, it is checked only at the end of the transaction",
+						"propertyType": "select",
+						"defaultValue": "",
+						"options": ["", "INITIALLY IMMEDIATE", "INITIALLY DEFERRED"],
+						"dependency": {
+							"key": "deferrable",
+							"value": "DEFERRABLE"
+						}
+					},
+					{
 						"propertyName": "Comment",
 						"propertyKeyword": "indexComment",
 						"propertyTooltip": "comment",
@@ -3414,6 +3674,26 @@ making sure that you maintain a proper JSON format.
 						"propertyName": "Tablespace",
 						"propertyKeyword": "indexTablespace",
 						"propertyType": "text"
+					},
+					{
+						"propertyName": "Deferrable",
+						"propertyKeyword": "deferrable",
+						"propertyTooltip": "\nA constraint that is not deferrable will be checked immediately after every command. Checking of constraints that are deferrable can be postponed until the end of the transaction",
+						"propertyType": "select",
+						"defaultValue": "",
+						"options": ["", "DEFERRABLE", "NOT DEFERRABLE"]
+					},
+					{
+						"propertyName": "Check time",
+						"propertyKeyword": "deferrableConstraintCheckTime",
+						"propertyTooltip": "\nIf the constraint is INITIALLY IMMEDIATE, it is checked after each statement. This is the default. If the constraint is INITIALLY DEFERRED, it is checked only at the end of the transaction",
+						"propertyType": "select",
+						"defaultValue": "",
+						"options": ["", "INITIALLY IMMEDIATE", "INITIALLY DEFERRED"],
+						"dependency": {
+							"key": "deferrable",
+							"value": "DEFERRABLE"
+						}
 					},
 					{
 						"propertyName": "Comment",
@@ -3708,6 +3988,26 @@ making sure that you maintain a proper JSON format.
 						"propertyType": "text"
 					},
 					{
+						"propertyName": "Deferrable",
+						"propertyKeyword": "deferrable",
+						"propertyTooltip": "\nA constraint that is not deferrable will be checked immediately after every command. Checking of constraints that are deferrable can be postponed until the end of the transaction",
+						"propertyType": "select",
+						"defaultValue": "",
+						"options": ["", "DEFERRABLE", "NOT DEFERRABLE"]
+					},
+					{
+						"propertyName": "Check time",
+						"propertyKeyword": "deferrableConstraintCheckTime",
+						"propertyTooltip": "\nIf the constraint is INITIALLY IMMEDIATE, it is checked after each statement. This is the default. If the constraint is INITIALLY DEFERRED, it is checked only at the end of the transaction",
+						"propertyType": "select",
+						"defaultValue": "",
+						"options": ["", "INITIALLY IMMEDIATE", "INITIALLY DEFERRED"],
+						"dependency": {
+							"key": "deferrable",
+							"value": "DEFERRABLE"
+						}
+					},
+					{
 						"propertyName": "Comment",
 						"propertyKeyword": "indexComment",
 						"propertyTooltip": "comment",
@@ -3830,6 +4130,26 @@ making sure that you maintain a proper JSON format.
 						"propertyName": "Tablespace",
 						"propertyKeyword": "indexTablespace",
 						"propertyType": "text"
+					},
+					{
+						"propertyName": "Deferrable",
+						"propertyKeyword": "deferrable",
+						"propertyTooltip": "\nA constraint that is not deferrable will be checked immediately after every command. Checking of constraints that are deferrable can be postponed until the end of the transaction",
+						"propertyType": "select",
+						"defaultValue": "",
+						"options": ["", "DEFERRABLE", "NOT DEFERRABLE"]
+					},
+					{
+						"propertyName": "Check time",
+						"propertyKeyword": "deferrableConstraintCheckTime",
+						"propertyTooltip": "\nIf the constraint is INITIALLY IMMEDIATE, it is checked after each statement. This is the default. If the constraint is INITIALLY DEFERRED, it is checked only at the end of the transaction",
+						"propertyType": "select",
+						"defaultValue": "",
+						"options": ["", "INITIALLY IMMEDIATE", "INITIALLY DEFERRED"],
+						"dependency": {
+							"key": "deferrable",
+							"value": "DEFERRABLE"
+						}
 					},
 					{
 						"propertyName": "Comment",
@@ -4145,6 +4465,26 @@ making sure that you maintain a proper JSON format.
 						"propertyType": "text"
 					},
 					{
+						"propertyName": "Deferrable",
+						"propertyKeyword": "deferrable",
+						"propertyTooltip": "\nA constraint that is not deferrable will be checked immediately after every command. Checking of constraints that are deferrable can be postponed until the end of the transaction",
+						"propertyType": "select",
+						"defaultValue": "",
+						"options": ["", "DEFERRABLE", "NOT DEFERRABLE"]
+					},
+					{
+						"propertyName": "Check time",
+						"propertyKeyword": "deferrableConstraintCheckTime",
+						"propertyTooltip": "\nIf the constraint is INITIALLY IMMEDIATE, it is checked after each statement. This is the default. If the constraint is INITIALLY DEFERRED, it is checked only at the end of the transaction",
+						"propertyType": "select",
+						"defaultValue": "",
+						"options": ["", "INITIALLY IMMEDIATE", "INITIALLY DEFERRED"],
+						"dependency": {
+							"key": "deferrable",
+							"value": "DEFERRABLE"
+						}
+					},
+					{
 						"propertyName": "Comment",
 						"propertyKeyword": "indexComment",
 						"propertyTooltip": "comment",
@@ -4267,6 +4607,26 @@ making sure that you maintain a proper JSON format.
 						"propertyName": "Tablespace",
 						"propertyKeyword": "indexTablespace",
 						"propertyType": "text"
+					},
+					{
+						"propertyName": "Deferrable",
+						"propertyKeyword": "deferrable",
+						"propertyTooltip": "\nA constraint that is not deferrable will be checked immediately after every command. Checking of constraints that are deferrable can be postponed until the end of the transaction",
+						"propertyType": "select",
+						"defaultValue": "",
+						"options": ["", "DEFERRABLE", "NOT DEFERRABLE"]
+					},
+					{
+						"propertyName": "Check time",
+						"propertyKeyword": "deferrableConstraintCheckTime",
+						"propertyTooltip": "\nIf the constraint is INITIALLY IMMEDIATE, it is checked after each statement. This is the default. If the constraint is INITIALLY DEFERRED, it is checked only at the end of the transaction",
+						"propertyType": "select",
+						"defaultValue": "",
+						"options": ["", "INITIALLY IMMEDIATE", "INITIALLY DEFERRED"],
+						"dependency": {
+							"key": "deferrable",
+							"value": "DEFERRABLE"
+						}
 					},
 					{
 						"propertyName": "Comment",
