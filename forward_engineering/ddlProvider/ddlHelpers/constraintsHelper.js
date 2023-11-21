@@ -80,6 +80,9 @@ module.exports = ({
             : '';
         const storageParameters = keyData.storageParameters ? ` WITH (${keyData.storageParameters})` : '';
         const tablespace = keyData.tablespace ? ` USING INDEX TABLESPACE ${wrapInQuotes(keyData.tablespace)}` : '';
+        const deferrable = keyData?.deferrable ? ` ${keyData.deferrable}` : '';
+        const deferrableConstraintCheckTime = keyData?.deferrable === 'DEFERRABLE' && keyData?.deferrableConstraintCheckTime
+            ? ` ${keyData?.deferrableConstraintCheckTime}` : '';
 
         return {
             statement: assignTemplates(templates.createKeyConstraint, {
@@ -89,6 +92,8 @@ module.exports = ({
                 includeNonKey,
                 storageParameters,
                 tablespace,
+                deferrable,
+                deferrableConstraintCheckTime,
             }),
             isActivated: !isAllColumnsDeactivated,
         };
