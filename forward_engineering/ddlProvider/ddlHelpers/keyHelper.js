@@ -59,6 +59,8 @@ module.exports = (_, clean) => {
 			comment: options['indexComment'],
 			tablespace: options['indexTablespace'],
 			nullsDistinct: options['nullsDistinct'],
+			deferrable: options['deferrable'],
+			deferrableConstraintCheckTime: options['deferrableConstraintCheckTime'],
 		});
 
 	const hydratePrimaryKeyOptions = (options, columnName, isActivated, jsonSchema) =>
@@ -75,6 +77,8 @@ module.exports = (_, clean) => {
 			storageParameters: options['indexStorageParameters'],
 			comment: options['indexComment'],
 			tablespace: options['indexTablespace'],
+			deferrable: options['deferrable'],
+			deferrableConstraintCheckTime: options['deferrableConstraintCheckTime'],
 		});
 
 	const findName = (keyId, properties) => {
