@@ -16,7 +16,9 @@ module.exports = {
 		'${partitionOf} ${openParenthesis}${keyConstraints}${checkConstraints}${foreignKeyConstraints}\n' +
 		'${closeParenthesis}${options};\n\n${comment}${columnDescriptions}',
 
-	columnDefinition: '${name} ${type}${collation}${primaryKey}${uniqueKey}${defaultValue}${notNull}',
+	generatedColumnClause: ' GENERATED ALWAYS AS (${generationExpression}) STORED',
+
+	columnDefinition: '${name} ${type}${collation}${generatedColumnClause}${primaryKey}${uniqueKey}${defaultValue}${notNull}',
 
 	checkConstraint: '${name} CHECK (${expression})${noInherit}',
 
