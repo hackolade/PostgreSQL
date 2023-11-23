@@ -204,6 +204,15 @@ const getModifyGeneratedColumnsScriptDtos = ({app, dbVersion, modelDefinitions, 
         .filter(Boolean);
 }
 
+const getDropAndRecreateColumnsScriptDtos = ({app, dbVersion, modelDefinitions, internalDefinitions, externalDefinitions}) =>
+    (collection) => {
+        const modifyGeneratedColumnsScriptDtos = getModifyGeneratedColumnsScriptDtos({app, dbVersion, modelDefinitions, internalDefinitions, externalDefinitions})(collection);
+
+        return [
+            ...modifyGeneratedColumnsScriptDtos,
+        ]
+    }
+
 /**
  * @return {(collection: Object) => AlterScriptDto[]}
  * */
@@ -214,15 +223,22 @@ const getModifyColumnScriptDtos = (
     const ddlProvider = require('../../ddlProvider/ddlProvider')(null, null, app);
 
     const renameColumnScriptDtos = getRenameColumnScriptDtos(_, ddlProvider)(collection);
+
+    const dropAndRecreateScriptDtos = getDropAndRecreateColumnsScriptDtos({app, dbVersion, modelDefinitions, internalDefinitions, externalDefinitions})(collection);
+    if (dropAndRecreateScriptDtos.length) {
+        return [
+            ...renameColumnScriptDtos,
+            ...dropAndRecreateScriptDtos,
+        ].filter(Boolean);
+    }
+
     const updateTypeScriptDtos = getUpdateTypesScriptDtos(_, ddlProvider)(collection);
-    const modifyGeneratedColumnsScriptDtos = getModifyGeneratedColumnsScriptDtos({app, dbVersion, modelDefinitions, internalDefinitions, externalDefinitions})(collection);
     const modifyNotNullScriptDtos = getModifyNonNullColumnsScriptDtos(_, ddlProvider)(collection);
     const modifyCommentScriptDtos = getModifiedCommentOnColumnScriptDtos(_, ddlProvider)(collection);
 
     return [
         ...renameColumnScriptDtos,
         ...updateTypeScriptDtos,
-        ...modifyGeneratedColumnsScriptDtos,
         ...modifyNotNullScriptDtos,
         ...modifyCommentScriptDtos,
     ].filter(Boolean);
