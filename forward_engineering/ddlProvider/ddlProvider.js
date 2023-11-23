@@ -258,11 +258,17 @@ module.exports = (baseProvider, options, app) => {
 			const defaultValue = !_.isUndefined(columnDefinition.default)
 				? ' DEFAULT ' + decorateDefault(type, columnDefinition.default, isArrayType)
 				: '';
+			const generatedColumnClause = columnDefinition.generatedColumn && columnDefinition.columnGenerationExpression
+				? assignTemplates(templates.generatedColumnClause, {
+					generationExpression: columnDefinition.columnGenerationExpression,
+				})
+				: '';
 
 			return commentIfDeactivated(
 				assignTemplates(templates.columnDefinition, {
 					name: wrapInQuotes(columnDefinition.name),
 					type: decorateType(type, columnDefinition),
+					generatedColumnClause,
 					notNull,
 					primaryKey,
 					uniqueKey,
@@ -670,6 +676,8 @@ module.exports = (baseProvider, options, app) => {
 				timezone,
 				intervalOptions,
 				dbVersion,
+				generatedColumn: Boolean(jsonSchema.generatedColumn),
+				columnGenerationExpression: jsonSchema.columnGenerationExpression,
 			};
 		},
 

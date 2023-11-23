@@ -120,7 +120,7 @@ const getAlterCollectionsScriptDtos = ({
         .filter(Boolean)
         .map(item => Object.values(item.properties)[0])
         .filter(collection => !collection.compMod)
-        .flatMap(getModifyColumnScriptDtos(app));
+        .flatMap(getModifyColumnScriptDtos({app, dbVersion, modelDefinitions, internalDefinitions, externalDefinitions}));
 
     return [
         ...createCollectionsScriptDtos,

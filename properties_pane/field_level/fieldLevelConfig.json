@@ -190,6 +190,65 @@ making sure that you maintain a proper JSON format.
 				}
 			},
 			{
+				"propertyName": "Generated column",
+				"propertyKeyword": "generatedColumn",
+				"propertyTooltip": "A generated column is a special column that is always computed from other columns",
+				"propertyType": "checkbox",
+				"dependency": {
+					"type": "not",
+					"values": {
+						"type": "or",
+						"values": [
+							{
+								"level": "model",
+								"key": "dbVersion",
+								"value": "v10.x"
+							},
+							{
+								"level": "model",
+								"key": "dbVersion",
+								"value": "v11.x"
+							}
+						]
+					}
+				}
+			},
+			{
+				"propertyName": "Generation expression",
+				"propertyKeyword": "columnGenerationExpression",
+				"propertyTooltip": "An SQL statement for computing values for this column",
+				"propertyType": "details",
+				"template": "textarea",
+				"markdown": false,
+				"dependency": {
+					"type": "and",
+					"values": [
+						{
+							"key": "generatedColumn",
+							"value": true
+						},
+						{
+							"type": "not",
+							"values": {
+								"type": "or",
+								"values": [
+									{
+										"level": "model",
+										"key": "dbVersion",
+										"value": "v10.x"
+									},
+									{
+										"level": "model",
+										"key": "dbVersion",
+										"value": "v11.x"
+									}
+								]
+							}
+						}
+					]
+				}
+			},
+			{
 				"propertyName": "Not null",
 				"propertyKeyword": "required",
 				"enableForReference": true,
@@ -733,6 +792,65 @@ making sure that you maintain a proper JSON format.
 				]
 			},
 			{
+				"propertyName": "Generated column",
+				"propertyKeyword": "generatedColumn",
+				"propertyTooltip": "A generated column is a special column that is always computed from other columns",
+				"propertyType": "checkbox",
+				"dependency": {
+					"type": "not",
+					"values": {
+						"type": "or",
+						"values": [
+							{
+								"level": "model",
+								"key": "dbVersion",
+								"value": "v10.x"
+							},
+							{
+								"level": "model",
+								"key": "dbVersion",
+								"value": "v11.x"
+							}
+						]
+					}
+				}
+			},
+			{
+				"propertyName": "Generation expression",
+				"propertyKeyword": "columnGenerationExpression",
+				"propertyTooltip": "An SQL statement for computing values for this column",
+				"propertyType": "details",
+				"template": "textarea",
+				"markdown": false,
+				"dependency": {
+					"type": "and",
+					"values": [
+						{
+							"key": "generatedColumn",
+							"value": true
+						},
+						{
+							"type": "not",
+							"values": {
+								"type": "or",
+								"values": [
+									{
+										"level": "model",
+										"key": "dbVersion",
+										"value": "v10.x"
+									},
+									{
+										"level": "model",
+										"key": "dbVersion",
+										"value": "v11.x"
+									}
+								]
+							}
+						}
+					]
+				}
+			},
+			{
 				"propertyName": "Not null",
 				"propertyKeyword": "required",
 				"enableForReference": true,
@@ -1212,6 +1330,65 @@ making sure that you maintain a proper JSON format.
 						"step": 1
 					}
 				]
+			},
+			{
+				"propertyName": "Generated column",
+				"propertyKeyword": "generatedColumn",
+				"propertyTooltip": "A generated column is a special column that is always computed from other columns",
+				"propertyType": "checkbox",
+				"dependency": {
+					"type": "not",
+					"values": {
+						"type": "or",
+						"values": [
+							{
+								"level": "model",
+								"key": "dbVersion",
+								"value": "v10.x"
+							},
+							{
+								"level": "model",
+								"key": "dbVersion",
+								"value": "v11.x"
+							}
+						]
+					}
+				}
+			},
+			{
+				"propertyName": "Generation expression",
+				"propertyKeyword": "columnGenerationExpression",
+				"propertyTooltip": "An SQL statement for computing values for this column",
+				"propertyType": "details",
+				"template": "textarea",
+				"markdown": false,
+				"dependency": {
+					"type": "and",
+					"values": [
+						{
+							"key": "generatedColumn",
+							"value": true
+						},
+						{
+							"type": "not",
+							"values": {
+								"type": "or",
+								"values": [
+									{
+										"level": "model",
+										"key": "dbVersion",
+										"value": "v10.x"
+									},
+									{
+										"level": "model",
+										"key": "dbVersion",
+										"value": "v11.x"
+									}
+								]
+							}
+						}
+					]
+				}
 			},
 			{
 				"propertyName": "Not null",
@@ -1738,6 +1915,65 @@ making sure that you maintain a proper JSON format.
 				]
 			},
 			{
+				"propertyName": "Generated column",
+				"propertyKeyword": "generatedColumn",
+				"propertyTooltip": "A generated column is a special column that is always computed from other columns",
+				"propertyType": "checkbox",
+				"dependency": {
+					"type": "not",
+					"values": {
+						"type": "or",
+						"values": [
+							{
+								"level": "model",
+								"key": "dbVersion",
+								"value": "v10.x"
+							},
+							{
+								"level": "model",
+								"key": "dbVersion",
+								"value": "v11.x"
+							}
+						]
+					}
+				}
+			},
+			{
+				"propertyName": "Generation expression",
+				"propertyKeyword": "columnGenerationExpression",
+				"propertyTooltip": "An SQL statement for computing values for this column",
+				"propertyType": "details",
+				"template": "textarea",
+				"markdown": false,
+				"dependency": {
+					"type": "and",
+					"values": [
+						{
+							"key": "generatedColumn",
+							"value": true
+						},
+						{
+							"type": "not",
+							"values": {
+								"type": "or",
+								"values": [
+									{
+										"level": "model",
+										"key": "dbVersion",
+										"value": "v10.x"
+									},
+									{
+										"level": "model",
+										"key": "dbVersion",
+										"value": "v11.x"
+									}
+								]
+							}
+						}
+					]
+				}
+			},
+			{
 				"propertyName": "Not null",
 				"propertyKeyword": "required",
 				"enableForReference": true,
@@ -2189,6 +2425,65 @@ making sure that you maintain a proper JSON format.
 				]
 			},
 			{
+				"propertyName": "Generated column",
+				"propertyKeyword": "generatedColumn",
+				"propertyTooltip": "A generated column is a special column that is always computed from other columns",
+				"propertyType": "checkbox",
+				"dependency": {
+					"type": "not",
+					"values": {
+						"type": "or",
+						"values": [
+							{
+								"level": "model",
+								"key": "dbVersion",
+								"value": "v10.x"
+							},
+							{
+								"level": "model",
+								"key": "dbVersion",
+								"value": "v11.x"
+							}
+						]
+					}
+				}
+			},
+			{
+				"propertyName": "Generation expression",
+				"propertyKeyword": "columnGenerationExpression",
+				"propertyTooltip": "An SQL statement for computing values for this column",
+				"propertyType": "details",
+				"template": "textarea",
+				"markdown": false,
+				"dependency": {
+					"type": "and",
+					"values": [
+						{
+							"key": "generatedColumn",
+							"value": true
+						},
+						{
+							"type": "not",
+							"values": {
+								"type": "or",
+								"values": [
+									{
+										"level": "model",
+										"key": "dbVersion",
+										"value": "v10.x"
+									},
+									{
+										"level": "model",
+										"key": "dbVersion",
+										"value": "v11.x"
+									}
+								]
+							}
+						}
+					]
+				}
+			},
+			{
 				"propertyName": "Not null",
 				"propertyKeyword": "required",
 				"enableForReference": true,
@@ -2242,6 +2537,65 @@ making sure that you maintain a proper JSON format.
 						"step": 1
 					}
 				]
+			},
+			{
+				"propertyName": "Generated column",
+				"propertyKeyword": "generatedColumn",
+				"propertyTooltip": "A generated column is a special column that is always computed from other columns",
+				"propertyType": "checkbox",
+				"dependency": {
+					"type": "not",
+					"values": {
+						"type": "or",
+						"values": [
+							{
+								"level": "model",
+								"key": "dbVersion",
+								"value": "v10.x"
+							},
+							{
+								"level": "model",
+								"key": "dbVersion",
+								"value": "v11.x"
+							}
+						]
+					}
+				}
+			},
+			{
+				"propertyName": "Generation expression",
+				"propertyKeyword": "columnGenerationExpression",
+				"propertyTooltip": "An SQL statement for computing values for this column",
+				"propertyType": "details",
+				"template": "textarea",
+				"markdown": false,
+				"dependency": {
+					"type": "and",
+					"values": [
+						{
+							"key": "generatedColumn",
+							"value": true
+						},
+						{
+							"type": "not",
+							"values": {
+								"type": "or",
+								"values": [
+									{
+										"level": "model",
+										"key": "dbVersion",
+										"value": "v10.x"
+									},
+									{
+										"level": "model",
+										"key": "dbVersion",
+										"value": "v11.x"
+									}
+								]
+							}
+						}
+					]
+				}
 			},
 			{
 				"propertyName": "Not null",
@@ -2718,6 +3072,65 @@ making sure that you maintain a proper JSON format.
 						"step": 1
 					}
 				]
+			},
+			{
+				"propertyName": "Generated column",
+				"propertyKeyword": "generatedColumn",
+				"propertyTooltip": "A generated column is a special column that is always computed from other columns",
+				"propertyType": "checkbox",
+				"dependency": {
+					"type": "not",
+					"values": {
+						"type": "or",
+						"values": [
+							{
+								"level": "model",
+								"key": "dbVersion",
+								"value": "v10.x"
+							},
+							{
+								"level": "model",
+								"key": "dbVersion",
+								"value": "v11.x"
+							}
+						]
+					}
+				}
+			},
+			{
+				"propertyName": "Generation expression",
+				"propertyKeyword": "columnGenerationExpression",
+				"propertyTooltip": "An SQL statement for computing values for this column",
+				"propertyType": "details",
+				"template": "textarea",
+				"markdown": false,
+				"dependency": {
+					"type": "and",
+					"values": [
+						{
+							"key": "generatedColumn",
+							"value": true
+						},
+						{
+							"type": "not",
+							"values": {
+								"type": "or",
+								"values": [
+									{
+										"level": "model",
+										"key": "dbVersion",
+										"value": "v10.x"
+									},
+									{
+										"level": "model",
+										"key": "dbVersion",
+										"value": "v11.x"
+									}
+								]
+							}
+						}
+					]
+				}
 			},
 			{
 				"propertyName": "Not null",
@@ -3249,6 +3662,65 @@ making sure that you maintain a proper JSON format.
 				]
 			},
 			{
+				"propertyName": "Generated column",
+				"propertyKeyword": "generatedColumn",
+				"propertyTooltip": "A generated column is a special column that is always computed from other columns",
+				"propertyType": "checkbox",
+				"dependency": {
+					"type": "not",
+					"values": {
+						"type": "or",
+						"values": [
+							{
+								"level": "model",
+								"key": "dbVersion",
+								"value": "v10.x"
+							},
+							{
+								"level": "model",
+								"key": "dbVersion",
+								"value": "v11.x"
+							}
+						]
+					}
+				}
+			},
+			{
+				"propertyName": "Generation expression",
+				"propertyKeyword": "columnGenerationExpression",
+				"propertyTooltip": "An SQL statement for computing values for this column",
+				"propertyType": "details",
+				"template": "textarea",
+				"markdown": false,
+				"dependency": {
+					"type": "and",
+					"values": [
+						{
+							"key": "generatedColumn",
+							"value": true
+						},
+						{
+							"type": "not",
+							"values": {
+								"type": "or",
+								"values": [
+									{
+										"level": "model",
+										"key": "dbVersion",
+										"value": "v10.x"
+									},
+									{
+										"level": "model",
+										"key": "dbVersion",
+										"value": "v11.x"
+									}
+								]
+							}
+						}
+					]
+				}
+			},
+			{
 				"propertyName": "Not null",
 				"propertyKeyword": "required",
 				"enableForReference": true,
@@ -3308,6 +3780,65 @@ making sure that you maintain a proper JSON format.
 						"step": 1
 					}
 				]
+			},
+			{
+				"propertyName": "Generated column",
+				"propertyKeyword": "generatedColumn",
+				"propertyTooltip": "A generated column is a special column that is always computed from other columns",
+				"propertyType": "checkbox",
+				"dependency": {
+					"type": "not",
+					"values": {
+						"type": "or",
+						"values": [
+							{
+								"level": "model",
+								"key": "dbVersion",
+								"value": "v10.x"
+							},
+							{
+								"level": "model",
+								"key": "dbVersion",
+								"value": "v11.x"
+							}
+						]
+					}
+				}
+			},
+			{
+				"propertyName": "Generation expression",
+				"propertyKeyword": "columnGenerationExpression",
+				"propertyTooltip": "An SQL statement for computing values for this column",
+				"propertyType": "details",
+				"template": "textarea",
+				"markdown": false,
+				"dependency": {
+					"type": "and",
+					"values": [
+						{
+							"key": "generatedColumn",
+							"value": true
+						},
+						{
+							"type": "not",
+							"values": {
+								"type": "or",
+								"values": [
+									{
+										"level": "model",
+										"key": "dbVersion",
+										"value": "v10.x"
+									},
+									{
+										"level": "model",
+										"key": "dbVersion",
+										"value": "v11.x"
+									}
+								]
+							}
+						}
+					]
+				}
 			},
 			{
 				"propertyName": "Not null",
@@ -3764,6 +4295,65 @@ making sure that you maintain a proper JSON format.
 						"step": 1
 					}
 				]
+			},
+			{
+				"propertyName": "Generated column",
+				"propertyKeyword": "generatedColumn",
+				"propertyTooltip": "A generated column is a special column that is always computed from other columns",
+				"propertyType": "checkbox",
+				"dependency": {
+					"type": "not",
+					"values": {
+						"type": "or",
+						"values": [
+							{
+								"level": "model",
+								"key": "dbVersion",
+								"value": "v10.x"
+							},
+							{
+								"level": "model",
+								"key": "dbVersion",
+								"value": "v11.x"
+							}
+						]
+					}
+				}
+			},
+			{
+				"propertyName": "Generation expression",
+				"propertyKeyword": "columnGenerationExpression",
+				"propertyTooltip": "An SQL statement for computing values for this column",
+				"propertyType": "details",
+				"template": "textarea",
+				"markdown": false,
+				"dependency": {
+					"type": "and",
+					"values": [
+						{
+							"key": "generatedColumn",
+							"value": true
+						},
+						{
+							"type": "not",
+							"values": {
+								"type": "or",
+								"values": [
+									{
+										"level": "model",
+										"key": "dbVersion",
+										"value": "v10.x"
+									},
+									{
+										"level": "model",
+										"key": "dbVersion",
+										"value": "v11.x"
+									}
+								]
+							}
+						}
+					]
+				}
 			},
 			{
 				"propertyName": "Not null",
@@ -4243,6 +4833,65 @@ making sure that you maintain a proper JSON format.
 				]
 			},
 			{
+				"propertyName": "Generated column",
+				"propertyKeyword": "generatedColumn",
+				"propertyTooltip": "A generated column is a special column that is always computed from other columns",
+				"propertyType": "checkbox",
+				"dependency": {
+					"type": "not",
+					"values": {
+						"type": "or",
+						"values": [
+							{
+								"level": "model",
+								"key": "dbVersion",
+								"value": "v10.x"
+							},
+							{
+								"level": "model",
+								"key": "dbVersion",
+								"value": "v11.x"
+							}
+						]
+					}
+				}
+			},
+			{
+				"propertyName": "Generation expression",
+				"propertyKeyword": "columnGenerationExpression",
+				"propertyTooltip": "An SQL statement for computing values for this column",
+				"propertyType": "details",
+				"template": "textarea",
+				"markdown": false,
+				"dependency": {
+					"type": "and",
+					"values": [
+						{
+							"key": "generatedColumn",
+							"value": true
+						},
+						{
+							"type": "not",
+							"values": {
+								"type": "or",
+								"values": [
+									{
+										"level": "model",
+										"key": "dbVersion",
+										"value": "v10.x"
+									},
+									{
+										"level": "model",
+										"key": "dbVersion",
+										"value": "v11.x"
+									}
+								]
+							}
+						}
+					]
+				}
+			},
+			{
 				"propertyName": "Not null",
 				"propertyKeyword": "required",
 				"enableForReference": true,
@@ -4699,6 +5348,65 @@ making sure that you maintain a proper JSON format.
 				]
 			},
 			{
+				"propertyName": "Generated column",
+				"propertyKeyword": "generatedColumn",
+				"propertyTooltip": "A generated column is a special column that is always computed from other columns",
+				"propertyType": "checkbox",
+				"dependency": {
+					"type": "not",
+					"values": {
+						"type": "or",
+						"values": [
+							{
+								"level": "model",
+								"key": "dbVersion",
+								"value": "v10.x"
+							},
+							{
+								"level": "model",
+								"key": "dbVersion",
+								"value": "v11.x"
+							}
+						]
+					}
+				}
+			},
+			{
+				"propertyName": "Generation expression",
+				"propertyKeyword": "columnGenerationExpression",
+				"propertyTooltip": "An SQL statement for computing values for this column",
+				"propertyType": "details",
+				"template": "textarea",
+				"markdown": false,
+				"dependency": {
+					"type": "and",
+					"values": [
+						{
+							"key": "generatedColumn",
+							"value": true
+						},
+						{
+							"type": "not",
+							"values": {
+								"type": "or",
+								"values": [
+									{
+										"level": "model",
+										"key": "dbVersion",
+										"value": "v10.x"
+									},
+									{
+										"level": "model",
+										"key": "dbVersion",
+										"value": "v11.x"
+									}
+								]
+							}
+						}
+					]
+				}
+			},
+			{
 				"propertyName": "Not null",
 				"propertyKeyword": "required",
 				"enableForReference": true,
@@ -4793,6 +5501,65 @@ making sure that you maintain a proper JSON format.
 				]
 			},
 			{
+				"propertyName": "Generated column",
+				"propertyKeyword": "generatedColumn",
+				"propertyTooltip": "A generated column is a special column that is always computed from other columns",
+				"propertyType": "checkbox",
+				"dependency": {
+					"type": "not",
+					"values": {
+						"type": "or",
+						"values": [
+							{
+								"level": "model",
+								"key": "dbVersion",
+								"value": "v10.x"
+							},
+							{
+								"level": "model",
+								"key": "dbVersion",
+								"value": "v11.x"
+							}
+						]
+					}
+				}
+			},
+			{
+				"propertyName": "Generation expression",
+				"propertyKeyword": "columnGenerationExpression",
+				"propertyTooltip": "An SQL statement for computing values for this column",
+				"propertyType": "details",
+				"template": "textarea",
+				"markdown": false,
+				"dependency": {
+					"type": "and",
+					"values": [
+						{
+							"key": "generatedColumn",
+							"value": true
+						},
+						{
+							"type": "not",
+							"values": {
+								"type": "or",
+								"values": [
+									{
+										"level": "model",
+										"key": "dbVersion",
+										"value": "v10.x"
+									},
+									{
+										"level": "model",
+										"key": "dbVersion",
+										"value": "v11.x"
+									}
+								]
+							}
+						}
+					]
+				}
+			},
+			{
 				"propertyName": "Not null",
 				"propertyKeyword": "required",
 				"enableForReference": true,
@@ -4843,6 +5610,65 @@ making sure that you maintain a proper JSON format.
 				"addTimestampButton": false,
 				"propertyType": "details",
 				"template": "textarea"
+			},
+			{
+				"propertyName": "Generated column",
+				"propertyKeyword": "generatedColumn",
+				"propertyTooltip": "A generated column is a special column that is always computed from other columns",
+				"propertyType": "checkbox",
+				"dependency": {
+					"type": "not",
+					"values": {
+						"type": "or",
+						"values": [
+							{
+								"level": "model",
+								"key": "dbVersion",
+								"value": "v10.x"
+							},
+							{
+								"level": "model",
+								"key": "dbVersion",
+								"value": "v11.x"
+							}
+						]
+					}
+				}
+			},
+			{
+				"propertyName": "Generation expression",
+				"propertyKeyword": "columnGenerationExpression",
+				"propertyTooltip": "An SQL statement for computing values for this column",
+				"propertyType": "details",
+				"template": "textarea",
+				"markdown": false,
+				"dependency": {
+					"type": "and",
+					"values": [
+						{
+							"key": "generatedColumn",
+							"value": true
+						},
+						{
+							"type": "not",
+							"values": {
+								"type": "or",
+								"values": [
+									{
+										"level": "model",
+										"key": "dbVersion",
+										"value": "v10.x"
+									},
+									{
+										"level": "model",
+										"key": "dbVersion",
+										"value": "v11.x"
+									}
+								]
+							}
+						}
+					]
+				}
 			},
 			{
 				"propertyName": "Not null",
