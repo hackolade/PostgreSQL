@@ -670,6 +670,8 @@ module.exports = (baseProvider, options, app) => {
 				timezone,
 				intervalOptions,
 				dbVersion,
+				generatedColumn: Boolean(jsonSchema.generatedColumn),
+				columnGenerationExpression: jsonSchema.columnGenerationExpression,
 			};
 		},
 
