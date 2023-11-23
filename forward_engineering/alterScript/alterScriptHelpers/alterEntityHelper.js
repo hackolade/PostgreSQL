@@ -172,45 +172,41 @@ const getDeleteColumnScriptDtos = app => collection => {
     return getDeleteColumnsByConditionScriptDtos(app)(collection, ([name, jsonSchema]) => !jsonSchema.compMod)
 };
 
-const getModifyGeneratedColumnsScriptDtos = ({app, dbVersion, modelDefinitions, internalDefinitions, externalDefinitions}) =>
-    (collection) => {
-    const _ = app.require('lodash');
-
-    return _.toPairs(collection.properties)
-        .filter(([name, jsonSchema]) => {
-            const oldName = jsonSchema.compMod.oldField.name;
-            const oldProperty = collection.role.properties[oldName];
-
-            return oldProperty.generatedColumn !== jsonSchema.generatedColumn
-                || oldProperty.columnGenerationExpression !== jsonSchema.columnGenerationExpression;
-        })
-        .flatMap(([name, jsonSchema]) => {
-            const collectionWithJustThisProperty = {
-                ...collection,
-                properties: _.fromPairs([
-                    [name, jsonSchema]
-                ]),
-            }
-            const deleteColumnsScriptDtos = getDeleteColumnsByConditionScriptDtos(app)(collectionWithJustThisProperty, () => true);
-            const addColumnsScriptDtos = getAddColumnsByConditionScriptDtos({
-                app, dbVersion, modelDefinitions, internalDefinitions, externalDefinitions
-            })(collectionWithJustThisProperty, () => true);
-
-            return [
-                ...deleteColumnsScriptDtos,
-                ...addColumnsScriptDtos,
-            ]
-        })
-        .filter(Boolean);
-}
-
+/**
+ * @return {(collection: Object) => Array<AlterScriptDto>}
+ * */
 const getDropAndRecreateColumnsScriptDtos = ({app, dbVersion, modelDefinitions, internalDefinitions, externalDefinitions}) =>
     (collection) => {
-        const modifyGeneratedColumnsScriptDtos = getModifyGeneratedColumnsScriptDtos({app, dbVersion, modelDefinitions, internalDefinitions, externalDefinitions})(collection);
+        const _ = app.require('lodash');
 
-        return [
-            ...modifyGeneratedColumnsScriptDtos,
-        ]
+        return _.toPairs(collection.properties)
+            .filter(([name, jsonSchema]) => {
+                const oldName = jsonSchema.compMod.oldField.name;
+                const oldProperty = collection.role.properties[oldName];
+
+                const didGeneratedColumnChange = oldProperty.generatedColumn !== jsonSchema.generatedColumn
+                    || oldProperty.columnGenerationExpression !== jsonSchema.columnGenerationExpression;
+                // all conditions that require drop-and-recreate go here
+                return didGeneratedColumnChange;
+            })
+            .flatMap(([name, jsonSchema]) => {
+                const collectionWithJustThisProperty = {
+                    ...collection,
+                    properties: _.fromPairs([
+                        [name, jsonSchema]
+                    ]),
+                }
+                const deleteColumnsScriptDtos = getDeleteColumnsByConditionScriptDtos(app)(collectionWithJustThisProperty, () => true);
+                const addColumnsScriptDtos = getAddColumnsByConditionScriptDtos({
+                    app, dbVersion, modelDefinitions, internalDefinitions, externalDefinitions
+                })(collectionWithJustThisProperty, () => true);
+
+                return [
+                    ...deleteColumnsScriptDtos,
+                    ...addColumnsScriptDtos,
+                ]
+            })
+            .filter(Boolean);
     }
 
 /**
