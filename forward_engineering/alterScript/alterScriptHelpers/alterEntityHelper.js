@@ -90,52 +90,62 @@ const getModifyCollectionScriptDtos = (app) => (collection) => {
 }
 
 /**
+ * @return {(collection: Object, predicate: ([name: string, jsonSchema: Object]) => boolean) => AlterScriptDto[]}
+ * */
+const getAddColumnsByConditionScriptDtos =  ({app, dbVersion, modelDefinitions, internalDefinitions, externalDefinitions}) =>
+    (collection, predicate) => {
+        const _ = app.require('lodash');
+        const {getEntityName, getNamePrefixedWithSchemaName} = require('../../utils/general')(_);
+        const {createColumnDefinitionBySchema} = require('./createColumnDefinition')(app);
+        const ddlProvider = require('../../ddlProvider/ddlProvider')(null, null, app);
+        const {getDefinitionByReference} = app.require('@hackolade/ddl-fe-utils');
+
+        const collectionSchema = {...collection, ...(_.omit(collection?.role, 'properties') || {})};
+        const tableName = getEntityName(collectionSchema);
+        const schemaName = collectionSchema.compMod?.keyspaceName;
+        const fullName = getNamePrefixedWithSchemaName(tableName, schemaName);
+        const schemaData = {schemaName, dbVersion};
+
+        return _.toPairs(collection.properties)
+            .filter(([name, jsonSchema]) => predicate([name, jsonSchema]))
+            .map(([name, jsonSchema]) => {
+                const definitionJsonSchema = getDefinitionByReference({
+                    propertySchema: jsonSchema,
+                    modelDefinitions,
+                    internalDefinitions,
+                    externalDefinitions,
+                });
+
+                return createColumnDefinitionBySchema({
+                    name,
+                    jsonSchema,
+                    parentJsonSchema: collectionSchema,
+                    ddlProvider,
+                    schemaData,
+                    definitionJsonSchema,
+                });
+            })
+            .map(ddlProvider.convertColumnDefinition)
+            .map(columnDefinition => ddlProvider.addColumn(fullName, columnDefinition))
+            .map(addColumnScript => AlterScriptDto.getInstance([addColumnScript], true, false))
+            .filter(Boolean);
+    };
+
+/**
  * @return {(collection: Object) => AlterScriptDto[]}
  * */
 const getAddColumnScriptDtos =
     ({app, dbVersion, modelDefinitions, internalDefinitions, externalDefinitions}) =>
         collection => {
-            const _ = app.require('lodash');
-            const {getEntityName, getNamePrefixedWithSchemaName} = require('../../utils/general')(_);
-            const {createColumnDefinitionBySchema} = require('./createColumnDefinition')(app);
-            const ddlProvider = require('../../ddlProvider/ddlProvider')(null, null, app);
-            const {getDefinitionByReference} = app.require('@hackolade/ddl-fe-utils');
-
-            const collectionSchema = {...collection, ...(_.omit(collection?.role, 'properties') || {})};
-            const tableName = getEntityName(collectionSchema);
-            const schemaName = collectionSchema.compMod?.keyspaceName;
-            const fullName = getNamePrefixedWithSchemaName(tableName, schemaName);
-            const schemaData = {schemaName, dbVersion};
-
-            return _.toPairs(collection.properties)
-                .filter(([name, jsonSchema]) => !jsonSchema.compMod)
-                .map(([name, jsonSchema]) => {
-                    const definitionJsonSchema = getDefinitionByReference({
-                        propertySchema: jsonSchema,
-                        modelDefinitions,
-                        internalDefinitions,
-                        externalDefinitions,
-                    });
-
-                    return createColumnDefinitionBySchema({
-                        name,
-                        jsonSchema,
-                        parentJsonSchema: collectionSchema,
-                        ddlProvider,
-                        schemaData,
-                        definitionJsonSchema,
-                    });
-                })
-                .map(ddlProvider.convertColumnDefinition)
-                .map(columnDefinition => ddlProvider.addColumn(fullName, columnDefinition))
-                .map(addColumnScript => AlterScriptDto.getInstance([addColumnScript], true, false))
-                .filter(Boolean);
-        };
+            return getAddColumnsByConditionScriptDtos({
+                app, dbVersion, modelDefinitions, internalDefinitions, externalDefinitions
+            })(collection, ([name, jsonSchema]) => !jsonSchema.compMod);
+        }
 
 /**
- * @return {(collection: Object) => AlterScriptDto[]}
+ * @return {(collection: Object, predicate: ([name: string, jsonSchema: Object]) => boolean) => AlterScriptDto[]}
  * */
-const getDeleteColumnScriptDtos = app => collection => {
+const getDeleteColumnsByConditionScriptDtos = app => (collection, predicate) => {
     const _ = app.require('lodash');
     const ddlProvider = require('../../ddlProvider/ddlProvider')(null, null, app);
     const {getEntityName, getNamePrefixedWithSchemaName, wrapInQuotes} = require('../../utils/general')(_);
@@ -146,7 +156,7 @@ const getDeleteColumnScriptDtos = app => collection => {
     const fullTableName = getNamePrefixedWithSchemaName(tableName, schemaName);
 
     return _.toPairs(collection.properties)
-        .filter(([name, jsonSchema]) => !jsonSchema.compMod)
+        .filter(([name, jsonSchema]) => predicate([name, jsonSchema]))
         .map(([name]) => {
             const columnNameForDDL = wrapInQuotes(name);
             return ddlProvider.dropColumn(fullTableName, columnNameForDDL)
@@ -158,18 +168,61 @@ const getDeleteColumnScriptDtos = app => collection => {
 /**
  * @return {(collection: Object) => AlterScriptDto[]}
  * */
-const getModifyColumnScriptDtos = app => collection => {
+const getDeleteColumnScriptDtos = app => collection => {
+    return getDeleteColumnsByConditionScriptDtos(app)(collection, ([name, jsonSchema]) => !jsonSchema.compMod)
+};
+
+const getModifyGeneratedColumnsScriptDtos = ({app, dbVersion, modelDefinitions, internalDefinitions, externalDefinitions}) =>
+    (collection) => {
+    const _ = app.require('lodash');
+
+    return _.toPairs(collection.properties)
+        .filter(([name, jsonSchema]) => {
+            const oldName = jsonSchema.compMod.oldField.name;
+            const oldProperty = collection.role.properties[oldName];
+
+            return oldProperty.generatedColumn !== jsonSchema.generatedColumn
+                || oldProperty.columnGenerationExpression !== jsonSchema.columnGenerationExpression;
+        })
+        .flatMap(([name, jsonSchema]) => {
+            const collectionWithJustThisProperty = {
+                ...collection,
+                properties: _.fromPairs([
+                    [name, jsonSchema]
+                ]),
+            }
+            const deleteColumnsScriptDtos = getDeleteColumnsByConditionScriptDtos(app)(collectionWithJustThisProperty, () => true);
+            const addColumnsScriptDtos = getAddColumnsByConditionScriptDtos({
+                app, dbVersion, modelDefinitions, internalDefinitions, externalDefinitions
+            })(collectionWithJustThisProperty, () => true);
+
+            return [
+                ...deleteColumnsScriptDtos,
+                ...addColumnsScriptDtos,
+            ]
+        })
+        .filter(Boolean);
+}
+
+/**
+ * @return {(collection: Object) => AlterScriptDto[]}
+ * */
+const getModifyColumnScriptDtos = (
+    {app, dbVersion, modelDefinitions, internalDefinitions, externalDefinitions}
+) => collection => {
     const _ = app.require('lodash');
     const ddlProvider = require('../../ddlProvider/ddlProvider')(null, null, app);
 
     const renameColumnScriptDtos = getRenameColumnScriptDtos(_, ddlProvider)(collection);
     const updateTypeScriptDtos = getUpdateTypesScriptDtos(_, ddlProvider)(collection);
+    const modifyGeneratedColumnsScriptDtos = getModifyGeneratedColumnsScriptDtos({app, dbVersion, modelDefinitions, internalDefinitions, externalDefinitions})(collection);
     const modifyNotNullScriptDtos = getModifyNonNullColumnsScriptDtos(_, ddlProvider)(collection);
     const modifyCommentScriptDtos = getModifiedCommentOnColumnScriptDtos(_, ddlProvider)(collection);
 
     return [
         ...renameColumnScriptDtos,
         ...updateTypeScriptDtos,
+        ...modifyGeneratedColumnsScriptDtos,
         ...modifyNotNullScriptDtos,
         ...modifyCommentScriptDtos,
     ].filter(Boolean);
