@@ -258,7 +258,7 @@ module.exports = (baseProvider, options, app) => {
 			const defaultValue = !_.isUndefined(columnDefinition.default)
 				? ' DEFAULT ' + decorateDefault(type, columnDefinition.default, isArrayType)
 				: '';
-			const generatedColumnClause = columnDefinition.generatedColumn && columnDefinition.columnGenerationExpression
+			const generatedColumnClause = columnDefinition.dbVersion >= 12 && columnDefinition.generatedColumn && columnDefinition.columnGenerationExpression
 				? assignTemplates(templates.generatedColumnClause, {
 					generationExpression: columnDefinition.columnGenerationExpression,
 				})
