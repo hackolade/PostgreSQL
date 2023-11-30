@@ -1336,6 +1336,8 @@ making sure that you maintain a proper JSON format.
 						"propertyKeyword": "triggerUpdateColumns",
 						"propertyType": "fieldList",
 						"template": "orderedList",
+						"disabledItemStrategy": "default",
+						"isCompositeKey": true,
 						"setPrimaryKey": false,
 						"abbr": "",
 						"dependency": {
