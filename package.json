@@ -1,7 +1,7 @@
 {
     "name": "PostgreSQL",
-    "version": "0.1.53",
-    "versionDate": "2023-11-30",
+    "version": "0.1.54",
+    "versionDate": "2023-12-06",
     "author": "hackolade",
     "engines": {
         "hackolade": "6.1.2",
