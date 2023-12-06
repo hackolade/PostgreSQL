@@ -67,7 +67,7 @@ module.exports = ({ _, templates, assignTemplates, getFunctionArguments, getName
 		}
 	};
 	const getExecutionRows = (value, udf) => {
-		if (!value || udf.functionReturnsSetOf) {
+		if (!value || !udf.functionReturnsSetOf) {
 			return '';
 		}
 
