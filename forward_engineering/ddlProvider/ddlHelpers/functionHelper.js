@@ -82,7 +82,7 @@ module.exports = ({
 		}
 	};
 	const getExecutionRows = (value, udf) => {
-		if (!value || !udf.functionReturnsSetOf) {
+		if (!value || (!udf.functionReturnsSetOf && !isFunctionReturnsTable(udf))) {
 			return '';
 		}
 
@@ -97,6 +97,11 @@ module.exports = ({
 		if (value) {
 			return `SET ${value}`;
 		}
+	};
+
+	const isFunctionReturnsTable = (udf) => {
+		const returnType = (udf.functionReturnType || '').trim().toUpperCase();
+		return returnType.startsWith('TABLE');
 	};
 
 	return {
