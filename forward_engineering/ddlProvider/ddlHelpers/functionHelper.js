@@ -85,8 +85,8 @@ module.exports = ({ _, templates, assignTemplates, getFunctionArguments, getName
 	};
 
 	const isFunctionReturnsTable = (udf) => {
-		const returnType = (udf.functionReturnType || '').replace(/\s/g, '').toUpperCase();
-		return returnType.startsWith('TABLE(');
+		const returnType = (udf.functionReturnType || '').trim().toUpperCase();
+		return returnType.startsWith('TABLE');
 	};
 
 	return {
