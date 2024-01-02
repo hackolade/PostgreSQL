@@ -312,11 +312,7 @@ making sure that you maintain a proper JSON format.
 						"valueType": "number",
 						"minValue": 0,
 						"step": 1,
-						"propertyTooltip": "A positive number giving the estimated number of rows that the planner should expect the function to return.",
-						"dependency": {
-							"key": "functionReturnsSetOf",
-							"value": true
-						}
+						"propertyTooltip": "A positive number giving the estimated number of rows that the planner should expect the function to return."
 					},
 					{
 						"propertyName": "Support function",

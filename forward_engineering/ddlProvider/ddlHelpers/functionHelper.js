@@ -1,9 +1,15 @@
-module.exports = ({ _, templates, assignTemplates, getFunctionArguments, getNamePrefixedWithSchemaName }) => {
+module.exports = ({
+	_,
+	templates,
+	assignTemplates,
+	getFunctionArguments,
+	getNamePrefixedWithSchemaName,
+	wrapComment,
+}) => {
 	const getFunctionsScript = (schemaName, udfs) => {
 		return _.map(udfs, udf => {
 			const orReplace = udf.functionOrReplace ? ' OR REPLACE' : '';
-
-			return assignTemplates(templates.createFunction, {
+			const createFunctionStatement = assignTemplates(templates.createFunction, {
 				name: getNamePrefixedWithSchemaName(udf.name, schemaName),
 				orReplace: orReplace,
 				parameters: getFunctionArguments(udf.functionArguments),
@@ -12,6 +18,15 @@ module.exports = ({ _, templates, assignTemplates, getFunctionArguments, getName
 				properties: getProperties(udf),
 				definition: udf.functionBody,
 			});
+			const commentOnFunction = udf.functionDescription
+				? assignTemplates(templates.comment, {
+						object: 'FUNCTION',
+						objectName: getNamePrefixedWithSchemaName(udf.name, schemaName),
+						comment: wrapComment(udf.functionDescription),
+				  })
+				: '';
+
+			return [createFunctionStatement, commentOnFunction].filter(Boolean).join('\n');
 		}).join('\n');
 	};
 
@@ -67,7 +82,7 @@ module.exports = ({ _, templates, assignTemplates, getFunctionArguments, getName
 		}
 	};
 	const getExecutionRows = (value, udf) => {
-		if (!value || udf.functionReturnsSetOf) {
+		if (!value || (!udf.functionReturnsSetOf && !isFunctionReturnsTable(udf))) {
 			return '';
 		}
 
@@ -82,6 +97,11 @@ module.exports = ({ _, templates, assignTemplates, getFunctionArguments, getName
 		if (value) {
 			return `SET ${value}`;
 		}
+	};
+
+	const isFunctionReturnsTable = (udf) => {
+		const returnType = (udf.functionReturnType || '').trim().toUpperCase();
+		return returnType.startsWith('TABLE');
 	};
 
 	return {

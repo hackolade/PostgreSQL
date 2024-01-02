@@ -897,7 +897,7 @@ making sure that you maintain a proper JSON format.
 						"propertyTooltip": "",
 						"propertyType": "select",
 						"defaultValue": "btree",
-						"options": ["btree", "hash", "gist", "spgist", "gin", "brin"]
+						"options": ["","btree", "hash", "gist", "spgist", "gin", "brin"]
 					},
 					{
 						"propertyName": "Unique",
