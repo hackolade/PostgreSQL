@@ -222,7 +222,7 @@ module.exports = _ => {
 					return result;
 				}
 
-				let tableName = wrapInQuotes(key.tableName);
+				const tableName = `${wrapInQuotes(key.dbName)}.${wrapInQuotes(key.tableName)}`;
 
 				if (!result.tables.includes(tableName)) {
 					result.tables.push(tableName);
