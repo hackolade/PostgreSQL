@@ -134,6 +134,118 @@ making sure that you maintain a proper JSON format.
 		"containerLevelKeys": []
 	},
 	{
+		"lowerTab": "Sequences",
+		"structure": [
+			{
+				"propertyName": "Sequences",
+				"propertyType": "group",
+				"propertyKeyword": "sequences",
+				"propertyTooltip": "",
+				"structure": [
+					{
+						"propertyName": "Sequence name",
+						"propertyKeyword": "sequenceName",
+						"propertyTooltip": "",
+						"propertyType": "text"
+					},
+					{
+						"propertyName": "If not exists",
+						"propertyKeyword": "ifNotExist",
+						"propertyTooltip": "Do not throw an error if a relation with the same name already exists. A notice is issued in this case. Note that there is no guarantee that the existing relation is anything like the sequence that would have been created — it might not even be a sequence.",
+						"propertyType": "checkbox"
+					},
+					{
+						"propertyName": "Temporary",
+						"propertyKeyword": "temporary",
+						"propertyTooltip": "If specified, the sequence object is created only for this session, and is automatically dropped on session exit. Existing permanent sequences with the same name are not visible (in this session) while the temporary sequence exists, unless they are referenced with schema-qualified names.",
+						"defaultValue": false,
+						"propertyType": "checkbox"
+					},
+					{
+						"propertyName": "Unlogged",
+						"propertyKeyword": "unlogged",
+						"propertyTooltip": "If specified, the sequence is created as an unlogged sequence. Changes to unlogged sequences are not written to the write-ahead log. They are not crash-safe: an unlogged sequence is automatically reset to its initial state after a crash or unclean shutdown. Unlogged sequences are also not replicated to standby servers.",
+						"defaultValue": false,
+						"propertyType": "checkbox"
+					},
+					{
+						"propertyName": "Data type",
+						"propertyKeyword": "dataType",
+						"propertyTooltip": "The data type determines the default minimum and maximum values of the sequence.",
+						"propertyType": "select",
+						"defaultValue": "bigint",
+						"options": [
+							"bigint",
+							"integer",
+							"smallint"
+						]
+					},
+					{
+						"propertyName": "Start",
+						"propertyKeyword": "start",
+						"propertyType": "numeric",
+						"valueType": "number",
+						"propertyTooltip": "Allows the sequence to begin anywhere. The default starting value is minvalue for ascending sequences and maxvalue for descending ones."
+					},
+					{
+						"propertyName": "Increment",
+						"propertyKeyword": "increment",
+						"propertyType": "numeric",
+						"valueType": "number",
+						"propertyTooltip": "The data type determines the default minimum and maximum values of the sequence."
+					},
+					{
+						"propertyName": "Min value",
+						"propertyKeyword": "minValue",
+						"propertyType": "numeric",
+						"valueType": "number",
+						"propertyTooltip": "Determines the minimum value a sequence can generate. If this clause is not supplied is specified, then defaults will be used. The default for an ascending sequence is 1. The default for a descending sequence is the minimum value of the data type."
+					},
+					{
+						"propertyName": "Max value",
+						"propertyKeyword": "maxValue",
+						"propertyType": "numeric",
+						"valueType": "number",
+						"propertyTooltip": "Determines the maximum value for the sequence. If this clause is not supplied is specified, then default values will be used. The default for an ascending sequence is the maximum value of the data type. The default for a descending sequence is -1."
+					},
+					{
+						"propertyName": "Cache",
+						"propertyKeyword": "cache",
+						"propertyType": "numeric",
+						"valueType": "number",
+						"propertyTooltip": "specifies how many sequence numbers are to be preallocated and stored in memory for faster access. The minimum value is 1 (only one value can be generated at a time, i.e., no cache), and this is also the default",
+						"minValue": 1
+					},
+					{
+						"propertyName": "Cycle",
+						"propertyKeyword": "cycle",
+						"propertyTooltip": "Allows the sequence to wrap around when the maxvalue or minvalue has been reached by an ascending or descending sequence respectively. If the limit is reached, the next number generated will be the minvalue or maxvalue, respectively.",
+						"defaultValue": true,
+						"propertyType": "checkbox"
+					},
+					{
+						"propertyName": "Owned by none",
+						"propertyKeyword": "ownedByNone",
+						"propertyTooltip": "Specifies that there is no  association with a specific table column, such that if that column (or its whole table) is dropped, the sequence will be automatically dropped as well. ",
+						"defaultValue": true,
+						"propertyType": "checkbox"
+					},
+					{
+						"propertyName": "Owned by column",
+						"propertyKeyword": "ownedByColumn",
+						"propertyType": "fieldList",
+						"template": "orderedList",
+						"propertyTooltip": "Causes the sequence to be associated with a specific table column, such that if that column (or its whole table) is dropped, the sequence will be automatically dropped as well. The specified table must have the same owner and be in the same schema as the sequence.",
+						"dependency": {
+							"key": "ownedByNone",
+							"value": false
+						}
+					}
+				]
+			}
+		]
+	},
+	{
 		"lowerTab": "Functions",
 		"structure": [
 			{
