@@ -56,6 +56,13 @@ module.exports = (baseProvider, options, app) => {
 		getNamePrefixedWithSchemaName,
 	});
 
+	const { getSequencesScript } = require('./ddlHelpers/sequenceHelper')({
+		_,
+		templates,
+		assignTemplates,
+		getNamePrefixedWithSchemaName,
+	});
+
 	const { getTableTemporaryValue, getTableOptions } = require('./ddlHelpers/tableHelper')({
 		_,
 		checkAllKeysDeactivated,
@@ -119,7 +126,7 @@ module.exports = (baseProvider, options, app) => {
 			});
 		},
 
-		createSchema({ schemaName, ifNotExist, comments, udfs, procedures }) {
+		createSchema({ schemaName, ifNotExist, comments, udfs, procedures, sequences }) {
 			const comment = assignTemplates(templates.comment, {
 				object: 'SCHEMA',
 				objectName: wrapInQuotes(schemaName),
@@ -134,8 +141,9 @@ module.exports = (baseProvider, options, app) => {
 
 			const createFunctionStatement = getFunctionsScript(schemaName, udfs);
 			const createProceduresStatement = getProceduresScript(schemaName, procedures);
+			const createSequencesStatement = getSequencesScript(schemaName, sequences);
 
-			return _.chain([schemaStatement, createFunctionStatement, createProceduresStatement])
+			return _.chain([schemaStatement, createFunctionStatement, createProceduresStatement, createSequencesStatement])
 				.compact()
 				.map(_.trim)
 				.join('\n\n')
@@ -716,6 +724,7 @@ module.exports = (baseProvider, options, app) => {
 				comments: containerData.description,
 				udfs: data?.udfs || [],
 				procedures: data?.procedures || [],
+				sequences: data?.sequences || [],
 				dbVersion,
 			};
 		},

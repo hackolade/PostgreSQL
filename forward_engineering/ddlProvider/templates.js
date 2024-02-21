@@ -110,4 +110,9 @@ module.exports = {
 		'\tON ${tableName}\n' +
 		'${options}' +
 		'\tEXECUTE ${functionKey} ${functionName};\n',
+
+	createSequence:
+		'CREATE${sequenceType} SEQUENCE${ifNotExists} ${name}' +
+		'${options}' +
+		';\n'
 };
