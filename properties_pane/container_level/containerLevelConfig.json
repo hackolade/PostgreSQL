@@ -236,6 +236,9 @@ making sure that you maintain a proper JSON format.
 						"propertyType": "fieldList",
 						"template": "orderedList",
 						"propertyTooltip": "Causes the sequence to be associated with a specific table column, such that if that column (or its whole table) is dropped, the sequence will be automatically dropped as well. The specified table must have the same owner and be in the same schema as the sequence.",
+						"templateOptions": {
+							"maxFields": 1
+						},
 						"dependency": {
 							"key": "ownedByNone",
 							"value": false
