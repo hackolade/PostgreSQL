@@ -220,7 +220,7 @@ making sure that you maintain a proper JSON format.
 						"propertyName": "Cycle",
 						"propertyKeyword": "cycle",
 						"propertyTooltip": "Allows the sequence to wrap around when the maxvalue or minvalue has been reached by an ascending or descending sequence respectively. If the limit is reached, the next number generated will be the minvalue or maxvalue, respectively.",
-						"defaultValue": true,
+						"defaultValue": false,
 						"propertyType": "checkbox"
 					},
 					{
