@@ -59,46 +59,22 @@ module.exports = ({
 	 */
 	const getSequenceOptions = (sequence) => {
 		const optionConfigs = [
-			[{ key: 'dataType', clause: 'AS', getOption }],
-			[{ key: 'increment', clause: 'INCREMENT', getOption }],
-			[
-				{ key: 'minValue', clause: 'MINVALUE', getOption },
-				{ key: 'maxValue', clause: 'MAXVALUE', getOption },
-			],
-			[
-				{ key: 'start', clause: 'START WITH', getOption },
-				{ key: 'cache', clause: 'CACHE', getOption },
-				{ key: 'cycle', clause: 'CYCLE', getOption: getCycle },
-			],
-			[{ key: 'ownedByNone', clause: 'OWNED BY', getOption: getOwnedBy }],
+			{ getOption, key: 'dataType', clause: 'AS', },
+			{ getOption, key: 'increment', clause: 'INCREMENT', },
+			{ getOption, key: 'start', clause: 'START WITH', },
+			{ getOption, key: 'minValue', clause: 'MINVALUE', },
+			{ getOption, key: 'maxValue', clause: 'MAXVALUE', },
+			{ getOption, key: 'cache', clause: 'CACHE', },
+			{ getOption: getCycle, key: 'cycle' },
+			{ getOption: getOwnedBy, key: 'ownedByColumn' },
 		];
 
 		const options = optionConfigs
-			.map((configs) => getOptions(sequence, configs))
-			.map(wrapOption)
+			.map((config) => wrapOption(config.getOption(sequence, config)))
+			.filter(Boolean)
 			.join('');
 
-		return options ? '\n' + options.replace(/\n$/, '') : options;
-	};
-
-	/**
-	 * @param {Sequence} sequence 
-	 * @param {OptionConfig[]} configs 
-	 * @returns {string}
-	 */
-	const getOptions = (sequence, configs) => {
-		return configs
-			.map((config) => config.getOption(sequence, config))
-			.filter(Boolean)
-			.join(' ');
-	};
-
-	/**
-	 * @param {string} value 
-	 * @returns {string}
-	 */
-	const wrapOption = (value) => {
-		return value ? `\t${value}\n` : '';
+		return options ? wrapOptionsBlock(options) : options;
 	};
 
 	/**
@@ -109,6 +85,22 @@ module.exports = ({
 	const getOption = (sequence, config) => {
 		const value = sequence[config.key];
 		return value || value === 0 ? `${config.clause} ${value}` : '';
+	};
+
+	/**
+	 * @param {string} option 
+	 * @returns {string}
+	 */
+	const wrapOption = (option) => {
+		return option ? `\t${option}\n` : '';
+	};
+
+	/**
+	 * @param {string} option 
+	 * @returns {string}
+	 */
+	const wrapOptionsBlock = (option) => {
+		return '\n' + option.replace(/\n$/, '');
 	};
 
 	/**
