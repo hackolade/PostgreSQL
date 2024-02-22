@@ -73,7 +73,7 @@ module.exports = ({
 		];
 
 		const options = optionConfigs
-			.map((config) => wrapOption(config.getOption(sequence, config)))
+			.map((config) => wrapOption(config.getOption({ sequence, config })))
 			.filter(Boolean)
 			.join('');
 
