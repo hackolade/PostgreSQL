@@ -20,7 +20,7 @@
  * @typedef {{
  * key: keyof Sequence;
  * clause: string;
- * getOption: (sequence: Sequence, config: OptionConfig)=> {}
+ * getOption: ({ sequence: Sequence, config: OptionConfig }) => {}
  * }} OptionConfig
  */
 
@@ -58,6 +58,9 @@ module.exports = ({
 	 * @returns {string}
 	 */
 	const getSequenceOptions = (sequence) => {
+		/**
+		 * @type {Array<OptionConfig>}
+		 */
 		const optionConfigs = [
 			{ getOption, key: 'dataType', clause: 'AS', },
 			{ getOption, key: 'increment', clause: 'INCREMENT', },
@@ -78,11 +81,10 @@ module.exports = ({
 	};
 
 	/**
-	 * @param {Sequence} sequence 
-	 * @param {OptionConfig} config 
+	 * @param {{ sequence: Sequence; config: OptionConfig }} param0 
 	 * @returns {string}
 	 */
-	const getOption = (sequence, config) => {
+	const getOption = ({ sequence, config }) => {
 		const value = sequence[config.key];
 		return value || value === 0 ? `${config.clause} ${value}` : '';
 	};
@@ -128,10 +130,10 @@ module.exports = ({
 	};
 
 	/**
-	 * @param {Sequence} sequence 
+	 * @param {{ sequence: Sequence }} param0
 	 * @returns {string}
 	 */
-	const getCycle = (sequence) => {
+	const getCycle = ({ sequence }) => {
 		if (sequence.cycle === true) {
 			return 'CYCLE';
 		}
@@ -144,10 +146,10 @@ module.exports = ({
 	};
 
 	/**
-	 * @param {Sequence} sequence 
+	 * @param {{ sequence: Sequence }} param0 
 	 * @returns {string}
 	 */
-	const getOwnedBy = (sequence) => {
+	const getOwnedBy = ({ sequence }) => {
 		if (sequence.ownedByNone) {
 			return 'OWNED BY NONE';
 		}
