@@ -64,7 +64,7 @@ module.exports = ({
 		 */
 		const optionConfigs = [
 			{ getOption, key: 'dataType', clause: 'AS', },
-			{ getOption, key: 'increment', clause: 'INCREMENT', },
+			{ getOption, key: 'increment', clause: 'INCREMENT BY', },
 			{ getOption, key: 'start', clause: 'START WITH', },
 			{ getOption, key: 'minValue', clause: 'MINVALUE', },
 			{ getOption, key: 'maxValue', clause: 'MAXVALUE', },
