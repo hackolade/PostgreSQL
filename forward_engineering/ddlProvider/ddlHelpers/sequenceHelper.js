@@ -37,9 +37,10 @@ module.exports = ({
 	 */
 	const getSequencesScript = (schemaName, sequences) => {
 		return _.map(sequences, (sequence) => {
+			const sequenceSchemaName = sequence.temporary ? '' : schemaName;
 			const name = getNamePrefixedWithSchemaName(
 				sequence.sequenceName,
-				schemaName
+				sequenceSchemaName
 			);
 			const ifNotExists = getIfNotExists(sequence);
 			const sequenceType = getSequenceType(sequence);
@@ -63,7 +64,7 @@ module.exports = ({
 		 */
 		const optionConfigs = [
 			{ getOption, key: 'dataType', clause: 'AS', },
-			{ getOption, key: 'increment', clause: 'INCREMENT', },
+			{ getOption, key: 'increment', clause: 'INCREMENT BY', },
 			{ getOption, key: 'start', clause: 'START WITH', },
 			{ getOption, key: 'minValue', clause: 'MINVALUE', },
 			{ getOption, key: 'maxValue', clause: 'MAXVALUE', },
