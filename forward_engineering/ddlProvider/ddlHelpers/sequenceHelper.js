@@ -37,9 +37,10 @@ module.exports = ({
 	 */
 	const getSequencesScript = (schemaName, sequences) => {
 		return _.map(sequences, (sequence) => {
+			const sequenceSchemaName = sequence.temporary ? '' : schemaName;
 			const name = getNamePrefixedWithSchemaName(
 				sequence.sequenceName,
-				schemaName
+				sequenceSchemaName
 			);
 			const ifNotExists = getIfNotExists(sequence);
 			const sequenceType = getSequenceType(sequence);
