@@ -141,9 +141,8 @@ module.exports = (baseProvider, options, app) => {
 
 			const createFunctionStatement = getFunctionsScript(schemaName, udfs);
 			const createProceduresStatement = getProceduresScript(schemaName, procedures);
-			const createSequencesStatement = getSequencesScript(schemaName, sequences);
 
-			return _.chain([schemaStatement, createFunctionStatement, createProceduresStatement, createSequencesStatement])
+			return _.chain([schemaStatement, createFunctionStatement, createProceduresStatement])
 				.compact()
 				.map(_.trim)
 				.join('\n\n')
@@ -1194,5 +1193,9 @@ module.exports = (baseProvider, options, app) => {
 			}
 			return assignTemplates(templates.dropConstraint, templatesConfig);
 		},
+
+		createSchemaSequences({ schemaName, sequences }) {
+			return getSequencesScript(schemaName, sequences);
+		}
 	};
 };
