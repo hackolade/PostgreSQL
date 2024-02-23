@@ -185,28 +185,32 @@ making sure that you maintain a proper JSON format.
 						"propertyKeyword": "start",
 						"propertyType": "numeric",
 						"valueType": "number",
-						"propertyTooltip": "Allows the sequence to begin anywhere. The default starting value is minvalue for ascending sequences and maxvalue for descending ones."
+						"propertyTooltip": "Allows the sequence to begin anywhere. The default starting value is minvalue for ascending sequences and maxvalue for descending ones.",
+						"maxValue": 999999999999999
 					},
 					{
 						"propertyName": "Increment",
 						"propertyKeyword": "increment",
 						"propertyType": "numeric",
 						"valueType": "number",
-						"propertyTooltip": "The data type determines the default minimum and maximum values of the sequence."
+						"propertyTooltip": "The data type determines the default minimum and maximum values of the sequence.",
+						"maxValue": 999999999999999
 					},
 					{
 						"propertyName": "Min value",
 						"propertyKeyword": "minValue",
 						"propertyType": "numeric",
 						"valueType": "number",
-						"propertyTooltip": "Determines the minimum value a sequence can generate. If this clause is not supplied is specified, then defaults will be used. The default for an ascending sequence is 1. The default for a descending sequence is the minimum value of the data type."
+						"propertyTooltip": "Determines the minimum value a sequence can generate. If this clause is not supplied is specified, then defaults will be used. The default for an ascending sequence is 1. The default for a descending sequence is the minimum value of the data type.",
+						"maxValue": 999999999999999
 					},
 					{
 						"propertyName": "Max value",
 						"propertyKeyword": "maxValue",
 						"propertyType": "numeric",
 						"valueType": "number",
-						"propertyTooltip": "Determines the maximum value for the sequence. If this clause is not supplied is specified, then default values will be used. The default for an ascending sequence is the maximum value of the data type. The default for a descending sequence is -1."
+						"propertyTooltip": "Determines the maximum value for the sequence. If this clause is not supplied is specified, then default values will be used. The default for an ascending sequence is the maximum value of the data type. The default for a descending sequence is -1.",
+						"maxValue": 999999999999999
 					},
 					{
 						"propertyName": "Cache",
@@ -214,7 +218,8 @@ making sure that you maintain a proper JSON format.
 						"propertyType": "numeric",
 						"valueType": "number",
 						"propertyTooltip": "specifies how many sequence numbers are to be preallocated and stored in memory for faster access. The minimum value is 1 (only one value can be generated at a time, i.e., no cache), and this is also the default",
-						"minValue": 1
+						"minValue": 1,
+						"maxValue": 999999999999999
 					},
 					{
 						"propertyName": "Cycle",
