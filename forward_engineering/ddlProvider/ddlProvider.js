@@ -61,6 +61,7 @@ module.exports = (baseProvider, options, app) => {
 		templates,
 		assignTemplates,
 		getNamePrefixedWithSchemaName,
+		wrapInQuotes,
 	});
 
 	const { getTableTemporaryValue, getTableOptions } = require('./ddlHelpers/tableHelper')({

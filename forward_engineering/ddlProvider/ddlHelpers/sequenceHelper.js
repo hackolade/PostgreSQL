@@ -29,6 +29,7 @@ module.exports = ({
 	templates,
 	assignTemplates,
 	getNamePrefixedWithSchemaName,
+	wrapInQuotes,
 }) => {
 	/**
 	 * @param {string} schemaName 
@@ -52,7 +53,7 @@ module.exports = ({
 		);
 		const ifNotExists = getIfNotExists(sequence);
 		const sequenceType = getSequenceType(sequence);
-		const options = getSequenceOptions(sequence);
+		const options = getSequenceOptions(sequence, schemaName);
 
 		return assignTemplates(templates.createSequence, {
 			name,
@@ -70,7 +71,7 @@ module.exports = ({
 			sequenceSchemaName
 		);
 		const modifiedSequence = _.omitBy(sequence, (value, key) => _.isEqual(value, oldSequence[key]));
-		const options = getSequenceOptions(modifiedSequence);
+		const options = getSequenceOptions(modifiedSequence, schemaName);
 		const sequenceType = getAlterSequenceType(modifiedSequence);
 		const newName = modifiedSequence.sequenceName;
 		/**
@@ -103,10 +104,11 @@ module.exports = ({
 	};
 
 	/**
-	 * @param {Sequence} sequence 
+	 * @param {Sequence} sequence
+	 * @param {string} schemaName
 	 * @returns {string}
 	 */
-	const getSequenceOptions = (sequence) => {
+	const getSequenceOptions = (sequence, schemaName) => {
 		/**
 		 * @type {Array<OptionConfig>}
 		 */
@@ -122,7 +124,7 @@ module.exports = ({
 		];
 
 		const options = optionConfigs
-			.map((config) => wrapOption(config.getOption({ sequence, config })))
+			.map((config) => wrapOption(config.getOption({ sequence, schemaName, config })))
 			.filter(Boolean)
 			.join('');
 
@@ -215,10 +217,10 @@ module.exports = ({
 	};
 
 	/**
-	 * @param {{ sequence: Sequence }} param0 
+	 * @param {{ sequence: Sequence, schemaName: string }} param0 
 	 * @returns {string}
 	 */
-	const getOwnedBy = ({ sequence }) => {
+	const getOwnedBy = ({ sequence, schemaName }) => {
 		if (sequence.ownedByNone) {
 			return 'OWNED BY NONE';
 		}
@@ -227,10 +229,7 @@ module.exports = ({
 
 		if (ownedColumn) {
 			const [tableName, columnName] = ownedColumn.name?.split('.') || [];
-			const ownedColumnName = getNamePrefixedWithSchemaName(
-				columnName,
-				tableName
-			);
+			const ownedColumnName = [schemaName, tableName, columnName].filter(Boolean).map(wrapInQuotes).join('.');
 			return `OWNED BY ${ownedColumnName}`;
 		}
 
