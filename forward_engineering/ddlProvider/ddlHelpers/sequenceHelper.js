@@ -183,6 +183,10 @@ module.exports = ({
 	 * @returns {string}
 	 */
 	const getAlterSequenceType = (sequence) => {
+		if (sequence.temporary) {
+			return '';
+		}
+
 		if (sequence.unlogged === true) {
 			return 'UNLOGGED';
 		}
