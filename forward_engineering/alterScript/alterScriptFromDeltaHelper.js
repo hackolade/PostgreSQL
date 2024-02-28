@@ -31,7 +31,7 @@ const {
 const {AlterScriptDto, ModificationScript} = require("./types/AlterScriptDto");
 const {App, CoreData} = require("../types/coreApplicationTypes");
 const {InternalDefinitions, ModelDefinitions, ExternalDefinitions} = require("../types/coreApplicationDataTypes");
-const { getModifyContainerSequencesScriptDtos } = require('./alterScriptHelpers/containerHelpers/sequencesHelper');
+const { getModifyContainerSequencesScriptDtos, getDeleteContainerSequencesScriptDtos } = require('./alterScriptHelpers/containerHelpers/sequencesHelper');
 
 
 /**
@@ -320,7 +320,8 @@ const getAlterContainersSequencesScriptDtos = ({collection, app}) => {
     const deleteContainersScriptDtos = []
         .concat(deletedContainers)
         .filter(Boolean)
-        .map(container => getDeleteContainerScriptDto(app)(Object.keys(container.properties)[0]));
+        .map(container => Object.values(container.properties)[0])
+        .flatMap(container => getDeleteContainerSequencesScriptDtos(app)(container))
     const modifyContainersScriptDtos = []
         .concat(modifiedContainers)
         .filter(Boolean)
