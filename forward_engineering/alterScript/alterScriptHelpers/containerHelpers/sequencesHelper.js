@@ -2,6 +2,21 @@ const { AlterScriptDto } = require("../../types/AlterScriptDto");
 const sequencesCompModKey = "sequences";
 
 /**
+ * @return {(containerName: string) => AlterScriptDto | undefined}
+ * */
+const getAddContainerSequencesScriptDtos = (app) => (data) => {
+  const _ = app.require("lodash");
+  const ddlProvider = require("../../../ddlProvider")(null, null, app);
+  const { getDbName } = require("../../../utils/general")(_);
+  const schemaName = getDbName([data.role]);
+
+  return (data.role?.sequences || [])
+    .map((sequence) => ddlProvider.createSchemaSequence({ schemaName, sequence }))
+    .map((script) => AlterScriptDto.getInstance([script], true, false))
+    .filter(Boolean);
+};
+
+/**
  * @return {(data: Object) => Array<AlterScriptDto>}
  * */
 const getModifyContainerSequencesScriptDtos = (app) => (data) => {
@@ -64,6 +79,7 @@ const getDeleteContainerSequencesScriptDtos = (app) => (data) => {
 };
 
 module.exports = {
+  getAddContainerSequencesScriptDtos,
   getModifyContainerSequencesScriptDtos,
   getDeleteContainerSequencesScriptDtos,
 };
