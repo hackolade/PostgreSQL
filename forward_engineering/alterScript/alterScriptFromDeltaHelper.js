@@ -308,7 +308,7 @@ const prettifyAlterScriptDto = (dto) => {
  * }} dto
  * @return {AlterScriptDto[]}
  * */
-const getAlterContainersSequencesScriptDtos = ({collection, app}) => {
+const getAlterContainersSequencesScriptDtos = ({ collection, app }) => {
     const addedContainers = collection.properties?.containers?.properties?.added?.items;
     const deletedContainers = collection.properties?.containers?.properties?.deleted?.items;
     const modifiedContainers = collection.properties?.containers?.properties?.modified?.items;
