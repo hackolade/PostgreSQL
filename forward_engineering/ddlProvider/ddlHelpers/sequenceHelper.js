@@ -36,22 +36,70 @@ module.exports = ({
 	 * @returns {string}
 	 */
 	const getSequencesScript = (schemaName, sequences) => {
-		return _.map(sequences, (sequence) => {
-			const sequenceSchemaName = sequence.temporary ? '' : schemaName;
-			const name = getNamePrefixedWithSchemaName(
-				sequence.sequenceName,
-				sequenceSchemaName
-			);
-			const ifNotExists = getIfNotExists(sequence);
-			const sequenceType = getSequenceType(sequence);
-			const options = getSequenceOptions(sequence);
-			return assignTemplates(templates.createSequence, {
-				name,
-				ifNotExists,
-				sequenceType,
-				options,
-			});
-		}).join('\n');
+		return _.map(sequences, (sequence) => createSequenceScript(schemaName, sequence)).join('\n');
+	};
+
+	/**
+	 * @param {string} schemaName 
+	 * @param {Sequence} sequence
+	 * @returns {string}
+	 */
+	const createSequenceScript = (schemaName, sequence) => {
+		const sequenceSchemaName = sequence.temporary ? '' : schemaName;
+		const name = getNamePrefixedWithSchemaName(
+			sequence.sequenceName,
+			sequenceSchemaName
+		);
+		const ifNotExists = getIfNotExists(sequence);
+		const sequenceType = getSequenceType(sequence);
+		const options = getSequenceOptions(sequence);
+
+		return assignTemplates(templates.createSequence, {
+			name,
+			ifNotExists,
+			sequenceType,
+			options,
+		});
+	};
+
+	const alterSequenceScript = (schemaName, sequence, oldSequence) => {
+		const sequenceSchemaName = sequence.temporary ? '' : schemaName;
+		const sequenceName = oldSequence.sequenceName || sequence.sequenceName;
+		const name = getNamePrefixedWithSchemaName(
+			sequenceName,
+			sequenceSchemaName
+		);
+		const modifiedSequence = _.omitBy(sequence, (value, key) => _.isEqual(value, oldSequence[key]));
+		const options = getSequenceOptions(modifiedSequence);
+		const sequenceType = getAlterSequenceType(modifiedSequence);
+		const newName = modifiedSequence.sequenceName;
+		/**
+		 * @type {Array}
+		 */
+		const configs = [
+			{ key: 'options', value: options, template: templates.alterSequence },
+			{ key: 'sequenceType', value: sequenceType, template: templates.setSequenceType },
+			{ key: 'newName', value: newName, template: templates.renameSequence }
+		];
+
+		return configs.filter(config => config.value).map(config => assignTemplates(config.template, { [config.key]: config.value, name })).join('\n');
+	};
+
+	/**
+	 * @param {string} schemaName 
+	 * @param {Sequence} sequence
+	 * @returns {string}
+	 */
+	const dropSequenceScript = (schemaName, sequence) => {
+		const sequenceSchemaName = sequence.temporary ? '' : schemaName;
+		const name = getNamePrefixedWithSchemaName(
+			sequence.sequenceName,
+			sequenceSchemaName
+		);
+
+		return assignTemplates(templates.dropSequence, {
+			name,
+		});
 	};
 
 	/**
@@ -131,6 +179,22 @@ module.exports = ({
 	};
 
 	/**
+	 * @param {Sequence} sequence 
+	 * @returns {string}
+	 */
+	const getAlterSequenceType = (sequence) => {
+		if (sequence.unlogged === true) {
+			return 'UNLOGGED';
+		}
+
+		if (sequence.unlogged === false) {
+			return 'LOGGED';
+		}
+
+		return '';
+	};
+
+	/**
 	 * @param {{ sequence: Sequence }} param0
 	 * @returns {string}
 	 */
@@ -171,5 +235,8 @@ module.exports = ({
 
 	return {
 		getSequencesScript,
+		createSequenceScript,
+		dropSequenceScript,
+		alterSequenceScript,
 	};
 };

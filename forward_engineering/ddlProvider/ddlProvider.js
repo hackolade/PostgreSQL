@@ -56,7 +56,7 @@ module.exports = (baseProvider, options, app) => {
 		getNamePrefixedWithSchemaName,
 	});
 
-	const { getSequencesScript } = require('./ddlHelpers/sequenceHelper')({
+	const { getSequencesScript, createSequenceScript, dropSequenceScript, alterSequenceScript } = require('./ddlHelpers/sequenceHelper')({
 		_,
 		templates,
 		assignTemplates,
@@ -1196,6 +1196,18 @@ module.exports = (baseProvider, options, app) => {
 
 		createSchemaSequences({ schemaName, sequences }) {
 			return getSequencesScript(schemaName, sequences);
-		}
-	};
+		},
+
+		createSchemaSequence({ schemaName, sequence }) {
+			return createSequenceScript(schemaName, sequence);
+		},
+
+		dropSchemaSequence({ schemaName, sequence }) {
+			return dropSequenceScript(schemaName, sequence);
+	},
+
+	alterSchemaSequence({ schemaName, sequence, oldSequence }) {
+		return alterSequenceScript(schemaName, sequence, oldSequence);
+	}
+};
 };

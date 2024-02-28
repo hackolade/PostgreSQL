@@ -114,5 +114,19 @@ module.exports = {
 	createSequence:
 		'CREATE${sequenceType} SEQUENCE${ifNotExists} ${name}' +
 		'${options}' +
-		';\n'
+		';\n',
+
+	dropSequence:
+	'DROP SEQUENCE IF EXISTS ${name};\n',
+
+	renameSequence:
+	'ALTER SEQUENCE IF EXISTS ${name} RENAME TO ${newName};\n',
+
+	setSequenceType:
+	'ALTER SEQUENCE IF EXISTS ${name} SET ${sequenceType};\n',
+
+	alterSequence: 
+	'ALTER SEQUENCE IF EXISTS ${name}' +
+	'${options}' +
+	';\n',
 };

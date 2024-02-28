@@ -31,6 +31,7 @@ const {
 const {AlterScriptDto, ModificationScript} = require("./types/AlterScriptDto");
 const {App, CoreData} = require("../types/coreApplicationTypes");
 const {InternalDefinitions, ModelDefinitions, ExternalDefinitions} = require("../types/coreApplicationDataTypes");
+const { getModifyContainerSequencesScriptDtos } = require('./alterScriptHelpers/containerHelpers/sequencesHelper');
 
 
 /**
@@ -301,6 +302,39 @@ const prettifyAlterScriptDto = (dto) => {
 }
 
 /**
+ * @param {{
+ * collection: Object,
+ * app: App,
+ * }} dto
+ * @return {AlterScriptDto[]}
+ * */
+const getAlterContainersSequencesScriptDtos = ({collection, app}) => {
+    const addedContainers = collection.properties?.containers?.properties?.added?.items;
+    const deletedContainers = collection.properties?.containers?.properties?.deleted?.items;
+    const modifiedContainers = collection.properties?.containers?.properties?.modified?.items;
+
+    const addContainersSequencesScriptDtos = []
+        .concat(addedContainers)
+        .filter(Boolean)
+        .map(container => getAddContainerScriptDto(app)(Object.keys(container.properties)[0]));
+    const deleteContainersScriptDtos = []
+        .concat(deletedContainers)
+        .filter(Boolean)
+        .map(container => getDeleteContainerScriptDto(app)(Object.keys(container.properties)[0]));
+    const modifyContainersScriptDtos = []
+        .concat(modifiedContainers)
+        .filter(Boolean)
+        .map(container => Object.values(container.properties)[0])
+        .flatMap(container => getModifyContainerSequencesScriptDtos(app)(container))
+
+    return [
+        ...addContainersSequencesScriptDtos,
+        ...deleteContainersScriptDtos,
+        ...modifyContainersScriptDtos,
+    ].filter(Boolean);
+};
+
+/**
  * @param data {CoreData}
  * @param app {App}
  * @return {Array<AlterScriptDto>}
@@ -336,11 +370,13 @@ const getAlterScriptDtos = (data, app) => {
         externalDefinitions,
     });
     const relationshipScriptDtos = getAlterRelationshipsScriptDtos({collection, app});
+    const containersSequencesScriptDtos = getAlterContainersSequencesScriptDtos({collection, app});
 
     return [
         ...containersScriptDtos,
         ...modelDefinitionsScriptDtos,
         ...collectionsScriptDtos,
+        ...containersSequencesScriptDtos,
         ...viewScriptDtos,
         ...relationshipScriptDtos,
     ]
