@@ -75,7 +75,7 @@ const getDeleteCollectionScriptDto = app => collection => {
 /**
  * @return {(collection: AlterCollectionDto) => AlterScriptDto[]}
  * */
-const getModifyCollectionScriptDtos = (app) => (collection) => {
+const getModifyCollectionScriptDtos = ({app, dbVersion}) => (collection) => {
     const _ = app.require('lodash');
     const ddlProvider = require('../../ddlProvider/ddlProvider')(null, null, app);
 

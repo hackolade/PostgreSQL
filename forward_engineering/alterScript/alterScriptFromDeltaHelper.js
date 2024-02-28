@@ -102,7 +102,7 @@ const getAlterCollectionsScriptDtos = ({
         .concat(collection.properties?.entities?.properties?.modified?.items)
         .filter(Boolean)
         .map(item => Object.values(item.properties)[0])
-        .flatMap(getModifyCollectionScriptDtos(app));
+        .flatMap(getModifyCollectionScriptDtos({app, dbVersion}));
     const addColumnScriptDtos = []
         .concat(collection.properties?.entities?.properties?.added?.items)
         .filter(Boolean)

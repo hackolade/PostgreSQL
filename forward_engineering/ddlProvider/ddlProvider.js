@@ -289,6 +289,34 @@ module.exports = (baseProvider, options, app) => {
 			);
 		},
 
+		/**
+		 * @param tableName {string}
+		 * @param dbData {{
+		 *     dbVersion: string,
+		 * }}
+		 * @param isParentActivated {boolean}
+		 * @param index {{
+		 *     unique?: boolean,
+		 *     index_method?: string,
+		 *     indxName?: string,
+		 *     schemaName?: string,
+		 *     concurrently?: boolean,
+		 *     ifNotExist?: boolean,
+		 *     only?: boolean,
+		 *     nullsDistinct?: string,
+		 *     columns?: Array<{
+		 *         sortOrder?: any,
+		 *         nullsOrder?: any,
+		 *         isActivated?: boolean,
+		 *         name: string,
+		 *         collation?: string,
+		 *         opclass?: string,
+		 *     }>,
+		 *     isActivated?: boolean,
+		 * }}
+		 *
+		 * @return {string}
+		 * */
 		createIndex(tableName, index, dbData, isParentActivated = true) {
 			const isUnique = index.unique && index.index_method === 'btree';
 			const name = wrapInQuotes(index.indxName);
