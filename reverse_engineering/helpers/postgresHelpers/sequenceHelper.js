@@ -1,13 +1,13 @@
 
 
-const getOwnedByColumn = (sequence) => {
+const getOwnedByColumn = ({ sequence }) => {
 	if (!sequence.column_name) {
 		return [];
 	}
 	return [{ entity: sequence.table_name, name: sequence.column_name }];
 };
 
-const mapSequenceData = (sequence) => {
+const mapSequenceData = ({ sequence }) => {
 	return {
 		sequenceName: sequence.sequence_name,
 		increment: sequence.increment,

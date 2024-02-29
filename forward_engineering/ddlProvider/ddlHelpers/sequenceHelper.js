@@ -31,29 +31,28 @@ module.exports = ({
 	getNamePrefixedWithSchemaName,
 	wrapInQuotes,
 }) => {
+
 	/**
-	 * @param {string} schemaName 
-	 * @param {Sequence[]} sequences 
+	 * @param {{ schemaName: string, sequences: Sequence[] }} 
 	 * @returns {string}
 	 */
-	const getSequencesScript = (schemaName, sequences) => {
-		return _.map(sequences, (sequence) => createSequenceScript(schemaName, sequence)).join('\n');
+	const getSequencesScript = ({ schemaName, sequences }) => {
+		return _.map(sequences, (sequence) => createSequenceScript({ schemaName, sequence })).join('\n');
 	};
 
 	/**
-	 * @param {string} schemaName 
-	 * @param {Sequence} sequence
+	 * @param {{ schemaName: string, sequence: Sequence }} 
 	 * @returns {string}
 	 */
-	const createSequenceScript = (schemaName, sequence) => {
+	const createSequenceScript = ({ schemaName, sequence }) => {
 		const sequenceSchemaName = sequence.temporary ? '' : schemaName;
 		const name = getNamePrefixedWithSchemaName(
 			sequence.sequenceName,
 			sequenceSchemaName
 		);
-		const ifNotExists = getIfNotExists(sequence);
-		const sequenceType = getSequenceType(sequence);
-		const options = getSequenceOptions(sequence, schemaName);
+		const ifNotExists = getIfNotExists({ sequence });
+		const sequenceType = getSequenceType({ sequence });
+		const options = getSequenceOptions({ sequence, schemaName });
 
 		return assignTemplates(templates.createSequence, {
 			name,
@@ -63,7 +62,12 @@ module.exports = ({
 		});
 	};
 
-	const alterSequenceScript = (schemaName, sequence, oldSequence) => {
+	/**
+	 * 
+	 * @param {{ schemaName: string, sequence: Sequence, oldSequence: Sequence }} 
+	 * @returns {string}
+	 */
+	const alterSequenceScript = ({ schemaName, sequence, oldSequence }) => {
 		const sequenceSchemaName = sequence.temporary ? '' : schemaName;
 		const sequenceName = oldSequence.sequenceName || sequence.sequenceName;
 		const name = getNamePrefixedWithSchemaName(
@@ -71,8 +75,8 @@ module.exports = ({
 			sequenceSchemaName
 		);
 		const modifiedSequence = _.omitBy(sequence, (value, key) => _.isEqual(value, oldSequence[key]));
-		const options = getSequenceOptions(modifiedSequence, schemaName);
-		const sequenceType = getAlterSequenceType(modifiedSequence);
+		const options = getSequenceOptions({ schemaName, sequence: modifiedSequence });
+		const sequenceType = getAlterSequenceType({ sequence: modifiedSequence });
 		const newName = modifiedSequence.sequenceName;
 		/**
 		 * @type {Array}
@@ -87,11 +91,10 @@ module.exports = ({
 	};
 
 	/**
-	 * @param {string} schemaName 
-	 * @param {Sequence} sequence
+	 * @param {{ schemaName: string, sequence: Sequence }} 
 	 * @returns {string}
 	 */
-	const dropSequenceScript = (schemaName, sequence) => {
+	const dropSequenceScript = ({ schemaName, sequence }) => {
 		const sequenceSchemaName = sequence.temporary ? '' : schemaName;
 		const name = getNamePrefixedWithSchemaName(
 			sequence.sequenceName,
@@ -104,11 +107,10 @@ module.exports = ({
 	};
 
 	/**
-	 * @param {Sequence} sequence
-	 * @param {string} schemaName
+	 * @param {{ schemaName: string, sequence: Sequence }} 
 	 * @returns {string}
 	 */
-	const getSequenceOptions = (sequence, schemaName) => {
+	const getSequenceOptions = ({ schemaName, sequence }) => {
 		/**
 		 * @type {Array<OptionConfig>}
 		 */
@@ -124,11 +126,14 @@ module.exports = ({
 		];
 
 		const options = optionConfigs
-			.map((config) => wrapOption(config.getOption({ sequence, schemaName, config })))
+			.map((config) => {
+				const option = config.getOption({ sequence, schemaName, config });
+				return wrapOption({ option });
+			})
 			.filter(Boolean)
 			.join('');
 
-		return options ? wrapOptionsBlock(options) : options;
+		return options ? wrapOptionsBlock({ options }) : options;
 	};
 
 	/**
@@ -141,34 +146,34 @@ module.exports = ({
 	};
 
 	/**
-	 * @param {string} option 
+	 * @param {{ option: string }} 
 	 * @returns {string}
 	 */
-	const wrapOption = (option) => {
+	const wrapOption = ({ option }) => {
 		return option ? `\t${option}\n` : '';
 	};
 
 	/**
-	 * @param {string} option 
+	 * @param {{ options: string }} 
 	 * @returns {string}
 	 */
-	const wrapOptionsBlock = (option) => {
-		return '\n' + option.replace(/\n$/, '');
+	const wrapOptionsBlock = ({ options }) => {
+		return '\n' + options.replace(/\n$/, '');
 	};
 
 	/**
-	 * @param {Sequence} sequence 
+	 * @param {{ sequence: Sequence }} 
 	 * @returns {string}
 	 */
-	const getIfNotExists = (sequence) => {
+	const getIfNotExists = ({ sequence }) => {
 		return sequence.ifNotExist ? ' IF NOT EXISTS' : '';
 	};
 
 	/**
-	 * @param {Sequence} sequence 
+	 * @param {{ sequence: Sequence }} 
 	 * @returns {string}
 	 */
-	const getSequenceType = (sequence) => {
+	const getSequenceType = ({ sequence }) => {
 		if (sequence.temporary) {
 			return ' TEMPORARY';
 		}
@@ -181,10 +186,10 @@ module.exports = ({
 	};
 
 	/**
-	 * @param {Sequence} sequence 
+	 * @param {{ sequence: Sequence }} 
 	 * @returns {string}
 	 */
-	const getAlterSequenceType = (sequence) => {
+	const getAlterSequenceType = ({ sequence }) => {
 		if (sequence.temporary) {
 			return '';
 		}

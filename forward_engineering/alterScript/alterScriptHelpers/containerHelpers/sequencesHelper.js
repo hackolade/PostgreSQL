@@ -3,33 +3,33 @@ const { App } = require('../../../types/coreApplicationTypes');
 const sequencesCompModKey = 'sequences';
 
 /**
- * @param {App} app
- * @return {(data: object) => AlterScriptDto[]}
+ * @param {{ app: App }}
+ * @return {({ container }: { container: object }) => AlterScriptDto[]}
  * */
-const getAddContainerSequencesScriptDtos = (app) => (data) => {
+const getAddContainerSequencesScriptDtos = ({ app }) => ({ container }) => {
     const _ = app.require('lodash');
     const ddlProvider = require('../../../ddlProvider')(null, null, app);
     const { getDbName } = require('../../../utils/general')(_);
-    const schemaName = getDbName([data.role]);
+    const schemaName = getDbName([container.role]);
 
-    return (data.role?.sequences || [])
+    return (container.role?.sequences || [])
         .map((sequence) => ddlProvider.createSchemaSequence({ schemaName, sequence }))
         .map((script) => AlterScriptDto.getInstance([script], true, false))
         .filter(Boolean);
 };
 
 /**
- * @param {App} app
- * @return {(data: object) => AlterScriptDto[]}
+ * @param {{ app: App }}
+ * @return {({ container }: { container: object }) => AlterScriptDto[]}
  * */
-const getModifyContainerSequencesScriptDtos = (app) => (data) => {
+const getModifyContainerSequencesScriptDtos = ({ app }) => ({ container }) => {
     const _ = app.require('lodash');
     const ddlProvider = require('../../../ddlProvider')(null, null, app);
     const { getDbName, getGroupItemsByCompMode } =
         require('../../../utils/general')(_);
 
-    const schemaName = getDbName([data.role]);
-    const sequencesCompMod = data.role?.compMod?.[sequencesCompModKey] || {};
+    const schemaName = getDbName([container.role]);
+    const sequencesCompMod = container.role?.compMod?.[sequencesCompModKey] || {};
     const { new: newItems = [], old: oldItems = [] } = sequencesCompMod;
 
     const { removed, added, modified } = getGroupItemsByCompMode({
@@ -67,16 +67,16 @@ const getModifyContainerSequencesScriptDtos = (app) => (data) => {
 };
 
 /**
- * @param {App} app
- * @return {(data: object) => AlterScriptDto[]}
+ * @param {{ app: App }}
+ * @return {({ container }: { container: object }) => AlterScriptDto[]}
  * */
-const getDeleteContainerSequencesScriptDtos = (app) => (data) => {
+const getDeleteContainerSequencesScriptDtos = ({ app }) => ({ container }) => {
     const _ = app.require('lodash');
     const ddlProvider = require('../../../ddlProvider')(null, null, app);
     const { getDbName } = require('../../../utils/general')(_);
-    const schemaName = getDbName([data.role]);
+    const schemaName = getDbName([container.role]);
 
-    return (data.role?.sequences || [])
+    return (container.role?.sequences || [])
         .map((sequence) => ddlProvider.dropSchemaSequence({ schemaName, sequence }))
         .map((script) => AlterScriptDto.getInstance([script], true, true))
         .filter(Boolean);

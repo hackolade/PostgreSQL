@@ -317,17 +317,17 @@ const getAlterContainersSequencesScriptDtos = ({ collection, app }) => {
         .concat(addedContainers)
         .filter(Boolean)
         .map(container => Object.values(container.properties)[0])
-        .flatMap(container => getAddContainerSequencesScriptDtos(app)(container))
+        .flatMap(container => getAddContainerSequencesScriptDtos({ app })({ container }))
     const deleteContainersScriptDtos = []
         .concat(deletedContainers)
         .filter(Boolean)
         .map(container => Object.values(container.properties)[0])
-        .flatMap(container => getDeleteContainerSequencesScriptDtos(app)(container))
+        .flatMap(container => getDeleteContainerSequencesScriptDtos({ app })({ container }))
     const modifyContainersScriptDtos = []
         .concat(modifiedContainers)
         .filter(Boolean)
         .map(container => Object.values(container.properties)[0])
-        .flatMap(container => getModifyContainerSequencesScriptDtos(app)(container))
+        .flatMap(container => getModifyContainerSequencesScriptDtos({ app })({ container }))
 
     return [
         ...addContainersSequencesScriptDtos,
