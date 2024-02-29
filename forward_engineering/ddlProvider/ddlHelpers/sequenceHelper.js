@@ -1,28 +1,12 @@
 /**
- * @typedef {'bigint' | 'integer' | 'smallint'} DataType
- * 
- * @typedef {{
- * cache?: number;
- * cycle: boolean;
- * dataType: DataType;
- * ifNotExist: boolean;
- * increment?: number;
- * maxValue?: number;
- * minValue?: number;
- * ownedByColumn: object[];
- * ownedByNone: boolean;
- * sequenceName: string;
- * start?: number;
- * temporary: boolean;
- * unlogged: boolean;
- * }} Sequence
- * 
  * @typedef {{
  * key: keyof Sequence;
  * clause: string;
- * getOption: ({ sequence: Sequence, config: OptionConfig }) => {}
+ * getOption: ({ sequence, config } : { sequence: Sequence, config: OptionConfig }) => string
  * }} OptionConfig
  */
+
+const { Sequence } = require('../../types/schemaSequenceTypes');
 
 module.exports = ({
 	_,

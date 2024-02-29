@@ -1,5 +1,10 @@
 
+const { Sequence, SequenceDto } = require('../../../forward_engineering/types/schemaSequenceTypes');
 
+/**
+ * @param {{sequence: SequenceDto }} 
+ * @returns {object[]}
+ */
 const getOwnedByColumn = ({ sequence }) => {
 	if (!sequence.column_name) {
 		return [];
@@ -7,6 +12,10 @@ const getOwnedByColumn = ({ sequence }) => {
 	return [{ entity: sequence.table_name, name: sequence.column_name }];
 };
 
+/**
+ * @param {{ sequence: SequenceDto }} 
+ * @returns {Sequence}
+ */
 const mapSequenceData = ({ sequence }) => {
 	return {
 		sequenceName: sequence.sequence_name,

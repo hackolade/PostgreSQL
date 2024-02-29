@@ -25,8 +25,7 @@ const getAddContainerSequencesScriptDtos = ({ app }) => ({ container }) => {
 const getModifyContainerSequencesScriptDtos = ({ app }) => ({ container }) => {
     const _ = app.require('lodash');
     const ddlProvider = require('../../../ddlProvider')(null, null, app);
-    const { getDbName, getGroupItemsByCompMode } =
-        require('../../../utils/general')(_);
+    const { getDbName, getGroupItemsByCompMode } = require('../../../utils/general')(_);
 
     const schemaName = getDbName([container.role]);
     const sequencesCompMod = container.role?.compMod?.[sequencesCompModKey] || {};
