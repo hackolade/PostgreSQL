@@ -79,6 +79,8 @@ module.exports = {
 		'CREATE${unique} INDEX${concurrently}${ifNotExist} ${name}\n' +
 		' ON${only} ${tableName}${using}${keys}${nullsDistinct}${options};\n',
 
+	dropIndex: 'DROP INDEX IF EXISTS ${indexName};',
+
 	createView:
 		'CREATE${orReplace}${temporary} VIEW ${name}${withOptions}\nAS ${selectStatement}${checkOption};\n\n${comment}\n',
 

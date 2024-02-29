@@ -1224,6 +1224,17 @@ module.exports = (baseProvider, options, app) => {
 
 		createSchemaSequences({ schemaName, sequences }) {
 			return getSequencesScript(schemaName, sequences);
-		}
+		},
+
+		/**
+		 * @param indexName {string}
+		 * @return {string}
+		 * */
+		dropIndex({ indexName }) {
+			const templatesConfig = {
+				indexName
+			};
+			return assignTemplates(templates.dropIndex, templatesConfig);
+		},
 	};
 };

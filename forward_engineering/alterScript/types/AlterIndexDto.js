@@ -31,6 +31,14 @@ class AlterIndexColumnDto {
     opclass
 }
 
+class AlterIndexIncludeColumnDto {
+
+    /**
+     * @type {string}
+     * */
+    keyId
+
+}
 
 class AlterIndexDto {
 
@@ -74,9 +82,15 @@ class AlterIndexDto {
      * */
     columns
 
+    /**
+     * @type {Array<AlterIndexIncludeColumnDto> | undefined}
+     * */
+    include
+
 }
 
 module.exports = {
     AlterIndexDto,
-    AlterIndexColumnDto
+    AlterIndexColumnDto,
+    AlterIndexIncludeColumnDto,
 }

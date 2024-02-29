@@ -24,6 +24,22 @@ const getColumnNameById = ({_}) => ({columnId, collection}) => {
 }
 
 /**
+ * @return {({
+ *      columns?: Array<{keyId: string}>,
+ *      collection: AlterCollectionDto
+ * }) => Object}
+ * */
+const setNamesToColumns = ({_}) => ({columns, collection}) => {
+    return (columns || [])
+        .map(column => {
+            return {
+                ...column, name: getColumnNameById({_})({columnId: column.keyId, collection}),
+            }
+        })
+        .filter(column => Boolean(column.name));
+}
+
+/**
  * @return {({ index: AlterIndexDto, collection: AlterCollectionDto }) => Object}
  * */
 const mapIndexToFeIndexDto = ({_}) => ({
@@ -31,18 +47,23 @@ const mapIndexToFeIndexDto = ({_}) => ({
                                        }) => {
     const {getSchemaNameFromCollection} = require('../../../utils/general')(_);
 
-    const schemaName = getSchemaNameFromCollection(collection);
+    const schemaName = getSchemaNameFromCollection({collection});
 
-    const columnsWithNamesSet = (index.columns || [])
-        .map(indexedColumn => {
-            return {
-                ...indexedColumn, name: getColumnNameById({_})({columnId: indexedColumn.keyId, collection}),
-            }
-        })
-        .filter(indexedColumn => Boolean(indexedColumn.name));
+    const columnsWithNamesSet = setNamesToColumns({_})({
+        columns: index.columns,
+        collection
+    });
+
+    const includeColumnsWithNameSet = setNamesToColumns({_})({
+        columns: index.include,
+        collection
+    });
 
     return {
-        ...index, schemaName, columns: columnsWithNamesSet,
+        ...index,
+        schemaName,
+        columns: columnsWithNamesSet,
+        include: includeColumnsWithNameSet,
     }
 }
 
@@ -81,11 +102,12 @@ const areOldIndexDtoAndNewIndexDtoDescribingSameDatabaseIndex = ({oldIndex, newI
  * @return {({
  *      collection: AlterCollectionDto,
  *      additionalDataForDdlProvider: Object,
- * }) => Array<AlterIndexDto>}
+ * }) => Array<AlterScriptDto>}
  * */
 const getAddedIndexesScriptDtos = ({_, ddlProvider}) => ({collection, additionalDataForDdlProvider}) => {
-    const { dbData, tableName, isParentActivated, } = additionalDataForDdlProvider;
+    const {getNamePrefixedWithSchemaName} = require('../../../utils/general')(_);
 
+    const {dbData, tableName, isParentActivated, schemaName} = additionalDataForDdlProvider;
     const newIndexes = collection?.role?.compMod?.Indxs?.new || [];
     const oldIndexes = collection?.role?.compMod?.Indxs?.old || [];
 
@@ -98,7 +120,15 @@ const getAddedIndexesScriptDtos = ({_, ddlProvider}) => ({collection, additional
         })
         .map(newIndex => mapIndexToFeIndexDto({_})({index: newIndex, collection}))
         .map(newIndex => {
-            const script = ddlProvider.createIndex(tableName, newIndex, dbData, isParentActivated);
+            const fullIndexName = getNamePrefixedWithSchemaName(newIndex.indxName, schemaName);
+            const fullTableName = getNamePrefixedWithSchemaName(tableName, schemaName);
+
+            const newIndexWithFullName = {
+                ...newIndex,
+                indxName: fullIndexName,
+            }
+
+            const script = ddlProvider.createIndex(fullTableName, newIndexWithFullName, dbData, isParentActivated);
             const isIndexActivated = newIndex.isActivated && isParentActivated;
             return AlterScriptDto.getInstance([script], isIndexActivated, false);
         })
@@ -109,11 +139,12 @@ const getAddedIndexesScriptDtos = ({_, ddlProvider}) => ({collection, additional
  * @return {({
  *      collection: AlterCollectionDto,
  *      additionalDataForDdlProvider: Object,
- * }) => Array<AlterIndexDto>}
+ * }) => Array<AlterScriptDto>}
  * */
 const getDeletedIndexesScriptDtos = ({_, ddlProvider}) => ({collection, additionalDataForDdlProvider}) => {
-    const { dbData, tableName, isParentActivated, } = additionalDataForDdlProvider;
+    const {getNamePrefixedWithSchemaName} = require('../../../utils/general')(_);
 
+    const {schemaName, isParentActivated} = additionalDataForDdlProvider;
     const newIndexes = collection?.role?.compMod?.Indxs?.new || [];
     const oldIndexes = collection?.role?.compMod?.Indxs?.old || [];
 
@@ -123,7 +154,14 @@ const getDeletedIndexesScriptDtos = ({_, ddlProvider}) => ({collection, addition
                 oldIndex, newIndex
             }));
             return !Boolean(correspondingNewIndex);
-        });
+        })
+        .map(oldIndex => {
+            const fullIndexName = getNamePrefixedWithSchemaName(oldIndex.indxName, schemaName);
+            const script = ddlProvider.dropIndex({indexName: fullIndexName});
+            const isIndexActivated = oldIndex.isActivated && isParentActivated;
+            return AlterScriptDto.getInstance([script], isIndexActivated, true);
+        })
+        .filter(Boolean);
 }
 
 /**
@@ -153,14 +191,28 @@ const getModifiedIndexes = ({_}) => ({collection}) => {
  * @return {({ collection: AlterCollectionDto, dbVersion: string }) => Array<AlterScriptDto>}
  * */
 const getModifyIndexesScriptDtos = ({_, ddlProvider}) => ({collection, dbVersion}) => {
+    const {getSchemaNameFromCollection} = require('../../../utils/general')(_);
     const additionalDataForDdlProvider = {
         dbData: {dbVersion},
         tableName: collection?.compMod?.collectionName?.new || '',
+        schemaName: getSchemaNameFromCollection({collection}) || '',
         isParentActivated: collection.isActivated,
     }
 
-    return []
+    const deletedIndexesScriptDtos = getDeletedIndexesScriptDtos({_, ddlProvider})({
+        collection, additionalDataForDdlProvider
+    });
+    const addedIndexesScriptDtos = getAddedIndexesScriptDtos({_, ddlProvider})({
+        collection, additionalDataForDdlProvider
+    })
+
+    return [
+        ...deletedIndexesScriptDtos,
+        ...addedIndexesScriptDtos,
+    ]
         .filter(Boolean);
 }
 
-module.exports = {}
+module.exports = {
+    getModifyIndexesScriptDtos,
+}
