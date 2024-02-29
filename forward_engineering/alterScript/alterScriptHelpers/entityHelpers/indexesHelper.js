@@ -121,14 +121,12 @@ const getAddedIndexesScriptDtos = ({_, ddlProvider}) => ({collection, additional
         .map(newIndex => mapIndexToFeIndexDto({_})({index: newIndex, collection}))
         .map(newIndex => {
             const fullIndexName = getNamePrefixedWithSchemaName(newIndex.indxName, schemaName);
-            const fullTableName = getNamePrefixedWithSchemaName(tableName, schemaName);
-
             const newIndexWithFullName = {
                 ...newIndex,
                 indxName: fullIndexName,
             }
 
-            const script = ddlProvider.createIndex(fullTableName, newIndexWithFullName, dbData, isParentActivated);
+            const script = ddlProvider.createIndex(tableName, newIndexWithFullName, dbData, isParentActivated);
             const isIndexActivated = newIndex.isActivated && isParentActivated;
             return AlterScriptDto.getInstance([script], isIndexActivated, false);
         })
@@ -142,7 +140,7 @@ const getAddedIndexesScriptDtos = ({_, ddlProvider}) => ({collection, additional
  * }) => Array<AlterScriptDto>}
  * */
 const getDeletedIndexesScriptDtos = ({_, ddlProvider}) => ({collection, additionalDataForDdlProvider}) => {
-    const {getNamePrefixedWithSchemaName} = require('../../../utils/general')(_);
+    const {getNamePrefixedWithSchemaName, wrapInQuotes} = require('../../../utils/general')(_);
 
     const {schemaName, isParentActivated} = additionalDataForDdlProvider;
     const newIndexes = collection?.role?.compMod?.Indxs?.new || [];
@@ -157,7 +155,8 @@ const getDeletedIndexesScriptDtos = ({_, ddlProvider}) => ({collection, addition
         })
         .map(oldIndex => {
             const fullIndexName = getNamePrefixedWithSchemaName(oldIndex.indxName, schemaName);
-            const script = ddlProvider.dropIndex({indexName: fullIndexName});
+            const ddlIndexName = wrapInQuotes(fullIndexName);
+            const script = ddlProvider.dropIndex({indexName: ddlIndexName});
             const isIndexActivated = oldIndex.isActivated && isParentActivated;
             return AlterScriptDto.getInstance([script], isIndexActivated, true);
         })
