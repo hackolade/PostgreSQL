@@ -395,7 +395,7 @@ const queryConstants = {
         LEFT JOIN pg_class AS inher_parent ON (inher_parent.oid = pg_inherits.inhparent)
         WHERE inher_parent.relnamespace = $1;`,
         GET_SEQUENCES: `
-        SELECT
+        SELECT DISTINCT ON (sequence_name)
                 sequence_name,
                 data_type,
                 start_value,
@@ -411,7 +411,8 @@ const queryConstants = {
         LEFT JOIN pg_class AS inner_pg_class ON pg_depend.refobjid = inner_pg_class.oid
         LEFT JOIN pg_attribute ON (pg_depend.refobjid, pg_depend.refobjsubid) = (pg_attribute.attrelid, pg_attribute.attnum)
         WHERE pg_class.relkind = 'S'
-        AND information_schema."sequences".sequence_schema = $1;
+        AND information_schema."sequences".sequence_schema = $1
+        ORDER BY sequence_name, column_name;
         `,
 };
 
