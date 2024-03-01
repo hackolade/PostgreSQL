@@ -1,7 +1,6 @@
 const defaultTypes = require('../configs/defaultTypes');
 const descriptors = require('../configs/descriptors');
 const templates = require('./templates');
-const assignTemplates = require("../utils/assignTemplates");
 
 
 module.exports = (baseProvider, options, app) => {
