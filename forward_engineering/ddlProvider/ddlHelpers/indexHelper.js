@@ -85,5 +85,6 @@ module.exports = ({ _, wrapInQuotes, checkAllKeysDeactivated, getColumnsList }) 
 	return {
 		getIndexKeys,
 		getIndexOptions,
+		getWithOptions,
 	};
 };

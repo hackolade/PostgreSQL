@@ -79,7 +79,15 @@ module.exports = {
 		'CREATE${unique} INDEX${concurrently}${ifNotExist} ${name}\n' +
 		' ON${only} ${tableName}${using}${keys}${nullsDistinct}${options};\n',
 
-	dropIndex: 'DROP INDEX IF EXISTS ${indexName};',
+	dropIndex: 'DROP INDEX IF EXISTS ${indexName};\n',
+
+	alterIndexRename: 'ALTER INDEX IF EXISTS ${oldIndexName} RENAME TO ${newIndexName};\n',
+
+	alterIndexTablespace: 'ALTER INDEX IF EXISTS ${indexName} SET TABLESPACE ${tablespaceName};\n',
+
+	alterIndexStorageParams: 'ALTER INDEX IF EXISTS ${indexName} SET (\n\t${options}\n);\n',
+
+	reindexIndex: 'REINDEX INDEX ${indexName};\n',
 
 	createView:
 		'CREATE${orReplace}${temporary} VIEW ${name}${withOptions}\nAS ${selectStatement}${checkOption};\n\n${comment}\n',

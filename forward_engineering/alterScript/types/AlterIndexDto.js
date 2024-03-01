@@ -87,6 +87,11 @@ class AlterIndexDto {
      * */
     include
 
+    /**
+     * @type {Object}
+     * */
+    index_storage_parameter
+
 }
 
 module.exports = {

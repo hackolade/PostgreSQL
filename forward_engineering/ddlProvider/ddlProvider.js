@@ -1,6 +1,7 @@
 const defaultTypes = require('../configs/defaultTypes');
 const descriptors = require('../configs/descriptors');
 const templates = require('./templates');
+const assignTemplates = require("../utils/assignTemplates");
 
 
 module.exports = (baseProvider, options, app) => {
@@ -78,7 +79,7 @@ module.exports = (baseProvider, options, app) => {
 		wrapComment,
 	});
 
-	const { getIndexKeys, getIndexOptions } = require('./ddlHelpers/indexHelper')({
+	const { getIndexKeys, getIndexOptions, getWithOptions } = require('./ddlHelpers/indexHelper')({
 		_,
 		wrapInQuotes,
 		checkAllKeysDeactivated,
@@ -1236,5 +1237,56 @@ module.exports = (baseProvider, options, app) => {
 			};
 			return assignTemplates(templates.dropIndex, templatesConfig);
 		},
+
+		/**
+		 * @param oldIndexName {string}
+		 * @param newIndexName {string}
+		 * @return {string}
+		 * */
+		alterIndexRename({ oldIndexName, newIndexName }) {
+			const templatesConfig = {
+				oldIndexName, newIndexName,
+			};
+			return assignTemplates(templates.alterIndexRename, templatesConfig);
+		},
+
+		/**
+		 * @param indexName {string}
+		 * @param tablespaceName {string}
+		 * @return {string}
+		 * */
+		alterIndexTablespace({ indexName, tablespaceName }) {
+			const templatesConfig = {
+				indexName,
+				tablespaceName,
+			};
+			return assignTemplates(templates.alterIndexTablespace, templatesConfig);
+		},
+
+		/**
+		 * @param indexName {string}
+		 * @param index {Object}
+		 * @return {string}
+		 * */
+		alterIndexStorageParams({ indexName, index }) {
+			const ddlIndexStorageParameters = getWithOptions(index);
+			const templatesConfig = {
+				indexName,
+				options: ddlIndexStorageParameters,
+			}
+			return assignTemplates(templates.alterIndexStorageParams, templatesConfig);
+		},
+
+		/**
+		 * @param indexName {string}
+		 * @return {string}
+		 * */
+		reindexIndex({ indexName }){
+			const templatesConfig = {
+				indexName,
+			}
+			return assignTemplates(templates.reindexIndex, templatesConfig);
+		},
+
 	};
 };
