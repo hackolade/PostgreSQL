@@ -61,7 +61,7 @@ module.exports = ({ _, wrapInQuotes, checkAllKeysDeactivated, getColumnsList }) 
 		return _.chain(config)
 			.toPairs()
 			.map(([keyInModel, postgresKey]) => {
-				const value = index.index_storage_parameter[keyInModel];
+				const value = (index.index_storage_parameter || {})[keyInModel];
 
 				if (_.isNil(value) || value === '') {
 					return;
