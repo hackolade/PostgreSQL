@@ -1238,51 +1238,69 @@ module.exports = (baseProvider, options, app) => {
 		},
 
 		/**
+		 * @param schemaName {string}
 		 * @param oldIndexName {string}
 		 * @param newIndexName {string}
 		 * @return {string}
 		 * */
-		alterIndexRename({ oldIndexName, newIndexName }) {
+		alterIndexRename({ schemaName, oldIndexName, newIndexName }) {
+			const ddlSchemaName = wrapInQuotes(schemaName);
+			const ddlOldIndexName = getNamePrefixedWithSchemaName(wrapInQuotes(oldIndexName), ddlSchemaName);
+			const ddlNewIndexName = wrapInQuotes(newIndexName);
+
 			const templatesConfig = {
-				oldIndexName, newIndexName,
+				oldIndexName: ddlOldIndexName,
+				newIndexName: ddlNewIndexName,
 			};
 			return assignTemplates(templates.alterIndexRename, templatesConfig);
 		},
 
 		/**
+		 * @param schemaName {string}
 		 * @param indexName {string}
 		 * @param tablespaceName {string}
 		 * @return {string}
 		 * */
-		alterIndexTablespace({ indexName, tablespaceName }) {
+		alterIndexTablespace({ schemaName, indexName, tablespaceName }) {
+			const ddlSchemaName = wrapInQuotes(schemaName);
+			const ddlIndexName = getNamePrefixedWithSchemaName(wrapInQuotes(indexName), ddlSchemaName);
+
 			const templatesConfig = {
-				indexName,
+				indexName: ddlIndexName,
 				tablespaceName,
 			};
 			return assignTemplates(templates.alterIndexTablespace, templatesConfig);
 		},
 
 		/**
+		 * @param schemaName {string}
 		 * @param indexName {string}
 		 * @param index {Object}
 		 * @return {string}
 		 * */
-		alterIndexStorageParams({ indexName, index }) {
+		alterIndexStorageParams({ schemaName, indexName, index }) {
+			const ddlSchemaName = wrapInQuotes(schemaName);
+			const ddlIndexName = getNamePrefixedWithSchemaName(wrapInQuotes(indexName), ddlSchemaName);
+
 			const ddlIndexStorageParameters = getWithOptions(index);
 			const templatesConfig = {
-				indexName,
+				indexName: ddlIndexName,
 				options: ddlIndexStorageParameters,
 			}
 			return assignTemplates(templates.alterIndexStorageParams, templatesConfig);
 		},
 
 		/**
+		 * @param schemaName {string}
 		 * @param indexName {string}
 		 * @return {string}
 		 * */
-		reindexIndex({ indexName }){
+		reindexIndex({ schemaName, indexName }){
+			const ddlSchemaName = wrapInQuotes(schemaName);
+			const ddlIndexName = getNamePrefixedWithSchemaName(wrapInQuotes(indexName), ddlSchemaName);
+
 			const templatesConfig = {
-				indexName,
+				indexName: ddlIndexName,
 			}
 			return assignTemplates(templates.reindexIndex, templatesConfig);
 		},

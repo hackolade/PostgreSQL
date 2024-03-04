@@ -123,18 +123,11 @@ const areOldIndexDtoAndNewIndexDtoDescribingSameDatabaseIndex = ({oldIndex, newI
  * }) => AlterScriptDto | undefined}
  * */
 const getCreateIndexScriptDto = ({_, ddlProvider}) => ({index, collection, additionalDataForDdlProvider}) => {
-    const {getNamePrefixedWithSchemaName} = require('../../../utils/general')(_);
-
-    const {dbData, tableName, isParentActivated, schemaName} = additionalDataForDdlProvider;
+    const {dbData, tableName, isParentActivated} = additionalDataForDdlProvider;
 
     const indexForFeScript = mapIndexToFeIndexDto({_})({index, collection});
-    const fullIndexName = getNamePrefixedWithSchemaName(indexForFeScript.indxName, schemaName);
-    const indexWithFullName = {
-        ...indexForFeScript,
-        indxName: fullIndexName,
-    }
 
-    const script = ddlProvider.createIndex(tableName, indexWithFullName, dbData, isParentActivated);
+    const script = ddlProvider.createIndex(tableName, indexForFeScript, dbData, isParentActivated);
     const isIndexActivated = indexForFeScript.isActivated && isParentActivated;
     return AlterScriptDto.getInstance([script], isIndexActivated, false);
 }
@@ -173,13 +166,12 @@ const getAddedIndexesScriptDtos = ({_, ddlProvider}) => ({collection, additional
  * }) => AlterScriptDto | undefined}
  * */
 const getDeleteIndexScriptDto = ({_, ddlProvider}) => ({index, additionalDataForDdlProvider}) => {
-    const {getNamePrefixedWithSchemaName, wrapInQuotes} = require('../../../utils/general')(_);
+    const {getNamePrefixedWithSchemaName} = require('../../../utils/general')(_);
 
     const {isParentActivated, schemaName} = additionalDataForDdlProvider;
 
     const fullIndexName = getNamePrefixedWithSchemaName(index.indxName, schemaName);
-    const ddlIndexName = wrapInQuotes(fullIndexName);
-    const script = ddlProvider.dropIndex({indexName: ddlIndexName});
+    const script = ddlProvider.dropIndex({indexName: fullIndexName});
     const isIndexActivated = index.isActivated && isParentActivated;
     return AlterScriptDto.getInstance([script], isIndexActivated, true);
 }
@@ -219,22 +211,17 @@ const getAlterIndexScriptDtos = ({_, ddlProvider}) => ({
                                                            oldIndex,
                                                            additionalDataForDdlProvider
                                                        }) => {
-    const {getNamePrefixedWithSchemaName, wrapInQuotes} = require('../../../utils/general')(_);
     const alterIndexScriptDtos = [];
 
     const {isParentActivated, schemaName} = additionalDataForDdlProvider;
     const isNewIndexActivated = newIndex.isActivated && isParentActivated;
-    const fullNewIndexName = getNamePrefixedWithSchemaName(newIndex.indxName, schemaName);
-    const newIndexNameForDdl = wrapInQuotes(fullNewIndexName);
 
     const shouldRename = !_.isEqual(newIndex.indxName, oldIndex.indxName);
     if (shouldRename) {
-        const fullOldIndexName = getNamePrefixedWithSchemaName(oldIndex.indxName, schemaName);
-        const oldIndexNameForDdl = wrapInQuotes(fullOldIndexName);
-
         const script = ddlProvider.alterIndexRename({
-            oldIndexName: oldIndexNameForDdl,
-            newIndexName: newIndexNameForDdl,
+            schemaName,
+            oldIndexName: oldIndex.indxName,
+            newIndexName: newIndex.indxName,
         });
         const renameScriptDto = AlterScriptDto.getInstance([script], isNewIndexActivated, false);
         alterIndexScriptDtos.push(renameScriptDto);
@@ -243,7 +230,8 @@ const getAlterIndexScriptDtos = ({_, ddlProvider}) => ({
     const shouldUpdateTablespace = !_.isEqual(newIndex.index_tablespace_name, oldIndex.index_tablespace_name);
     if (shouldUpdateTablespace) {
         const script = ddlProvider.alterIndexTablespace({
-            indexName: newIndexNameForDdl,
+            schemaName,
+            indexName: newIndex.indxName,
             tablespaceName: newIndex.index_tablespace_name,
         });
         const changeTablespaceScriptDto = AlterScriptDto.getInstance([script], isNewIndexActivated, false);
@@ -253,14 +241,16 @@ const getAlterIndexScriptDtos = ({_, ddlProvider}) => ({
     const shouldUpdateStorageParams = !_.isEqual(newIndex.index_storage_parameter, oldIndex.index_storage_parameter);
     if (shouldUpdateStorageParams) {
         const updateStorageParamsScript = ddlProvider.alterIndexStorageParams({
-            indexName: newIndexNameForDdl,
+            schemaName,
+            indexName: newIndex.indxName,
             index: newIndex,
         });
         const updateStorageParamsScriptDto = AlterScriptDto.getInstance([updateStorageParamsScript], isNewIndexActivated, false);
         alterIndexScriptDtos.push(updateStorageParamsScriptDto);
 
         const reindexScript = ddlProvider.reindexIndex({
-            indexName: newIndexNameForDdl,
+            schemaName,
+            indexName: newIndex.indxName,
         });
         const reindexScriptDto = AlterScriptDto.getInstance([reindexScript], isNewIndexActivated, false);
         alterIndexScriptDtos.push(reindexScriptDto);
