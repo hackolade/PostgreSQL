@@ -125,8 +125,12 @@ module.exports = _ => {
 	const getFullTableName = (collection) => {
 		const collectionSchema = {...collection, ...(_.omit(collection?.role, 'properties') || {})};
 		const tableName = getEntityName(collectionSchema);
-		const schemaName = collectionSchema.compMod?.keyspaceName;
+		const schemaName = getSchemaNameFromCollection({collection: collectionSchema});
 		return getNamePrefixedWithSchemaName(tableName, schemaName);
+	}
+
+	const getSchemaNameFromCollection = ({collection}) => {
+		return collection.compMod?.keyspaceName;
 	}
 
 	const getFullColumnName = (collection, columnName) => {
@@ -293,6 +297,7 @@ module.exports = _ => {
 		getViewData,
 		getSchemaOfAlterCollection,
 		getFullCollectionName,
+		getSchemaNameFromCollection,
 		getGroupItemsByCompMode,
 	};
 };

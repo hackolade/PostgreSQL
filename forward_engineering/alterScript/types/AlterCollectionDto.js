@@ -1,3 +1,5 @@
+const {AlterIndexDto} = require('./AlterIndexDto');
+
 class ColumnCompModField {
 
     /**
@@ -253,6 +255,14 @@ class AlterCollectionRoleCompModDto {
      * }>}
      */
     newProperties
+
+    /**
+     * @type {{
+     *     new: Array<AlterIndexDto>,
+     *     old: Array<AlterIndexDto>,
+     * }}
+     * */
+    Indxs
 }
 
 class AlterCollectionRoleDto {
