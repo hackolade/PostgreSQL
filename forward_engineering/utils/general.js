@@ -125,7 +125,7 @@ module.exports = _ => {
 	const getFullTableName = (collection) => {
 		const collectionSchema = {...collection, ...(_.omit(collection?.role, 'properties') || {})};
 		const tableName = getEntityName(collectionSchema);
-		const schemaName = getSchemaNameFromCollection({collection});
+		const schemaName = getSchemaNameFromCollection({collection: collectionSchema});
 		return getNamePrefixedWithSchemaName(tableName, schemaName);
 	}
 
