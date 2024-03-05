@@ -25,9 +25,8 @@ const mapSequenceData = ({ sequence }) => {
 		maxValue: sequence.maximum_value,
 		minValue: sequence.minimum_value,
 		cycle: sequence.cycle_option === 'YES',
-		ownedByColumn: getOwnedByColumn(sequence),
+		ownedByColumn: getOwnedByColumn({ sequence }),
 		ownedByNone: !sequence.column_name,
-
 	};
 };
 
