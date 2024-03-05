@@ -1,6 +1,7 @@
 const defaultTypes = require('../configs/defaultTypes');
 const descriptors = require('../configs/descriptors');
 const templates = require('./templates');
+const { Sequence } =require('../types/schemaSequenceTypes');
 
 
 module.exports = (baseProvider, options, app) => {
@@ -56,11 +57,12 @@ module.exports = (baseProvider, options, app) => {
 		getNamePrefixedWithSchemaName,
 	});
 
-	const { getSequencesScript } = require('./ddlHelpers/sequenceHelper')({
+	const { getSequencesScript, createSequenceScript, dropSequenceScript, alterSequenceScript } = require('./ddlHelpers/sequenceHelper')({
 		_,
 		templates,
 		assignTemplates,
 		getNamePrefixedWithSchemaName,
+		wrapInQuotes,
 	});
 
 	const { getTableTemporaryValue, getTableOptions } = require('./ddlHelpers/tableHelper')({
@@ -1222,8 +1224,36 @@ module.exports = (baseProvider, options, app) => {
 			return assignTemplates(templates.dropConstraint, templatesConfig);
 		},
 
+		/**
+		 * @param {{ schemaName: string, sequences: Sequence[] }} 
+		 * @returns {string}
+		 */
 		createSchemaSequences({ schemaName, sequences }) {
-			return getSequencesScript(schemaName, sequences);
+			return getSequencesScript({ schemaName, sequences });
+		},
+
+		/**
+		 * @param {{ schemaName: string, sequence: Sequence }} 
+		 * @returns {string}
+		 */
+		createSchemaSequence({ schemaName, sequence }) {
+			return createSequenceScript({ schemaName, sequence });
+		},
+
+		/**
+		 * @param {{ schemaName: string, sequence: Sequence }} 
+		 * @returns {string}
+		 */
+		dropSchemaSequence({ schemaName, sequence }) {
+			return dropSequenceScript({ schemaName, sequence });
+		},
+
+		/**
+		 * @param {{ schemaName: string, sequence: Sequence, oldSequence: Sequence }} 
+		 * @returns {string}
+		 */
+		alterSchemaSequence({ schemaName, sequence, oldSequence }) {
+			return alterSequenceScript({ schemaName, sequence, oldSequence });
 		},
 
 		/**

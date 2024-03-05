@@ -46,6 +46,7 @@ const {
 const { setDependencies: setDependenciesInTriggerHelper, getTriggers } = require('./postgresHelpers/triggerHelper');
 const queryConstants = require('./queryConstants');
 const { reorganizeConstraints } = require('./postgresHelpers/reorganizeConstraints');
+const { mapSequenceData } = require('./postgresHelpers/sequenceHelper');
 
 let currentSshTunnel = null;
 let _ = null;
@@ -223,7 +224,12 @@ module.exports = {
 			return mapProcedureData(functionData, functionArgs, additionalData);
 		});
 
-		return { functions: userDefinedFunctions, procedures: userDefinedProcedures };
+		const sequencesData = await db.queryTolerant(queryConstants.GET_SEQUENCES, [
+			schemaName,
+		]);
+		const sequences = sequencesData.map(sequence => mapSequenceData({ sequence }));
+
+		return { functions: userDefinedFunctions, procedures: userDefinedProcedures, sequences };
 	},
 
 	async _retrieveUserDefinedTypes(schemaName) {

@@ -394,6 +394,26 @@ const queryConstants = {
         LEFT JOIN pg_class AS inher_child ON (inher_child.oid = pg_inherits.inhrelid)
         LEFT JOIN pg_class AS inher_parent ON (inher_parent.oid = pg_inherits.inhparent)
         WHERE inher_parent.relnamespace = $1;`,
+        GET_SEQUENCES: `
+        SELECT DISTINCT ON (sequence_name)
+                sequence_name,
+                data_type,
+                start_value,
+                minimum_value,
+                maximum_value,
+                "increment",
+                cycle_option,
+                inner_pg_class.relname AS table_name,
+                pg_attribute.attname AS column_name
+        FROM information_schema."sequences"
+        JOIN pg_class ON pg_class.relname = information_schema."sequences".sequence_name
+        JOIN pg_depend ON pg_depend.objid = pg_class.oid
+        LEFT JOIN pg_class AS inner_pg_class ON pg_depend.refobjid = inner_pg_class.oid
+        LEFT JOIN pg_attribute ON (pg_depend.refobjid, pg_depend.refobjsubid) = (pg_attribute.attrelid, pg_attribute.attnum)
+        WHERE pg_class.relkind = 'S'
+        AND information_schema."sequences".sequence_schema = $1
+        ORDER BY sequence_name, column_name;
+        `,
 };
 
 const getQueryName = query => {
