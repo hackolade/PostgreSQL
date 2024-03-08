@@ -102,10 +102,10 @@ module.exports = ({
 			{ getOption, key: 'dataType', clause: 'AS', },
 			{ getOption, key: 'increment', clause: 'INCREMENT BY', },
 			{ getOption, key: 'start', clause: 'START WITH', },
+			{ getOption, key: 'restart', clause: 'RESTART WITH', },
 			{ getOption, key: 'minValue', clause: 'MINVALUE', },
 			{ getOption, key: 'maxValue', clause: 'MAXVALUE', },
 			{ getOption, key: 'cache', clause: 'CACHE', },
-			{ getOption, key: 'restart', clause: 'RESTART WITH', },
 			{ getOption: getCycle, key: 'cycle' },
 			{ getOption: getOwnedBy, key: 'ownedByColumn' },
 		];
