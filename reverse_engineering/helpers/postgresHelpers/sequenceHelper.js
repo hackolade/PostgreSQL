@@ -19,11 +19,14 @@ const getOwnedByColumn = ({ sequence }) => {
 const mapSequenceData = ({ sequence }) => {
 	return {
 		sequenceName: sequence.sequence_name,
-		increment: sequence.increment,
-		start: sequence.start_value,
+		increment: Number(sequence.increment),
+		start: Number(sequence.start_value),
 		dataType: sequence.data_type,
-		maxValue: sequence.maximum_value,
-		minValue: sequence.minimum_value,
+		maxValue: Number(sequence.maximum_value),
+		minValue: Number(sequence.minimum_value),
+		cache: Number(sequence.cache_size),
+		temporary: sequence.rel_persistance === 't',
+		unlogged: sequence.rel_persistance === 'u',
 		cycle: sequence.cycle_option === 'YES',
 		ownedByColumn: getOwnedByColumn({ sequence }),
 		ownedByNone: !sequence.column_name,

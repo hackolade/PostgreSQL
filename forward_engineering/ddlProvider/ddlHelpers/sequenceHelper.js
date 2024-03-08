@@ -58,7 +58,7 @@ module.exports = ({
 			sequenceName,
 			sequenceSchemaName
 		);
-		const modifiedSequence = _.omitBy(sequence, (value, key) => _.isEqual(value, oldSequence[key]));
+		const modifiedSequence = getModifiedSequence({ sequence, oldSequence });
 		const options = getSequenceOptions({ schemaName, sequence: modifiedSequence });
 		const sequenceType = getAlterSequenceType({ sequence: modifiedSequence });
 		const newName = modifiedSequence.sequenceName;
@@ -102,6 +102,7 @@ module.exports = ({
 			{ getOption, key: 'dataType', clause: 'AS', },
 			{ getOption, key: 'increment', clause: 'INCREMENT BY', },
 			{ getOption, key: 'start', clause: 'START WITH', },
+			{ getOption, key: 'restart', clause: 'RESTART WITH', },
 			{ getOption, key: 'minValue', clause: 'MINVALUE', },
 			{ getOption, key: 'maxValue', clause: 'MAXVALUE', },
 			{ getOption, key: 'cache', clause: 'CACHE', },
@@ -223,6 +224,23 @@ module.exports = ({
 		}
 
 		return '';
+	};
+
+	/**
+	 * @param {{ sequence: Sequence, oldSequence: Sequence }} 
+	 * @returns {Sequence}
+	 */
+	const getModifiedSequence = ({ sequence, oldSequence }) => {
+		const modifiedSequence = _.omitBy(sequence, (value, key) => _.isEqual(value, oldSequence[key]));
+
+		if (sequence.minValue > oldSequence.minValue) {
+			return {
+				...modifiedSequence,
+				restart: sequence.start,
+			};
+		}
+
+		return modifiedSequence;
 	};
 
 	return {

@@ -102,6 +102,16 @@ class SequenceDto {
   cycle_option
 
   /**
+   * @type {number}
+   */
+  cache_size
+
+  /**
+   * @type {'t' | 'u' | 'p' | null}
+   */
+  rel_persistance
+
+  /**
    * @type {string | null}
    */
   column_name
