@@ -396,18 +396,21 @@ const queryConstants = {
         WHERE inher_parent.relnamespace = $1;`,
         GET_SEQUENCES: `
         SELECT DISTINCT ON (sequence_name)
-                sequence_name,
-                data_type,
-                start_value,
-                minimum_value,
-                maximum_value,
-                "increment",
-                cycle_option,
+                information_schema."sequences".sequence_name,
+                information_schema."sequences".data_type,
+                information_schema."sequences".start_value,
+                information_schema."sequences".minimum_value,
+                information_schema."sequences".maximum_value,
+                information_schema."sequences"."increment",
+                information_schema."sequences".cycle_option,
+                pg_catalog.pg_sequences.cache_size,
+                pg_class.relpersistence as rel_persistance,
                 inner_pg_class.relname AS table_name,
                 pg_attribute.attname AS column_name
         FROM information_schema."sequences"
         JOIN pg_class ON pg_class.relname = information_schema."sequences".sequence_name
         JOIN pg_depend ON pg_depend.objid = pg_class.oid
+        LEFT JOIN pg_catalog.pg_sequences ON (pg_catalog.pg_sequences.schemaname, pg_catalog.pg_sequences.sequencename) = (information_schema."sequences".sequence_schema, information_schema."sequences".sequence_name)
         LEFT JOIN pg_class AS inner_pg_class ON pg_depend.refobjid = inner_pg_class.oid
         LEFT JOIN pg_attribute ON (pg_depend.refobjid, pg_depend.refobjsubid) = (pg_attribute.attrelid, pg_attribute.attnum)
         WHERE pg_class.relkind = 'S'
