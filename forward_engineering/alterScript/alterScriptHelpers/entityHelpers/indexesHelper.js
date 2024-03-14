@@ -112,7 +112,7 @@ const shouldAlterIndex = ({_}) => ({oldIndex, newIndex}) => {
  * @return {boolean}
  * */
 const areOldIndexDtoAndNewIndexDtoDescribingSameDatabaseIndex = ({oldIndex, newIndex}) => {
-    return (oldIndex.id === newIndex.id) || (oldIndex.indxName === oldIndex.indxName);
+    return (oldIndex.id === newIndex.id) || (oldIndex.indxName === newIndex.indxName);
 }
 
 /**
