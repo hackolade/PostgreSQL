@@ -56,7 +56,7 @@ const getAddCollectionScriptDto =
             };
             const hydratedTable = ddlProvider.hydrateTable({tableData, entityData: [jsonSchema], jsonSchema});
 
-            const indexesOnNewlyCreatedColumnsScripts = getModifyIndexesScriptDtos({_, ddlProvider})({collection, dbVersion}).flatMap(({scripts}) => scripts.map(({script}) => script))
+            const indexesOnNewlyCreatedColumnsScripts = getIndexesBasedOnNewlyCreatedColumnsScript({_, ddlProvider, collection, dbVersion}).flatMap(({scripts}) => scripts.map(({script}) => script))
             const script = ddlProvider.createTable(hydratedTable, jsonSchema.isActivated);
             return AlterScriptDto.getInstance([script, ...indexesOnNewlyCreatedColumnsScripts], true, false)
         };
