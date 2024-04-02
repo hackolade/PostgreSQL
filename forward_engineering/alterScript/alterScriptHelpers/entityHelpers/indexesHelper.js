@@ -139,7 +139,7 @@ const getCreateIndexScriptDto = ({_, ddlProvider}) => ({index, collection, addit
  * }) => Array<AlterScriptDto>}
  * */
 const getAddedIndexesScriptDtos = ({_, ddlProvider}) => ({collection, additionalDataForDdlProvider}) => {
-    const newIndexes = collection?.role?.compMod?.Indxs?.new || [];
+    const newIndexes = collection?.role?.compMod?.Indxs?.new || collection?.role?.Indxs || [];
     const oldIndexes = collection?.role?.compMod?.Indxs?.old || [];
 
     return newIndexes
