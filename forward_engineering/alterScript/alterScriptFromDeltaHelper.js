@@ -108,19 +108,16 @@ const getAlterCollectionsScriptDtos = ({
         .concat(collection.properties?.entities?.properties?.added?.items)
         .filter(Boolean)
         .map(item => Object.values(item.properties)[0])
-        .filter(collection => !collection.compMod)
         .flatMap(getAddColumnScriptDtos({app, dbVersion, modelDefinitions, internalDefinitions, externalDefinitions}));
     const deleteColumnScriptDtos = []
         .concat(collection.properties?.entities?.properties?.deleted?.items)
         .filter(Boolean)
         .map(item => Object.values(item.properties)[0])
-        .filter(collection => !collection.compMod)
         .flatMap(getDeleteColumnScriptDtos(app));
     const modifyColumnScriptDtos = []
         .concat(collection.properties?.entities?.properties?.modified?.items)
         .filter(Boolean)
         .map(item => Object.values(item.properties)[0])
-        .filter(collection => !collection.compMod)
         .flatMap(getModifyColumnScriptDtos({app, dbVersion, modelDefinitions, internalDefinitions, externalDefinitions}));
 
     return [
