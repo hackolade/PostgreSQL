@@ -105,8 +105,8 @@ const getAlterCollectionsScriptDtos = ({
     const createCollectionsScriptDtos = createScriptsData.filter(collection => collection.compMod?.created).map(getAddCollectionScriptDto({app, dbVersion, modelDefinitions, internalDefinitions, externalDefinitions}));
     const deleteCollectionScriptDtos = deleteScriptsData.filter(collection => collection.compMod?.deleted).map(getDeleteCollectionScriptDto(app));
     const modifyCollectionScriptDtos = modifyScriptsData.flatMap(getModifyCollectionScriptDtos({app, dbVersion}));
-    const addColumnScriptDtos = createScriptsData.flatMap(getAddColumnScriptDtos({app, dbVersion, modelDefinitions, internalDefinitions, externalDefinitions}));
-    const deleteColumnScriptDtos = deleteScriptsData.flatMap(getDeleteColumnScriptDtos(app));
+    const addColumnScriptDtos = createScriptsData.filter(item => !item?.compMod?.created).flatMap(getAddColumnScriptDtos({app, dbVersion, modelDefinitions, internalDefinitions, externalDefinitions}));
+    const deleteColumnScriptDtos = deleteScriptsData.filter(item => !item?.compMod?.deleted).flatMap(getDeleteColumnScriptDtos(app));
     const modifyColumnScriptDtos = modifyScriptsData.flatMap(getModifyColumnScriptDtos({app, dbVersion, modelDefinitions, internalDefinitions, externalDefinitions}));
 
     return [
