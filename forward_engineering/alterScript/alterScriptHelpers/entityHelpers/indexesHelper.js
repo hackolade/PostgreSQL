@@ -13,13 +13,15 @@ const {AlterScriptDto} = require("../../types/AlterScriptDto");
  * @return {({ columnId: string, collection: AlterCollectionDto }) => string | undefined}
  * */
 const getColumnNameById = ({_}) => ({columnId, collection}) => {
-    const nameToSchemaInProperties = _.toPairs(collection.role.properties || {})
-        .find(([fieldName, fieldJsonSchema]) => {
-            return fieldJsonSchema.GUID === columnId;
-        });
-    if (nameToSchemaInProperties?.length) {
-        return nameToSchemaInProperties[0];
+    const rolePropertiesEntries = _.toPairs(collection.role.properties || {}).map(([name, value]) => ({...value, name}))
+    const oldProperties = (collection?.role?.compMod?.oldProperties || []).map(property => ({...property, GUID: property.id}))
+    const properties = rolePropertiesEntries.length > 0 ? rolePropertiesEntries : oldProperties
+    const propertySchema = properties.find(fieldJsonSchema => fieldJsonSchema.GUID === columnId);
+
+    if (propertySchema) {
+        return propertySchema.name;
     }
+
     return undefined;
 }
 
@@ -139,7 +141,7 @@ const getCreateIndexScriptDto = ({_, ddlProvider}) => ({index, collection, addit
  * }) => Array<AlterScriptDto>}
  * */
 const getAddedIndexesScriptDtos = ({_, ddlProvider}) => ({collection, additionalDataForDdlProvider}) => {
-    const newIndexes = collection?.role?.compMod?.Indxs?.new || [];
+    const newIndexes = collection?.role?.compMod?.Indxs?.new || collection?.role?.Indxs || [];
     const oldIndexes = collection?.role?.compMod?.Indxs?.old || [];
 
     return newIndexes

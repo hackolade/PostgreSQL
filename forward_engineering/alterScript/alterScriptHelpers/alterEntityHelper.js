@@ -56,8 +56,9 @@ const getAddCollectionScriptDto =
             };
             const hydratedTable = ddlProvider.hydrateTable({tableData, entityData: [jsonSchema], jsonSchema});
 
+            const indexesOnNewlyCreatedColumnsScripts = getIndexesBasedOnNewlyCreatedColumnsScript({_, ddlProvider, collection, dbVersion}).flatMap(({scripts}) => scripts.map(({script}) => script))
             const script = ddlProvider.createTable(hydratedTable, jsonSchema.isActivated);
-            return AlterScriptDto.getInstance([script], true, false)
+            return AlterScriptDto.getInstance([script, ...indexesOnNewlyCreatedColumnsScripts], true, false)
         };
 
 /**
@@ -109,7 +110,7 @@ const getAddColumnsByConditionScriptDtos =  ({app, dbVersion, modelDefinitions, 
         const fullName = getNamePrefixedWithSchemaName(tableName, schemaName);
         const schemaData = {schemaName, dbVersion};
 
-        return _.toPairs(collection.properties)
+        const scripts = _.toPairs(collection.properties)
             .filter(([name, jsonSchema]) => predicate([name, jsonSchema]))
             .map(([name, jsonSchema]) => {
                 const definitionJsonSchema = getDefinitionByReference({
@@ -130,9 +131,32 @@ const getAddColumnsByConditionScriptDtos =  ({app, dbVersion, modelDefinitions, 
             })
             .map(ddlProvider.convertColumnDefinition)
             .map(columnDefinition => ddlProvider.addColumn(fullName, columnDefinition))
-            .map(addColumnScript => AlterScriptDto.getInstance([addColumnScript], true, false))
-            .filter(Boolean);
+            .map(addColumnScript => AlterScriptDto.getInstance([addColumnScript], true, false));
+
+        const indexesOnNewlyCreatedColumns = getIndexesBasedOnNewlyCreatedColumnsScript({_, ddlProvider, collection})
+        return scripts.concat(indexesOnNewlyCreatedColumns).filter(Boolean)
     };
+
+/**
+ * 
+ * @return {AlterScriptDto[]}
+ * */
+const getIndexesBasedOnNewlyCreatedColumnsScript = ({_, ddlProvider, dbVersion, collection}) => {
+    const newIndexes = collection?.role?.compMod?.Indxs?.new || collection?.role?.Indxs || []
+    const newPropertiesIds = Object.values(collection?.properties).map(({GUID}) => GUID)
+
+    if (newIndexes.length === 0 || newPropertiesIds.length === 0) {
+        return []
+    }
+
+    const doAnyIndexUseNewlyCreatedColumn = newIndexes.some(({columns}) => columns.find(({keyId}) => newPropertiesIds.includes(keyId)))
+
+    if (!doAnyIndexUseNewlyCreatedColumn) {
+        return []
+    }
+
+    return getModifyIndexesScriptDtos({ _, ddlProvider })({ collection, dbVersion })
+}
 
 /**
  * @return {(collection: Object) => AlterScriptDto[]}
