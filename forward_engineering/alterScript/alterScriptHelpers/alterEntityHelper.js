@@ -143,7 +143,7 @@ const getAddColumnsByConditionScriptDtos =  ({app, dbVersion, modelDefinitions, 
  * */
 const getIndexesBasedOnNewlyCreatedColumnsScript = ({_, ddlProvider, dbVersion, collection}) => {
     const newIndexes = collection?.role?.compMod?.Indxs?.new || collection?.role?.Indxs || []
-    const newPropertiesIds = Object.values(collection?.properties).map(({GUID}) => GUID)
+    const newPropertiesIds = Object.values(collection?.properties ?? {}).map(({GUID}) => GUID)
 
     if (newIndexes.length === 0 || newPropertiesIds.length === 0) {
         return []
