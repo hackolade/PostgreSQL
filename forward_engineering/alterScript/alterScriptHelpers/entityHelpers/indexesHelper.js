@@ -141,7 +141,7 @@ const getCreateIndexScriptDto = ({_, ddlProvider}) => ({index, collection, addit
  * }) => Array<AlterScriptDto>}
  * */
 const getAddedIndexesScriptDtos = ({_, ddlProvider}) => ({collection, additionalDataForDdlProvider}) => {
-    const newIndexes = collection?.role?.compMod?.Indxs?.new || collection?.role?.Indxs || [];
+    const newIndexes = collection?.role?.Indxs || [];
     const oldIndexes = collection?.role?.compMod?.Indxs?.old || [];
 
     return newIndexes
@@ -319,13 +319,7 @@ const getModifiedIndexesScriptDtos = ({_, ddlProvider}) => ({collection, additio
  * @return {({ collection: AlterCollectionDto, dbVersion: string }) => Array<AlterScriptDto>}
  * */
 const getModifyIndexesScriptDtos = ({_, ddlProvider}) => ({collection, dbVersion}) => {
-    const {getSchemaNameFromCollection} = require('../../../utils/general')(_);
-    const additionalDataForDdlProvider = {
-        dbData: {dbVersion},
-        tableName: collection?.compMod?.collectionName?.new || collection?.role?.name || '',
-        schemaName: getSchemaNameFromCollection({collection}) || '',
-        isParentActivated: collection.isActivated,
-    }
+    const additionalDataForDdlProvider = getAdditionalDataForDdlProvider({_, dbVersion, collection})
 
     const deletedIndexesScriptDtos = getDeletedIndexesScriptDtos({_, ddlProvider})({
         collection, additionalDataForDdlProvider
@@ -345,6 +339,19 @@ const getModifyIndexesScriptDtos = ({_, ddlProvider}) => ({collection, dbVersion
         .filter(Boolean);
 }
 
+const getAdditionalDataForDdlProvider = ({_, dbVersion, collection}) => {
+    const {getSchemaNameFromCollection} = require('../../../utils/general')(_);
+    
+    return {
+        dbData: {dbVersion},
+        tableName: collection?.compMod?.collectionName?.new || collection?.role?.name || '',
+        schemaName: getSchemaNameFromCollection({collection}) || '',
+        isParentActivated: collection.isActivated,
+    }
+}
+
 module.exports = {
     getModifyIndexesScriptDtos,
+    getAddedIndexesScriptDtos,
+    getAdditionalDataForDdlProvider
 }

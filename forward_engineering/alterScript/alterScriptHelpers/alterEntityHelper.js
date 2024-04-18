@@ -7,7 +7,7 @@ const {getRenameColumnScriptDtos} = require("./columnHelpers/renameColumnHelper"
 const {AlterScriptDto} = require("../types/AlterScriptDto");
 const {AlterCollectionDto} = require('../types/AlterCollectionDto');
 const {getModifyPkConstraintsScriptDtos} = require("./entityHelpers/primaryKeyHelper");
-const {getModifyIndexesScriptDtos} = require("./entityHelpers/indexesHelper");
+const {getModifyIndexesScriptDtos, getAddedIndexesScriptDtos, getAdditionalDataForDdlProvider} = require("./entityHelpers/indexesHelper");
 
 
 /**
@@ -142,7 +142,7 @@ const getAddColumnsByConditionScriptDtos =  ({app, dbVersion, modelDefinitions, 
  * @return {AlterScriptDto[]}
  * */
 const getIndexesBasedOnNewlyCreatedColumnsScript = ({_, ddlProvider, dbVersion, collection}) => {
-    const newIndexes = collection?.role?.compMod?.Indxs?.new || collection?.role?.Indxs || []
+    const newIndexes = collection?.role?.Indxs || []
     const newPropertiesIds = Object.values(collection?.properties ?? {}).map(({GUID}) => GUID)
 
     if (newIndexes.length === 0 || newPropertiesIds.length === 0) {
@@ -155,7 +155,11 @@ const getIndexesBasedOnNewlyCreatedColumnsScript = ({_, ddlProvider, dbVersion, 
         return []
     }
 
-    return getModifyIndexesScriptDtos({ _, ddlProvider })({ collection, dbVersion })
+    const additionalDataForDdlProvider = getAdditionalDataForDdlProvider({_, dbVersion, collection})
+
+    return getAddedIndexesScriptDtos({_, ddlProvider})({
+        collection, additionalDataForDdlProvider
+    });
 }
 
 /**
