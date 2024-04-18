@@ -322,7 +322,7 @@ const getModifyIndexesScriptDtos = ({_, ddlProvider}) => ({collection, dbVersion
     const {getSchemaNameFromCollection} = require('../../../utils/general')(_);
     const additionalDataForDdlProvider = {
         dbData: {dbVersion},
-        tableName: collection?.compMod?.collectionName?.new || '',
+        tableName: collection?.compMod?.collectionName?.new || collection?.role?.name || '',
         schemaName: getSchemaNameFromCollection({collection}) || '',
         isParentActivated: collection.isActivated,
     }
