@@ -7,7 +7,7 @@ const {getRenameColumnScriptDtos} = require("./columnHelpers/renameColumnHelper"
 const {AlterScriptDto} = require("../types/AlterScriptDto");
 const {AlterCollectionDto} = require('../types/AlterCollectionDto');
 const {getModifyPkConstraintsScriptDtos} = require("./entityHelpers/primaryKeyHelper");
-const {getModifyIndexesScriptDtos} = require("./entityHelpers/indexesHelper");
+const {getModifyIndexesScriptDtos, getAddedIndexesScriptDtos} = require("./entityHelpers/indexesHelper");
 
 
 /**
@@ -155,7 +155,17 @@ const getIndexesBasedOnNewlyCreatedColumnsScript = ({_, ddlProvider, dbVersion, 
         return []
     }
 
-    return getModifyIndexesScriptDtos({ _, ddlProvider })({ collection, dbVersion })
+    const {getSchemaNameFromCollection} = require('../../utils/general')(_);
+    const additionalDataForDdlProvider = {
+        dbData: {dbVersion},
+        tableName: collection?.compMod?.collectionName?.new || collection?.role?.name || '',
+        schemaName: getSchemaNameFromCollection({collection}) || '',
+        isParentActivated: collection.isActivated,
+    }
+
+    return getAddedIndexesScriptDtos({_, ddlProvider})({
+        collection, additionalDataForDdlProvider
+    });
 }
 
 /**

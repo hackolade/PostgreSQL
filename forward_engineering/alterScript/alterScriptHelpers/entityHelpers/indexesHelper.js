@@ -141,7 +141,7 @@ const getCreateIndexScriptDto = ({_, ddlProvider}) => ({index, collection, addit
  * }) => Array<AlterScriptDto>}
  * */
 const getAddedIndexesScriptDtos = ({_, ddlProvider}) => ({collection, additionalDataForDdlProvider}) => {
-    const newIndexes = collection?.role?.compMod?.Indxs?.new || collection?.role?.Indxs || [];
+    const newIndexes = collection?.role?.Indxs || [];
     const oldIndexes = collection?.role?.compMod?.Indxs?.old || [];
 
     return newIndexes
@@ -347,4 +347,5 @@ const getModifyIndexesScriptDtos = ({_, ddlProvider}) => ({collection, dbVersion
 
 module.exports = {
     getModifyIndexesScriptDtos,
+    getAddedIndexesScriptDtos
 }
