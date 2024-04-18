@@ -13,7 +13,7 @@ const {AlterScriptDto} = require("../../types/AlterScriptDto");
  * @return {({ columnId: string, collection: AlterCollectionDto }) => string | undefined}
  * */
 const getColumnNameById = ({_}) => ({columnId, collection}) => {
-    const rolePropertiesEntries = _.toPairs(collection.role.properties || {}).map(([name, value]) => ({...value, name}))
+    const rolePropertiesEntries = _.toPairs(collection?.role?.properties || collection?.properties || {}).map(([name, value]) => ({...value, name}))
     const oldProperties = (collection?.role?.compMod?.oldProperties || []).map(property => ({...property, GUID: property.id}))
     const properties = rolePropertiesEntries.length > 0 ? rolePropertiesEntries : oldProperties
     const propertySchema = properties.find(fieldJsonSchema => fieldJsonSchema.GUID === columnId);
@@ -322,7 +322,7 @@ const getModifyIndexesScriptDtos = ({_, ddlProvider}) => ({collection, dbVersion
     const {getSchemaNameFromCollection} = require('../../../utils/general')(_);
     const additionalDataForDdlProvider = {
         dbData: {dbVersion},
-        tableName: collection?.compMod?.collectionName?.new || '',
+        tableName: collection?.compMod?.collectionName?.new || collection?.role?.name || '',
         schemaName: getSchemaNameFromCollection({collection}) || '',
         isParentActivated: collection.isActivated,
     }
