@@ -56,7 +56,7 @@ const getAddCollectionScriptDto =
             };
             const hydratedTable = ddlProvider.hydrateTable({tableData, entityData: [jsonSchema], jsonSchema});
 
-            const indexesOnNewlyCreatedColumnsScripts = getIndexesBasedOnNewlyCreatedColumnsScript({_, ddlProvider, collection, dbVersion}).flatMap(({scripts}) => scripts.map(({script}) => script))
+            const indexesOnNewlyCreatedColumnsScripts = getNewlyCreatedIndexesScripts({_, ddlProvider, collection, dbVersion}).flatMap(({scripts}) => scripts.map(({script}) => script))
             const script = ddlProvider.createTable(hydratedTable, jsonSchema.isActivated);
             return AlterScriptDto.getInstance([script, ...indexesOnNewlyCreatedColumnsScripts], true, false)
         };
@@ -133,7 +133,7 @@ const getAddColumnsByConditionScriptDtos =  ({app, dbVersion, modelDefinitions, 
             .map(columnDefinition => ddlProvider.addColumn(fullName, columnDefinition))
             .map(addColumnScript => AlterScriptDto.getInstance([addColumnScript], true, false));
 
-        const indexesOnNewlyCreatedColumns = getIndexesBasedOnNewlyCreatedColumnsScript({_, ddlProvider, collection})
+        const indexesOnNewlyCreatedColumns = getNewlyCreatedIndexesScripts({_, ddlProvider, collection})
         return scripts.concat(indexesOnNewlyCreatedColumns).filter(Boolean)
     };
 
@@ -141,15 +141,16 @@ const getAddColumnsByConditionScriptDtos =  ({app, dbVersion, modelDefinitions, 
  * 
  * @return {AlterScriptDto[]}
  * */
-const getIndexesBasedOnNewlyCreatedColumnsScript = ({_, ddlProvider, dbVersion, collection}) => {
+const getNewlyCreatedIndexesScripts = ({_, ddlProvider, dbVersion, collection}) => {
     const newIndexes = collection?.role?.Indxs || []
-    const newPropertiesIds = Object.values(collection?.properties ?? {}).map(({GUID}) => GUID)
+    const properties = {...(collection?.properties), ...(collection?.role?.properties)}
+    const propertiesIds = Object.values(properties).map(({GUID}) => GUID)
 
-    if (newIndexes.length === 0 || newPropertiesIds.length === 0) {
+    if (newIndexes.length === 0 || propertiesIds.length === 0) {
         return []
     }
 
-    const doAnyIndexUseNewlyCreatedColumn = newIndexes.some(({columns}) => columns.find(({keyId}) => newPropertiesIds.includes(keyId)))
+    const doAnyIndexUseNewlyCreatedColumn = newIndexes.some(({columns}) => columns.find(({keyId}) => propertiesIds.includes(keyId)))
 
     if (!doAnyIndexUseNewlyCreatedColumn) {
         return []
