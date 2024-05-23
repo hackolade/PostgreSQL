@@ -7,6 +7,7 @@ const {getRenameColumnScriptDtos} = require("./columnHelpers/renameColumnHelper"
 const {AlterScriptDto} = require("../types/AlterScriptDto");
 const {AlterCollectionDto} = require('../types/AlterCollectionDto');
 const {getModifyPkConstraintsScriptDtos} = require("./entityHelpers/primaryKeyHelper");
+const {getModifyUniqueKeyConstraintsScriptDtos} = require("./entityHelpers/uniqueKeyHelper");
 const {getModifyIndexesScriptDtos, getAddedIndexesScriptDtos, getAdditionalDataForDdlProvider} = require("./entityHelpers/indexesHelper");
 
 
@@ -84,11 +85,13 @@ const getModifyCollectionScriptDtos = ({app, dbVersion}) => (collection) => {
     const modifyCheckConstraintScriptDtos = getModifyCheckConstraintScriptDtos(_, ddlProvider)(collection);
     const modifyCommentScriptDtos = getModifyEntityCommentsScriptDtos(_, ddlProvider)(collection);
     const modifyPKConstraintDtos = getModifyPkConstraintsScriptDtos(_, ddlProvider)(collection);
+    const modifyUniqueKeyConstraintDtos = getModifyUniqueKeyConstraintsScriptDtos(_, ddlProvider)(collection);
     const modifyIndexesScriptDtos = getModifyIndexesScriptDtos({ _, ddlProvider })({ collection, dbVersion });
     return [
         ...modifyCheckConstraintScriptDtos,
         ...modifyCommentScriptDtos,
         ...modifyPKConstraintDtos,
+        ...modifyUniqueKeyConstraintDtos,
         ...modifyIndexesScriptDtos,
     ].filter(Boolean);
 }

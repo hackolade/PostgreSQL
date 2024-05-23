@@ -1216,7 +1216,7 @@ module.exports = (baseProvider, options, app) => {
 		 * @param tableName {string}
 		 * @param constraintName {string}
 		 * */
-		dropPkConstraint(tableName, constraintName) {
+		dropKeyConstraint(tableName, constraintName) {
 			const templatesConfig = {
 				tableName,
 				constraintName,
