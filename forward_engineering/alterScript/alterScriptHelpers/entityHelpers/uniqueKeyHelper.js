@@ -21,7 +21,7 @@ const getDefaultConstraintName = (entityName) => {
 
 /**
  * @param {AlterCollectionColumnKeyOptionDto} optionHolder
- * @return {<Partial<AlterCollectionColumnKeyOptionDto>}
+ * @return {Partial<AlterCollectionColumnKeyOptionDto}
  * */
 const extractOptionsForComparisonWithRegularUniqueKeyOptions = (optionHolder) => {
     return {
@@ -136,8 +136,8 @@ const wasCompositeUniqueKeyChangedInTransitionFromRegularToComposite = (_) => (c
 }
 
 /**
- * @param uniqueKey {AlterCollectionRoleCompModUniqueKeyDto}
- * @param entityName {string}
+ * @param {AlterCollectionRoleCompModUniqueKeyDto} uniqueKey
+ * @param {string} entityName
  * @return {string}
  * */
 const getConstraintNameForCompositeUniqueKey = (uniqueKey, entityName) => {
@@ -316,8 +316,8 @@ const getModifyCompositeUniqueKeyScriptDtos = (_, ddlProvider) => (collection) =
 }
 
 /**
- * @param columnJsonSchema {AlterCollectionColumnDto}
- * @param entityName {string}
+ * @param {AlterCollectionColumnDto} columnJsonSchema
+ * @param {string} entityName
  * @return {string}
  * */
 const getConstraintNameForRegularUniqueKey = (columnJsonSchema, entityName) => {
@@ -630,7 +630,7 @@ const getModifyUniqueKeyScriptDtos = (_, ddlProvider) => (collection) => {
 }
 
 /**
- * @param constraintDtos {KeyScriptModificationDto[]}
+ * @param {KeyScriptModificationDto[]} constraintDtos
  * @return {KeyScriptModificationDto[]}
  * */
 const sortModifyUniqueKeyConstraints = (constraintDtos) => {
