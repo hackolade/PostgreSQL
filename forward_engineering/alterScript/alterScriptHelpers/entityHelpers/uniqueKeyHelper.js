@@ -185,6 +185,9 @@ const getCreateCompositeUniqueKeyDDLProviderConfig = (_) => (
     let storageParameters = '';
     let indexTablespace = '';
     let includeColumns = [];
+    let deferrable = uniqueKey.deferrable;
+    let deferrableConstraintCheckTime = uniqueKey.deferrableConstraintCheckTime;
+
     if (uniqueKey.indexStorageParameters) {
         storageParameters = uniqueKey.indexStorageParameters;
     }
@@ -199,14 +202,17 @@ const getCreateCompositeUniqueKeyDDLProviderConfig = (_) => (
                 isActivated: jsonSchema.isActivated,
             }));
     }
+    const keyType =  'UNIQUE' + (uniqueKey.nullsDistinct ? ' ' + uniqueKey.nullsDistinct : '');
 
     return {
         name: constraintName,
-        keyType: 'UNIQUE',
+        keyType,
         columns: uniqueColumns,
         include: includeColumns,
         storageParameters,
         tablespace: indexTablespace,
+        deferrable,
+        deferrableConstraintCheckTime,
     }
 }
 
@@ -372,6 +378,10 @@ const getCreateRegularUniqueKeyDDLProviderConfig = (_) => (
     let storageParameters = '';
     let indexTablespace = '';
     let includeColumns = [];
+    let deferrable = '';
+    let deferrableConstraintCheckTime = '';
+    let nullsDistinct = '';
+
     const constraintOptions = columnJsonSchema.uniqueKeyOptions;
     if (constraintOptions?.length && constraintOptions?.length > 0) {
         /**
@@ -392,15 +402,23 @@ const getCreateRegularUniqueKeyDDLProviderConfig = (_) => (
                     isActivated: jsonSchema.isActivated,
                 }));
         }
+
+        deferrable = constraintOption.deferrable;
+        deferrableConstraintCheckTime = constraintOption.deferrableConstraintCheckTime;
+        nullsDistinct = constraintOption.nullsDistinct;
     }
+
+    const keyType =  'UNIQUE' + (nullsDistinct ? ' ' + nullsDistinct : '');
 
     return {
         name: constraintName,
-        keyType: 'UNIQUE',
+        keyType,
         columns: uniqueColumns,
         include: includeColumns,
         storageParameters,
         tablespace: indexTablespace,
+        deferrable,
+        deferrableConstraintCheckTime,
     }
 }
 
@@ -413,7 +431,7 @@ const wasFieldChangedToBeARegularUniqueKey = (_) => (columnJsonSchema, collectio
     const oldColumnJsonSchema = collection.role.properties[oldName];
 
     const isRegularUniqueKey = columnJsonSchema.unique && !columnJsonSchema.compositeUniqueKey;
-    const wasTheFieldAnyUniqueKey = Boolean(oldColumnJsonSchema?.unique);
+    const wasTheFieldAnyUniqueKey = oldColumnJsonSchema?.unique || oldColumnJsonSchema.compositeUniqueKey;
 
     return isRegularUniqueKey && !wasTheFieldAnyUniqueKey;
 }
@@ -426,7 +444,7 @@ const wasRegularUniqueKeyChangedInTransitionFromCompositeToRegular = (_) => (col
     const oldColumnJsonSchema = collection.role.properties[oldName];
 
     const isRegularUniqueKey = columnJsonSchema.unique && !columnJsonSchema.compositeUniqueKey;
-    const wasTheFieldAnyUniqueKey = Boolean(oldColumnJsonSchema?.unique);
+    const wasTheFieldAnyUniqueKey = oldColumnJsonSchema?.unique || oldColumnJsonSchema.compositeUniqueKey;
 
     if (!(isRegularUniqueKey && wasTheFieldAnyUniqueKey)) {
         return KeyTransitionDto.noTransition();
