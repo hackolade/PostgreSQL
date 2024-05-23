@@ -32,7 +32,7 @@ class AlterCollectionColumnCompModDto {
 
 }
 
-class AlterCollectionColumnPrimaryKeyOptionDto {
+class AlterCollectionColumnKeyOptionDto {
     /**
      * @type {string}
      * */
@@ -119,7 +119,7 @@ class AlterCollectionColumnDto {
     compositeUniqueKey
 
     /**
-     * @type {Array<AlterCollectionColumnPrimaryKeyOptionDto> | undefined}
+     * @type {Array<AlterCollectionColumnKeyOptionDto> | undefined}
      * */
     primaryKeyOptions
 
@@ -157,7 +157,7 @@ class AlterCollectionRoleDefinitionDto {
     properties
 }
 
-class AlterCollectionRoleCompModPKDto extends AlterCollectionColumnPrimaryKeyOptionDto{
+class AlterCollectionRoleCompModPKDto extends AlterCollectionColumnKeyOptionDto{
 
     /**
      * @type {Array<{
@@ -169,6 +169,18 @@ class AlterCollectionRoleCompModPKDto extends AlterCollectionColumnPrimaryKeyOpt
 
 }
 
+class AlterCollectionRoleCompModUniqueKeyDto extends AlterCollectionColumnKeyOptionDto{
+
+    /**
+     * @type {Array<{
+     *   type: string,
+     *   keyId: string,
+     * }>}
+     * */
+    compositeUniqueKey
+
+}
+
 class AlterCollectionRoleCompModPrimaryKey {
     /**
      * @type {AlterCollectionRoleCompModPKDto[] | undefined}
@@ -176,6 +188,17 @@ class AlterCollectionRoleCompModPrimaryKey {
     new
     /**
      * @type {AlterCollectionRoleCompModPKDto[] | undefined}
+     * */
+    old
+}
+
+class AlterCollectionRoleCompModUniqueKey {
+    /**
+     * @type {AlterCollectionRoleCompModUniqueKeyDto[] | undefined}
+     * */
+    new
+    /**
+     * @type {AlterCollectionRoleCompModUniqueKeyDto[] | undefined}
      * */
     old
 
@@ -429,6 +452,9 @@ module.exports = {
     AlterCollectionDto,
     AlterCollectionRoleDto,
     AlterCollectionColumnDto,
+    AlterCollectionColumnKeyOptionDto,
     AlterCollectionRoleCompModPrimaryKey,
     AlterCollectionRoleCompModPKDto,
+    AlterCollectionRoleCompModUniqueKeyDto,
+    AlterCollectionRoleCompModUniqueKey,
 }
