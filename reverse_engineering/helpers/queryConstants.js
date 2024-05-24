@@ -25,7 +25,7 @@ const getGET_TABLE_INDEXES = postgresVersion => {
                     c.relname AS indexname,
                     m.amname AS index_method,
                     indexes.indisunique AS index_unique,
-                    ${postgresVersion === 15 ? 'indexes.indnullsnotdistinct' : 'FALSE' } AS index_indnullsnotdistinct,
+                    ${postgresVersion === 15 ? 'indexes.indnullsnotdistinct' : 'FALSE'} AS index_indnullsnotdistinct,
                     indexes.ord,
                     attribute.attname,
                      c.reloptions,
@@ -154,7 +154,7 @@ const queryConstants = {
 	GET_DESCRIPTION_BY_OID: `SELECT obj_description($1)`,
 	GET_ROWS_COUNT: fullTableName => `SELECT COUNT(*) AS quantity FROM ${fullTableName};`,
 	GET_SAMPLED_DATA: (fullTableName, jsonColumns) => `SELECT ${jsonColumns} FROM ${fullTableName} LIMIT $1;`,
-        GET_SAMPLED_DATA_SIZE: (fullTableName, jsonColumns) => `
+	GET_SAMPLED_DATA_SIZE: (fullTableName, jsonColumns) => `
         SELECT sum(pg_column_size(_hackolade_tmp_sampling_tbl.*)) AS _hackolade_tmp_sampling_tbl_size 
         FROM (SELECT ${jsonColumns} FROM ${fullTableName} LIMIT $1) AS _hackolade_tmp_sampling_tbl;`,
 	GET_INHERITS_PARENT_TABLE_NAME: `
@@ -179,7 +179,7 @@ const queryConstants = {
 	        WHERE pcon.conrelid = $1;`,
 	GET_TABLE_INDEXES: getGET_TABLE_INDEXES(),
 	GET_TABLE_INDEXES_V_10: getGET_TABLE_INDEXES(10),
-        GET_TABLE_INDEXES_V_15: getGET_TABLE_INDEXES(15),
+	GET_TABLE_INDEXES_V_15: getGET_TABLE_INDEXES(15),
 	GET_TABLE_FOREIGN_KEYS: `
         SELECT pcon.conname AS relationship_name, 
                 pcon.conkey AS table_columns_positions,
@@ -394,7 +394,7 @@ const queryConstants = {
         LEFT JOIN pg_class AS inher_child ON (inher_child.oid = pg_inherits.inhrelid)
         LEFT JOIN pg_class AS inher_parent ON (inher_parent.oid = pg_inherits.inhparent)
         WHERE inher_parent.relnamespace = $1;`,
-        GET_SEQUENCES: `
+	GET_SEQUENCES: `
         SELECT DISTINCT ON (sequence_name)
                 information_schema."sequences".sequence_name,
                 information_schema."sequences".data_type,

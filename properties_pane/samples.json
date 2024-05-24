@@ -23,7 +23,7 @@
 			]
 		}
 	},
-    {
+	{
 		"validateAs": "string",
 		"dependency": {
 			"type": "and",

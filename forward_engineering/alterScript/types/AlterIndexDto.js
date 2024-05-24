@@ -1,101 +1,96 @@
 class AlterIndexColumnDto {
+	/**
+	 * @type {any | undefined}
+	 */
+	sortOrder;
 
-    /**
-     * @type {any | undefined}
-     */
-    sortOrder
+	/**
+	 * @type {any | undefined}
+	 */
+	nullsOrder;
 
-    /**
-     * @type {any | undefined}
-     */
-    nullsOrder
+	/**
+	 * @type {boolean}
+	 */
+	isActivated;
 
-    /**
-     * @type {boolean}
-     */
-    isActivated
+	/**
+	 * @type {any | undefined}
+	 */
+	keyId;
 
-    /**
-     * @type {any | undefined}
-     */
-    keyId
+	/**
+	 * @type {string | undefined}
+	 */
+	collation;
 
-    /**
-     * @type {string | undefined}
-     */
-    collation
-
-    /**
-     * @type {string | undefined}
-     */
-    opclass
+	/**
+	 * @type {string | undefined}
+	 */
+	opclass;
 }
 
 class AlterIndexIncludeColumnDto {
-
-    /**
-     * @type {string}
-     * */
-    keyId
-
+	/**
+	 * @type {string}
+	 * */
+	keyId;
 }
 
 class AlterIndexDto {
+	/**
+	 * @type {string}
+	 */
+	id;
 
-    /**
-     * @type {string}
-     */
-    id
+	/**
+	 * @type {boolean}
+	 */
+	isActivated;
 
-    /**
-     * @type {boolean}
-     */
-    isActivated
+	/**
+	 * @type {string}
+	 */
+	index_method;
 
-    /**
-     * @type {string}
-     */
-    index_method
+	/**
+	 * @type {boolean}
+	 */
+	ifNotExist;
 
-    /**
-     * @type {boolean}
-     */
-    ifNotExist
+	/**
+	 * @type {boolean}
+	 */
+	only;
 
-    /**
-     * @type {boolean}
-     */
-    only
+	/**
+	 * @type {string}
+	 */
+	index_tablespace_name;
 
-    /**
-     * @type {string}
-     */
-    index_tablespace_name
+	/**
+	 * @type {string}
+	 */
+	indxName;
 
-    /**
-     * @type {string}
-     */
-    indxName
+	/**
+	 * @type {Array<AlterIndexColumnDto> | undefined}
+	 * */
+	columns;
 
-    /**
-     * @type {Array<AlterIndexColumnDto> | undefined}
-     * */
-    columns
+	/**
+	 * @type {Array<AlterIndexIncludeColumnDto> | undefined}
+	 * */
+	include;
 
-    /**
-     * @type {Array<AlterIndexIncludeColumnDto> | undefined}
-     * */
-    include
-
-    /**
-     * @type {Object}
-     * */
-    index_storage_parameter
-
+	/**
+	 * @type {Object}
+	 * */
+	index_storage_parameter;
 }
 
 module.exports = {
-    AlterIndexDto,
-    AlterIndexColumnDto,
-    AlterIndexIncludeColumnDto,
-}
+	AlterIndexDto,
+	AlterIndexColumnDto,
+	AlterIndexIncludeColumnDto,
+};

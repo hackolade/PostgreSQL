@@ -18,13 +18,16 @@ module.exports = {
 
 	generatedColumnClause: ' GENERATED ALWAYS AS (${generationExpression}) STORED',
 
-	columnDefinition: '${name} ${type}${collation}${generatedColumnClause}${primaryKey}${uniqueKey}${defaultValue}${notNull}',
+	columnDefinition:
+		'${name} ${type}${collation}${generatedColumnClause}${primaryKey}${uniqueKey}${defaultValue}${notNull}',
 
 	checkConstraint: '${name} CHECK (${expression})${noInherit}',
 
-	createForeignKeyConstraint: '${name} FOREIGN KEY (${foreignKey}) REFERENCES ${primaryTable} (${primaryKey})${match}${onDelete}${onUpdate}${deferrable}${deferrableConstraintCheckTime}',
+	createForeignKeyConstraint:
+		'${name} FOREIGN KEY (${foreignKey}) REFERENCES ${primaryTable} (${primaryKey})${match}${onDelete}${onUpdate}${deferrable}${deferrableConstraintCheckTime}',
 
-	createKeyConstraint: '${constraintName}${keyType}${columns}${includeNonKey}${storageParameters}${tablespace}${deferrable}${deferrableConstraintCheckTime}',
+	createKeyConstraint:
+		'${constraintName}${keyType}${columns}${includeNonKey}${storageParameters}${tablespace}${deferrable}${deferrableConstraintCheckTime}',
 
 	alterColumnType: 'ALTER TABLE IF EXISTS ${tableName} ALTER COLUMN ${columnName} SET DATA TYPE ${dataType};',
 
@@ -61,7 +64,8 @@ module.exports = {
 
 	alterTypeRenameAttribute: 'ALTER TYPE ${udtName} RENAME ATTRIBUTE ${oldAttributeName} TO ${newAttributeName};',
 
-	alterTypeChangeAttributeType: 'ALTER TYPE ${udtName} ALTER ATTRIBUTE ${attributeName} SET DATA TYPE ${newDataType};',
+	alterTypeChangeAttributeType:
+		'ALTER TYPE ${udtName} ALTER ATTRIBUTE ${attributeName} SET DATA TYPE ${newDataType};',
 
 	updateCommentOnTable: 'COMMENT ON TABLE ${tableName} IS ${comment};',
 
@@ -121,22 +125,13 @@ module.exports = {
 		'${options}' +
 		'\tEXECUTE ${functionKey} ${functionName};\n',
 
-	createSequence:
-		'CREATE${sequenceType} SEQUENCE${ifNotExists} ${name}' +
-		'${options}' +
-		';\n',
+	createSequence: 'CREATE${sequenceType} SEQUENCE${ifNotExists} ${name}' + '${options}' + ';\n',
 
-	dropSequence:
-	'DROP SEQUENCE IF EXISTS ${name};\n',
+	dropSequence: 'DROP SEQUENCE IF EXISTS ${name};\n',
 
-	renameSequence:
-	'ALTER SEQUENCE IF EXISTS ${name} RENAME TO ${newName};\n',
+	renameSequence: 'ALTER SEQUENCE IF EXISTS ${name} RENAME TO ${newName};\n',
 
-	setSequenceType:
-	'ALTER SEQUENCE IF EXISTS ${name} SET ${sequenceType};\n',
+	setSequenceType: 'ALTER SEQUENCE IF EXISTS ${name} SET ${sequenceType};\n',
 
-	alterSequence: 
-	'ALTER SEQUENCE IF EXISTS ${name}' +
-	'${options}' +
-	';\n',
+	alterSequence: 'ALTER SEQUENCE IF EXISTS ${name}' + '${options}' + ';\n',
 };

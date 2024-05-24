@@ -51,7 +51,7 @@ const prepareForeignKeys = (tableForeignKeys, tableName, schemaName, columns) =>
 				relationshipOnDelete: prepareDeleteAndUpdate(foreignKeyData.relationship_on_delete),
 				relationshipOnUpdate: prepareDeleteAndUpdate(foreignKeyData.relationship_on_update),
 				relationshipMatch: prepareMatch(foreignKeyData.relationship_match),
-			}
+			},
 		};
 	});
 };

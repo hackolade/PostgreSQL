@@ -23,7 +23,7 @@ module.exports = ({
 						object: 'FUNCTION',
 						objectName: getNamePrefixedWithSchemaName(udf.name, schemaName),
 						comment: wrapComment(udf.functionDescription),
-				  })
+					})
 				: '';
 
 			return [createFunctionStatement, commentOnFunction].filter(Boolean).join('\n');
@@ -99,7 +99,7 @@ module.exports = ({
 		}
 	};
 
-	const isFunctionReturnsTable = (udf) => {
+	const isFunctionReturnsTable = udf => {
 		const returnType = (udf.functionReturnType || '').trim().toUpperCase();
 		return returnType.startsWith('TABLE');
 	};

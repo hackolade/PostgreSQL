@@ -57,7 +57,7 @@ module.exports = ({
 		}
 	};
 
-	const isNotPlainType = (definitionJsonSchema) => {
+	const isNotPlainType = definitionJsonSchema => {
 		return notPlainTypes.includes(definitionJsonSchema.type);
 	};
 

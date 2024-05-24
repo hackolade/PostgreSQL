@@ -1,7 +1,6 @@
 {
     "name": "PostgreSQL",
-    "version": "0.1.61",
-    "versionDate": "2024-04-26",
+    "version": "0.2.0",
     "author": "hackolade",
     "engines": {
         "hackolade": "6.1.2",
@@ -31,8 +30,8 @@
             "enableJsonType": true,
             "useJsonTypesWithComplexTypes": true,
             "reverseSchemaIntoOneColumn": true,
-			"disableDenormalization": true,
-			"enableComplexTypesNormalization": true,
+            "disableDenormalization": true,
+            "enableComplexTypesNormalization": true,
             "views": {
                 "enabled": true,
                 "viewLevel": "model",
@@ -48,5 +47,37 @@
     },
     "description": "Hackolade plugin for PostgreSQL",
     "icon_url": "logo.jpg",
-    "disabled": false
+    "disabled": false,
+    "lint-staged": {
+        "*.{js,json}": "prettier --write"
+    },
+    "simple-git-hooks": {
+        "pre-commit": "npx lint-staged",
+        "pre-push": "npx eslint ."
+    },
+    "scripts": {
+        "lint": "eslint . --max-warnings=0",
+        "package": "node esbuild.package.js"
+    },
+    "devDependencies": {
+        "@hackolade/hck-esbuild-plugins-pack": "0.0.1",
+        "esbuild": "0.21.3",
+        "esbuild-plugin-clean": "1.0.1",
+        "eslint": "9.3.0",
+        "eslint-config-prettier": "9.1.0",
+        "eslint-plugin-prettier": "5.1.3",
+        "lint-staged": "14.0.1",
+        "prettier": "3.2.5",
+        "simple-git-hooks": "2.11.1"
+    },
+    "dependencies": {
+        "pg": "^8.7.1",
+        "tunnel-ssh": "^4.1.6"
+    },
+    "overrides": {
+        "tunnel-ssh":{
+            "cpu-features": "npm:-@0.0.1",
+            "ssh2": "npm:-@0.0.1"
+        }
+    }
 }

@@ -5,15 +5,8 @@
 	},
 	"defaultDdlType": "postgres",
 	"scenario": "getDatabases",
-	"excludeDocKind": [
-		"id"
-	],
-	"connectionList": [
-		"name",
-		"host",
-		"port",
-		"userName"
-	],
+	"excludeDocKind": ["id"],
+	"connectionList": ["name", "host", "port", "userName"],
 	"helpUrl": "https://hackolade.com/help/ConnecttoaPostgreSQLinstance.html",
 	"options": [
 		{

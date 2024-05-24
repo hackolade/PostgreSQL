@@ -7,9 +7,9 @@
  * the agreement/contract under which the software has been supplied.
  */
 
-const {AlterCollectionDto, AlterCollectionRoleDto} = require('../alterScript/types/AlterCollectionDto');
+const { AlterCollectionDto, AlterCollectionRoleDto } = require('../alterScript/types/AlterCollectionDto');
 
-const {ReservedWordsAsArray} = require("../enums/reservedWords");
+const { ReservedWordsAsArray } = require('../enums/reservedWords');
 const MUST_BE_ESCAPED = /\t|\n|'|\f|\r/gm;
 
 module.exports = _ => {
@@ -46,19 +46,19 @@ module.exports = _ => {
 	 * @param collection {AlterCollectionDto}
 	 * @return {AlterCollectionDto & AlterCollectionRoleDto}
 	 * */
-	const getSchemaOfAlterCollection = (collection) => {
-		return {...collection, ...(_.omit(collection?.role, 'properties') || {})};
-	}
+	const getSchemaOfAlterCollection = collection => {
+		return { ...collection, ...(_.omit(collection?.role, 'properties') || {}) };
+	};
 
 	/**
 	 * @param collectionSchema {AlterCollectionDto & AlterCollectionRoleDto}
 	 * @return {string}
 	 * */
-	const getFullCollectionName = (collectionSchema) => {
+	const getFullCollectionName = collectionSchema => {
 		const collectionName = getEntityName(collectionSchema);
 		const bucketName = collectionSchema.compMod?.keyspaceName;
 		return getNamePrefixedWithSchemaName(collectionName, bucketName);
-	}
+	};
 
 	const clean = obj =>
 		Object.entries(obj)
@@ -122,38 +122,38 @@ module.exports = _ => {
 		return propertiesToCheck.some(prop => compMod?.oldField[prop] !== compMod?.newField[prop]);
 	};
 
-	const getFullTableName = (collection) => {
-		const collectionSchema = {...collection, ...(_.omit(collection?.role, 'properties') || {})};
+	const getFullTableName = collection => {
+		const collectionSchema = { ...collection, ...(_.omit(collection?.role, 'properties') || {}) };
 		const tableName = getEntityName(collectionSchema);
-		const schemaName = getSchemaNameFromCollection({collection: collectionSchema});
+		const schemaName = getSchemaNameFromCollection({ collection: collectionSchema });
 		return getNamePrefixedWithSchemaName(tableName, schemaName);
-	}
+	};
 
-	const getSchemaNameFromCollection = ({collection}) => {
+	const getSchemaNameFromCollection = ({ collection }) => {
 		return collection.compMod?.keyspaceName;
-	}
+	};
 
 	const getFullColumnName = (collection, columnName) => {
-		const {wrapInQuotes} = require('../utils/general')(_);
+		const { wrapInQuotes } = require('../utils/general')(_);
 
 		const fullTableName = getFullTableName(collection);
 		return `${fullTableName}.${wrapInQuotes(columnName)}`;
-	}
+	};
 
-	const getFullViewName = (view) => {
-		const viewSchema = {...view, ...(_.omit(view?.role, 'properties') || {})};
+	const getFullViewName = view => {
+		const viewSchema = { ...view, ...(_.omit(view?.role, 'properties') || {}) };
 		const viewName = getViewName(viewSchema);
 		const schemaName = viewSchema.compMod?.keyspaceName;
 		return getNamePrefixedWithSchemaName(viewName, schemaName);
-	}
+	};
 
 	/**
 	 * @param udt {Object}
 	 * @return {string}
 	 * */
-	const getUdtName = (udt) => {
+	const getUdtName = udt => {
 		return udt.code || udt.name;
-	}
+	};
 
 	const getDbVersion = (dbVersion = '') => {
 		const version = dbVersion.match(/\d+/);
@@ -161,8 +161,7 @@ module.exports = _ => {
 		return Number(_.get(version, [0], 0));
 	};
 
-	const prepareComment = (comment = '') =>
-		comment.replace(MUST_BE_ESCAPED, character => `\\${character}`);
+	const prepareComment = (comment = '') => comment.replace(MUST_BE_ESCAPED, character => `\\${character}`);
 
 	const wrapComment = comment => `E'${prepareComment(JSON.stringify(comment)).slice(1, -1)}'`;
 
@@ -191,9 +190,9 @@ module.exports = _ => {
 		const dividedColumns = divideIntoActivatedAndDeactivated(columns, mapColumn);
 		const deactivatedColumnsAsString = dividedColumns?.deactivatedItems?.length
 			? commentIfDeactivated(dividedColumns.deactivatedItems.join(', '), {
-				isActivated: false,
-				isPartOfLine: true,
-			})
+					isActivated: false,
+					isPartOfLine: true,
+				})
 			: '';
 
 		return !isAllColumnsDeactivated && isParentActivated
@@ -247,27 +246,27 @@ module.exports = _ => {
 	};
 
 	const getGroupItemsByCompMode = ({ newItems = [], oldItems = [] }) => {
-    const addedItems = newItems.filter(newItem => !oldItems.some(item => item.id === newItem.id));
-    const removedItems = [];
-    const modifiedItems = [];
+		const addedItems = newItems.filter(newItem => !oldItems.some(item => item.id === newItem.id));
+		const removedItems = [];
+		const modifiedItems = [];
 
-    oldItems.forEach(oldItem => {
-        const newItem = newItems.find(item => item.id === oldItem.id);
-        if (!newItem) {
-            removedItems.push(oldItem);
-        } else {
-            if (!_.isEqual(newItem, oldItem)) {
-                modifiedItems.push(newItem);
-            }
-        }
-    });
+		oldItems.forEach(oldItem => {
+			const newItem = newItems.find(item => item.id === oldItem.id);
+			if (!newItem) {
+				removedItems.push(oldItem);
+			} else {
+				if (!_.isEqual(newItem, oldItem)) {
+					modifiedItems.push(newItem);
+				}
+			}
+		});
 
-    return {
-        added: addedItems,
-        removed: removedItems,
-        modified: modifiedItems,
-    };
-};
+		return {
+			added: addedItems,
+			removed: removedItems,
+			modified: modifiedItems,
+		};
+	};
 
 	return {
 		getDbName,

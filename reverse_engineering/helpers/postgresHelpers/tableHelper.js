@@ -198,7 +198,7 @@ const getUniqueKeyConstraint = (constraint, tableColumns, tableIndexes) => {
 		indexStorageParameters: _.join(constraint.storage_parameters, ','),
 		indexTablespace: constraint.tablespace,
 		indexComment: constraint.description,
-		...(nullsDistinct && { nullsDistinct })
+		...(nullsDistinct && { nullsDistinct }),
 	};
 };
 

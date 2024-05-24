@@ -1,13 +1,13 @@
-const {getModifySchemaCommentsScriptDtos} = require("./containerHelpers/commentsHelper");
-const {AlterScriptDto} = require("../types/AlterScriptDto");
+const { getModifySchemaCommentsScriptDtos } = require('./containerHelpers/commentsHelper');
+const { AlterScriptDto } = require('../types/AlterScriptDto');
 
 /**
  * @return {(containerName: string) => AlterScriptDto | undefined}
  * */
-const getAddContainerScriptDto = (app) => (containerName) => {
+const getAddContainerScriptDto = app => containerName => {
 	const _ = app.require('lodash');
 	const ddlProvider = require('../../ddlProvider/ddlProvider')(null, null, app);
-	const {wrapInQuotes} = require('../../utils/general')(_);
+	const { wrapInQuotes } = require('../../utils/general')(_);
 	const script = ddlProvider.createSchemaOnly(wrapInQuotes(containerName));
 	return AlterScriptDto.getInstance([script], true, false);
 };
@@ -15,10 +15,10 @@ const getAddContainerScriptDto = (app) => (containerName) => {
 /**
  * @return {(containerName: string) => AlterScriptDto | undefined}
  * */
-const getDeleteContainerScriptDto = (app) => (containerName) => {
+const getDeleteContainerScriptDto = app => containerName => {
 	const _ = app.require('lodash');
 	const ddlProvider = require('../../ddlProvider/ddlProvider')(null, null, app);
-	const {wrapInQuotes} = require('../../utils/general')(_);
+	const { wrapInQuotes } = require('../../utils/general')(_);
 
 	const script = ddlProvider.dropSchema(wrapInQuotes(containerName));
 	return AlterScriptDto.getInstance([script], true, true);
@@ -27,19 +27,17 @@ const getDeleteContainerScriptDto = (app) => (containerName) => {
 /**
  * @return {(container: Object) => Array<AlterScriptDto>}
  * */
-const getModifyContainerScriptDtos = (app) => (container) => {
+const getModifyContainerScriptDtos = app => container => {
 	const _ = app.require('lodash');
 	const ddlProvider = require('../../ddlProvider/ddlProvider')(null, null, app);
 
 	const modifyCommentScriptDtos = getModifySchemaCommentsScriptDtos(_, ddlProvider)(container);
 
-	return [
-		...modifyCommentScriptDtos
-	];
-}
+	return [...modifyCommentScriptDtos];
+};
 
 module.exports = {
 	getAddContainerScriptDto,
 	getDeleteContainerScriptDto,
-	getModifyContainerScriptDtos
+	getModifyContainerScriptDtos,
 };

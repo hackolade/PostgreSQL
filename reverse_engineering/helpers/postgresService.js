@@ -224,9 +224,7 @@ module.exports = {
 			return mapProcedureData(functionData, functionArgs, additionalData);
 		});
 
-		const sequencesData = await db.queryTolerant(queryConstants.GET_SEQUENCES, [
-			schemaName,
-		]);
+		const sequencesData = await db.queryTolerant(queryConstants.GET_SEQUENCES, [schemaName]);
 		const sequences = sequencesData.map(sequence => mapSequenceData({ sequence }));
 
 		return { functions: userDefinedFunctions, procedures: userDefinedProcedures, sequences };
