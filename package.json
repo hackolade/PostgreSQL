@@ -1,6 +1,6 @@
 {
     "name": "PostgreSQL",
-    "version": "0.2.0",
+    "version": "0.2.1",
     "author": "hackolade",
     "engines": {
         "hackolade": "6.1.2",
@@ -75,7 +75,7 @@
         "tunnel-ssh": "^4.1.6"
     },
     "overrides": {
-        "tunnel-ssh":{
+        "tunnel-ssh": {
             "cpu-features": "npm:-@0.0.1",
             "ssh2": "npm:-@0.0.1"
         }
