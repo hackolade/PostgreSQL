@@ -69,5 +69,12 @@
         "lint-staged": "14.0.1",
         "prettier": "3.2.5",
         "simple-git-hooks": "2.11.1"
+    },
+    "dependencies": {
+        "pg": "^8.7.1",
+        "tunnel-ssh": "^4.1.6"
+    },
+    "optionalDependencies": {
+        "cpu-features": "^0.0.4"
     }
 }
