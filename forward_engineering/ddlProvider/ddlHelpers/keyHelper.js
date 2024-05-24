@@ -190,5 +190,6 @@ module.exports = (_, clean) => {
 		getKeys,
 		hydratePrimaryKeyOptions,
 		hydrateUniqueOptions,
+		getUniqueKeyType,
 	};
 };
