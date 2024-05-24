@@ -95,7 +95,10 @@ const getModifyCollectionScriptDtos =
 		const modifyCheckConstraintScriptDtos = getModifyCheckConstraintScriptDtos(_, ddlProvider)(collection);
 		const modifyCommentScriptDtos = getModifyEntityCommentsScriptDtos(_, ddlProvider)(collection);
 		const modifyPKConstraintDtos = getModifyPkConstraintsScriptDtos(_, ddlProvider)(collection);
-		const modifyUniqueKeyConstraintDtos = getModifyUniqueKeyConstraintsScriptDtos(_, ddlProvider)(collection);
+		const modifyUniqueKeyConstraintDtos = getModifyUniqueKeyConstraintsScriptDtos({ _, ddlProvider })({
+			collection,
+			dbVersion,
+		});
 		const modifyIndexesScriptDtos = getModifyIndexesScriptDtos({ _, ddlProvider })({ collection, dbVersion });
 		return [
 			...modifyCheckConstraintScriptDtos,
