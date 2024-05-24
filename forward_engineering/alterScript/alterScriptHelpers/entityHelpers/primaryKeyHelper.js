@@ -285,7 +285,7 @@ const getDropCompositePkScriptDtos = (_, ddlProvider) => collection => {
 				constraintName = oldPk.constraintName;
 			}
 			const ddlConstraintName = wrapInQuotes(constraintName);
-			const script = ddlProvider.dropPkConstraint(fullTableName, ddlConstraintName);
+			const script = ddlProvider.dropKeyConstraint(fullTableName, ddlConstraintName);
 			return new KeyScriptModificationDto(script, fullTableName, true, collection.isActivated);
 		})
 		.filter(scriptDto => Boolean(scriptDto.script));
@@ -598,7 +598,7 @@ const getDropPkScriptDto = (_, ddlProvider) => collection => {
 			const oldJsonSchema = collection.role.properties[oldName];
 			const ddlConstraintName = wrapInQuotes(getConstraintNameForRegularPk(oldJsonSchema, entityName));
 
-			const script = ddlProvider.dropPkConstraint(fullTableName, ddlConstraintName);
+			const script = ddlProvider.dropKeyConstraint(fullTableName, ddlConstraintName);
 			return new KeyScriptModificationDto(script, fullTableName, true, collection.isActivated);
 		})
 		.filter(scriptDto => Boolean(scriptDto.script));
