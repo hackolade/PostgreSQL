@@ -74,7 +74,10 @@
         "pg": "^8.7.1",
         "tunnel-ssh": "^4.1.6"
     },
-    "optionalDependencies": {
-        "cpu-features": "^0.0.4"
+    "overrides": {
+        "tunnel-ssh":{
+            "cpu-features": "npm:-@0.0.1",
+            "ssh2": "npm:-@0.0.1"
+        }
     }
 }
