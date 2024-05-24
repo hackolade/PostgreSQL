@@ -1,8 +1,7 @@
 const defaultTypes = require('../configs/defaultTypes');
 const descriptors = require('../configs/descriptors');
 const templates = require('./templates');
-const { Sequence } =require('../types/schemaSequenceTypes');
-
+const { Sequence } = require('../types/schemaSequenceTypes');
 
 module.exports = (baseProvider, options, app) => {
 	const _ = app.require('lodash');
@@ -57,13 +56,14 @@ module.exports = (baseProvider, options, app) => {
 		getNamePrefixedWithSchemaName,
 	});
 
-	const { getSequencesScript, createSequenceScript, dropSequenceScript, alterSequenceScript } = require('./ddlHelpers/sequenceHelper')({
-		_,
-		templates,
-		assignTemplates,
-		getNamePrefixedWithSchemaName,
-		wrapInQuotes,
-	});
+	const { getSequencesScript, createSequenceScript, dropSequenceScript, alterSequenceScript } =
+		require('./ddlHelpers/sequenceHelper')({
+			_,
+			templates,
+			assignTemplates,
+			getNamePrefixedWithSchemaName,
+			wrapInQuotes,
+		});
 
 	const { getTableTemporaryValue, getTableOptions } = require('./ddlHelpers/tableHelper')({
 		_,
@@ -268,11 +268,14 @@ module.exports = (baseProvider, options, app) => {
 			const defaultValue = !_.isUndefined(columnDefinition.default)
 				? ' DEFAULT ' + decorateDefault(type, columnDefinition.default, isArrayType)
 				: '';
-			const generatedColumnClause = columnDefinition.dbVersion >= 12 && columnDefinition.generatedColumn && columnDefinition.columnGenerationExpression
-				? assignTemplates(templates.generatedColumnClause, {
-					generationExpression: columnDefinition.columnGenerationExpression,
-				})
-				: '';
+			const generatedColumnClause =
+				columnDefinition.dbVersion >= 12 &&
+				columnDefinition.generatedColumn &&
+				columnDefinition.columnGenerationExpression
+					? assignTemplates(templates.generatedColumnClause, {
+							generationExpression: columnDefinition.columnGenerationExpression,
+						})
+					: '';
 
 			return commentIfDeactivated(
 				assignTemplates(templates.columnDefinition, {
@@ -409,7 +412,7 @@ module.exports = (baseProvider, options, app) => {
 				foreignSchemaName,
 				primarySchemaName,
 				customProperties,
-				isActivated
+				isActivated,
 			},
 			dbData,
 			schemaData,
@@ -434,8 +437,10 @@ module.exports = (baseProvider, options, app) => {
 				onUpdate: foreignOnUpdate ? ` ON UPDATE ${foreignOnUpdate}` : '',
 				match: foreignMatch ? ` MATCH ${foreignMatch}` : '',
 				deferrable: deferrable ? ` ${deferrable}` : '',
-				deferrableConstraintCheckTime: deferrable === 'DEFERRABLE' && deferrableConstraintCheckTime
-					? ` ${deferrableConstraintCheckTime}` : '',
+				deferrableConstraintCheckTime:
+					deferrable === 'DEFERRABLE' && deferrableConstraintCheckTime
+						? ` ${deferrableConstraintCheckTime}`
+						: '',
 			});
 
 			return {
@@ -487,7 +492,7 @@ module.exports = (baseProvider, options, app) => {
 				foreignSchemaName,
 				primarySchemaName,
 				customProperties,
-				isActivated
+				isActivated,
 			},
 			dbData,
 			schemaData,
@@ -513,8 +518,10 @@ module.exports = (baseProvider, options, app) => {
 				onUpdate: foreignOnUpdate ? ` ON UPDATE ${foreignOnUpdate}` : '',
 				match: foreignMatch ? ` MATCH ${foreignMatch}` : '',
 				deferrable: deferrable ? ` ${deferrable}` : '',
-				deferrableConstraintCheckTime: deferrable === 'DEFERRABLE' && deferrableConstraintCheckTime
-					? ` ${deferrableConstraintCheckTime}` : '',
+				deferrableConstraintCheckTime:
+					deferrable === 'DEFERRABLE' && deferrableConstraintCheckTime
+						? ` ${deferrableConstraintCheckTime}`
+						: '',
 			});
 
 			return {
@@ -543,7 +550,7 @@ module.exports = (baseProvider, options, app) => {
 					? commentIfDeactivated(dividedColumns.deactivatedItems.join(',\n\t\t'), {
 							isActivated: false,
 							isPartOfLine: true,
-					  })
+						})
 					: '';
 				columnsAsString = dividedColumns.activatedItems.join(',\n\t\t') + deactivatedColumnsString;
 			}
@@ -553,7 +560,7 @@ module.exports = (baseProvider, options, app) => {
 				: assignTemplates(templates.viewSelectStatement, {
 						tableName: tables.join(', '),
 						keys: columnsAsString,
-				  });
+					});
 
 			const check_option = viewData.viewOptions?.check_option
 				? `check_option=${viewData.viewOptions?.check_option}`
@@ -610,7 +617,7 @@ module.exports = (baseProvider, options, app) => {
 		dropView(viewName) {
 			const templatesConfig = {
 				viewName,
-			}
+			};
 			return assignTemplates(templates.dropView, templatesConfig);
 		},
 
@@ -660,7 +667,7 @@ module.exports = (baseProvider, options, app) => {
 			const timezone = _.includes(timeTypes, columnDefinition.type) ? jsonSchema.timezone : '';
 			const intervalOptions = columnDefinition.type === 'interval' ? jsonSchema.intervalOptions : '';
 			const { getDbVersion } = require('../utils/general')(_);
-			const dbVersion = getDbVersion(schemaData.dbVersion)
+			const dbVersion = getDbVersion(schemaData.dbVersion);
 			const primaryKeyOptions = _.omit(
 				keyHelper.hydratePrimaryKeyOptions(
 					_.first(jsonSchema.primaryKeyOptions) || {},
@@ -860,7 +867,7 @@ module.exports = (baseProvider, options, app) => {
 				tableName,
 				columnName,
 				dataType: dataTypeString,
-			})
+			});
 		},
 
 		/**
@@ -871,7 +878,7 @@ module.exports = (baseProvider, options, app) => {
 		setNotNullConstraint(tableName, columnName) {
 			return assignTemplates(templates.addNotNullConstraint, {
 				tableName,
-				columnName
+				columnName,
 			});
 		},
 
@@ -883,7 +890,7 @@ module.exports = (baseProvider, options, app) => {
 		dropNotNullConstraint(tableName, columnName) {
 			return assignTemplates(templates.dropNotNullConstraint, {
 				tableName,
-				columnName
+				columnName,
 			});
 		},
 
@@ -897,7 +904,7 @@ module.exports = (baseProvider, options, app) => {
 			return assignTemplates(templates.renameColumn, {
 				tableName,
 				oldColumnName,
-				newColumnName
+				newColumnName,
 			});
 		},
 
@@ -911,7 +918,7 @@ module.exports = (baseProvider, options, app) => {
 			const templateConfig = {
 				tableName,
 				constraintName,
-				expression
+				expression,
 			};
 			return assignTemplates(templates.addCheckConstraint, templateConfig);
 		},
@@ -937,8 +944,8 @@ module.exports = (baseProvider, options, app) => {
 		updateTableComment(tableName, comment) {
 			const templateConfig = {
 				tableName,
-				comment
-			}
+				comment,
+			};
 			return assignTemplates(templates.updateCommentOnTable, templateConfig);
 		},
 
@@ -949,8 +956,8 @@ module.exports = (baseProvider, options, app) => {
 		dropTableComment(tableName) {
 			const templateConfig = {
 				tableName,
-				comment: 'NULL'
-			}
+				comment: 'NULL',
+			};
 			return assignTemplates(templates.updateCommentOnTable, templateConfig);
 		},
 
@@ -962,8 +969,8 @@ module.exports = (baseProvider, options, app) => {
 		updateColumnComment(columnName, comment) {
 			const templateConfig = {
 				columnName,
-				comment
-			}
+				comment,
+			};
 			return assignTemplates(templates.updateCommentOnColumn, templateConfig);
 		},
 
@@ -974,8 +981,8 @@ module.exports = (baseProvider, options, app) => {
 		dropColumnComment(columnName) {
 			const templateConfig = {
 				columnName,
-				comment: 'NULL'
-			}
+				comment: 'NULL',
+			};
 			return assignTemplates(templates.updateCommentOnColumn, templateConfig);
 		},
 
@@ -987,8 +994,8 @@ module.exports = (baseProvider, options, app) => {
 		updateSchemaComment(schemaName, comment) {
 			const templateConfig = {
 				schemaName,
-				comment
-			}
+				comment,
+			};
 			return assignTemplates(templates.updateCommentOnSchema, templateConfig);
 		},
 
@@ -999,8 +1006,8 @@ module.exports = (baseProvider, options, app) => {
 		dropSchemaComment(schemaName) {
 			const templateConfig = {
 				schemaName,
-				comment: 'NULL'
-			}
+				comment: 'NULL',
+			};
 			return assignTemplates(templates.updateCommentOnSchema, templateConfig);
 		},
 
@@ -1012,8 +1019,8 @@ module.exports = (baseProvider, options, app) => {
 		updateViewComment(viewName, comment) {
 			const templateConfig = {
 				viewName,
-				comment
-			}
+				comment,
+			};
 			return assignTemplates(templates.updateCommentOnView, templateConfig);
 		},
 
@@ -1024,8 +1031,8 @@ module.exports = (baseProvider, options, app) => {
 		dropViewComment(viewName) {
 			const templateConfig = {
 				viewName,
-				comment: 'NULL'
-			}
+				comment: 'NULL',
+			};
 			return assignTemplates(templates.updateCommentOnView, templateConfig);
 		},
 
@@ -1036,7 +1043,7 @@ module.exports = (baseProvider, options, app) => {
 		createSchemaOnly(schemaName) {
 			const templateConfig = {
 				schemaName,
-			}
+			};
 			return assignTemplates(templates.createSchemaOnly, templateConfig);
 		},
 
@@ -1047,7 +1054,7 @@ module.exports = (baseProvider, options, app) => {
 		dropSchema(schemaName) {
 			const templateConfig = {
 				schemaName,
-			}
+			};
 			return assignTemplates(templates.dropSchema, templateConfig);
 		},
 
@@ -1058,7 +1065,7 @@ module.exports = (baseProvider, options, app) => {
 		dropTable(tableName) {
 			const templateConfig = {
 				tableName,
-			}
+			};
 			return assignTemplates(templates.dropTable, templateConfig);
 		},
 
@@ -1071,7 +1078,7 @@ module.exports = (baseProvider, options, app) => {
 			const templateConfig = {
 				tableName,
 				columnDefinition,
-			}
+			};
 			return assignTemplates(templates.addColumn, templateConfig);
 		},
 
@@ -1084,7 +1091,7 @@ module.exports = (baseProvider, options, app) => {
 			const templateConfig = {
 				tableName,
 				columnName,
-			}
+			};
 			return assignTemplates(templates.dropColumn, templateConfig);
 		},
 
@@ -1092,10 +1099,10 @@ module.exports = (baseProvider, options, app) => {
 		 * @param udtName {string}
 		 * @return string
 		 * */
-		dropDomain(udtName,) {
+		dropDomain(udtName) {
 			const templateConfig = {
 				udtName,
-			}
+			};
 			return assignTemplates(templates.dropDomain, templateConfig);
 		},
 
@@ -1103,10 +1110,10 @@ module.exports = (baseProvider, options, app) => {
 		 * @param udtName {string}
 		 * @return string
 		 * */
-		dropType(udtName,) {
+		dropType(udtName) {
 			const templateConfig = {
 				udtName,
-			}
+			};
 			return assignTemplates(templates.dropType, templateConfig);
 		},
 
@@ -1119,7 +1126,7 @@ module.exports = (baseProvider, options, app) => {
 			const templateConfig = {
 				udtName,
 				columnDefinition,
-			}
+			};
 			return assignTemplates(templates.alterTypeAddAttribute, templateConfig);
 		},
 
@@ -1132,7 +1139,7 @@ module.exports = (baseProvider, options, app) => {
 			const templateConfig = {
 				udtName,
 				attributeName,
-			}
+			};
 			return assignTemplates(templates.alterTypeDropAttribute, templateConfig);
 		},
 
@@ -1147,7 +1154,7 @@ module.exports = (baseProvider, options, app) => {
 				udtName,
 				oldAttributeName,
 				newAttributeName,
-			}
+			};
 			return assignTemplates(templates.alterTypeRenameAttribute, templateConfig);
 		},
 
@@ -1162,7 +1169,7 @@ module.exports = (baseProvider, options, app) => {
 				udtName,
 				attributeName,
 				newDataType,
-			}
+			};
 			return assignTemplates(templates.alterTypeChangeAttributeType, templateConfig);
 		},
 
@@ -1175,7 +1182,7 @@ module.exports = (baseProvider, options, app) => {
 			const templateConfig = {
 				tableName,
 				fkConstraintName,
-			}
+			};
 			return assignTemplates(templates.dropForeignKey, templateConfig);
 		},
 
@@ -1209,7 +1216,7 @@ module.exports = (baseProvider, options, app) => {
 					tableName,
 				}),
 				isActivated: constraintStatementDto.isActivated,
-			}
+			};
 		},
 
 		/**
@@ -1220,12 +1227,12 @@ module.exports = (baseProvider, options, app) => {
 			const templatesConfig = {
 				tableName,
 				constraintName,
-			}
+			};
 			return assignTemplates(templates.dropConstraint, templatesConfig);
 		},
 
 		/**
-		 * @param {{ schemaName: string, sequences: Sequence[] }} 
+		 * @param {{ schemaName: string, sequences: Sequence[] }}
 		 * @returns {string}
 		 */
 		createSchemaSequences({ schemaName, sequences }) {
@@ -1233,7 +1240,7 @@ module.exports = (baseProvider, options, app) => {
 		},
 
 		/**
-		 * @param {{ schemaName: string, sequence: Sequence }} 
+		 * @param {{ schemaName: string, sequence: Sequence }}
 		 * @returns {string}
 		 */
 		createSchemaSequence({ schemaName, sequence }) {
@@ -1241,7 +1248,7 @@ module.exports = (baseProvider, options, app) => {
 		},
 
 		/**
-		 * @param {{ schemaName: string, sequence: Sequence }} 
+		 * @param {{ schemaName: string, sequence: Sequence }}
 		 * @returns {string}
 		 */
 		dropSchemaSequence({ schemaName, sequence }) {
@@ -1249,7 +1256,7 @@ module.exports = (baseProvider, options, app) => {
 		},
 
 		/**
-		 * @param {{ schemaName: string, sequence: Sequence, oldSequence: Sequence }} 
+		 * @param {{ schemaName: string, sequence: Sequence, oldSequence: Sequence }}
 		 * @returns {string}
 		 */
 		alterSchemaSequence({ schemaName, sequence, oldSequence }) {
@@ -1262,7 +1269,7 @@ module.exports = (baseProvider, options, app) => {
 		 * */
 		dropIndex({ indexName }) {
 			const templatesConfig = {
-				indexName
+				indexName,
 			};
 			return assignTemplates(templates.dropIndex, templatesConfig);
 		},
@@ -1316,7 +1323,7 @@ module.exports = (baseProvider, options, app) => {
 			const templatesConfig = {
 				indexName: ddlIndexName,
 				options: ddlIndexStorageParameters,
-			}
+			};
 			return assignTemplates(templates.alterIndexStorageParams, templatesConfig);
 		},
 
@@ -1325,15 +1332,14 @@ module.exports = (baseProvider, options, app) => {
 		 * @param indexName {string}
 		 * @return {string}
 		 * */
-		reindexIndex({ schemaName, indexName }){
+		reindexIndex({ schemaName, indexName }) {
 			const ddlSchemaName = wrapInQuotes(schemaName);
 			const ddlIndexName = getNamePrefixedWithSchemaName(wrapInQuotes(indexName), ddlSchemaName);
 
 			const templatesConfig = {
 				indexName: ddlIndexName,
-			}
+			};
 			return assignTemplates(templates.reindexIndex, templatesConfig);
 		},
-
 	};
 };

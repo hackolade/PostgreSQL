@@ -1,11 +1,7 @@
 {
-  "name": "PostgreSQL",
-  "version": "1.0.0",
-  "description": "",
-  "author": "Hackolade",
-  "dependencies": {
-    "pg": "^8.7.1",
-    "tunnel-ssh": "^4.1.6"
-  },
-  "installed": true
+    "name": "PostgreSQL",
+    "version": "1.0.0",
+    "description": "",
+    "author": "Hackolade",
+    "installed": true
 }

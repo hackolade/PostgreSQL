@@ -151,11 +151,7 @@ making sure that you maintain a proper JSON format.
 						"propertyKeyword": "check_option",
 						"propertyTooltip": "This option controls the behavior of automatically updatable views. When this option is specified, INSERT and UPDATE commands on the view will be checked to ensure that new rows satisfy the view-defining condition (that is, the new rows are checked to ensure that they are visible through the view). If they are not, the update will be rejected.",
 						"propertyType": "select",
-						"options": [
-							"",
-							"local",
-							"cascaded"
-						]
+						"options": ["", "local", "cascaded"]
 					},
 					{
 						"propertyName": "Security barrier",
@@ -190,17 +186,15 @@ making sure that you maintain a proper JSON format.
 				"propertyKeyword": "checkTestingScope",
 				"propertyTooltip": "This option controls the behavior of automatically updatable views. When this option is specified, INSERT and UPDATE commands on the view will be checked to ensure that new rows satisfy the view-defining condition (that is, the new rows are checked to ensure that they are visible through the view). If they are not, the update will be rejected.",
 				"propertyType": "select",
-				"options": [
-					"",
-					"LOCAL",
-					"CASCADED"
-				],
+				"options": ["", "LOCAL", "CASCADED"],
 				"dependency": {
 					"type": "or",
-					"values": [{
-						"key": "withCheckOption",
-						"value": true
-					}]
+					"values": [
+						{
+							"key": "withCheckOption",
+							"value": true
+						}
+					]
 				}
 			},
 			{
@@ -274,11 +268,7 @@ making sure that you maintain a proper JSON format.
 						"propertyKeyword": "triggerType",
 						"propertyTooltip": "Determines whether the function is called before, after, or instead of the event.",
 						"propertyType": "select",
-						"options": [
-							"BEFORE",
-							"AFTER",
-							"INSTEAD OF"
-						],
+						"options": ["BEFORE", "AFTER", "INSTEAD OF"],
 						"defaultValue": "AFTER"
 					},
 					{
@@ -291,12 +281,7 @@ making sure that you maintain a proper JSON format.
 								"propertyKeyword": "triggerEvent",
 								"propertyTooltip": "This specifies the event that will fire the trigger",
 								"propertyType": "select",
-								"options": [
-									"INSERT",
-									"UPDATE",
-									"DELETE",
-									"TRUNCATE"
-								]
+								"options": ["INSERT", "UPDATE", "DELETE", "TRUNCATE"]
 							}
 						]
 					},
@@ -328,11 +313,7 @@ making sure that you maintain a proper JSON format.
 						"propertyName": "Deferrable",
 						"propertyKeyword": "triggerTimeConstraintCheck",
 						"propertyType": "select",
-						"options": [
-							"",
-							"INITIALLY IMMEDIATE",
-							"INITIALLY DEFERRED"
-						],
+						"options": ["", "INITIALLY IMMEDIATE", "INITIALLY DEFERRED"],
 						"propertyTooltip": "If a constraint is deferrable, this clause specifies the default time to check the constraint. If the constraint is INITIALLY IMMEDIATE, it is checked after each statement. This is the default. If the constraint is INITIALLY DEFERRED, it is checked only at the end of the transaction.",
 						"dependency": {
 							"type": "and",
@@ -379,10 +360,7 @@ making sure that you maintain a proper JSON format.
 						"propertyKeyword": "triggerEachRowStatement",
 						"propertyType": "select",
 						"propertyTooltip": "This specifies whether the trigger function should be fired once for every row affected by the trigger event, or just once per SQL statement.",
-						"options": [
-							"FOR EACH STATEMENT",
-							"FOR EACH ROW"
-						],
+						"options": ["FOR EACH STATEMENT", "FOR EACH ROW"],
 						"dependency": {
 							"type": "not",
 							"values": {

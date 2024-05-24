@@ -8,32 +8,22 @@
 
 const { Sequence } = require('../../types/schemaSequenceTypes');
 
-module.exports = ({
-	_,
-	templates,
-	assignTemplates,
-	getNamePrefixedWithSchemaName,
-	wrapInQuotes,
-}) => {
-
+module.exports = ({ _, templates, assignTemplates, getNamePrefixedWithSchemaName, wrapInQuotes }) => {
 	/**
-	 * @param {{ schemaName: string, sequences: Sequence[] }} 
+	 * @param {{ schemaName: string, sequences: Sequence[] }}
 	 * @returns {string}
 	 */
 	const getSequencesScript = ({ schemaName, sequences }) => {
-		return _.map(sequences, (sequence) => createSequenceScript({ schemaName, sequence })).join('\n');
+		return _.map(sequences, sequence => createSequenceScript({ schemaName, sequence })).join('\n');
 	};
 
 	/**
-	 * @param {{ schemaName: string, sequence: Sequence }} 
+	 * @param {{ schemaName: string, sequence: Sequence }}
 	 * @returns {string}
 	 */
 	const createSequenceScript = ({ schemaName, sequence }) => {
 		const sequenceSchemaName = sequence.temporary ? '' : schemaName;
-		const name = getNamePrefixedWithSchemaName(
-			sequence.sequenceName,
-			sequenceSchemaName
-		);
+		const name = getNamePrefixedWithSchemaName(sequence.sequenceName, sequenceSchemaName);
 		const ifNotExists = getIfNotExists({ sequence });
 		const sequenceType = getSequenceType({ sequence });
 		const options = getSequenceOptions({ sequence, schemaName });
@@ -47,17 +37,14 @@ module.exports = ({
 	};
 
 	/**
-	 * 
-	 * @param {{ schemaName: string, sequence: Sequence, oldSequence: Sequence }} 
+	 *
+	 * @param {{ schemaName: string, sequence: Sequence, oldSequence: Sequence }}
 	 * @returns {string}
 	 */
 	const alterSequenceScript = ({ schemaName, sequence, oldSequence }) => {
 		const sequenceSchemaName = sequence.temporary ? '' : schemaName;
 		const sequenceName = oldSequence.sequenceName || sequence.sequenceName;
-		const name = getNamePrefixedWithSchemaName(
-			sequenceName,
-			sequenceSchemaName
-		);
+		const name = getNamePrefixedWithSchemaName(sequenceName, sequenceSchemaName);
 		const modifiedSequence = getModifiedSequence({ sequence, oldSequence });
 		const options = getSequenceOptions({ schemaName, sequence: modifiedSequence });
 		const sequenceType = getAlterSequenceType({ sequence: modifiedSequence });
@@ -68,22 +55,22 @@ module.exports = ({
 		const configs = [
 			{ key: 'options', value: options, template: templates.alterSequence },
 			{ key: 'sequenceType', value: sequenceType, template: templates.setSequenceType },
-			{ key: 'newName', value: newName, template: templates.renameSequence }
+			{ key: 'newName', value: newName, template: templates.renameSequence },
 		];
 
-		return configs.filter(config => config.value).map(config => assignTemplates(config.template, { [config.key]: config.value, name })).join('\n');
+		return configs
+			.filter(config => config.value)
+			.map(config => assignTemplates(config.template, { [config.key]: config.value, name }))
+			.join('\n');
 	};
 
 	/**
-	 * @param {{ schemaName: string, sequence: Sequence }} 
+	 * @param {{ schemaName: string, sequence: Sequence }}
 	 * @returns {string}
 	 */
 	const dropSequenceScript = ({ schemaName, sequence }) => {
 		const sequenceSchemaName = sequence.temporary ? '' : schemaName;
-		const name = getNamePrefixedWithSchemaName(
-			sequence.sequenceName,
-			sequenceSchemaName
-		);
+		const name = getNamePrefixedWithSchemaName(sequence.sequenceName, sequenceSchemaName);
 
 		return assignTemplates(templates.dropSequence, {
 			name,
@@ -91,7 +78,7 @@ module.exports = ({
 	};
 
 	/**
-	 * @param {{ schemaName: string, sequence: Sequence }} 
+	 * @param {{ schemaName: string, sequence: Sequence }}
 	 * @returns {string}
 	 */
 	const getSequenceOptions = ({ schemaName, sequence }) => {
@@ -99,19 +86,19 @@ module.exports = ({
 		 * @type {Array<OptionConfig>}
 		 */
 		const optionConfigs = [
-			{ getOption, key: 'dataType', clause: 'AS', },
-			{ getOption, key: 'increment', clause: 'INCREMENT BY', },
-			{ getOption, key: 'start', clause: 'START WITH', },
-			{ getOption, key: 'restart', clause: 'RESTART WITH', },
-			{ getOption, key: 'minValue', clause: 'MINVALUE', },
-			{ getOption, key: 'maxValue', clause: 'MAXVALUE', },
-			{ getOption, key: 'cache', clause: 'CACHE', },
+			{ getOption, key: 'dataType', clause: 'AS' },
+			{ getOption, key: 'increment', clause: 'INCREMENT BY' },
+			{ getOption, key: 'start', clause: 'START WITH' },
+			{ getOption, key: 'restart', clause: 'RESTART WITH' },
+			{ getOption, key: 'minValue', clause: 'MINVALUE' },
+			{ getOption, key: 'maxValue', clause: 'MAXVALUE' },
+			{ getOption, key: 'cache', clause: 'CACHE' },
 			{ getOption: getCycle, key: 'cycle' },
 			{ getOption: getOwnedBy, key: 'ownedByColumn' },
 		];
 
 		const options = optionConfigs
-			.map((config) => {
+			.map(config => {
 				const option = config.getOption({ sequence, schemaName, config });
 				return wrapOption({ option });
 			})
@@ -122,7 +109,7 @@ module.exports = ({
 	};
 
 	/**
-	 * @param {{ sequence: Sequence; config: OptionConfig }} param0 
+	 * @param {{ sequence: Sequence; config: OptionConfig }} param0
 	 * @returns {string}
 	 */
 	const getOption = ({ sequence, config }) => {
@@ -131,7 +118,7 @@ module.exports = ({
 	};
 
 	/**
-	 * @param {{ option: string }} 
+	 * @param {{ option: string }}
 	 * @returns {string}
 	 */
 	const wrapOption = ({ option }) => {
@@ -139,7 +126,7 @@ module.exports = ({
 	};
 
 	/**
-	 * @param {{ options: string }} 
+	 * @param {{ options: string }}
 	 * @returns {string}
 	 */
 	const wrapOptionsBlock = ({ options }) => {
@@ -147,7 +134,7 @@ module.exports = ({
 	};
 
 	/**
-	 * @param {{ sequence: Sequence }} 
+	 * @param {{ sequence: Sequence }}
 	 * @returns {string}
 	 */
 	const getIfNotExists = ({ sequence }) => {
@@ -155,7 +142,7 @@ module.exports = ({
 	};
 
 	/**
-	 * @param {{ sequence: Sequence }} 
+	 * @param {{ sequence: Sequence }}
 	 * @returns {string}
 	 */
 	const getSequenceType = ({ sequence }) => {
@@ -171,7 +158,7 @@ module.exports = ({
 	};
 
 	/**
-	 * @param {{ sequence: Sequence }} 
+	 * @param {{ sequence: Sequence }}
 	 * @returns {string}
 	 */
 	const getAlterSequenceType = ({ sequence }) => {
@@ -207,7 +194,7 @@ module.exports = ({
 	};
 
 	/**
-	 * @param {{ sequence: Sequence, schemaName: string }} param0 
+	 * @param {{ sequence: Sequence, schemaName: string }} param0
 	 * @returns {string}
 	 */
 	const getOwnedBy = ({ sequence, schemaName }) => {
@@ -227,7 +214,7 @@ module.exports = ({
 	};
 
 	/**
-	 * @param {{ sequence: Sequence, oldSequence: Sequence }} 
+	 * @param {{ sequence: Sequence, oldSequence: Sequence }}
 	 * @returns {Sequence}
 	 */
 	const getModifiedSequence = ({ sequence, oldSequence }) => {

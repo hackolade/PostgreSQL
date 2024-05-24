@@ -1,5 +1,5 @@
-const {getModifyViewCommentsScriptDtos} = require("./viewHelpers/commentsHelper");
-const {AlterScriptDto} = require("../types/AlterScriptDto");
+const { getModifyViewCommentsScriptDtos } = require('./viewHelpers/commentsHelper');
+const { AlterScriptDto } = require('../types/AlterScriptDto');
 
 /**
  * @return {(view: Object) => AlterScriptDto | undefined}
@@ -34,16 +34,14 @@ const getDeleteViewScriptDto = app => view => {
 /**
  * @return {(view: Object) => AlterScriptDto[]}
  * */
-const getModifyViewScriptDtos = (app) => (view) => {
+const getModifyViewScriptDtos = app => view => {
 	const _ = app.require('lodash');
 	const ddlProvider = require('../../ddlProvider/ddlProvider')(null, null, app);
 
 	const modifyCommentsScriptDtos = getModifyViewCommentsScriptDtos(_, ddlProvider)(view);
 
-	return [
-		...modifyCommentsScriptDtos,
-	].filter(Boolean);
-}
+	return [...modifyCommentsScriptDtos].filter(Boolean);
+};
 
 module.exports = {
 	getAddViewScriptDto,
