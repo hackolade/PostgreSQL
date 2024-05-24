@@ -98,19 +98,10 @@
 				"inputKeyword": "certAuthority",
 				"inputType": "file",
 				"inputPlaceholder": "Certificate Authority",
-				"extensions": [
-					"pem",
-					"crt",
-					"key"
-				],
+				"extensions": ["pem", "crt", "key"],
 				"dependency": {
 					"key": "sslType",
-					"value": [
-						"prefer",
-						"require",
-						"verify-ca",
-						"verify-full"
-					]
+					"value": ["prefer", "require", "verify-ca", "verify-full"]
 				}
 			},
 			{
@@ -118,19 +109,10 @@
 				"inputKeyword": "clientCert",
 				"inputType": "file",
 				"inputPlaceholder": "Client Certificate",
-				"extensions": [
-					"pem",
-					"crt",
-					"key"
-				],
+				"extensions": ["pem", "crt", "key"],
 				"dependency": {
 					"key": "sslType",
-					"value": [
-						"prefer",
-						"require",
-						"verify-ca",
-						"verify-full"
-					]
+					"value": ["prefer", "require", "verify-ca", "verify-full"]
 				}
 			},
 			{
@@ -138,19 +120,10 @@
 				"inputKeyword": "clientPrivateKey",
 				"inputType": "file",
 				"inputPlaceholder": "Client Private Key",
-				"extensions": [
-					"pem",
-					"crt",
-					"key"
-				],
+				"extensions": ["pem", "crt", "key"],
 				"dependency": {
 					"key": "sslType",
-					"value": [
-						"prefer",
-						"require",
-						"verify-ca",
-						"verify-full"
-					]
+					"value": ["prefer", "require", "verify-ca", "verify-full"]
 				}
 			}
 		]
@@ -221,15 +194,10 @@
 				"inputKeyword": "ssh_key_file",
 				"inputType": "file",
 				"inputPlaceholder": "Private Key",
-				"extensions": [
-					"*"
-				],
+				"extensions": ["*"],
 				"dependency": {
 					"key": "ssh_method",
-					"value": [
-						"privateKey",
-						""
-					]
+					"value": ["privateKey", ""]
 				},
 				"disable": {
 					"key": "ssh",
@@ -244,10 +212,7 @@
 				"isHiddenKey": true,
 				"dependency": {
 					"key": "ssh_method",
-					"value": [
-						"privateKey",
-						""
-					]
+					"value": ["privateKey", ""]
 				},
 				"disable": {
 					"key": "ssh",
@@ -262,10 +227,7 @@
 				"isHiddenKey": true,
 				"dependency": {
 					"key": "ssh_method",
-					"value": [
-						"password",
-						""
-					]
+					"value": ["password", ""]
 				},
 				"disable": {
 					"key": "ssh",
