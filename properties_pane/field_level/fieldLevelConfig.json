@@ -5426,6 +5426,24 @@ making sure that you maintain a proper JSON format.
 				"template": "textarea"
 			},
 			{
+				"propertyName": "Min Properties",
+				"propertyKeyword": "minProperties",
+				"propertyType": "numeric",
+				"dependency": {
+					"key": "subtype",
+					"value": "object"
+				}
+			},
+			{
+				"propertyName": "Max Properties",
+				"propertyKeyword": "maxProperties",
+				"propertyType": "numeric",
+				"dependency": {
+					"key": "subtype",
+					"value": "object"
+				}
+			},
+			{
 				"propertyName": "Array type",
 				"propertyType": "group",
 				"propertyKeyword": "array_type",

@@ -11,8 +11,6 @@
 		"foreignCollection": "",
 		"foreignField": [],
 		"dependencies": [],
-		"minProperties": "",
-		"maxProperties": "",
 		"additionalProperties": false,
 		"enum": []
 	},
