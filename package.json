@@ -71,13 +71,6 @@
         "simple-git-hooks": "2.11.1"
     },
     "dependencies": {
-        "pg": "^8.7.1",
-        "tunnel-ssh": "^4.1.6"
-    },
-    "overrides": {
-        "tunnel-ssh": {
-            "cpu-features": "npm:-@0.0.1",
-            "ssh2": "npm:-@0.0.1"
-        }
+        "pg": "^8.7.1"
     }
 }

@@ -1,49 +1,8 @@
 const fs = require('fs');
-const ssh = require('tunnel-ssh');
 const pg = require('pg');
 
 const SSL_NOT_SUPPORTED_MESSAGE = 'The server does not support SSL connections';
 const POSTGRES_SSL_REQUIRED_ERROR_CODE = '28000';
-
-const getSshConfig = info => {
-	const config = {
-		username: info.ssh_user,
-		host: info.ssh_host,
-		port: info.ssh_port,
-		dstHost: info.host,
-		dstPort: info.port,
-		localHost: '127.0.0.1',
-		localPort: info.port,
-		keepAlive: true,
-	};
-
-	if (info.ssh_method === 'privateKey') {
-		return Object.assign({}, config, {
-			privateKey: fs.readFileSync(info.ssh_key_file),
-			passphrase: info.ssh_key_passphrase,
-		});
-	} else {
-		return Object.assign({}, config, {
-			password: info.ssh_password,
-		});
-	}
-};
-
-const connectViaSsh = info =>
-	new Promise((resolve, reject) => {
-		ssh(getSshConfig(info), (err, tunnel) => {
-			if (err) {
-				reject(err);
-			} else {
-				resolve({
-					tunnel,
-					info: Object.assign({}, info, {
-						host: '127.0.0.1',
-					}),
-				});
-			}
-		});
-	});
 
 const getSslOptions = (connectionInfo, logger) => {
 	const sslType = connectionInfo.sslType;
@@ -98,13 +57,27 @@ const mapSslType = sslType => {
 	return oldToNewSslType[sslType] || sslType;
 };
 
-const createClient = async (connectionInfo, logger) => {
-	let sshTunnel = null;
+const createClient = async (connectionInfo, sshService, logger) => {
+	let isSshTunnel = false;
 
 	if (connectionInfo.ssh) {
-		const { info, tunnel } = await connectViaSsh(connectionInfo);
-		sshTunnel = tunnel;
-		connectionInfo = info;
+		const { options } = await sshService.openTunnel({
+			sshAuthMethod: connectionInfo.ssh_method === 'privateKey' ? 'IDENTITY_FILE' : 'USER_PASSWORD',
+			sshTunnelHostname: connectionInfo.ssh_host,
+			sshTunnelPort: connectionInfo.ssh_port,
+			sshTunnelUsername: connectionInfo.ssh_user,
+			sshTunnelPassword: connectionInfo.ssh_password,
+			sshTunnelIdentityFile: connectionInfo.ssh_key_file,
+			sshTunnelPassphrase: connectionInfo.ssh_key_passphrase,
+			host: connectionInfo.host,
+			port: connectionInfo.port,
+		});
+
+		connectionInfo = {
+			...connectionInfo,
+			...options,
+		};
+		isSshTunnel = true;
 	}
 
 	connectionInfo = Object.assign({}, connectionInfo, { sslType: mapSslType(connectionInfo.sslType) });
@@ -127,7 +100,7 @@ const createClient = async (connectionInfo, logger) => {
 
 	const client = await createConnectionPool(config, logger);
 
-	return { client, sshTunnel };
+	return { client, isSshTunnel };
 };
 
 const retryOnSslError = (config, logger, error) => {
