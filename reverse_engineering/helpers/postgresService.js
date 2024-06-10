@@ -48,7 +48,7 @@ const queryConstants = require('./queryConstants');
 const { reorganizeConstraints } = require('./postgresHelpers/reorganizeConstraints');
 const { mapSequenceData } = require('./postgresHelpers/sequenceHelper');
 
-let currentSshTunnel = null;
+let useSshTunnel = false;
 let _ = null;
 let logger = null;
 let version = 14;
@@ -66,23 +66,23 @@ module.exports = {
 		setDependenciesInTriggerHelper(app);
 	},
 
-	async connect(connectionInfo, specificLogger) {
+	async connect(connectionInfo, sshService, specificLogger) {
 		if (db.isClientInitialized()) {
-			await this.disconnect();
+			await this.disconnect(sshService);
 		}
 
-		const { client, sshTunnel } = await createClient(connectionInfo, specificLogger);
+		const { client, isSshTunnel } = await createClient(connectionInfo, sshService, specificLogger);
 
 		db.initializeClient(client, specificLogger);
-		currentSshTunnel = sshTunnel;
+		useSshTunnel = isSshTunnel;
 		logger = specificLogger;
 		version = await this._getServerVersion();
 	},
 
-	async disconnect() {
-		if (currentSshTunnel) {
-			currentSshTunnel.close();
-			currentSshTunnel = null;
+	async disconnect(sshService) {
+		if (useSshTunnel) {
+			useSshTunnel = false;
+			await sshService.closeConsumer();
 		}
 
 		await db.releaseClient();
