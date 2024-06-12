@@ -4,25 +4,66 @@
 		"node": true,
 		"es2022": true
 	},
+	"plugins": ["import", "unused-imports", "@typescript-eslint"],
 	"rules": {
 		"no-cond-assign": "error",
 		"no-const-assign": "error",
 		"no-dupe-args": "error",
 		"no-dupe-keys": "error",
 		"no-duplicate-case": "error",
+		"no-dupe-else-if": "warn",
+		"no-duplicate-imports": "warn",
+		"no-import-assign": "warn",
 		"no-unreachable": "error",
 		"eqeqeq": "error",
 		"no-var": "error",
 		"no-undef": "error",
 		"no-bitwise": "warn",
-		"no-dupe-else-if": "warn",
-		"no-duplicate-imports": "warn",
-		"no-import-assign": "warn",
+		"import/no-unresolved": [
+			"error"
+		],
+		"import/named": "error",
+		"import/default": "error",
+		"import/no-self-import": "error",
+		"no-unused-vars": "off",
+		"unused-imports/no-unused-imports": "error",
+		"unused-imports/no-unused-vars": [
+			"off",
+			{
+				"vars": "all",
+				"varsIgnorePattern": "^(React$|__)",
+				"argsIgnorePattern": ".*"
+			}
+		],
+		"no-debugger": "error",
 		"no-empty": "warn",
 		"no-extra-semi": "error",
 		"no-global-assign": "warn",
 		"no-redeclare": "warn",
-		"no-debugger": "error",
 		"no-console": "error"
-	}
+	},
+	"overrides": [
+		{
+			"files": ["*.ts"],
+			"extends": ["plugin:@typescript-eslint/recommended"],
+			"parser": "@typescript-eslint/parser",
+			"parserOptions": {
+				"project": "./tsconfig.json"
+			}
+		},
+		{
+			"files": ["*.d.ts"],
+			"rules": {
+				"@typescript-eslint/no-explicit-any": "off"
+			}
+		},
+	],
+	"settings": {
+		"import/resolver": {
+			"node": {
+				"extensions": [".js", ".ts", ".cjs", ".mjs"]
+			}
+		}
+	},
+	"root": true
 }

@@ -134,8 +134,6 @@ module.exports = _ => {
 	};
 
 	const getFullColumnName = (collection, columnName) => {
-		const { wrapInQuotes } = require('../utils/general')(_);
-
 		const fullTableName = getFullTableName(collection);
 		return `${fullTableName}.${wrapInQuotes(columnName)}`;
 	};
