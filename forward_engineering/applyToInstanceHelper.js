@@ -2,8 +2,9 @@ const postgresService = require('../reverse_engineering/helpers/postgresService'
 
 const applyToInstance = async (connectionInfo, logger, app) => {
 	try {
+		const sshService = app.require('@hackolade/ssh-service');
 		postgresService.setDependencies(app);
-		await postgresService.connect(connectionInfo, logger);
+		await postgresService.connect(connectionInfo, sshService, logger);
 		await postgresService.logVersion();
 		await postgresService.applyScript(removeCreateDbScript(connectionInfo.script));
 	} catch (error) {
