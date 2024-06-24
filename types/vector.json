@@ -1,0 +1,39 @@
+{
+	"name": "vector",
+	"erdAbbreviation": "<vctr>",
+	"dtdAbbreviation": "[...]",
+	"parentType": "array",
+	"useSample": false,
+	"hiddenOnEntity": "view",
+	"defaultValues": {
+		"properties": [],
+		"primaryKey": false,
+		"additionalItems": true,
+		"minItems": "",
+		"maxItems": "",
+		"uniqueItems": false,
+		"subtype": "float",
+		"dimension": 1
+	},
+	"subtypes": {
+		"vector": {
+			"childValueType": "numeric",
+			"childValueMode": "real"
+		}
+	},
+	"dependency": {
+		"type": "not",
+		"values": [
+			{
+				"level": "model",
+				"key": "dbVersion",
+				"value": "v10.x"
+			},
+			{
+				"level": "model",
+				"key": "dbVersion",
+				"value": "v11.x"
+			}
+		]
+	}
+}
