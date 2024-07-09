@@ -28,7 +28,8 @@
 				"enum",
 				"composite",
 				"range_udt",
-				"domain"
+				"domain",
+				"object"
 			]
 		}
 	}
