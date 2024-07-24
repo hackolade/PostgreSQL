@@ -167,7 +167,7 @@ const getNewlyCreatedIndexesScripts = ({ _, ddlProvider, dbVersion, collection }
 		return [];
 	}
 
-	const doAnyIndexUseNewlyCreatedColumn = newIndexes.some(({ columns }) =>
+	const doAnyIndexUseNewlyCreatedColumn = newIndexes.some(({ columns = [] }) =>
 		columns.find(({ keyId }) => propertiesIds.includes(keyId)),
 	);
 
