@@ -5,16 +5,16 @@
 		"dbVendor": "PostgreSQL"
 	},
 	"container": {
-		"name": "New schema"
+		"name": "New_schema"
 	},
 	"collection": {
-		"collectionName": "New table",
+		"collectionName": "New_table",
 		"memory_optimized": false,
 		"collectionUsers": [],
 		"collation": {}
 	},
 	"field": {
-		"name": "New column",
+		"name": "New_column",
 		"primaryKey": false,
 		"unique": false
 	},
