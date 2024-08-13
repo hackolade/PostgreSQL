@@ -36,7 +36,11 @@ const getDeletedDefaultColumnValueScriptDtos = ({ ddlProvider, collection }) =>
 			const newDefault = jsonSchema.default;
 			const oldName = jsonSchema.compMod.oldField.name;
 			const oldDefault = collection.role.properties[oldName]?.default;
-			return oldDefault && (newDefault === undefined || !newDefault);
+			const hasPrevValue = oldDefault !== undefined;
+			const hasNewValue = newDefault !== undefined;
+			if (hasPrevValue && !hasNewValue) {
+				return true;
+			}
 		})
 		.map(([columnName]) => {
 			const scriptGenerationConfig = {
