@@ -12,7 +12,7 @@ const getUpdatedDefaultColumnValueScriptDtos = ({ ddlProvider, collection }) =>
 			const newDefault = jsonSchema.default;
 			const oldName = jsonSchema.compMod.oldField.name;
 			const oldDefault = collection.role.properties[oldName]?.default;
-			return newDefault && (!oldDefault || newDefault !== oldDefault);
+			return newDefault !== undefined && (!oldDefault || newDefault !== oldDefault);
 		})
 		.map(([columnName, jsonSchema]) => {
 			const newDefaultValue = jsonSchema.default;
