@@ -41,7 +41,7 @@ const getDeletedDefaultColumnValueScriptDtos = ({ ddlProvider, collection }) =>
 		.map(([columnName]) => {
 			const scriptGenerationConfig = {
 				tableName: getFullTableName(collection),
-				columnName,
+				columnName: wrapInQuotes(columnName),
 			};
 			return ddlProvider.dropColumnDefaultValue(scriptGenerationConfig);
 		})
