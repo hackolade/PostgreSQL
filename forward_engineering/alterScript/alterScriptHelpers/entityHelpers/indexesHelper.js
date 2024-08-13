@@ -57,7 +57,7 @@ const setNamesToColumns =
 const mapIndexToFeIndexDto =
 	({ _ }) =>
 	({ index, collection }) => {
-		const { getSchemaNameFromCollection } = require('../../../utils/general')(_);
+		const { getSchemaNameFromCollection } = require('../../../utils/general');
 
 		const schemaName = getSchemaNameFromCollection({ collection });
 
@@ -183,7 +183,7 @@ const getAddedIndexesScriptDtos =
 const getDeleteIndexScriptDto =
 	({ _, ddlProvider }) =>
 	({ index, additionalDataForDdlProvider }) => {
-		const { getNamePrefixedWithSchemaName } = require('../../../utils/general')(_);
+		const { getNamePrefixedWithSchemaName } = require('../../../utils/general');
 
 		const { isParentActivated, schemaName } = additionalDataForDdlProvider;
 
@@ -369,7 +369,7 @@ const getModifyIndexesScriptDtos =
 	};
 
 const getAdditionalDataForDdlProvider = ({ _, dbVersion, collection }) => {
-	const { getSchemaNameFromCollection } = require('../../../utils/general')(_);
+	const { getSchemaNameFromCollection } = require('../../../utils/general');
 
 	return {
 		dbData: { dbVersion },

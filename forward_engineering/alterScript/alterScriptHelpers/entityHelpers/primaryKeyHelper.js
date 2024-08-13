@@ -215,7 +215,7 @@ const getCreateCompositePKDDLProviderConfig = _ => (primaryKey, entityName, enti
  * @return {(collection: AlterCollectionDto) => Array<KeyScriptModificationDto>}
  * */
 const getAddCompositePkScriptDtos = (_, ddlProvider) => collection => {
-	const { getFullCollectionName, getSchemaOfAlterCollection, getEntityName } = require('../../../utils/general')(_);
+	const { getFullCollectionName, getSchemaOfAlterCollection, getEntityName } = require('../../../utils/general');
 
 	/**
 	 * @type {AlterCollectionRoleCompModPrimaryKey}
@@ -254,8 +254,12 @@ const getAddCompositePkScriptDtos = (_, ddlProvider) => collection => {
  * @return {(collection: AlterCollectionDto) => Array<KeyScriptModificationDto>}
  * */
 const getDropCompositePkScriptDtos = (_, ddlProvider) => collection => {
-	const { getFullCollectionName, getSchemaOfAlterCollection, getEntityName, wrapInQuotes } =
-		require('../../../utils/general')(_);
+	const {
+		getFullCollectionName,
+		getSchemaOfAlterCollection,
+		getEntityName,
+		wrapInQuotes,
+	} = require('../../../utils/general');
 
 	const pkDto = collection?.role?.compMod?.primaryKey || {};
 	const newPrimaryKeys = pkDto.new || [];
@@ -540,7 +544,7 @@ const wasRegularPkModified = _ => (columnJsonSchema, collection) => {
  * @return {(collection: AlterCollectionDto) => Array<KeyScriptModificationDto>}
  * */
 const getAddPkScriptDtos = (_, ddlProvider) => collection => {
-	const { getFullCollectionName, getSchemaOfAlterCollection, getEntityName } = require('../../../utils/general')(_);
+	const { getFullCollectionName, getSchemaOfAlterCollection, getEntityName } = require('../../../utils/general');
 
 	const collectionSchema = getSchemaOfAlterCollection(collection);
 	const fullTableName = getFullCollectionName(collectionSchema);
@@ -572,8 +576,12 @@ const getAddPkScriptDtos = (_, ddlProvider) => collection => {
  * @return {(collection: AlterCollectionDto) => Array<KeyScriptModificationDto>}
  * */
 const getDropPkScriptDto = (_, ddlProvider) => collection => {
-	const { getFullCollectionName, getSchemaOfAlterCollection, getEntityName, wrapInQuotes } =
-		require('../../../utils/general')(_);
+	const {
+		getFullCollectionName,
+		getSchemaOfAlterCollection,
+		getEntityName,
+		wrapInQuotes,
+	} = require('../../../utils/general');
 
 	const collectionSchema = getSchemaOfAlterCollection(collection);
 	const fullTableName = getFullCollectionName(collectionSchema);

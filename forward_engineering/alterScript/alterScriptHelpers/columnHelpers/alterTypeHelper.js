@@ -29,7 +29,7 @@ const hasPrecisionOrScaleChanged = (collection, oldFieldName, currentJsonSchema)
  * @return {(collection: Object) => AlterScriptDto[]}
  * */
 const getUpdateTypesScriptDtos = (_, ddlProvider) => collection => {
-	const { checkFieldPropertiesChanged, getFullTableName, wrapInQuotes } = require('../../../utils/general')(_);
+	const { checkFieldPropertiesChanged, getFullTableName, wrapInQuotes } = require('../../../utils/general');
 	const fullTableName = getFullTableName(collection);
 
 	return _.toPairs(collection.properties)
