@@ -38,9 +38,7 @@ const getDeletedDefaultColumnValueScriptDtos = ({ ddlProvider, collection }) =>
 			const oldDefault = collection.role.properties[oldName]?.default;
 			const hasPrevValue = oldDefault !== undefined;
 			const hasNewValue = newDefault !== undefined;
-			if (hasPrevValue && !hasNewValue) {
-				return true;
-			}
+			return hasPrevValue && !hasNewValue;
 		})
 		.map(([columnName]) => {
 			const scriptGenerationConfig = {
