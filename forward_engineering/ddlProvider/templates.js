@@ -134,4 +134,9 @@ module.exports = {
 	setSequenceType: 'ALTER SEQUENCE IF EXISTS ${name} SET ${sequenceType};\n',
 
 	alterSequence: 'ALTER SEQUENCE IF EXISTS ${name}' + '${options}' + ';\n',
+
+	updateColumnDefaultValue:
+		'ALTER TABLE IF EXISTS ${tableName} ALTER COLUMN ${columnName} SET DEFAULT ${defaultValue};',
+
+	dropColumnDefaultValue: 'ALTER TABLE IF EXISTS ${tableName} ALTER COLUMN ${columnName} DROP DEFAULT;',
 };

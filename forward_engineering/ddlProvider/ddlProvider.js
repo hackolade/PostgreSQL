@@ -19,7 +19,7 @@ module.exports = (baseProvider, options, app) => {
 		getNamePrefixedWithSchemaName,
 		getColumnsList,
 		getViewData,
-	} = require('../utils/general')(_);
+	} = require('../utils/general');
 	const assignTemplates = require('../utils/assignTemplates');
 
 	const {
@@ -330,7 +330,7 @@ module.exports = (baseProvider, options, app) => {
 			const ifNotExist = index.ifNotExist ? ' IF NOT EXISTS' : '';
 			const only = index.only ? ' ONLY' : '';
 			const using = index.index_method ? ` USING ${_.toUpper(index.index_method)}` : '';
-			const { getDbVersion } = require('../utils/general')(_);
+			const { getDbVersion } = require('../utils/general');
 			const dbVersion = getDbVersion(_.get(dbData, 'dbVersion', ''));
 			const nullsDistinct = isUnique && index.nullsDistinct && dbVersion >= 15 ? `\n ${index.nullsDistinct}` : '';
 
@@ -567,7 +567,7 @@ module.exports = (baseProvider, options, app) => {
 				: '';
 			const security_barrier = viewData.viewOptions?.security_barrier ? `security_barrier` : '';
 			const dbVersionWhereSecurityInvokerAppeared = 15;
-			const { getDbVersion } = require('../utils/general')(_);
+			const { getDbVersion } = require('../utils/general');
 			const security_invoker =
 				viewData.viewOptions?.security_invoker &&
 				getDbVersion(dbData.dbVersion) >= dbVersionWhereSecurityInvokerAppeared
@@ -666,7 +666,7 @@ module.exports = (baseProvider, options, app) => {
 			const timePrecision = _.includes(timeTypes, columnDefinition.type) ? jsonSchema.timePrecision : '';
 			const timezone = _.includes(timeTypes, columnDefinition.type) ? jsonSchema.timezone : '';
 			const intervalOptions = columnDefinition.type === 'interval' ? jsonSchema.intervalOptions : '';
-			const { getDbVersion } = require('../utils/general')(_);
+			const { getDbVersion } = require('../utils/general');
 			const dbVersion = getDbVersion(schemaData.dbVersion);
 			const primaryKeyOptions = _.omit(
 				keyHelper.hydratePrimaryKeyOptions(
@@ -782,7 +782,7 @@ module.exports = (baseProvider, options, app) => {
 				? getNamePrefixedWithSchemaName(partitionParent.collectionName, partitionParent.bucketName)
 				: '';
 			const triggers = hydrateTriggers(entityData, tableData.relatedSchemas);
-			const { getDbVersion } = require('../utils/general')(_);
+			const { getDbVersion } = require('../utils/general');
 			const dbVersion = getDbVersion(_.get(tableData, 'dbData.dbVersion', ''));
 
 			return {
@@ -1340,6 +1340,31 @@ module.exports = (baseProvider, options, app) => {
 				indexName: ddlIndexName,
 			};
 			return assignTemplates(templates.reindexIndex, templatesConfig);
+		},
+
+		/**
+		 * @param {{ tableName: string, columnName: string, defaultValue: string }}
+		 * @return string
+		 * */
+		updateColumnDefaultValue({ tableName, columnName, defaultValue }) {
+			const templateConfig = {
+				tableName,
+				columnName,
+				defaultValue,
+			};
+			return assignTemplates(templates.updateColumnDefaultValue, templateConfig);
+		},
+
+		/**
+		 * @param {{ tableName: string, columnName: string }}
+		 * @return string
+		 * */
+		dropColumnDefaultValue({ tableName, columnName }) {
+			const templateConfig = {
+				tableName,
+				columnName,
+			};
+			return assignTemplates(templates.dropColumnDefaultValue, templateConfig);
 		},
 	};
 };

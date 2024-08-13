@@ -5,7 +5,7 @@ const { AlterCollectionDto } = require('../../types/AlterCollectionDto');
  * @return {(collection: AlterCollectionDto) => AlterScriptDto}
  */
 const getUpdatedCommentOnCollectionScriptDto = (_, ddlProvider) => collection => {
-	const { getFullTableName, wrapComment } = require('../../../utils/general')(_);
+	const { getFullTableName, wrapComment } = require('../../../utils/general');
 
 	const descriptionInfo = collection?.role.compMod?.description;
 	if (!descriptionInfo) {
@@ -28,7 +28,7 @@ const getUpdatedCommentOnCollectionScriptDto = (_, ddlProvider) => collection =>
  * @return {(collection: AlterCollectionDto) => AlterScriptDto}
  */
 const getDeletedCommentOnCollectionScriptDto = (_, ddlProvider) => collection => {
-	const { getFullTableName } = require('../../../utils/general')(_);
+	const { getFullTableName } = require('../../../utils/general');
 
 	const descriptionInfo = collection?.role.compMod?.description;
 	if (!descriptionInfo) {

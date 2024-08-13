@@ -11,7 +11,7 @@ const getAddContainerSequencesScriptDtos =
 	({ container }) => {
 		const _ = app.require('lodash');
 		const ddlProvider = require('../../../ddlProvider')(null, null, app);
-		const { getDbName } = require('../../../utils/general')(_);
+		const { getDbName } = require('../../../utils/general');
 		const schemaName = getDbName([container.role]);
 
 		return (container.role?.sequences || [])
@@ -29,7 +29,7 @@ const getModifyContainerSequencesScriptDtos =
 	({ container }) => {
 		const _ = app.require('lodash');
 		const ddlProvider = require('../../../ddlProvider')(null, null, app);
-		const { getDbName, getGroupItemsByCompMode } = require('../../../utils/general')(_);
+		const { getDbName, getGroupItemsByCompMode } = require('../../../utils/general');
 
 		const schemaName = getDbName([container.role]);
 		const sequencesCompMod = container.role?.compMod?.[sequencesCompModKey] || {};
@@ -72,7 +72,7 @@ const getDeleteContainerSequencesScriptDtos =
 	({ container }) => {
 		const _ = app.require('lodash');
 		const ddlProvider = require('../../../ddlProvider')(null, null, app);
-		const { getDbName } = require('../../../utils/general')(_);
+		const { getDbName } = require('../../../utils/general');
 		const schemaName = getDbName([container.role]);
 
 		return (container.role?.sequences || [])
