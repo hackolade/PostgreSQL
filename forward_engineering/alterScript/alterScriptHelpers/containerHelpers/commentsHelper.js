@@ -8,7 +8,7 @@ const extractDescription = container => {
  * @return {(collection: Object) => AlterScriptDto | undefined}
  * */
 const getUpsertCommentsScriptDto = (_, ddlProvider) => container => {
-	const { wrapComment, wrapInQuotes } = require('../../../utils/general')(_);
+	const { wrapComment, wrapInQuotes } = require('../../../utils/general');
 
 	const description = extractDescription(container);
 	if (description.new && description.new !== description.old) {
@@ -24,7 +24,7 @@ const getUpsertCommentsScriptDto = (_, ddlProvider) => container => {
  * @return {(collection: Object) => AlterScriptDto | undefined}
  * */
 const getDropCommentsScriptDto = (_, ddlProvider) => container => {
-	const { wrapInQuotes } = require('../../../utils/general')(_);
+	const { wrapInQuotes } = require('../../../utils/general');
 
 	const description = extractDescription(container);
 	if (description.old && !description.new) {

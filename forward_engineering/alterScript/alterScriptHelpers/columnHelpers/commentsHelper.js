@@ -4,7 +4,7 @@ const { AlterScriptDto } = require('../../types/AlterScriptDto');
  * @return {(collection: Object) => AlterScriptDto[]}
  * */
 const getUpdatedCommentOnColumnScriptDtos = (_, ddlProvider) => collection => {
-	const { getFullColumnName, wrapComment } = require('../../../utils/general')(_);
+	const { getFullColumnName, wrapComment } = require('../../../utils/general');
 	return _.toPairs(collection.properties)
 		.filter(([name, jsonSchema]) => {
 			const newComment = jsonSchema.description;
@@ -25,7 +25,7 @@ const getUpdatedCommentOnColumnScriptDtos = (_, ddlProvider) => collection => {
  * @return {(collection: Object) => AlterScriptDto[]}
  * */
 const getDeletedCommentOnColumnScriptDtos = (_, ddlProvider) => collection => {
-	const { getFullColumnName } = require('../../../utils/general')(_);
+	const { getFullColumnName } = require('../../../utils/general');
 
 	return _.toPairs(collection.properties)
 		.filter(([name, jsonSchema]) => {

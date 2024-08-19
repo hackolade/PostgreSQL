@@ -6,7 +6,7 @@ const { AlterScriptDto } = require('./types/AlterScriptDto');
  * @return {(dtos: AlterScriptDto[], shouldApplyDropStatements: boolean) => string}
  * */
 const joinAlterScriptDtosIntoScript = _ => (dtos, shouldApplyDropStatements) => {
-	const { commentIfDeactivated } = require('../utils/general')(_);
+	const { commentIfDeactivated } = require('../utils/general');
 	return dtos
 		.map(dto => {
 			if (dto.isActivated === false) {

@@ -53,7 +53,7 @@ const getDeleteUdtScriptDto = app => udt => {
 	const _ = app.require('lodash');
 	const ddlProvider = require('../../ddlProvider/ddlProvider')(null, null, app);
 
-	const { getUdtName, wrapInQuotes } = require('../../utils/general')(_);
+	const { getUdtName, wrapInQuotes } = require('../../utils/general');
 
 	const ddlUdtName = wrapInQuotes(getUdtName(udt));
 	if (udt.type === 'domain') {
@@ -73,7 +73,7 @@ const getAddColumnToTypeScriptDtos =
 	udt => {
 		const _ = app.require('lodash');
 		const { createColumnDefinitionBySchema } = require('./createColumnDefinition')(app);
-		const { getUdtName, wrapInQuotes } = require('../../utils/general')(_);
+		const { getUdtName, wrapInQuotes } = require('../../utils/general');
 		const ddlProvider = require('../../ddlProvider/ddlProvider')(null, null, app);
 		const { getDefinitionByReference } = app.require('@hackolade/ddl-fe-utils');
 
@@ -112,7 +112,7 @@ const getDeleteColumnFromTypeScriptDtos = app => udt => {
 	const _ = app.require('lodash');
 	const ddlProvider = require('../../ddlProvider/ddlProvider')(null, null, app);
 
-	const { wrapInQuotes } = require('../../utils/general')(_);
+	const { wrapInQuotes } = require('../../utils/general');
 
 	const fullName = wrapInQuotes(udt.code || udt.name);
 
@@ -130,7 +130,7 @@ const getModifyColumnOfTypeScriptDtos = app => udt => {
 	const _ = app.require('lodash');
 	const ddlProvider = require('../../ddlProvider/ddlProvider')(null, null, app);
 
-	const { checkFieldPropertiesChanged, wrapInQuotes } = require('../../utils/general')(_);
+	const { checkFieldPropertiesChanged, wrapInQuotes } = require('../../utils/general');
 
 	const fullName = wrapInQuotes(udt.code || udt.name);
 

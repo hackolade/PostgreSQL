@@ -4,7 +4,7 @@ const { AlterScriptDto } = require('../../types/AlterScriptDto');
  * @return {(collection: Object) => AlterScriptDto[]}
  * */
 const getModifyNonNullColumnsScriptDtos = (_, ddlProvider) => collection => {
-	const { getFullTableName, wrapInQuotes } = require('../../../utils/general')(_);
+	const { getFullTableName, wrapInQuotes } = require('../../../utils/general');
 	const fullTableName = getFullTableName(collection);
 
 	const currentRequiredColumnNames = collection.required || [];

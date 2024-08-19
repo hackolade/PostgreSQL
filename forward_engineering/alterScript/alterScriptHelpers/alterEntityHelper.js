@@ -13,6 +13,7 @@ const {
 	getAddedIndexesScriptDtos,
 	getAdditionalDataForDdlProvider,
 } = require('./entityHelpers/indexesHelper');
+const { getModifiedDefaultColumnValueScriptDtos } = require('./columnHelpers/defaultValueHelper');
 
 /**
  * @return {(collection: AlterCollectionDto) => AlterScriptDto | undefined}
@@ -21,7 +22,7 @@ const getAddCollectionScriptDto =
 	({ app, dbVersion, modelDefinitions, internalDefinitions, externalDefinitions }) =>
 	collection => {
 		const _ = app.require('lodash');
-		const { getEntityName } = require('../../utils/general')(_);
+		const { getEntityName } = require('../../utils/general');
 		const { createColumnDefinitionBySchema } = require('./createColumnDefinition')(app);
 		const ddlProvider = require('../../ddlProvider/ddlProvider')(null, null, app);
 		const { getDefinitionByReference } = app.require('@hackolade/ddl-fe-utils');
@@ -76,7 +77,7 @@ const getAddCollectionScriptDto =
 const getDeleteCollectionScriptDto = app => collection => {
 	const _ = app.require('lodash');
 	const ddlProvider = require('../../ddlProvider/ddlProvider')(null, null, app);
-	const { getFullTableName } = require('../../utils/general')(_);
+	const { getFullTableName } = require('../../utils/general');
 
 	const fullName = getFullTableName(collection);
 	const script = ddlProvider.dropTable(fullName);
@@ -116,7 +117,7 @@ const getAddColumnsByConditionScriptDtos =
 	({ app, dbVersion, modelDefinitions, internalDefinitions, externalDefinitions }) =>
 	(collection, predicate) => {
 		const _ = app.require('lodash');
-		const { getEntityName, getNamePrefixedWithSchemaName } = require('../../utils/general')(_);
+		const { getEntityName, getNamePrefixedWithSchemaName } = require('../../utils/general');
 		const { createColumnDefinitionBySchema } = require('./createColumnDefinition')(app);
 		const ddlProvider = require('../../ddlProvider/ddlProvider')(null, null, app);
 		const { getDefinitionByReference } = app.require('@hackolade/ddl-fe-utils');
@@ -204,7 +205,7 @@ const getAddColumnScriptDtos =
 const getDeleteColumnsByConditionScriptDtos = app => (collection, predicate) => {
 	const _ = app.require('lodash');
 	const ddlProvider = require('../../ddlProvider/ddlProvider')(null, null, app);
-	const { getEntityName, getNamePrefixedWithSchemaName, wrapInQuotes } = require('../../utils/general')(_);
+	const { getEntityName, getNamePrefixedWithSchemaName, wrapInQuotes } = require('../../utils/general');
 
 	const collectionSchema = { ...collection, ...(_.omit(collection?.role, 'properties') || {}) };
 	const tableName = getEntityName(collectionSchema);
@@ -294,12 +295,17 @@ const getModifyColumnScriptDtos =
 		const updateTypeScriptDtos = getUpdateTypesScriptDtos(_, ddlProvider)(collection);
 		const modifyNotNullScriptDtos = getModifyNonNullColumnsScriptDtos(_, ddlProvider)(collection);
 		const modifyCommentScriptDtos = getModifiedCommentOnColumnScriptDtos(_, ddlProvider)(collection);
+		const modifyDefaultColumnValueScriptDtos = getModifiedDefaultColumnValueScriptDtos({
+			ddlProvider,
+			collection,
+		});
 
 		return [
 			...renameColumnScriptDtos,
 			...updateTypeScriptDtos,
 			...modifyNotNullScriptDtos,
 			...modifyCommentScriptDtos,
+			...modifyDefaultColumnValueScriptDtos,
 		].filter(Boolean);
 	};
 

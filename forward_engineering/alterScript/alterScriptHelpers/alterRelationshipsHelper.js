@@ -13,7 +13,7 @@ const getRelationshipName = relationship => {
  * @return {(relationship: AlterRelationshipDto) => string}
  * */
 const getFullChildTableName = _ => relationship => {
-	const { getNamePrefixedWithSchemaName } = require('../../utils/general')(_);
+	const { getNamePrefixedWithSchemaName } = require('../../utils/general');
 	const compMod = relationship.role.compMod;
 
 	const childBucketName = compMod.child.bucket.name;
@@ -88,7 +88,7 @@ const getAddForeignKeyScriptDtos = (ddlProvider, _) => addedRelationships => {
  * }}
  * */
 const getDeleteSingleForeignKeyStatementDto = (ddlProvider, _) => relationship => {
-	const { wrapInQuotes } = require('../../utils/general')(_);
+	const { wrapInQuotes } = require('../../utils/general');
 	const compMod = relationship.role.compMod;
 
 	const ddlChildEntityName = getFullChildTableName(_)(relationship);
