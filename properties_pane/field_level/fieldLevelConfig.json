@@ -127,8 +127,7 @@ making sure that you maintain a proper JSON format.
 				"propertyType": "select",
 				"options": ["char", "varchar", "text", "bit", "varbit", "tsvector", "tsquery"],
 				"data": "options",
-				"valueType": "string",
-				"cleanDependency": true
+				"valueType": "string"
 			},
 			{
 				"propertyName": "Length",
