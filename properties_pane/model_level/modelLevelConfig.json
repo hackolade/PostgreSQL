@@ -159,7 +159,7 @@ making sure that you maintain a proper JSON format.
 					"values": [
 						{
 							"key": "locale",
-							"exists": false
+							"exist": false
 						},
 						{
 							"key": "locale",
@@ -178,7 +178,7 @@ making sure that you maintain a proper JSON format.
 					"values": [
 						{
 							"key": "locale",
-							"exists": false
+							"exist": false
 						},
 						{
 							"key": "locale",
