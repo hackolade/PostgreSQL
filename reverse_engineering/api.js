@@ -78,7 +78,6 @@ module.exports = {
 			});
 
 			postgresService.setDependencies(app);
-			await postgresService.connect(connectionInfo, sshService, postgresLogger);
 			await postgresService.logVersion();
 			const schemasNames = await postgresService.getAllSchemasNames();
 
