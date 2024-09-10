@@ -38,6 +38,7 @@ module.exports = {
 
 	async getDatabases(connectionInfo, logger, cb, app) {
 		const sshService = app.require('@hackolade/ssh-service');
+		await postgresService.disconnect(sshService);
 
 		try {
 			logInfo('Get databases', connectionInfo, logger);
@@ -78,6 +79,9 @@ module.exports = {
 			});
 
 			postgresService.setDependencies(app);
+			if (!connectionInfo.ssh) {
+				await postgresService.connect(connectionInfo, sshService, postgresLogger);
+			}
 			await postgresService.logVersion();
 			const schemasNames = await postgresService.getAllSchemasNames();
 
