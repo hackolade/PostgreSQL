@@ -135,12 +135,14 @@ module.exports = {
 		const database_name = (await db.queryTolerant(queryConstants.GET_DB_NAME, [], true))?.current_database;
 		const encoding = (await db.queryTolerant(queryConstants.GET_DB_ENCODING, [], true))?.server_encoding;
 		const LC_COLLATE = (await db.queryTolerant(queryConstants.GET_DB_COLLATE_NAME, [], true))?.default_collate_name;
+		const dbVersion = `v${await this._getServerVersion()}.x`;
 
 		return clearEmptyPropertiesInObject({
 			database_name,
 			encoding,
 			LC_COLLATE,
 			LC_CTYPE: LC_COLLATE,
+			dbVersion,
 		});
 	},
 
