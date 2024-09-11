@@ -1,7 +1,7 @@
 {
 	"model": {
 		"modelName": "New model",
-		"dbVersion": "v15.x",
+		"dbVersion": "v16.x",
 		"dbVendor": "PostgreSQL"
 	},
 	"container": {
