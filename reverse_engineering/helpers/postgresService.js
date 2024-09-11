@@ -51,7 +51,7 @@ const { mapSequenceData } = require('./postgresHelpers/sequenceHelper');
 let useSshTunnel = false;
 let _ = null;
 let logger = null;
-let version = 14;
+let version = 16;
 
 module.exports = {
 	setDependencies(app) {
@@ -102,9 +102,9 @@ module.exports = {
 
 	async logVersion() {
 		const versionRow = await db.queryTolerant(queryConstants.GET_VERSION, [], true);
-		const version = versionRow?.version || 'Version not retrieved';
+		const serverVersion = versionRow?.version || 'Version not retrieved';
 
-		logger.info(`PostgreSQL version: ${version}`);
+		logger.info(`PostgreSQL version: ${serverVersion}`);
 	},
 
 	async getAllSchemasNames() {
@@ -441,6 +441,7 @@ module.exports = {
 	async _getServerVersion() {
 		const result = await db.queryTolerant(queryConstants.GET_VERSION_AS_NUM, [], true);
 		const serverVersionNum = _.toNumber(result?.server_version_num);
+		const latestPgVersion = 16;
 
 		if (serverVersionNum >= 100000 && serverVersionNum < 110000) {
 			return 10;
@@ -452,9 +453,13 @@ module.exports = {
 			return 13;
 		} else if (serverVersionNum >= 140000 && serverVersionNum < 150000) {
 			return 14;
+		} else if (serverVersionNum >= 150000 && serverVersionNum < 160000) {
+			return 15;
+		} else if (serverVersionNum >= 160000 && serverVersionNum < 170000) {
+			return 16;
 		}
 
-		return 14;
+		return latestPgVersion;
 	},
 };
 
