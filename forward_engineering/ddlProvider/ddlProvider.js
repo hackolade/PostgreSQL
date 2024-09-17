@@ -5,7 +5,6 @@ const { Sequence } = require('../types/schemaSequenceTypes');
 
 module.exports = (baseProvider, options, app) => {
 	const _ = app.require('lodash');
-	const { joinActivatedAndDeactivatedStatements } = app.require('@hackolade/ddl-fe-utils');
 	const {
 		tab,
 		commentIfDeactivated,
@@ -217,23 +216,12 @@ module.exports = (baseProvider, options, app) => {
 				partitionOf && !keyConstraintsValue && !checkConstraintsValue && !foreignKeyConstraintsString;
 			const openParenthesis = isEmptyPartitionBody ? '' : '(';
 			const closeParenthesis = isEmptyPartitionBody ? '' : ')';
-			const columnStatementDtos = columns.map(column => {
-				return {
-					statement: column,
-					isActivated: !column.startsWith('--'),
-				};
-			});
-			const columnStatements = joinActivatedAndDeactivatedStatements({
-				statementDtos: columnStatementDtos,
-				delimiter: ',',
-				indent: '\n\t',
-			});
 
 			const tableStatement = assignTemplates(template, {
 				temporary: getTableTemporaryValue(temporary, unlogged),
 				ifNotExist: ifNotExistStr,
 				name: tableName,
-				columnDefinitions: !partitionOf ? '\t' + columnStatements : '',
+				columnDefinitions: !partitionOf ? '\t' + _.join(columns, ',\n\t') : '',
 				keyConstraints: keyConstraintsValue,
 				checkConstraints: checkConstraintsValue,
 				foreignKeyConstraints: foreignKeyConstraintsString,
