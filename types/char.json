@@ -13,7 +13,6 @@
 		"childRelationships": [],
 		"foreignCollection": "",
 		"foreignField": [],
-		"mode": "varchar",
-		"length": 10
+		"mode": "varchar"
 	}
 }
