@@ -12,7 +12,7 @@
 		"minItems": "",
 		"maxItems": "",
 		"uniqueItems": false,
-		"subtype": "float",
+		"subtype": "vector",
 		"dimension": 1
 	},
 	"subtypes": {
