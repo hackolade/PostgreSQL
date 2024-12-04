@@ -1,0 +1,34 @@
+#https://docs.github.com/en/webhooks/webhook-events-and-payloads#push
+name: notify-push
+on:
+  push:
+    branches:
+        - develop
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    env:
+        AUTHOR: ${{ github.event.pusher.name }}
+        COMMIT_PUSH_SOURCE: ${{ secrets.COMMIT_PUSH_SOURCE }}
+    steps:
+      - name: notify slack
+        id: slack
+        if: ${{ env.AUTHOR == env.COMMIT_PUSH_SOURCE }}
+        uses: slackapi/slack-github-action@v1.26.0
+        with:
+            channel-id: 'develop-direct-pushes'
+            payload: |
+                {
+                    "text": " ${{ github.event.head_commit.url }}",
+                    "blocks": [
+                    {
+                        "type": "section",
+                        "text": {
+                        "type": "mrkdwn",
+                        "text": "Push: ${{ github.event.head_commit.url }}"
+                        }
+                    }
+                    ]
+                }
+        env:
+            SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}

@@ -7,8 +7,7 @@
 	"hiddenOnEntity": "view",
 	"defaultValues": {
 		"primaryKey": false,
-		"mode": "bytea",
-		"length": 10
+		"mode": "bytea"
 	},
 	"descriptor": [
 		{

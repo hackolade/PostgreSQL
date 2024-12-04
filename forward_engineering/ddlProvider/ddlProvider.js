@@ -2,6 +2,7 @@ const defaultTypes = require('../configs/defaultTypes');
 const descriptors = require('../configs/descriptors');
 const templates = require('./templates');
 const { Sequence } = require('../types/schemaSequenceTypes');
+const { joinActivatedAndDeactivatedStatements } = require('../utils/joinActivatedAndDeactivatedStatements');
 
 module.exports = (baseProvider, options, app) => {
 	const _ = app.require('lodash');
@@ -19,7 +20,7 @@ module.exports = (baseProvider, options, app) => {
 		getNamePrefixedWithSchemaName,
 		getColumnsList,
 		getViewData,
-	} = require('../utils/general')(_);
+	} = require('../utils/general');
 	const assignTemplates = require('../utils/assignTemplates');
 
 	const {
@@ -216,12 +217,13 @@ module.exports = (baseProvider, options, app) => {
 				partitionOf && !keyConstraintsValue && !checkConstraintsValue && !foreignKeyConstraintsString;
 			const openParenthesis = isEmptyPartitionBody ? '' : '(';
 			const closeParenthesis = isEmptyPartitionBody ? '' : ')';
+			const columnStatements = joinActivatedAndDeactivatedStatements({ statements: columns, indent: '\n\t' });
 
 			const tableStatement = assignTemplates(template, {
 				temporary: getTableTemporaryValue(temporary, unlogged),
 				ifNotExist: ifNotExistStr,
 				name: tableName,
-				columnDefinitions: !partitionOf ? '\t' + _.join(columns, ',\n\t') : '',
+				columnDefinitions: !partitionOf ? '\t' + columnStatements : '',
 				keyConstraints: keyConstraintsValue,
 				checkConstraints: checkConstraintsValue,
 				foreignKeyConstraints: foreignKeyConstraintsString,
@@ -324,13 +326,13 @@ module.exports = (baseProvider, options, app) => {
 		 * */
 		createIndex(tableName, index, dbData, isParentActivated = true) {
 			const isUnique = index.unique && index.index_method === 'btree';
-			const name = wrapInQuotes(index.indxName);
+			const name = getNamePrefixedWithSchemaName(index.indxName, index.schemaName);
 			const unique = isUnique ? ' UNIQUE' : '';
 			const concurrently = index.concurrently ? ' CONCURRENTLY' : '';
 			const ifNotExist = index.ifNotExist ? ' IF NOT EXISTS' : '';
 			const only = index.only ? ' ONLY' : '';
 			const using = index.index_method ? ` USING ${_.toUpper(index.index_method)}` : '';
-			const { getDbVersion } = require('../utils/general')(_);
+			const { getDbVersion } = require('../utils/general');
 			const dbVersion = getDbVersion(_.get(dbData, 'dbVersion', ''));
 			const nullsDistinct = isUnique && index.nullsDistinct && dbVersion >= 15 ? `\n ${index.nullsDistinct}` : '';
 
@@ -567,7 +569,7 @@ module.exports = (baseProvider, options, app) => {
 				: '';
 			const security_barrier = viewData.viewOptions?.security_barrier ? `security_barrier` : '';
 			const dbVersionWhereSecurityInvokerAppeared = 15;
-			const { getDbVersion } = require('../utils/general')(_);
+			const { getDbVersion } = require('../utils/general');
 			const security_invoker =
 				viewData.viewOptions?.security_invoker &&
 				getDbVersion(dbData.dbVersion) >= dbVersionWhereSecurityInvokerAppeared
@@ -666,7 +668,7 @@ module.exports = (baseProvider, options, app) => {
 			const timePrecision = _.includes(timeTypes, columnDefinition.type) ? jsonSchema.timePrecision : '';
 			const timezone = _.includes(timeTypes, columnDefinition.type) ? jsonSchema.timezone : '';
 			const intervalOptions = columnDefinition.type === 'interval' ? jsonSchema.intervalOptions : '';
-			const { getDbVersion } = require('../utils/general')(_);
+			const { getDbVersion } = require('../utils/general');
 			const dbVersion = getDbVersion(schemaData.dbVersion);
 			const primaryKeyOptions = _.omit(
 				keyHelper.hydratePrimaryKeyOptions(
@@ -782,7 +784,7 @@ module.exports = (baseProvider, options, app) => {
 				? getNamePrefixedWithSchemaName(partitionParent.collectionName, partitionParent.bucketName)
 				: '';
 			const triggers = hydrateTriggers(entityData, tableData.relatedSchemas);
-			const { getDbVersion } = require('../utils/general')(_);
+			const { getDbVersion } = require('../utils/general');
 			const dbVersion = getDbVersion(_.get(tableData, 'dbData.dbVersion', ''));
 
 			return {
@@ -1340,6 +1342,31 @@ module.exports = (baseProvider, options, app) => {
 				indexName: ddlIndexName,
 			};
 			return assignTemplates(templates.reindexIndex, templatesConfig);
+		},
+
+		/**
+		 * @param {{ tableName: string, columnName: string, defaultValue: string }}
+		 * @return string
+		 * */
+		updateColumnDefaultValue({ tableName, columnName, defaultValue }) {
+			const templateConfig = {
+				tableName,
+				columnName,
+				defaultValue,
+			};
+			return assignTemplates(templates.updateColumnDefaultValue, templateConfig);
+		},
+
+		/**
+		 * @param {{ tableName: string, columnName: string }}
+		 * @return string
+		 * */
+		dropColumnDefaultValue({ tableName, columnName }) {
+			const templateConfig = {
+				tableName,
+				columnName,
+			};
+			return assignTemplates(templates.dropColumnDefaultValue, templateConfig);
 		},
 	};
 };

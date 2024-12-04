@@ -174,7 +174,7 @@ const getConstraintNameForCompositeUniqueKey = (uniqueKey, entityName) => {
  *  }
  * */
 const getCreateCompositeUniqueKeyDDLProviderConfig = _ => (uniqueKey, entityName, entity, dbVersion) => {
-	const { clean, getDbVersion } = require('../../../utils/general')(_);
+	const { clean, getDbVersion } = require('../../../utils/general');
 	const keyHelper = require('../../../ddlProvider/ddlHelpers/keyHelper')(_, clean);
 
 	const constraintName = getConstraintNameForCompositeUniqueKey(uniqueKey, entityName);
@@ -228,7 +228,7 @@ const getCreateCompositeUniqueKeyDDLProviderConfig = _ => (uniqueKey, entityName
  * @return {(collection: AlterCollectionDto, dbVersion: string) => Array<KeyScriptModificationDto>}
  * */
 const getAddCompositeUniqueKeyScriptDtos = (_, ddlProvider) => (collection, dbVersion) => {
-	const { getFullCollectionName, getSchemaOfAlterCollection, getEntityName } = require('../../../utils/general')(_);
+	const { getFullCollectionName, getSchemaOfAlterCollection, getEntityName } = require('../../../utils/general');
 
 	/**
 	 * @type {AlterCollectionRoleCompModUniqueKey}
@@ -272,8 +272,12 @@ const getAddCompositeUniqueKeyScriptDtos = (_, ddlProvider) => (collection, dbVe
  * @return {(collection: AlterCollectionDto) => Array<KeyScriptModificationDto>}
  * */
 const getDropCompositeUniqueKeyScriptDtos = (_, ddlProvider) => collection => {
-	const { getFullCollectionName, getSchemaOfAlterCollection, getEntityName, wrapInQuotes } =
-		require('../../../utils/general')(_);
+	const {
+		getFullCollectionName,
+		getSchemaOfAlterCollection,
+		getEntityName,
+		wrapInQuotes,
+	} = require('../../../utils/general');
 
 	const uniqueDto = collection?.role?.compMod?.uniqueKey || {};
 	const newUniqueKeys = uniqueDto.new || [];
@@ -364,7 +368,7 @@ const getConstraintNameForRegularUniqueKey = (columnJsonSchema, entityName) => {
  * */
 const getCreateRegularUniqueKeyDDLProviderConfig =
 	_ => (columnName, columnJsonSchema, entityName, entity, dbVersion) => {
-		const { clean, getDbVersion } = require('../../../utils/general')(_);
+		const { clean, getDbVersion } = require('../../../utils/general');
 		const keyHelper = require('../../../ddlProvider/ddlHelpers/keyHelper')(_, clean);
 		const constraintName = getConstraintNameForRegularUniqueKey(columnJsonSchema, entityName);
 		const uniqueColumns = [
@@ -582,7 +586,7 @@ const wasRegularUniqueKeyModified = _ => (columnJsonSchema, collection) => {
  * @return {(collection: AlterCollectionDto, dbVersion: string) => Array<KeyScriptModificationDto>}
  * */
 const getAddUniqueKeyScriptDtos = (_, ddlProvider) => (collection, dbVersion) => {
-	const { getFullCollectionName, getSchemaOfAlterCollection, getEntityName } = require('../../../utils/general')(_);
+	const { getFullCollectionName, getSchemaOfAlterCollection, getEntityName } = require('../../../utils/general');
 
 	const collectionSchema = getSchemaOfAlterCollection(collection);
 	const fullTableName = getFullCollectionName(collectionSchema);
@@ -620,8 +624,12 @@ const getAddUniqueKeyScriptDtos = (_, ddlProvider) => (collection, dbVersion) =>
  * @return {(collection: AlterCollectionDto) => Array<KeyScriptModificationDto>}
  * */
 const getDropUniqueKeyScriptDto = (_, ddlProvider) => collection => {
-	const { getFullCollectionName, getSchemaOfAlterCollection, getEntityName, wrapInQuotes } =
-		require('../../../utils/general')(_);
+	const {
+		getFullCollectionName,
+		getSchemaOfAlterCollection,
+		getEntityName,
+		wrapInQuotes,
+	} = require('../../../utils/general');
 
 	const collectionSchema = getSchemaOfAlterCollection(collection);
 	const fullTableName = getFullCollectionName(collectionSchema);

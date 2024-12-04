@@ -8,7 +8,7 @@ const extractDescription = view => {
  * @return {(view: Object) => AlterScriptDto | undefined}
  * */
 const getUpsertCommentsScriptDto = (_, ddlProvider) => view => {
-	const { getFullViewName, wrapComment } = require('../../../utils/general')(_);
+	const { getFullViewName, wrapComment } = require('../../../utils/general');
 
 	const description = extractDescription(view);
 	if (description.new && description.new !== description.old) {
@@ -25,7 +25,7 @@ const getUpsertCommentsScriptDto = (_, ddlProvider) => view => {
  * */
 const getDropCommentsScriptDto = (_, ddlProvider) => view => {
 	const description = extractDescription(view);
-	const { getFullViewName } = require('../../../utils/general')(_);
+	const { getFullViewName } = require('../../../utils/general');
 
 	if (description.old && !description.new) {
 		const viewName = getFullViewName(view);

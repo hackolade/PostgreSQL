@@ -275,6 +275,7 @@ making sure that you maintain a proper JSON format.
 			{
 				"propertyName": "Primary key",
 				"propertyKeyword": "compositePrimaryKey",
+				"propertyNameFull": "Composite Primary Key",
 				"propertyType": "checkbox",
 				"propertyTooltip": {
 					"disabled": [
@@ -349,6 +350,7 @@ making sure that you maintain a proper JSON format.
 				"propertyKeyword": "primaryKey",
 				"enableForReference": true,
 				"propertyType": "checkbox",
+				"preserveOnCleanDependencies": true,
 				"dependency": {
 					"type": "and",
 					"values": [
@@ -420,6 +422,13 @@ making sure that you maintain a proper JSON format.
 									]
 								}
 							]
+						},
+						{
+							"type": "not",
+							"values": {
+								"key": "unique",
+								"value": true
+							}
 						}
 					]
 				}
@@ -525,6 +534,7 @@ making sure that you maintain a proper JSON format.
 			{
 				"propertyName": "Unique",
 				"propertyKeyword": "compositeUniqueKey",
+				"propertyNameFull": "Composite Unique Key",
 				"propertyType": "checkbox",
 				"dependency": {
 					"key": "compositeUniqueKey",
@@ -544,12 +554,21 @@ making sure that you maintain a proper JSON format.
 							"type": "or",
 							"values": [
 								{
-									"key": "compositePrimaryKey",
-									"value": false
+									"type": "or",
+									"values": [
+										{
+											"key": "primaryKey",
+											"value": false
+										},
+										{
+											"key": "primaryKey",
+											"exist": false
+										}
+									]
 								},
 								{
 									"key": "compositePrimaryKey",
-									"exist": false
+									"value": true
 								}
 							]
 						},
@@ -843,6 +862,7 @@ making sure that you maintain a proper JSON format.
 			{
 				"propertyName": "Primary key",
 				"propertyKeyword": "compositePrimaryKey",
+				"propertyNameFull": "Composite Primary Key",
 				"propertyType": "checkbox",
 				"propertyTooltip": {
 					"disabled": [
@@ -917,6 +937,7 @@ making sure that you maintain a proper JSON format.
 				"propertyKeyword": "primaryKey",
 				"enableForReference": true,
 				"propertyType": "checkbox",
+				"preserveOnCleanDependencies": true,
 				"dependency": {
 					"type": "and",
 					"values": [
@@ -988,6 +1009,13 @@ making sure that you maintain a proper JSON format.
 									]
 								}
 							]
+						},
+						{
+							"type": "not",
+							"values": {
+								"key": "unique",
+								"value": true
+							}
 						}
 					]
 				}
@@ -1093,6 +1121,7 @@ making sure that you maintain a proper JSON format.
 			{
 				"propertyName": "Unique",
 				"propertyKeyword": "compositeUniqueKey",
+				"propertyNameFull": "Composite Unique Key",
 				"propertyType": "checkbox",
 				"dependency": {
 					"key": "compositeUniqueKey",
@@ -1112,12 +1141,21 @@ making sure that you maintain a proper JSON format.
 							"type": "or",
 							"values": [
 								{
-									"key": "compositePrimaryKey",
-									"value": false
+									"type": "or",
+									"values": [
+										{
+											"key": "primaryKey",
+											"value": false
+										},
+										{
+											"key": "primaryKey",
+											"exist": false
+										}
+									]
 								},
 								{
 									"key": "compositePrimaryKey",
-									"exist": false
+									"value": true
 								}
 							]
 						},
@@ -1372,6 +1410,7 @@ making sure that you maintain a proper JSON format.
 			{
 				"propertyName": "Primary key",
 				"propertyKeyword": "compositePrimaryKey",
+				"propertyNameFull": "Composite Primary Key",
 				"propertyType": "checkbox",
 				"propertyTooltip": {
 					"disabled": [
@@ -1446,6 +1485,7 @@ making sure that you maintain a proper JSON format.
 				"propertyKeyword": "primaryKey",
 				"enableForReference": true,
 				"propertyType": "checkbox",
+				"preserveOnCleanDependencies": true,
 				"dependency": {
 					"type": "and",
 					"values": [
@@ -1517,6 +1557,13 @@ making sure that you maintain a proper JSON format.
 									]
 								}
 							]
+						},
+						{
+							"type": "not",
+							"values": {
+								"key": "unique",
+								"value": true
+							}
 						}
 					]
 				}
@@ -1622,6 +1669,7 @@ making sure that you maintain a proper JSON format.
 			{
 				"propertyName": "Unique",
 				"propertyKeyword": "compositeUniqueKey",
+				"propertyNameFull": "Composite Unique Key",
 				"propertyType": "checkbox",
 				"dependency": {
 					"key": "compositeUniqueKey",
@@ -1641,12 +1689,21 @@ making sure that you maintain a proper JSON format.
 							"type": "or",
 							"values": [
 								{
-									"key": "compositePrimaryKey",
-									"value": false
+									"type": "or",
+									"values": [
+										{
+											"key": "primaryKey",
+											"value": false
+										},
+										{
+											"key": "primaryKey",
+											"exist": false
+										}
+									]
 								},
 								{
 									"key": "compositePrimaryKey",
-									"exist": false
+									"value": true
 								}
 							]
 						},
@@ -1940,6 +1997,7 @@ making sure that you maintain a proper JSON format.
 			{
 				"propertyName": "Primary key",
 				"propertyKeyword": "compositePrimaryKey",
+				"propertyNameFull": "Composite Primary Key",
 				"propertyType": "checkbox",
 				"propertyTooltip": {
 					"disabled": [
@@ -2014,6 +2072,7 @@ making sure that you maintain a proper JSON format.
 				"propertyKeyword": "primaryKey",
 				"enableForReference": true,
 				"propertyType": "checkbox",
+				"preserveOnCleanDependencies": true,
 				"dependency": {
 					"type": "and",
 					"values": [
@@ -2085,6 +2144,13 @@ making sure that you maintain a proper JSON format.
 									]
 								}
 							]
+						},
+						{
+							"type": "not",
+							"values": {
+								"key": "unique",
+								"value": true
+							}
 						}
 					]
 				}
@@ -2190,6 +2256,7 @@ making sure that you maintain a proper JSON format.
 			{
 				"propertyName": "Unique",
 				"propertyKeyword": "compositeUniqueKey",
+				"propertyNameFull": "Composite Unique Key",
 				"propertyType": "checkbox",
 				"dependency": {
 					"key": "compositeUniqueKey",
@@ -2209,12 +2276,21 @@ making sure that you maintain a proper JSON format.
 							"type": "or",
 							"values": [
 								{
-									"key": "compositePrimaryKey",
-									"value": false
+									"type": "or",
+									"values": [
+										{
+											"key": "primaryKey",
+											"value": false
+										},
+										{
+											"key": "primaryKey",
+											"exist": false
+										}
+									]
 								},
 								{
 									"key": "compositePrimaryKey",
-									"exist": false
+									"value": true
 								}
 							]
 						},
@@ -2565,6 +2641,7 @@ making sure that you maintain a proper JSON format.
 			{
 				"propertyName": "Primary key",
 				"propertyKeyword": "compositePrimaryKey",
+				"propertyNameFull": "Composite Primary Key",
 				"propertyType": "checkbox",
 				"propertyTooltip": {
 					"disabled": [
@@ -2639,6 +2716,7 @@ making sure that you maintain a proper JSON format.
 				"propertyKeyword": "primaryKey",
 				"enableForReference": true,
 				"propertyType": "checkbox",
+				"preserveOnCleanDependencies": true,
 				"dependency": {
 					"type": "and",
 					"values": [
@@ -2710,6 +2788,13 @@ making sure that you maintain a proper JSON format.
 									]
 								}
 							]
+						},
+						{
+							"type": "not",
+							"values": {
+								"key": "unique",
+								"value": true
+							}
 						}
 					]
 				}
@@ -2815,6 +2900,7 @@ making sure that you maintain a proper JSON format.
 			{
 				"propertyName": "Unique",
 				"propertyKeyword": "compositeUniqueKey",
+				"propertyNameFull": "Composite Unique Key",
 				"propertyType": "checkbox",
 				"dependency": {
 					"key": "compositeUniqueKey",
@@ -2834,12 +2920,21 @@ making sure that you maintain a proper JSON format.
 							"type": "or",
 							"values": [
 								{
-									"key": "compositePrimaryKey",
-									"value": false
+									"type": "or",
+									"values": [
+										{
+											"key": "primaryKey",
+											"value": false
+										},
+										{
+											"key": "primaryKey",
+											"exist": false
+										}
+									]
 								},
 								{
 									"key": "compositePrimaryKey",
-									"exist": false
+									"value": true
 								}
 							]
 						},
@@ -3100,6 +3195,7 @@ making sure that you maintain a proper JSON format.
 			{
 				"propertyName": "Primary key",
 				"propertyKeyword": "compositePrimaryKey",
+				"propertyNameFull": "Composite Primary Key",
 				"propertyType": "checkbox",
 				"propertyTooltip": {
 					"disabled": [
@@ -3174,6 +3270,7 @@ making sure that you maintain a proper JSON format.
 				"propertyKeyword": "primaryKey",
 				"enableForReference": true,
 				"propertyType": "checkbox",
+				"preserveOnCleanDependencies": true,
 				"dependency": {
 					"type": "and",
 					"values": [
@@ -3245,6 +3342,13 @@ making sure that you maintain a proper JSON format.
 									]
 								}
 							]
+						},
+						{
+							"type": "not",
+							"values": {
+								"key": "unique",
+								"value": true
+							}
 						}
 					]
 				}
@@ -3350,6 +3454,7 @@ making sure that you maintain a proper JSON format.
 			{
 				"propertyName": "Unique",
 				"propertyKeyword": "compositeUniqueKey",
+				"propertyNameFull": "Composite Unique Key",
 				"propertyType": "checkbox",
 				"dependency": {
 					"key": "compositeUniqueKey",
@@ -3369,12 +3474,21 @@ making sure that you maintain a proper JSON format.
 							"type": "or",
 							"values": [
 								{
-									"key": "compositePrimaryKey",
-									"value": false
+									"type": "or",
+									"values": [
+										{
+											"key": "primaryKey",
+											"value": false
+										},
+										{
+											"key": "primaryKey",
+											"exist": false
+										}
+									]
 								},
 								{
 									"key": "compositePrimaryKey",
-									"exist": false
+									"value": true
 								}
 							]
 						},
@@ -3794,6 +3908,7 @@ making sure that you maintain a proper JSON format.
 			{
 				"propertyName": "Primary key",
 				"propertyKeyword": "compositePrimaryKey",
+				"propertyNameFull": "Composite Primary Key",
 				"propertyType": "checkbox",
 				"propertyTooltip": {
 					"disabled": [
@@ -3868,6 +3983,7 @@ making sure that you maintain a proper JSON format.
 				"propertyKeyword": "primaryKey",
 				"enableForReference": true,
 				"propertyType": "checkbox",
+				"preserveOnCleanDependencies": true,
 				"dependency": {
 					"type": "and",
 					"values": [
@@ -3939,6 +4055,13 @@ making sure that you maintain a proper JSON format.
 									]
 								}
 							]
+						},
+						{
+							"type": "not",
+							"values": {
+								"key": "unique",
+								"value": true
+							}
 						}
 					]
 				}
@@ -4044,6 +4167,7 @@ making sure that you maintain a proper JSON format.
 			{
 				"propertyName": "Unique",
 				"propertyKeyword": "compositeUniqueKey",
+				"propertyNameFull": "Composite Unique Key",
 				"propertyType": "checkbox",
 				"dependency": {
 					"key": "compositeUniqueKey",
@@ -4063,12 +4187,21 @@ making sure that you maintain a proper JSON format.
 							"type": "or",
 							"values": [
 								{
-									"key": "compositePrimaryKey",
-									"value": false
+									"type": "or",
+									"values": [
+										{
+											"key": "primaryKey",
+											"value": false
+										},
+										{
+											"key": "primaryKey",
+											"exist": false
+										}
+									]
 								},
 								{
 									"key": "compositePrimaryKey",
-									"exist": false
+									"value": true
 								}
 							]
 						},
@@ -4309,6 +4442,7 @@ making sure that you maintain a proper JSON format.
 			{
 				"propertyName": "Primary key",
 				"propertyKeyword": "compositePrimaryKey",
+				"propertyNameFull": "Composite Primary Key",
 				"propertyType": "checkbox",
 				"propertyTooltip": {
 					"disabled": [
@@ -4383,6 +4517,7 @@ making sure that you maintain a proper JSON format.
 				"propertyKeyword": "primaryKey",
 				"enableForReference": true,
 				"propertyType": "checkbox",
+				"preserveOnCleanDependencies": true,
 				"dependency": {
 					"type": "and",
 					"values": [
@@ -4454,6 +4589,13 @@ making sure that you maintain a proper JSON format.
 									]
 								}
 							]
+						},
+						{
+							"type": "not",
+							"values": {
+								"key": "unique",
+								"value": true
+							}
 						}
 					]
 				}
@@ -4559,6 +4701,7 @@ making sure that you maintain a proper JSON format.
 			{
 				"propertyName": "Unique",
 				"propertyKeyword": "compositeUniqueKey",
+				"propertyNameFull": "Composite Unique Key",
 				"propertyType": "checkbox",
 				"dependency": {
 					"key": "compositeUniqueKey",
@@ -4578,12 +4721,21 @@ making sure that you maintain a proper JSON format.
 							"type": "or",
 							"values": [
 								{
-									"key": "compositePrimaryKey",
-									"value": false
+									"type": "or",
+									"values": [
+										{
+											"key": "primaryKey",
+											"value": false
+										},
+										{
+											"key": "primaryKey",
+											"exist": false
+										}
+									]
 								},
 								{
 									"key": "compositePrimaryKey",
-									"exist": false
+									"value": true
 								}
 							]
 						},
@@ -4845,6 +4997,7 @@ making sure that you maintain a proper JSON format.
 			{
 				"propertyName": "Primary key",
 				"propertyKeyword": "compositePrimaryKey",
+				"propertyNameFull": "Composite Primary Key",
 				"propertyType": "checkbox",
 				"propertyTooltip": {
 					"disabled": [
@@ -4919,6 +5072,7 @@ making sure that you maintain a proper JSON format.
 				"propertyKeyword": "primaryKey",
 				"enableForReference": true,
 				"propertyType": "checkbox",
+				"preserveOnCleanDependencies": true,
 				"dependency": {
 					"type": "and",
 					"values": [
@@ -4990,6 +5144,13 @@ making sure that you maintain a proper JSON format.
 									]
 								}
 							]
+						},
+						{
+							"type": "not",
+							"values": {
+								"key": "unique",
+								"value": true
+							}
 						}
 					]
 				}
@@ -5095,6 +5256,7 @@ making sure that you maintain a proper JSON format.
 			{
 				"propertyName": "Unique",
 				"propertyKeyword": "compositeUniqueKey",
+				"propertyNameFull": "Composite Unique Key",
 				"propertyType": "checkbox",
 				"dependency": {
 					"key": "compositeUniqueKey",
@@ -5114,12 +5276,21 @@ making sure that you maintain a proper JSON format.
 							"type": "or",
 							"values": [
 								{
-									"key": "compositePrimaryKey",
-									"value": false
+									"type": "or",
+									"values": [
+										{
+											"key": "primaryKey",
+											"value": false
+										},
+										{
+											"key": "primaryKey",
+											"exist": false
+										}
+									]
 								},
 								{
 									"key": "compositePrimaryKey",
-									"exist": false
+									"value": true
 								}
 							]
 						},
