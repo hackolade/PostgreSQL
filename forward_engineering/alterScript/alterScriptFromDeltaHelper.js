@@ -52,16 +52,16 @@ const getAlterContainersScriptDtos = ({ collection, app }) => {
 	const addContainersScriptDtos = []
 		.concat(addedContainers)
 		.filter(Boolean)
-		.map(container => getAddContainerScriptDto(app)(Object.keys(container.properties)[0]));
+		.map(container => getAddContainerScriptDto(Object.keys(container.properties)[0]));
 	const deleteContainersScriptDtos = []
 		.concat(deletedContainers)
 		.filter(Boolean)
-		.map(container => getDeleteContainerScriptDto(app)(Object.keys(container.properties)[0]));
+		.map(container => getDeleteContainerScriptDto(Object.keys(container.properties)[0]));
 	const modifyContainersScriptDtos = []
 		.concat(modifiedContainers)
 		.filter(Boolean)
 		.map(containerWrapper => Object.values(containerWrapper.properties)[0])
-		.flatMap(container => getModifyContainerScriptDtos(app)(container));
+		.flatMap(container => getModifyContainerScriptDtos(container));
 
 	return [...addContainersScriptDtos, ...deleteContainersScriptDtos, ...modifyContainersScriptDtos].filter(Boolean);
 };
@@ -106,7 +106,7 @@ const getAlterCollectionsScriptDtos = ({
 	const deleteCollectionScriptDtos = deleteScriptsData
 		.filter(collection => collection.compMod?.deleted)
 		.map(getDeleteCollectionScriptDto(app));
-	const modifyCollectionScriptDtos = modifyScriptsData.flatMap(getModifyCollectionScriptDtos({ app, dbVersion }));
+	const modifyCollectionScriptDtos = modifyScriptsData.flatMap(getModifyCollectionScriptDtos({ dbVersion }));
 	const addColumnScriptDtos = createScriptsData
 		.filter(item => !item?.compMod?.created)
 		.flatMap(
@@ -155,7 +155,7 @@ const getAlterViewScriptDtos = (collection, app) => {
 		.filter(Boolean)
 		.map(viewWrapper => Object.values(viewWrapper.properties)[0])
 		.map(view => ({ ...view, ...(view.role || {}) }))
-		.flatMap(view => getModifyViewScriptDtos(app)(view));
+		.flatMap(view => getModifyViewScriptDtos(view));
 
 	return [...deleteViewsScriptDtos, ...createViewsScriptDtos, ...modifyViewsScriptDtos].filter(Boolean);
 };
@@ -308,17 +308,17 @@ const getAlterContainersSequencesScriptDtos = ({ collection, app }) => {
 		.concat(addedContainers)
 		.filter(Boolean)
 		.map(container => Object.values(container.properties)[0])
-		.flatMap(container => getAddContainerSequencesScriptDtos({ app })({ container }));
+		.flatMap(container => getAddContainerSequencesScriptDtos({ container }));
 	const deleteContainersScriptDtos = []
 		.concat(deletedContainers)
 		.filter(Boolean)
 		.map(container => Object.values(container.properties)[0])
-		.flatMap(container => getDeleteContainerSequencesScriptDtos({ app })({ container }));
+		.flatMap(container => getDeleteContainerSequencesScriptDtos({ container }));
 	const modifyContainersScriptDtos = []
 		.concat(modifiedContainers)
 		.filter(Boolean)
 		.map(container => Object.values(container.properties)[0])
-		.flatMap(container => getModifyContainerSequencesScriptDtos({ app })({ container }));
+		.flatMap(container => getModifyContainerSequencesScriptDtos({ container }));
 
 	return [...addContainersSequencesScriptDtos, ...deleteContainersScriptDtos, ...modifyContainersScriptDtos].filter(
 		Boolean,
