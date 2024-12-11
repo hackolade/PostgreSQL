@@ -95,7 +95,7 @@ const getValue = value => {
 
 const createIndex = (tableName, index, dbData, isParentActivated = true) => {
 	const isUnique = index.unique && index.index_method === 'btree';
-	const name = getNamePrefixedWithSchemaName(index.indxName, index.schemaName);
+	const name = wrapInQuotes(index.indxName);
 	const unique = isUnique ? ' UNIQUE' : '';
 	const concurrently = index.concurrently ? ' CONCURRENTLY' : '';
 	const ifNotExist = index.ifNotExist ? ' IF NOT EXISTS' : '';
