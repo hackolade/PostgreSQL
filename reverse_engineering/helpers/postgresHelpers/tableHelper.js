@@ -346,7 +346,6 @@ const prepareTableInheritance = (schemaName, inheritanceResult) => {
 module.exports = {
 	prepareStorageParameters,
 	prepareTablePartition,
-	setDependencies,
 	checkHaveJsonTypes,
 	prepareTableConstraints,
 	prepareTableLevelData,
