@@ -80,7 +80,7 @@ const createClient = async (connectionInfo, sshService, logger) => {
 		isSshTunnel = true;
 	}
 
-	connectionInfo = Object.assign({}, connectionInfo, { sslType: mapSslType(connectionInfo.sslType) });
+	connectionInfo = { ...connectionInfo, sslType: mapSslType(connectionInfo.sslType) };
 
 	const config = {
 		host: connectionInfo.host,

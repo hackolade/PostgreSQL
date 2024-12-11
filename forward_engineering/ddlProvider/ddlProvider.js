@@ -15,6 +15,7 @@ const {
 	wrapInQuotes,
 	getNamePrefixedWithSchemaName,
 	getViewData,
+	getDbVersion,
 } = require('../utils/general');
 const assignTemplates = require('../utils/assignTemplates');
 const {
@@ -36,7 +37,7 @@ const {
 } = require('./ddlHelpers/sequenceHelper');
 const { getTableTemporaryValue, getTableOptions } = require('./ddlHelpers/tableHelper');
 const { getUserDefinedType, isNotPlainType } = require('./ddlHelpers/udtHelper');
-const { getIndexKeys, getIndexOptions, getWithOptions, dropIndex, createIndex } = require('./ddlHelpers/indexHelper');
+const { dropIndex, createIndex } = require('./ddlHelpers/indexHelper');
 const {
 	decorateType,
 	decorateDefault,
@@ -471,7 +472,6 @@ module.exports = (baseProvider, options, app) => {
 				: '';
 			const security_barrier = viewData.viewOptions?.security_barrier ? `security_barrier` : '';
 			const dbVersionWhereSecurityInvokerAppeared = 15;
-			const { getDbVersion } = require('../utils/general');
 			const security_invoker =
 				viewData.viewOptions?.security_invoker &&
 				getDbVersion(dbData.dbVersion) >= dbVersionWhereSecurityInvokerAppeared
@@ -570,7 +570,6 @@ module.exports = (baseProvider, options, app) => {
 			const timePrecision = _.includes(timeTypes, columnDefinition.type) ? jsonSchema.timePrecision : '';
 			const timezone = _.includes(timeTypes, columnDefinition.type) ? jsonSchema.timezone : '';
 			const intervalOptions = columnDefinition.type === 'interval' ? jsonSchema.intervalOptions : '';
-			const { getDbVersion } = require('../utils/general');
 			const dbVersion = getDbVersion(schemaData.dbVersion);
 			const primaryKeyOptions = _.omit(
 				keyHelper.hydratePrimaryKeyOptions(
@@ -686,7 +685,6 @@ module.exports = (baseProvider, options, app) => {
 				? getNamePrefixedWithSchemaName(partitionParent.collectionName, partitionParent.bucketName)
 				: '';
 			const triggers = hydrateTriggers(entityData, tableData.relatedSchemas);
-			const { getDbVersion } = require('../utils/general');
 			const dbVersion = getDbVersion(_.get(tableData, 'dbData.dbVersion', ''));
 
 			return {

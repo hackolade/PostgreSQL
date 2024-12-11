@@ -1,5 +1,5 @@
 const _ = require('lodash');
-const { wrap, commentIfDeactivated, wrapInQuotes, wrapComment } = require('../../utils/general');
+const { commentIfDeactivated, wrapInQuotes, wrapComment } = require('../../utils/general');
 const assignTemplates = require('../../utils/assignTemplates');
 const templates = require('../templates');
 

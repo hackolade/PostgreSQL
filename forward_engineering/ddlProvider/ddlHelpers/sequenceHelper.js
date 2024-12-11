@@ -1,9 +1,8 @@
 /**
- * @typedef {{
- * key: keyof Sequence;
- * clause: string;
- * getOption: ({ sequence, config } : { sequence: Sequence, config: OptionConfig }) => string
- * }} OptionConfig
+ * @typedef {Object} OptionConfig
+ * @property {string} key
+ * @property {string} clause
+ * @property {({sequence: Sequence, config: OptionConfig}) => string} getOption
  */
 
 const _ = require('lodash');

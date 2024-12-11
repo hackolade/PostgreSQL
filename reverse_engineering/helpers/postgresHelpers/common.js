@@ -1,3 +1,5 @@
+const _ = require('lodash');
+
 const POSTGRES_RESERVED_WORDS = [
 	'ALL',
 	'ANALYSE',
@@ -96,12 +98,6 @@ const POSTGRES_RESERVED_WORDS = [
 	'WITH',
 ];
 
-let _ = null;
-
-const setDependencies = app => {
-	_ = app.require('lodash');
-};
-
 const clearEmptyPropertiesInObject = obj =>
 	_.chain(obj)
 		.toPairs()
@@ -115,7 +111,6 @@ const wrapInQuotes = name =>
 
 module.exports = {
 	clearEmptyPropertiesInObject,
-	setDependencies,
 	getColumnNameByPosition,
 	wrapInQuotes,
 };

@@ -1,10 +1,5 @@
+const _ = require('lodash');
 const { clearEmptyPropertiesInObject, getColumnNameByPosition } = require('./common');
-
-let _ = null;
-
-const setDependencies = app => {
-	_ = app.require('lodash');
-};
 
 const prepareStorageParameters = (reloptions, tableToastOptions) => {
 	if (!reloptions && !tableToastOptions) {

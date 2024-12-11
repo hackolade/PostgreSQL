@@ -1,3 +1,4 @@
+const _ = require('lodash');
 const {
 	getAddContainerScriptDto,
 	getDeleteContainerScriptDto,
@@ -39,12 +40,11 @@ const {
 
 /**
  * @param dto {{
- *     collection: Object,
- *     app: App,
+ *     collection: Object
  * }}
  * @return {AlterScriptDto[]}
  * */
-const getAlterContainersScriptDtos = ({ collection, app }) => {
+const getAlterContainersScriptDtos = ({ collection }) => {
 	const addedContainers = collection.properties?.containers?.properties?.added?.items;
 	const deletedContainers = collection.properties?.containers?.properties?.deleted?.items;
 	const modifiedContainers = collection.properties?.containers?.properties?.modified?.items;
@@ -53,10 +53,12 @@ const getAlterContainersScriptDtos = ({ collection, app }) => {
 		.concat(addedContainers)
 		.filter(Boolean)
 		.map(container => getAddContainerScriptDto(Object.keys(container.properties)[0]));
+
 	const deleteContainersScriptDtos = []
 		.concat(deletedContainers)
 		.filter(Boolean)
 		.map(container => getDeleteContainerScriptDto(Object.keys(container.properties)[0]));
+
 	const modifyContainersScriptDtos = []
 		.concat(modifiedContainers)
 		.filter(Boolean)
@@ -103,18 +105,23 @@ const getAlterCollectionsScriptDtos = ({
 	const createCollectionsScriptDtos = createScriptsData
 		.filter(collection => collection.compMod?.created)
 		.map(getAddCollectionScriptDto({ app, dbVersion, modelDefinitions, internalDefinitions, externalDefinitions }));
+
 	const deleteCollectionScriptDtos = deleteScriptsData
 		.filter(collection => collection.compMod?.deleted)
 		.map(getDeleteCollectionScriptDto(app));
+
 	const modifyCollectionScriptDtos = modifyScriptsData.flatMap(getModifyCollectionScriptDtos({ dbVersion }));
+
 	const addColumnScriptDtos = createScriptsData
 		.filter(item => !item?.compMod?.created)
 		.flatMap(
 			getAddColumnScriptDtos({ app, dbVersion, modelDefinitions, internalDefinitions, externalDefinitions }),
 		);
+
 	const deleteColumnScriptDtos = deleteScriptsData
 		.filter(item => !item?.compMod?.deleted)
 		.flatMap(getDeleteColumnScriptDtos(app));
+
 	const modifyColumnScriptDtos = modifyScriptsData.flatMap(
 		getModifyColumnScriptDtos({ app, dbVersion, modelDefinitions, internalDefinitions, externalDefinitions }),
 	);
@@ -183,22 +190,24 @@ const getAlterModelDefinitionsScriptDtos = ({
 		.concat(collection.properties?.modelDefinitions?.properties?.added?.items)
 		.filter(Boolean)
 		.map(item => Object.values(item.properties)[0])
-		.map(item => ({ ...item, ...(app.require('lodash').omit(item.role, 'properties') || {}) }))
+		.map(item => ({ ...item, ...(_.omit(item.role, 'properties') || {}) }))
 		.filter(item => item.compMod?.created)
 		.map(getCreateUdtScriptDto({ app, dbVersion, modelDefinitions, internalDefinitions, externalDefinitions }));
+
 	const deleteUdtScriptDtos = []
 		.concat(collection.properties?.modelDefinitions?.properties?.deleted?.items)
 		.filter(Boolean)
 		.map(item => Object.values(item.properties)[0])
-		.map(item => ({ ...item, ...(app.require('lodash').omit(item.role, 'properties') || {}) }))
+		.map(item => ({ ...item, ...(_.omit(item.role, 'properties') || {}) }))
 		.filter(collection => collection.compMod?.deleted)
 		.map(getDeleteUdtScriptDto(app));
+
 	const addColumnScriptDtos = []
 		.concat(collection.properties?.modelDefinitions?.properties?.added?.items)
 		.filter(Boolean)
 		.map(item => Object.values(item.properties)[0])
 		.filter(item => !item.compMod)
-		.map(item => ({ ...item, ...(app.require('lodash').omit(item.role, 'properties') || {}) }))
+		.map(item => ({ ...item, ...(_.omit(item.role, 'properties') || {}) }))
 		.filter(item => item.childType === 'composite')
 		.flatMap(
 			getAddColumnToTypeScriptDtos({
@@ -209,12 +218,13 @@ const getAlterModelDefinitionsScriptDtos = ({
 				externalDefinitions,
 			}),
 		);
+
 	const deleteColumnScriptDtos = []
 		.concat(collection.properties?.modelDefinitions?.properties?.deleted?.items)
 		.filter(Boolean)
 		.map(item => Object.values(item.properties)[0])
 		.filter(item => !item.compMod)
-		.map(item => ({ ...item, ...(app.require('lodash').omit(item.role, 'properties') || {}) }))
+		.map(item => ({ ...item, ...(_.omit(item.role, 'properties') || {}) }))
 		.filter(item => item.childType === 'composite')
 		.flatMap(getDeleteColumnFromTypeScriptDtos(app));
 
@@ -223,7 +233,7 @@ const getAlterModelDefinitionsScriptDtos = ({
 		.filter(Boolean)
 		.map(item => Object.values(item.properties)[0])
 		.filter(item => !item.compMod)
-		.map(item => ({ ...item, ...(app.require('lodash').omit(item.role, 'properties') || {}) }))
+		.map(item => ({ ...item, ...(_.omit(item.role, 'properties') || {}) }))
 		.filter(item => item.childType === 'composite')
 		.flatMap(getModifyColumnOfTypeScriptDtos(app));
 
@@ -240,7 +250,6 @@ const getAlterModelDefinitionsScriptDtos = ({
  * @return Array<AlterScriptDto>
  * */
 const getAlterRelationshipsScriptDtos = ({ collection, app }) => {
-	const _ = app.require('lodash');
 	const ddlProvider = require('../ddlProvider/ddlProvider')(null, null, app);
 
 	const addedRelationships = []
@@ -248,20 +257,22 @@ const getAlterRelationshipsScriptDtos = ({ collection, app }) => {
 		.filter(Boolean)
 		.map(item => Object.values(item.properties)[0])
 		.filter(relationship => relationship?.role?.compMod?.created);
+
 	const deletedRelationships = []
 		.concat(collection.properties?.relationships?.properties?.deleted?.items)
 		.filter(Boolean)
 		.map(item => Object.values(item.properties)[0])
 		.filter(relationship => relationship?.role?.compMod?.deleted);
+
 	const modifiedRelationships = []
 		.concat(collection.properties?.relationships?.properties?.modified?.items)
 		.filter(Boolean)
 		.map(item => Object.values(item.properties)[0])
 		.filter(relationship => relationship?.role?.compMod?.modified);
 
-	const deleteFkScriptDtos = getDeleteForeignKeyScriptDtos(ddlProvider, _)(deletedRelationships);
-	const addFkScriptDtos = getAddForeignKeyScriptDtos(ddlProvider, _)(addedRelationships);
-	const modifiedFkScriptDtos = getModifyForeignKeyScriptDtos(ddlProvider, _)(modifiedRelationships);
+	const deleteFkScriptDtos = getDeleteForeignKeyScriptDtos(ddlProvider)(deletedRelationships);
+	const addFkScriptDtos = getAddForeignKeyScriptDtos(ddlProvider)(addedRelationships);
+	const modifiedFkScriptDtos = getModifyForeignKeyScriptDtos(ddlProvider)(modifiedRelationships);
 
 	return [...deleteFkScriptDtos, ...addFkScriptDtos, ...modifiedFkScriptDtos].filter(Boolean);
 };
@@ -309,11 +320,13 @@ const getAlterContainersSequencesScriptDtos = ({ collection, app }) => {
 		.filter(Boolean)
 		.map(container => Object.values(container.properties)[0])
 		.flatMap(container => getAddContainerSequencesScriptDtos({ container }));
+
 	const deleteContainersScriptDtos = []
 		.concat(deletedContainers)
 		.filter(Boolean)
 		.map(container => Object.values(container.properties)[0])
 		.flatMap(container => getDeleteContainerSequencesScriptDtos({ container }));
+
 	const modifyContainersScriptDtos = []
 		.concat(modifiedContainers)
 		.filter(Boolean)
@@ -342,7 +355,7 @@ const getAlterScriptDtos = (data, app) => {
 	const internalDefinitions = JSON.parse(data.internalDefinitions);
 	const externalDefinitions = JSON.parse(data.externalDefinitions);
 	const dbVersion = data.modelData[0]?.dbVersion;
-	const containersScriptDtos = getAlterContainersScriptDtos({ collection, app });
+	const containersScriptDtos = getAlterContainersScriptDtos({ collection });
 	const collectionsScriptDtos = getAlterCollectionsScriptDtos({
 		collection,
 		app,

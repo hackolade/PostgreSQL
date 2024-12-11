@@ -15,7 +15,7 @@ const {
 	getAdditionalDataForDdlProvider,
 } = require('./entityHelpers/indexesHelper');
 const { getModifiedDefaultColumnValueScriptDtos } = require('./columnHelpers/defaultValueHelper');
-const { getEntityName, getFullTableName } = require('../../utils/general');
+const { getEntityName, getFullTableName, getNamePrefixedWithSchemaName, wrapInQuotes } = require('../../utils/general');
 
 /**
  * @return {(collection: AlterCollectionDto) => AlterScriptDto | undefined}
@@ -109,7 +109,6 @@ const getModifyCollectionScriptDtos =
 const getAddColumnsByConditionScriptDtos =
 	({ app, dbVersion, modelDefinitions, internalDefinitions, externalDefinitions }) =>
 	(collection, predicate) => {
-		const { getEntityName, getNamePrefixedWithSchemaName } = require('../../utils/general');
 		const { createColumnDefinitionBySchema } = require('./createColumnDefinition')(app);
 		const ddlProvider = require('../../ddlProvider/ddlProvider')(null, null, app);
 		const { getDefinitionByReference } = app.require('@hackolade/ddl-fe-utils');
@@ -143,7 +142,7 @@ const getAddColumnsByConditionScriptDtos =
 			.map(columnDefinition => ddlProvider.addColumn(fullName, columnDefinition))
 			.map(addColumnScript => AlterScriptDto.getInstance([addColumnScript], true, false));
 
-		const indexesOnNewlyCreatedColumns = getNewlyCreatedIndexesScripts({ _, ddlProvider, collection });
+		const indexesOnNewlyCreatedColumns = getNewlyCreatedIndexesScripts({ dbVersion, collection });
 		return scripts.concat(indexesOnNewlyCreatedColumns).filter(Boolean);
 	};
 
@@ -151,7 +150,7 @@ const getAddColumnsByConditionScriptDtos =
  *
  * @return {AlterScriptDto[]}
  * */
-const getNewlyCreatedIndexesScripts = ({ ddlProvider, dbVersion, collection }) => {
+const getNewlyCreatedIndexesScripts = ({ dbVersion, collection }) => {
 	const newIndexes = collection?.role?.Indxs || [];
 	const properties = { ...collection?.properties, ...collection?.role?.properties };
 	const propertiesIds = Object.values(properties).map(({ GUID }) => GUID);
@@ -196,8 +195,6 @@ const getAddColumnScriptDtos =
  * */
 const getDeleteColumnsByConditionScriptDtos = app => (collection, predicate) => {
 	const ddlProvider = require('../../ddlProvider/ddlProvider')(null, null, app);
-	const { getEntityName, getNamePrefixedWithSchemaName, wrapInQuotes } = require('../../utils/general');
-
 	const collectionSchema = { ...collection, ...(_.omit(collection?.role, 'properties') || {}) };
 	const tableName = getEntityName(collectionSchema);
 	const schemaName = collectionSchema.compMod?.keyspaceName;
