@@ -5439,7 +5439,7 @@ making sure that you maintain a proper JSON format.
 			"type",
 			{
 				"propertyName": "Subtype",
-				"propertyKeyword": "subtype",
+				"propertyKeyword": "mode",
 				"shouldValidate": false,
 				"propertyType": "select",
 				"options": ["json", "jsonb"],
