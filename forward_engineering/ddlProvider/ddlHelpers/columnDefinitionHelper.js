@@ -57,32 +57,28 @@ const canHavePrecision = type => type === 'numeric';
 const canHaveTimePrecision = type => ['time', 'timestamp'].includes(type);
 const canHaveScale = type => type === 'numeric';
 const canHaveTypeModifier = type => ['geography', 'geometry'].includes(type);
-const canHaveDimension = type => type === 'vector';
+
+const isVector = type => type === 'vector';
 
 const decorateType = (type, columnDefinition) => {
-	if (canHaveLength(type) && _.isNumber(columnDefinition.length)) {
-		type = addLength(type, columnDefinition.length);
-	} else if (canHavePrecision(type) && canHaveScale(type) && _.isNumber(columnDefinition.precision)) {
-		type = addScalePrecision(type, columnDefinition.precision, columnDefinition.scale);
-	} else if (canHavePrecision(type) && _.isNumber(columnDefinition.precision)) {
-		type = addPrecision(type, columnDefinition.precision);
+	const { length, precision, scale, typeModifier, srid, timezone, timePrecision, dimension, subtype, array_type } =
+		columnDefinition;
+
+	if (canHaveLength(type) && _.isNumber(length)) {
+		type = addLength(type, length);
+	} else if (canHavePrecision(type) && canHaveScale(type) && _.isNumber(precision)) {
+		type = addScalePrecision(type, precision, scale);
+	} else if (canHavePrecision(type) && _.isNumber(precision)) {
+		type = addPrecision(type, precision);
 	} else if (canHaveTypeModifier(type)) {
-		type = addTypeModifier({
-			type,
-			typeModifier: columnDefinition.typeModifier,
-			srid: columnDefinition.srid,
-		});
-	} else if (
-		canHaveTimePrecision(type) &&
-		(_.isNumber(columnDefinition.timePrecision) || columnDefinition.timezone)
-	) {
-		type = addWithTimezone(addPrecision(type, columnDefinition.timePrecision), columnDefinition.timezone);
-	}
-	if (canHaveDimension(type)) {
-		return decorateVector(columnDefinition.subtype, columnDefinition.dimension);
+		type = addTypeModifier({ type, typeModifier, srid });
+	} else if (canHaveTimePrecision(type) && (_.isNumber(timePrecision) || timezone)) {
+		type = addWithTimezone(addPrecision(type, timePrecision), timezone);
+	} else if (isVector(type)) {
+		type = dimension ? decorateVector(subtype, dimension) : subtype;
 	}
 
-	return addArrayDecorator(type, columnDefinition.array_type);
+	return addArrayDecorator(type, array_type);
 };
 
 const isString = type => ['char', 'varchar', 'text', 'bit', 'varbit'].includes(type);
