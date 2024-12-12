@@ -7,7 +7,7 @@ const { wrapInQuotes } = require('../../utils/general');
 
 /**
  * @param {string} schemaName
- * @return string
+ * @return {AlterScriptDto | undefined}
  * */
 const createSchemaOnly = schemaName => {
 	const templateConfig = {
