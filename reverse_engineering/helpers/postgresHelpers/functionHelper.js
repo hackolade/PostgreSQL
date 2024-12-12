@@ -1,8 +1,4 @@
-let _ = null;
-
-const setDependencies = app => {
-	_ = app.require('lodash');
-};
+const _ = require('lodash');
 
 const mapFunctionArgs = args => {
 	return _.map(args, arg => ({
@@ -89,7 +85,6 @@ const mapProcedureData = (functionData, functionArgs, additionalData) => {
 };
 
 module.exports = {
-	setDependencies,
 	mapFunctionData,
 	mapProcedureData,
 };

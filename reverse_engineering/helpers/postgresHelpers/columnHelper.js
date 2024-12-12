@@ -1,8 +1,4 @@
-let _ = null;
-
-const setDependencies = app => {
-	_ = app.require('lodash');
-};
+const _ = require('lodash');
 
 const columnPropertiesMapper = {
 	column_default: 'default',
@@ -251,7 +247,6 @@ const canHaveTimePrecision = columnDataType => {
 };
 
 module.exports = {
-	setDependencies,
 	mapColumnData,
 	setSubtypeFromSampledJsonValues,
 };

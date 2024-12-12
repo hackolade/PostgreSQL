@@ -1,10 +1,28 @@
+const _ = require('lodash');
 const { AlterScriptDto } = require('../../types/AlterScriptDto');
+const { checkFieldPropertiesChanged, getFullTableName, wrapInQuotes } = require('../../../utils/general');
+const assignTemplates = require('../../../utils/assignTemplates');
+const templates = require('../../../ddlProvider/templates');
 
 /**
- * @return {(collection: Object) => AlterScriptDto[]}
+ * @param {string} tableName
+ * @param {string} oldColumnName
+ * @param {string} newColumnName
+ * @return string
  * */
-const getRenameColumnScriptDtos = (_, ddlProvider) => collection => {
-	const { checkFieldPropertiesChanged, getFullTableName, wrapInQuotes } = require('../../../utils/general');
+const renameColumn = (tableName, oldColumnName, newColumnName) => {
+	return assignTemplates(templates.renameColumn, {
+		tableName,
+		oldColumnName,
+		newColumnName,
+	});
+};
+
+/**
+ * @param {Object} collection
+ * @return {AlterScriptDto[]}
+ * */
+const getRenameColumnScriptDtos = collection => {
 	const fullTableName = getFullTableName(collection);
 
 	return _.values(collection.properties)
@@ -12,7 +30,7 @@ const getRenameColumnScriptDtos = (_, ddlProvider) => collection => {
 		.map(jsonSchema => {
 			const oldColumnName = wrapInQuotes(jsonSchema.compMod.oldField.name);
 			const newColumnName = wrapInQuotes(jsonSchema.compMod.newField.name);
-			return ddlProvider.renameColumn(fullTableName, oldColumnName, newColumnName);
+			return renameColumn(fullTableName, oldColumnName, newColumnName);
 		})
 		.map(script => AlterScriptDto.getInstance([script], true, false));
 };
