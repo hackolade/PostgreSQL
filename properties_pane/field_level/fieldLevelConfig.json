@@ -5610,7 +5610,7 @@ making sure that you maintain a proper JSON format.
 			"type",
 			{
 				"propertyName": "Subtype",
-				"propertyKeyword": "subtype",
+				"propertyKeyword": "mode",
 				"propertyType": "select",
 				"options": ["", "halfvec", "sparsevec"],
 				"cleanDependency": true

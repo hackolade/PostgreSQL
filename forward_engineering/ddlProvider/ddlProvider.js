@@ -593,7 +593,7 @@ module.exports = (baseProvider, options, app) => {
 
 			return {
 				name: columnDefinition.name,
-				type: columnDefinition.type,
+				type: jsonSchema.mode || jsonSchema.type,
 				primaryKey: keyHelper.isInlinePrimaryKey(jsonSchema),
 				primaryKeyOptions,
 				unique: keyHelper.isInlineUnique(jsonSchema),
