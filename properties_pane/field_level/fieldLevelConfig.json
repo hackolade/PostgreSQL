@@ -5607,13 +5607,7 @@ making sure that you maintain a proper JSON format.
 			"name",
 			"code",
 			"isActivated",
-			{
-				"propertyKeyword": "type",
-				"typeDecorator": {
-					"value": "vctr",
-					"useAsTypeName": true
-				}
-			},
+			"type",
 			{
 				"propertyName": "Subtype",
 				"propertyKeyword": "subtype",
