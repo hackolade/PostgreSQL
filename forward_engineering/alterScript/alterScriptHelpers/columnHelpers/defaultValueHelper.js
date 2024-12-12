@@ -1,12 +1,31 @@
 const { toPairs } = require('lodash');
 const { AlterScriptDto } = require('../../types/AlterScriptDto');
 const { getFullTableName, wrapInQuotes, wrapInSingleQuotes } = require('../../../utils/general');
+const assignTemplates = require('../../../utils/assignTemplates');
+const templates = require('../../../ddlProvider/templates');
 
 /**
- * @param { ({ ddlProvider: Object, collection: Object }) }
+ * @param {Object} props
+ * @param {string} props.tableName
+ * @param {string} props.columnName
+ * @param {string} props.defaultValue
+ * @return string
+ * */
+const updateColumnDefaultValue = ({ tableName, columnName, defaultValue }) => {
+	const templateConfig = {
+		tableName,
+		columnName,
+		defaultValue,
+	};
+	return assignTemplates(templates.updateColumnDefaultValue, templateConfig);
+};
+
+/**
+ * @param {Object} props
+ * @param {Object} props.collection
  * @returns { Array<AlterScriptDto> }
  * */
-const getUpdatedDefaultColumnValueScriptDtos = ({ ddlProvider, collection }) =>
+const getUpdatedDefaultColumnValueScriptDtos = ({ collection }) =>
 	toPairs(collection.properties)
 		.filter(([_name, jsonSchema]) => {
 			const newDefault = jsonSchema.default;
@@ -21,16 +40,31 @@ const getUpdatedDefaultColumnValueScriptDtos = ({ ddlProvider, collection }) =>
 				columnName: wrapInQuotes(columnName),
 				defaultValue: wrapInSingleQuotes({ name: newDefaultValue }),
 			};
-			return ddlProvider.updateColumnDefaultValue(scriptGenerationConfig);
+			return updateColumnDefaultValue(scriptGenerationConfig);
 		})
 		.map(script => AlterScriptDto.getInstance([script], true, false))
 		.filter(Boolean);
 
 /**
- * @param { ({ ddlProvider: Object, collection: Object }) }
+ * @param {Object} props
+ * @param {string} props.tableName
+ * @param {string} props.columnName
+ * @return string
+ * */
+const dropColumnDefaultValue = ({ tableName, columnName }) => {
+	const templateConfig = {
+		tableName,
+		columnName,
+	};
+	return assignTemplates(templates.dropColumnDefaultValue, templateConfig);
+};
+
+/**
+ * @param {Object} props
+ * @param {Object} props.collection
  * @returns { Array<AlterScriptDto> }
  * */
-const getDeletedDefaultColumnValueScriptDtos = ({ ddlProvider, collection }) =>
+const getDeletedDefaultColumnValueScriptDtos = ({ collection }) =>
 	toPairs(collection.properties)
 		.filter(([_name, jsonSchema]) => {
 			const newDefault = jsonSchema.default;
@@ -45,18 +79,19 @@ const getDeletedDefaultColumnValueScriptDtos = ({ ddlProvider, collection }) =>
 				tableName: getFullTableName(collection),
 				columnName: wrapInQuotes(columnName),
 			};
-			return ddlProvider.dropColumnDefaultValue(scriptGenerationConfig);
+			return dropColumnDefaultValue(scriptGenerationConfig);
 		})
 		.map(script => AlterScriptDto.getInstance([script], true, true))
 		.filter(Boolean);
 
 /**
- * @param { ({ ddlProvider: Object, collection: Object }) }
+ * @param {Object} props
+ * @param {Object} props.collection
  * @returns { Array<AlterScriptDto> }
  * */
-const getModifiedDefaultColumnValueScriptDtos = ({ ddlProvider, collection }) => {
-	const updatedDefaultValuesScriptDtos = getUpdatedDefaultColumnValueScriptDtos({ ddlProvider, collection });
-	const dropDefaultValuesScriptDtos = getDeletedDefaultColumnValueScriptDtos({ ddlProvider, collection });
+const getModifiedDefaultColumnValueScriptDtos = ({ collection }) => {
+	const updatedDefaultValuesScriptDtos = getUpdatedDefaultColumnValueScriptDtos({ collection });
+	const dropDefaultValuesScriptDtos = getDeletedDefaultColumnValueScriptDtos({ collection });
 	return [...updatedDefaultValuesScriptDtos, ...dropDefaultValuesScriptDtos];
 };
 

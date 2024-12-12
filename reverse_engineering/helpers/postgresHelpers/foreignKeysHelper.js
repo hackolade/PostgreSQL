@@ -1,10 +1,5 @@
+const _ = require('lodash');
 const { getColumnNameByPosition } = require('./common');
-
-let _ = null;
-
-const setDependencies = app => {
-	_ = app.require('lodash');
-};
 
 const prepareDeleteAndUpdate = value => {
 	switch (value) {
@@ -57,6 +52,5 @@ const prepareForeignKeys = (tableForeignKeys, tableName, schemaName, columns) =>
 };
 
 module.exports = {
-	setDependencies,
 	prepareForeignKeys,
 };

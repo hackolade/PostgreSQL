@@ -11,7 +11,7 @@ const _ = require('lodash');
 const { AlterCollectionDto, AlterCollectionRoleDto } = require('../alterScript/types/AlterCollectionDto');
 const { ReservedWordsAsArray } = require('../enums/reservedWords');
 
-const MUST_BE_ESCAPED = /\t|\n|'|\f|\r/gm;
+const MUST_BE_ESCAPED = /[\t\n'\f\r]/gm;
 
 const getDbName = containerData => {
 	return _.get(containerData, '[0].code') || _.get(containerData, '[0].name', '');
@@ -26,7 +26,7 @@ const getViewName = view => {
 };
 
 const getDbData = containerData => {
-	return Object.assign({}, _.get(containerData, '[0]', {}), { name: getDbName(containerData) });
+	return { ..._.get(containerData, '[0]', {}), name: getDbName(containerData) };
 };
 
 const getViewOn = viewData => _.get(viewData, '[0].viewOn');
@@ -255,10 +255,8 @@ const getGroupItemsByCompMode = ({ newItems = [], oldItems = [] }) => {
 		const newItem = newItems.find(item => item.id === oldItem.id);
 		if (!newItem) {
 			removedItems.push(oldItem);
-		} else {
-			if (!_.isEqual(newItem, oldItem)) {
-				modifiedItems.push(newItem);
-			}
+		} else if (!_.isEqual(newItem, oldItem)) {
+			modifiedItems.push(newItem);
 		}
 	});
 

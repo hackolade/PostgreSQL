@@ -1,4 +1,36 @@
+const _ = require('lodash');
 const { AlterScriptDto } = require('../../types/AlterScriptDto');
+const { checkFieldPropertiesChanged, getFullTableName, wrapInQuotes } = require('../../../utils/general');
+const assignTemplates = require('../../../utils/assignTemplates');
+const templates = require('../../../ddlProvider/templates');
+
+/**
+ * @param {string} tableName
+ * @param {string} columnName
+ * @param {string} dataType
+ * @param {{
+ *     length?: number,
+ *     scale?: number,
+ *     precision?: number
+ * }} dataTypeProperties
+ * @return string
+ * */
+const alterColumnType = (tableName, columnName, dataType, dataTypeProperties) => {
+	let dataTypeString = dataType;
+	if (dataTypeProperties.length) {
+		dataTypeString += `(${dataTypeProperties.length})`;
+	} else if (dataTypeProperties.precision && dataTypeProperties.scale) {
+		dataTypeString += `(${dataTypeProperties.precision},${dataTypeProperties.scale})`;
+	} else if (dataTypeProperties.precision) {
+		dataTypeString += `(${dataTypeProperties.precision})`;
+	}
+
+	return assignTemplates(templates.alterColumnType, {
+		tableName,
+		columnName,
+		dataType: dataTypeString,
+	});
+};
 
 /**
  * @return {boolean}
@@ -26,10 +58,10 @@ const hasPrecisionOrScaleChanged = (collection, oldFieldName, currentJsonSchema)
 };
 
 /**
- * @return {(collection: Object) => AlterScriptDto[]}
+ * @param {Object} collection
+ * @return {AlterScriptDto[]}
  * */
-const getUpdateTypesScriptDtos = (_, ddlProvider) => collection => {
-	const { checkFieldPropertiesChanged, getFullTableName, wrapInQuotes } = require('../../../utils/general');
+const getUpdateTypesScriptDtos = collection => {
 	const fullTableName = getFullTableName(collection);
 
 	return _.toPairs(collection.properties)
@@ -47,7 +79,7 @@ const getUpdateTypesScriptDtos = (_, ddlProvider) => collection => {
 			const typeName = jsonSchema.compMod.newField.mode || jsonSchema.compMod.newField.type;
 			const columnName = wrapInQuotes(name);
 			const typeConfig = _.pick(jsonSchema, ['length', 'precision', 'scale']);
-			return ddlProvider.alterColumnType(fullTableName, columnName, typeName, typeConfig);
+			return alterColumnType(fullTableName, columnName, typeName, typeConfig);
 		})
 		.map(script => AlterScriptDto.getInstance([script], true, false));
 };

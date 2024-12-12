@@ -1,12 +1,28 @@
+const _ = require('lodash');
 const { AlterScriptDto } = require('../../types/AlterScriptDto');
 const { AlterCollectionDto } = require('../../types/AlterCollectionDto');
+const { getFullTableName, wrapComment } = require('../../../utils/general');
+const assignTemplates = require('../../../utils/assignTemplates');
+const templates = require('../../../ddlProvider/templates');
 
 /**
- * @return {(collection: AlterCollectionDto) => AlterScriptDto}
- */
-const getUpdatedCommentOnCollectionScriptDto = (_, ddlProvider) => collection => {
-	const { getFullTableName, wrapComment } = require('../../../utils/general');
+ * @param {string} tableName
+ * @param {string} comment
+ * @return string
+ * */
+const updateTableComment = (tableName, comment) => {
+	const templateConfig = {
+		tableName,
+		comment,
+	};
+	return assignTemplates(templates.updateCommentOnTable, templateConfig);
+};
 
+/**
+ * @param {AlterCollectionDto} collection
+ * @return {AlterScriptDto}
+ */
+const getUpdatedCommentOnCollectionScriptDto = collection => {
 	const descriptionInfo = collection?.role.compMod?.description;
 	if (!descriptionInfo) {
 		return undefined;
@@ -20,16 +36,27 @@ const getUpdatedCommentOnCollectionScriptDto = (_, ddlProvider) => collection =>
 	const tableName = getFullTableName(collection);
 	const comment = wrapComment(newComment);
 
-	const script = ddlProvider.updateTableComment(tableName, comment);
+	const script = updateTableComment(tableName, comment);
 	return AlterScriptDto.getInstance([script], true, false);
 };
 
 /**
- * @return {(collection: AlterCollectionDto) => AlterScriptDto}
- */
-const getDeletedCommentOnCollectionScriptDto = (_, ddlProvider) => collection => {
-	const { getFullTableName } = require('../../../utils/general');
+ * @param {string} tableName
+ * @return string
+ * */
+const dropTableComment = tableName => {
+	const templateConfig = {
+		tableName,
+		comment: 'NULL',
+	};
+	return assignTemplates(templates.updateCommentOnTable, templateConfig);
+};
 
+/**
+ * @param {AlterCollectionDto} collection
+ * @return {AlterScriptDto}
+ */
+const getDeletedCommentOnCollectionScriptDto = collection => {
 	const descriptionInfo = collection?.role.compMod?.description;
 	if (!descriptionInfo) {
 		return undefined;
@@ -42,16 +69,17 @@ const getDeletedCommentOnCollectionScriptDto = (_, ddlProvider) => collection =>
 
 	const tableName = getFullTableName(collection);
 
-	const script = ddlProvider.dropTableComment(tableName);
+	const script = dropTableComment(tableName);
 	return AlterScriptDto.getInstance([script], true, true);
 };
 
 /**
- * @return {(collection: AlterCollectionDto) => Array<AlterScriptDto>}
+ * @param {AlterCollectionDto} collection
+ * @return {Array<AlterScriptDto>}
  * */
-const getModifyEntityCommentsScriptDtos = (_, ddlProvider) => collection => {
-	const updatedCommentScript = getUpdatedCommentOnCollectionScriptDto(_, ddlProvider)(collection);
-	const deletedCommentScript = getDeletedCommentOnCollectionScriptDto(_, ddlProvider)(collection);
+const getModifyEntityCommentsScriptDtos = collection => {
+	const updatedCommentScript = getUpdatedCommentOnCollectionScriptDto(collection);
+	const deletedCommentScript = getDeletedCommentOnCollectionScriptDto(collection);
 
 	return [updatedCommentScript, deletedCommentScript].filter(Boolean);
 };

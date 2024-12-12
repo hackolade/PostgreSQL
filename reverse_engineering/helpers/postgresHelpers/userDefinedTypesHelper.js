@@ -1,10 +1,5 @@
+const _ = require('lodash');
 const { mapColumnData } = require('./columnHelper');
-
-let _ = null;
-
-const setDependencies = app => {
-	_ = app.require('lodash');
-};
 
 const getUserDefinedTypes = (udtResponse, domainTypes) => {
 	return _.chain(udtResponse)
@@ -130,7 +125,6 @@ const mapDomainConstraint = constraint => {
 };
 
 module.exports = {
-	setDependencies,
 	getUserDefinedTypes,
 	isTypeComposite,
 };

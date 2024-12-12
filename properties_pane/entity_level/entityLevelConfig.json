@@ -877,6 +877,7 @@ making sure that you maintain a proper JSON format.
 				"propertyType": "group",
 				"propertyKeyword": "Indxs",
 				"propertyTooltip": "In general you should only add indexes to match the queries your application uses. Any extra will waste resources.",
+				"cleanDependency": true,
 				"structure": [
 					{
 						"propertyName": "Name",
@@ -897,7 +898,7 @@ making sure that you maintain a proper JSON format.
 						"propertyTooltip": "",
 						"propertyType": "select",
 						"defaultValue": "btree",
-						"options": ["", "btree", "hash", "gist", "spgist", "gin", "brin"]
+						"options": ["", "btree", "hash", "gist", "spgist", "gin", "brin", "hnsw", "ivfflat"]
 					},
 					{
 						"propertyName": "Unique",
@@ -950,7 +951,20 @@ making sure that you maintain a proper JSON format.
 						"propertyKeyword": "concurrently",
 						"propertyTooltip": "When this option is used, PostgreSQL will build the index without taking any locks that prevent concurrent inserts, updates, or deletes on the table; whereas a standard index build locks out writes (but not reads) on the table until it's done.",
 						"defaultValue": false,
-						"propertyType": "checkbox"
+						"propertyType": "checkbox",
+						"dependency": {
+							"type": "not",
+							"values": [
+								{
+									"key": "index_method",
+									"value": "hnsw"
+								},
+								{
+									"key": "index_method",
+									"value": "ivfflat"
+								}
+							]
+						}
 					},
 					{
 						"propertyName": "If not exist",
@@ -964,32 +978,19 @@ making sure that you maintain a proper JSON format.
 						"propertyKeyword": "only",
 						"propertyTooltip": "Indicates not to recurse creating indexes on partitions, if the table is partitioned.",
 						"defaultValue": true,
-						"propertyType": "checkbox"
-					},
-					{
-						"propertyName": "Columns",
-						"propertyKeyword": "columns",
-						"propertyType": "fieldList",
-						"template": "orderedList",
-						"propertyTooltip": "The name of a column of the table.",
-						"attributeList": {
-							"collation": {
-								"propertyType": "text",
-								"placeholder": "Collation",
-								"propertyTooltip": "The name of the collation to use for the index."
-							},
-							"opclass": {
-								"propertyType": "text",
-								"placeholder": "Opclass",
-								"propertyTooltip": "The name of an operator class."
-							}
-						},
+						"propertyType": "checkbox",
 						"dependency": {
 							"type": "not",
-							"values": {
-								"key": "index_method",
-								"value": "btree"
-							}
+							"values": [
+								{
+									"key": "index_method",
+									"value": "hnsw"
+								},
+								{
+									"key": "index_method",
+									"value": "ivfflat"
+								}
+							]
 						}
 					},
 					{
@@ -1023,6 +1024,70 @@ making sure that you maintain a proper JSON format.
 						"dependency": {
 							"key": "index_method",
 							"value": "btree"
+						}
+					},
+					{
+						"propertyName": "Columns",
+						"propertyKeyword": "columns",
+						"propertyType": "fieldList",
+						"template": "orderedList",
+						"propertyTooltip": "The name of a column of the table.",
+						"attributeList": {
+							"collation": {
+								"propertyType": "text",
+								"placeholder": "Collation",
+								"propertyTooltip": "The name of the collation to use for the index."
+							},
+							"opclass": {
+								"propertyType": "text",
+								"placeholder": "Opclass",
+								"propertyTooltip": "The name of an operator class."
+							}
+						},
+						"dependency": {
+							"type": "or",
+							"values": [
+								{
+									"key": "index_method",
+									"value": "hash"
+								},
+								{
+									"key": "index_method",
+									"value": "gist"
+								},
+								{
+									"key": "index_method",
+									"value": "spgist"
+								},
+								{
+									"key": "index_method",
+									"value": "gin"
+								},
+								{
+									"key": "index_method",
+									"value": "brin"
+								}
+							]
+						}
+					},
+					{
+						"propertyName": "Columns",
+						"propertyKeyword": "columns",
+						"propertyType": "fieldList",
+						"template": "orderedList",
+						"propertyTooltip": "The name of a column of the table.",
+						"dependency": {
+							"type": "or",
+							"values": [
+								{
+									"key": "index_method",
+									"value": "hnsw"
+								},
+								{
+									"key": "index_method",
+									"value": "ivfflat"
+								}
+							]
 						}
 					},
 					{
@@ -1192,7 +1257,20 @@ making sure that you maintain a proper JSON format.
 						"propertyKeyword": "index_tablespace_name",
 						"propertyTooltip": "Enter the name of an existing tablespace location for the database, or pg_default",
 						"defaultValue": "pg_default",
-						"propertyType": "text"
+						"propertyType": "text",
+						"dependency": {
+							"type": "not",
+							"values": [
+								{
+									"key": "index_method",
+									"value": "hnsw"
+								},
+								{
+									"key": "index_method",
+									"value": "ivfflat"
+								}
+							]
+						}
 					},
 					{
 						"propertyName": "Where constraint",
@@ -1201,6 +1279,101 @@ making sure that you maintain a proper JSON format.
 						"propertyType": "details",
 						"markdown": false,
 						"template": "textarea"
+					},
+					{
+						"propertyName": "Distance",
+						"propertyKeyword": "vectorDistance",
+						"propertyTooltip": "Add an index for each distance function you want to use",
+						"propertyType": "select",
+						"defaultValue": "vector_l2_ops",
+						"options": [
+							"vector_l2_ops",
+							"vector_ip_ops",
+							"vector_cosine_ops",
+							"vector_l1_ops",
+							"bit_hamming_ops",
+							"bit_jaccard_ops"
+						],
+						"dependency": {
+							"type": "or",
+							"values": [
+								{
+									"key": "index_method",
+									"value": "hnsw"
+								}
+							]
+						}
+					},
+					{
+						"propertyName": "Distance",
+						"propertyKeyword": "vectorDistance",
+						"propertyTooltip": "Add an index for each distance function you want to use",
+						"propertyType": "select",
+						"defaultValue": "vector_l2_ops",
+						"options": ["vector_l2_ops", "vector_ip_ops", "vector_cosine_ops", "bit_hamming_ops"],
+						"dependency": {
+							"type": "or",
+							"values": [
+								{
+									"key": "index_method",
+									"value": "ivfflat"
+								}
+							]
+						}
+					},
+					{
+						"propertyName": "With index options",
+						"propertyKeyword": "vectorIndexOptions",
+						"propertyType": "block",
+						"propertyTooltip": "The optional WITH clause specifies options for the vector index.",
+						"structure": [
+							{
+								"propertyName": "Max number of connections",
+								"propertyKeyword": "m",
+								"propertyType": "numeric",
+								"valueType": "number",
+								"propertyTooltip": "Defines the max number of connections per layer (16 by default)",
+								"minValue": 0,
+								"step": 1,
+								"defaultValue": 16
+							},
+							{
+								"propertyName": "EF construction",
+								"propertyKeyword": "ef_construction",
+								"propertyType": "numeric",
+								"valueType": "number",
+								"propertyTooltip": "the size of the dynamic candidate list for constructing the graph (64 by default)",
+								"minValue": 0,
+								"step": 1,
+								"defaultValue": 64
+							}
+						],
+						"dependency": {
+							"key": "index_method",
+							"value": "hnsw"
+						}
+					},
+					{
+						"propertyName": "With index options",
+						"propertyKeyword": "vectorIndexOptions",
+						"propertyType": "block",
+						"propertyTooltip": "The optional WITH clause specifies options for the vector index.",
+						"structure": [
+							{
+								"propertyName": "Number of lists",
+								"propertyKeyword": "lists",
+								"propertyType": "numeric",
+								"valueType": "number",
+								"propertyTooltip": "Choose an appropriate number of lists - a good place to start is rows / 1000 for up to 1M rows and sqrt(rows) for over 1M rows",
+								"minValue": 0,
+								"step": 1,
+								"defaultValue": 100
+							}
+						],
+						"dependency": {
+							"key": "index_method",
+							"value": "ivfflat"
+						}
 					},
 					{
 						"propertyName": "Comment",

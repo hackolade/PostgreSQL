@@ -5431,117 +5431,6 @@ making sure that you maintain a proper JSON format.
 				"template": "textarea"
 			}
 		],
-		"xml": [
-			"name",
-			"code",
-			"sampleName",
-			"schemaId",
-			"refPath",
-			"type",
-			{
-				"propertyName": "Comments",
-				"propertyKeyword": "description",
-				"propertyTooltip": "comments",
-				"addTimestampButton": false,
-				"propertyType": "details",
-				"template": "textarea"
-			},
-			{
-				"propertyName": "Array type",
-				"propertyType": "group",
-				"propertyKeyword": "array_type",
-				"propertyTooltip": "Declaring the array number of dimensions is simply for documentation; it does not affect run-time behavior.",
-				"structure": [
-					{
-						"propertyName": "Size limit",
-						"propertyKeyword": "array_size_limit",
-						"propertyTooltip": "Declaring the array size is simply for documentation; it does not affect run-time behavior.",
-						"propertyType": "numeric",
-						"valueType": "number",
-						"minValue": 0,
-						"step": 1
-					}
-				]
-			},
-			{
-				"propertyName": "Generated column",
-				"propertyKeyword": "generatedColumn",
-				"propertyTooltip": "A generated column is a special column that is always computed from other columns",
-				"propertyType": "checkbox",
-				"dependency": {
-					"type": "not",
-					"values": {
-						"type": "or",
-						"values": [
-							{
-								"level": "model",
-								"key": "dbVersion",
-								"value": "v10.x"
-							},
-							{
-								"level": "model",
-								"key": "dbVersion",
-								"value": "v11.x"
-							}
-						]
-					}
-				}
-			},
-			{
-				"propertyName": "Generation expression",
-				"propertyKeyword": "columnGenerationExpression",
-				"propertyTooltip": "An SQL statement for computing values for this column",
-				"propertyType": "details",
-				"template": "textarea",
-				"markdown": false,
-				"dependency": {
-					"type": "and",
-					"values": [
-						{
-							"key": "generatedColumn",
-							"value": true
-						},
-						{
-							"type": "not",
-							"values": {
-								"type": "or",
-								"values": [
-									{
-										"level": "model",
-										"key": "dbVersion",
-										"value": "v10.x"
-									},
-									{
-										"level": "model",
-										"key": "dbVersion",
-										"value": "v11.x"
-									}
-								]
-							}
-						}
-					]
-				}
-			},
-			{
-				"propertyName": "Not null",
-				"propertyKeyword": "required",
-				"enableForReference": true,
-				"propertyType": "checkbox"
-			},
-			"pattern",
-			"default",
-			"enum",
-			"sample",
-			{
-				"propertyName": "Remarks",
-				"propertyKeyword": "comments",
-				"shouldValidate": false,
-				"propertyTooltip": "remarks",
-				"addTimestampButton": true,
-				"propertyType": "details",
-				"template": "textarea"
-			}
-		],
 		"json": [
 			"name",
 			"sampleName",
@@ -5551,6 +5440,7 @@ making sure that you maintain a proper JSON format.
 			{
 				"propertyName": "Subtype",
 				"propertyKeyword": "mode",
+				"shouldValidate": false,
 				"propertyType": "select",
 				"options": ["json", "jsonb"],
 				"data": "options",
@@ -5711,6 +5601,172 @@ making sure that you maintain a proper JSON format.
 				"propertyName": "JSON Type",
 				"propertyKeyword": "physicalType",
 				"hidden": true
+			}
+		],
+		"vector": [
+			"name",
+			"code",
+			"isActivated",
+			"type",
+			{
+				"propertyName": "Subtype",
+				"propertyKeyword": "mode",
+				"propertyType": "select",
+				"options": ["", "halfvec", "sparsevec"],
+				"cleanDependency": true
+			},
+			{
+				"propertyName": "Dimension",
+				"propertyKeyword": "dimension",
+				"propertyType": "numeric",
+				"valueType": "integer",
+				"allowNegative": false,
+				"typeDecorator": true,
+				"minValue": 0,
+				"step": 1,
+				"maxValue": 16000
+			},
+			{
+				"propertyName": "Not null",
+				"propertyKeyword": "required",
+				"propertyType": "checkbox"
+			},
+			"minItems",
+			"maxItems",
+			"uniqueItems",
+			"additionalItems",
+			{
+				"propertyName": "Default",
+				"propertyKeyword": "default",
+				"propertyType": "text"
+			},
+			{
+				"propertyName": "Comments",
+				"propertyKeyword": "description",
+				"propertyTooltip": "comments",
+				"addTimestampButton": false,
+				"propertyType": "details",
+				"template": "textarea"
+			},
+			{
+				"propertyName": "Remarks",
+				"propertyKeyword": "comments",
+				"shouldValidate": false,
+				"propertyTooltip": "remarks",
+				"addTimestampButton": true,
+				"propertyType": "details",
+				"template": "textarea"
+			}
+		],
+		"xml": [
+			"name",
+			"code",
+			"sampleName",
+			"schemaId",
+			"refPath",
+			"type",
+			{
+				"propertyName": "Comments",
+				"propertyKeyword": "description",
+				"propertyTooltip": "comments",
+				"addTimestampButton": false,
+				"propertyType": "details",
+				"template": "textarea"
+			},
+			{
+				"propertyName": "Array type",
+				"propertyType": "group",
+				"propertyKeyword": "array_type",
+				"propertyTooltip": "Declaring the array number of dimensions is simply for documentation; it does not affect run-time behavior.",
+				"structure": [
+					{
+						"propertyName": "Size limit",
+						"propertyKeyword": "array_size_limit",
+						"propertyTooltip": "Declaring the array size is simply for documentation; it does not affect run-time behavior.",
+						"propertyType": "numeric",
+						"valueType": "number",
+						"minValue": 0,
+						"step": 1
+					}
+				]
+			},
+			{
+				"propertyName": "Generated column",
+				"propertyKeyword": "generatedColumn",
+				"propertyTooltip": "A generated column is a special column that is always computed from other columns",
+				"propertyType": "checkbox",
+				"dependency": {
+					"type": "not",
+					"values": {
+						"type": "or",
+						"values": [
+							{
+								"level": "model",
+								"key": "dbVersion",
+								"value": "v10.x"
+							},
+							{
+								"level": "model",
+								"key": "dbVersion",
+								"value": "v11.x"
+							}
+						]
+					}
+				}
+			},
+			{
+				"propertyName": "Generation expression",
+				"propertyKeyword": "columnGenerationExpression",
+				"propertyTooltip": "An SQL statement for computing values for this column",
+				"propertyType": "details",
+				"template": "textarea",
+				"markdown": false,
+				"dependency": {
+					"type": "and",
+					"values": [
+						{
+							"key": "generatedColumn",
+							"value": true
+						},
+						{
+							"type": "not",
+							"values": {
+								"type": "or",
+								"values": [
+									{
+										"level": "model",
+										"key": "dbVersion",
+										"value": "v10.x"
+									},
+									{
+										"level": "model",
+										"key": "dbVersion",
+										"value": "v11.x"
+									}
+								]
+							}
+						}
+					]
+				}
+			},
+			{
+				"propertyName": "Not null",
+				"propertyKeyword": "required",
+				"enableForReference": true,
+				"propertyType": "checkbox"
+			},
+			"pattern",
+			"default",
+			"enum",
+			"sample",
+			{
+				"propertyName": "Remarks",
+				"propertyKeyword": "comments",
+				"shouldValidate": false,
+				"propertyTooltip": "remarks",
+				"addTimestampButton": true,
+				"propertyType": "details",
+				"template": "textarea"
 			}
 		],
 		"___1": [],

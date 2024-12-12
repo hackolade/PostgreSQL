@@ -1,10 +1,27 @@
+const _ = require('lodash');
 const { AlterScriptDto } = require('../../types/AlterScriptDto');
+const { getFullColumnName, wrapComment } = require('../../../utils/general');
+const assignTemplates = require('../../../utils/assignTemplates');
+const templates = require('../../../ddlProvider/templates');
 
 /**
- * @return {(collection: Object) => AlterScriptDto[]}
+ * @param columnName {string}
+ * @param comment {string}
+ * @return string
  * */
-const getUpdatedCommentOnColumnScriptDtos = (_, ddlProvider) => collection => {
-	const { getFullColumnName, wrapComment } = require('../../../utils/general');
+const updateColumnComment = (columnName, comment) => {
+	const templateConfig = {
+		columnName,
+		comment,
+	};
+	return assignTemplates(templates.updateCommentOnColumn, templateConfig);
+};
+
+/**
+ * @param {Object} collection
+ * @return {AlterScriptDto[]}
+ * */
+const getUpdatedCommentOnColumnScriptDtos = collection => {
 	return _.toPairs(collection.properties)
 		.filter(([name, jsonSchema]) => {
 			const newComment = jsonSchema.description;
@@ -16,17 +33,28 @@ const getUpdatedCommentOnColumnScriptDtos = (_, ddlProvider) => collection => {
 			const newComment = jsonSchema.description;
 			const ddlComment = wrapComment(newComment);
 			const columnName = getFullColumnName(collection, name);
-			return ddlProvider.updateColumnComment(columnName, ddlComment);
+			return updateColumnComment(columnName, ddlComment);
 		})
 		.map(script => AlterScriptDto.getInstance([script], true, false));
 };
 
 /**
- * @return {(collection: Object) => AlterScriptDto[]}
+ * @param columnName {string}
+ * @return string
  * */
-const getDeletedCommentOnColumnScriptDtos = (_, ddlProvider) => collection => {
-	const { getFullColumnName } = require('../../../utils/general');
+const dropColumnComment = columnName => {
+	const templateConfig = {
+		columnName,
+		comment: 'NULL',
+	};
+	return assignTemplates(templates.updateCommentOnColumn, templateConfig);
+};
 
+/**
+ * @param {Object} collection
+ * @return {AlterScriptDto[]}
+ * */
+const getDeletedCommentOnColumnScriptDtos = collection => {
 	return _.toPairs(collection.properties)
 		.filter(([name, jsonSchema]) => {
 			const newComment = jsonSchema.description;
@@ -36,17 +64,18 @@ const getDeletedCommentOnColumnScriptDtos = (_, ddlProvider) => collection => {
 		})
 		.map(([name, jsonSchema]) => {
 			const columnName = getFullColumnName(collection, name);
-			return ddlProvider.dropColumnComment(columnName);
+			return dropColumnComment(columnName);
 		})
 		.map(script => AlterScriptDto.getInstance([script], true, true));
 };
 
 /**
- * @return {(collection: Object) => AlterScriptDto[]}
+ * @param {Object} collection
+ * @return {AlterScriptDto[]}
  * */
-const getModifiedCommentOnColumnScriptDtos = (_, ddlProvider) => collection => {
-	const updatedCommentScripts = getUpdatedCommentOnColumnScriptDtos(_, ddlProvider)(collection);
-	const deletedCommentScripts = getDeletedCommentOnColumnScriptDtos(_, ddlProvider)(collection);
+const getModifiedCommentOnColumnScriptDtos = collection => {
+	const updatedCommentScripts = getUpdatedCommentOnColumnScriptDtos(collection);
+	const deletedCommentScripts = getDeletedCommentOnColumnScriptDtos(collection);
 	return [...updatedCommentScripts, ...deletedCommentScripts];
 };
 

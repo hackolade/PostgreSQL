@@ -1,26 +1,12 @@
+const _ = require('lodash');
 const { createClient } = require('./connectionHelper');
 const db = require('./db');
 const { getJsonSchema } = require('./getJsonSchema');
+const { mapColumnData, setSubtypeFromSampledJsonValues } = require('./postgresHelpers/columnHelper');
+const { clearEmptyPropertiesInObject } = require('./postgresHelpers/common');
+const { prepareForeignKeys } = require('./postgresHelpers/foreignKeysHelper');
+const { mapFunctionData, mapProcedureData } = require('./postgresHelpers/functionHelper');
 const {
-	setDependencies: setDependenciesInColumnHelper,
-	mapColumnData,
-	setSubtypeFromSampledJsonValues,
-} = require('./postgresHelpers/columnHelper');
-const {
-	setDependencies: setDependenciesInCommonHelper,
-	clearEmptyPropertiesInObject,
-} = require('./postgresHelpers/common');
-const {
-	setDependencies: setDependenciesInForeignKeysHelper,
-	prepareForeignKeys,
-} = require('./postgresHelpers/foreignKeysHelper');
-const {
-	setDependencies: setFunctionHelperDependencies,
-	mapFunctionData,
-	mapProcedureData,
-} = require('./postgresHelpers/functionHelper');
-const {
-	setDependencies: setDependenciesInTableHelper,
 	prepareTablePartition,
 	checkHaveJsonTypes,
 	prepareTableConstraints,
@@ -29,13 +15,8 @@ const {
 	prepareTableIndexes,
 	prepareTableInheritance,
 } = require('./postgresHelpers/tableHelper');
+const { getUserDefinedTypes, isTypeComposite } = require('./postgresHelpers/userDefinedTypesHelper');
 const {
-	setDependencies: setDependenciesInUserDefinedTypesHelper,
-	getUserDefinedTypes,
-	isTypeComposite,
-} = require('./postgresHelpers/userDefinedTypesHelper');
-const {
-	setDependencies: setViewDependenciesInViewHelper,
 	isViewByTableType,
 	isViewByName,
 	removeViewNameSuffix,
@@ -43,29 +24,16 @@ const {
 	setViewSuffix,
 	prepareViewData,
 } = require('./postgresHelpers/viewHelper');
-const { setDependencies: setDependenciesInTriggerHelper, getTriggers } = require('./postgresHelpers/triggerHelper');
+const { getTriggers } = require('./postgresHelpers/triggerHelper');
 const queryConstants = require('./queryConstants');
 const { reorganizeConstraints } = require('./postgresHelpers/reorganizeConstraints');
 const { mapSequenceData } = require('./postgresHelpers/sequenceHelper');
 
 let useSshTunnel = false;
-let _ = null;
 let logger = null;
 let version = 16;
 
 module.exports = {
-	setDependencies(app) {
-		_ = app.require('lodash');
-		setDependenciesInCommonHelper(app);
-		setDependenciesInTableHelper(app);
-		setDependenciesInColumnHelper(app);
-		setDependenciesInForeignKeysHelper(app);
-		setViewDependenciesInViewHelper(app);
-		setFunctionHelperDependencies(app);
-		setDependenciesInUserDefinedTypesHelper(app);
-		setDependenciesInTriggerHelper(app);
-	},
-
 	async connect(connectionInfo, sshService, specificLogger) {
 		if (db.isClientInitialized()) {
 			await this.disconnect(sshService);
@@ -470,11 +438,7 @@ const isSystemSchema = schema_name => {
 		return true;
 	}
 
-	if (_.includes(['information_schema'], schema_name)) {
-		return true;
-	}
-
-	return false;
+	return _.includes(['information_schema'], schema_name);
 };
 
 const getGetIndexesQuery = postgresVersion => {
@@ -487,8 +451,8 @@ const getGetIndexesQuery = postgresVersion => {
 	}
 };
 
-const getGetFunctionsAdditionalDataQuery = postgreVersion => {
-	return postgreVersion === 10
+const getGetFunctionsAdditionalDataQuery = postgresVersion => {
+	return postgresVersion === 10
 		? queryConstants.GET_FUNCTIONS_WITH_PROCEDURES_ADDITIONAL_V_10
 		: queryConstants.GET_FUNCTIONS_WITH_PROCEDURES_ADDITIONAL;
 };

@@ -1,3 +1,4 @@
+const _ = require('lodash');
 const reApi = require('../reverse_engineering/api');
 const { createLogger } = require('../reverse_engineering/helpers/loggerHelper');
 const applyToInstanceHelper = require('./applyToInstanceHelper');
@@ -45,7 +46,7 @@ module.exports = {
 		logger.clear();
 		logger.log(
 			'info',
-			app.require('lodash').omit(connectionInfo, 'script', 'containerData'),
+			_.omit(connectionInfo, 'script', 'containerData'),
 			'connectionInfo',
 			connectionInfo.hiddenKeys,
 		);

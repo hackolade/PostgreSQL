@@ -124,6 +124,17 @@
 				"to": {
 					"mode": "point"
 				}
+			},
+			{
+				"from": {
+					"type": "numeric"
+				},
+				"to": {
+					"mode": "real"
+				},
+				"parent": {
+					"type": "vector"
+				}
 			}
 		]
 	},

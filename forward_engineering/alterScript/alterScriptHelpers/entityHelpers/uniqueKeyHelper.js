@@ -1,3 +1,4 @@
+const _ = require('lodash');
 const { AlterScriptDto } = require('../../types/AlterScriptDto');
 const {
 	AlterCollectionDto,
@@ -7,6 +8,15 @@ const {
 	AlterCollectionRoleCompModUniqueKey,
 } = require('../../types/AlterCollectionDto');
 const { KeyTransitionDto, KeyScriptModificationDto } = require('../../types/AlterKeyDto');
+const { dropKeyConstraint, alterKeyConstraint } = require('../../../ddlProvider/ddlHelpers/constraintsHelper');
+const keyHelper = require('../../../ddlProvider/ddlHelpers/keyHelper');
+const {
+	getFullCollectionName,
+	getSchemaOfAlterCollection,
+	getEntityName,
+	getDbVersion,
+	wrapInQuotes,
+} = require('../../../utils/general');
 
 const amountOfColumnsInRegularUniqueKey = 1;
 
@@ -20,7 +30,7 @@ const getDefaultConstraintName = entityName => {
 
 /**
  * @param {AlterCollectionColumnKeyOptionDto} optionHolder
- * @return {Partial<AlterCollectionColumnKeyOptionDto}
+ * @return {Partial<AlterCollectionColumnKeyOptionDto>}
  * */
 const extractOptionsForComparisonWithRegularUniqueKeyOptions = optionHolder => {
 	return {
@@ -53,9 +63,10 @@ const getCustomPropertiesOfCompositeUniqueKeyForComparisonWithRegularUniqueKeyOp
 };
 
 /**
- * @return {(collection: AlterCollectionDto) => KeyTransitionDto}
+ * @param {AlterCollectionDto} collection
+ * @return {KeyTransitionDto}
  * */
-const wasCompositeUniqueKeyChangedInTransitionFromCompositeToRegular = _ => collection => {
+const wasCompositeUniqueKeyChangedInTransitionFromCompositeToRegular = collection => {
 	/**
 	 * @type {AlterCollectionRoleCompModUniqueKey}
 	 * */
@@ -96,9 +107,10 @@ const wasCompositeUniqueKeyChangedInTransitionFromCompositeToRegular = _ => coll
 };
 
 /**
- * @return {(collection: AlterCollectionDto) => KeyTransitionDto}
+ * @param {AlterCollectionDto} collection
+ * @return {KeyTransitionDto}
  * */
-const wasCompositeUniqueKeyChangedInTransitionFromRegularToComposite = _ => collection => {
+const wasCompositeUniqueKeyChangedInTransitionFromRegularToComposite = collection => {
 	/**
 	 * @type {AlterCollectionRoleCompModUniqueKey}
 	 * */
@@ -151,32 +163,26 @@ const getConstraintNameForCompositeUniqueKey = (uniqueKey, entityName) => {
 };
 
 /**
- * @param _
- * @return {(
- *      uniqueKey: AlterCollectionRoleCompModUniqueKeyDto,
- *      entityName: string,
- *      entityJsonSchema: AlterCollectionDto,
- *      dbVersion: string,
- * ) => {
- *         name: string,
- *         keyType: string,
- *         columns: Array<{
- *      		isActivated: boolean,
- *      		name: string,
- *  	   }>,
- *         include: Array<{
- *              isActivated: boolean,
- *              name: string,
- *         }>,
- *         storageParameters: string,
- *         tablespace: string,
- *      }
- *  }
+ * @param {AlterCollectionRoleCompModUniqueKeyDto} uniqueKey
+ * @param {string} entityName
+ * @param {AlterCollectionDto} entity
+ * @param {string} dbVersion
+ * @return {{
+ *   name: string,
+ *   keyType: string,
+ *   columns: Array<{
+ *     isActivated: boolean,
+ *     name: string,
+ *   }>,
+ *   include: Array<{
+ *     isActivated: boolean,
+ *     name: string,
+ *   }>,
+ *   storageParameters: string,
+ *   tablespace: string,
+ * }}
  * */
-const getCreateCompositeUniqueKeyDDLProviderConfig = _ => (uniqueKey, entityName, entity, dbVersion) => {
-	const { clean, getDbVersion } = require('../../../utils/general');
-	const keyHelper = require('../../../ddlProvider/ddlHelpers/keyHelper')(_, clean);
-
+const getCreateCompositeUniqueKeyDDLProviderConfig = (uniqueKey, entityName, entity, dbVersion) => {
 	const constraintName = getConstraintNameForCompositeUniqueKey(uniqueKey, entityName);
 	const uniqueColumns = _.toPairs(entity.role.properties)
 		.filter(([name, jsonSchema]) =>
@@ -225,11 +231,11 @@ const getCreateCompositeUniqueKeyDDLProviderConfig = _ => (uniqueKey, entityName
 };
 
 /**
- * @return {(collection: AlterCollectionDto, dbVersion: string) => Array<KeyScriptModificationDto>}
+ * @param {AlterCollectionDto} collection
+ * @param {string} dbVersion
+ * @return {Array<KeyScriptModificationDto>}
  * */
-const getAddCompositeUniqueKeyScriptDtos = (_, ddlProvider) => (collection, dbVersion) => {
-	const { getFullCollectionName, getSchemaOfAlterCollection, getEntityName } = require('../../../utils/general');
-
+const getAddCompositeUniqueKeyScriptDtos = (collection, dbVersion) => {
 	/**
 	 * @type {AlterCollectionRoleCompModUniqueKey}
 	 * */
@@ -239,7 +245,7 @@ const getAddCompositeUniqueKeyScriptDtos = (_, ddlProvider) => (collection, dbVe
 	if (newUniqueKeys.length === 0 && oldUniqueKeys.length === 0) {
 		return [];
 	}
-	const transitionToCompositeDto = wasCompositeUniqueKeyChangedInTransitionFromRegularToComposite(_)(collection);
+	const transitionToCompositeDto = wasCompositeUniqueKeyChangedInTransitionFromRegularToComposite(collection);
 	if (transitionToCompositeDto.didTransitionHappen && !transitionToCompositeDto.wasUniqueKeyChangedInTransition) {
 		return [];
 	}
@@ -256,36 +262,30 @@ const getAddCompositeUniqueKeyScriptDtos = (_, ddlProvider) => (collection, dbVe
 
 	return newUniqueKeys
 		.map(newUniqueKey => {
-			const ddlConfig = getCreateCompositeUniqueKeyDDLProviderConfig(_)(
+			const ddlConfig = getCreateCompositeUniqueKeyDDLProviderConfig(
 				newUniqueKey,
 				entityName,
 				collection,
 				dbVersion,
 			);
-			const statementDto = ddlProvider.createKeyConstraint(fullTableName, collection.isActivated, ddlConfig);
+			const statementDto = alterKeyConstraint(fullTableName, collection.isActivated, ddlConfig);
 			return new KeyScriptModificationDto(statementDto.statement, fullTableName, false, statementDto.isActivated);
 		})
 		.filter(scriptDto => Boolean(scriptDto.script));
 };
 
 /**
- * @return {(collection: AlterCollectionDto) => Array<KeyScriptModificationDto>}
+ * @param {AlterCollectionDto} collection
+ * @return {Array<KeyScriptModificationDto>}
  * */
-const getDropCompositeUniqueKeyScriptDtos = (_, ddlProvider) => collection => {
-	const {
-		getFullCollectionName,
-		getSchemaOfAlterCollection,
-		getEntityName,
-		wrapInQuotes,
-	} = require('../../../utils/general');
-
+const getDropCompositeUniqueKeyScriptDtos = collection => {
 	const uniqueDto = collection?.role?.compMod?.uniqueKey || {};
 	const newUniqueKeys = uniqueDto.new || [];
 	const oldUniqueKeys = uniqueDto.old || [];
 	if (newUniqueKeys.length === 0 && oldUniqueKeys.length === 0) {
 		return [];
 	}
-	const transitionToCompositeDto = wasCompositeUniqueKeyChangedInTransitionFromCompositeToRegular(_)(collection);
+	const transitionToCompositeDto = wasCompositeUniqueKeyChangedInTransitionFromCompositeToRegular(collection);
 	if (transitionToCompositeDto.didTransitionHappen && !transitionToCompositeDto.wasUniqueKeyChangedInTransition) {
 		return [];
 	}
@@ -307,18 +307,20 @@ const getDropCompositeUniqueKeyScriptDtos = (_, ddlProvider) => collection => {
 				constraintName = oldUniqueKey.constraintName;
 			}
 			const ddlConstraintName = wrapInQuotes(constraintName);
-			const script = ddlProvider.dropKeyConstraint(fullTableName, ddlConstraintName);
+			const script = dropKeyConstraint(fullTableName, ddlConstraintName);
 			return new KeyScriptModificationDto(script, fullTableName, true, collection.isActivated);
 		})
 		.filter(scriptDto => Boolean(scriptDto.script));
 };
 
 /**
- * @return {(collection: AlterCollectionDto, dbVersion: string) => Array<KeyScriptModificationDto>}
+ * @param {AlterCollectionDto} collection
+ * @param {string} dbVersion
+ * @return {Array<KeyScriptModificationDto>}
  * */
-const getModifyCompositeUniqueKeyScriptDtos = (_, ddlProvider) => (collection, dbVersion) => {
-	const dropCompositeUniqueKeyScriptDtos = getDropCompositeUniqueKeyScriptDtos(_, ddlProvider)(collection);
-	const addCompositeUniqueKeyScriptDtos = getAddCompositeUniqueKeyScriptDtos(_, ddlProvider)(collection, dbVersion);
+const getModifyCompositeUniqueKeyScriptDtos = (collection, dbVersion) => {
+	const dropCompositeUniqueKeyScriptDtos = getDropCompositeUniqueKeyScriptDtos(collection);
+	const addCompositeUniqueKeyScriptDtos = getAddCompositeUniqueKeyScriptDtos(collection, dbVersion);
 
 	return [...dropCompositeUniqueKeyScriptDtos, ...addCompositeUniqueKeyScriptDtos].filter(Boolean);
 };
@@ -343,94 +345,90 @@ const getConstraintNameForRegularUniqueKey = (columnJsonSchema, entityName) => {
 };
 
 /**
- * @param _
- * @return {(
- *      name: string,
- *      columnJsonSchema: AlterCollectionColumnDto,
- *      entityName: string,
- *      entityJsonSchema: AlterCollectionDto,
- *      dbVersion: string
- * ) => {
- *         name: string,
- *         keyType: string,
- *         columns: Array<{
- *      		isActivated: boolean,
- *      		name: string,
- *  	   }>,
- *         include: Array<{
- *              isActivated: boolean,
- *              name: string,
- *         }>,
- *         storageParameters: string,
- *         tablespace: string,
- *      }
- *  }
+ * @param {string} columnName
+ * @param {AlterCollectionColumnDto} columnJsonSchema
+ * @param {string} entityName
+ * @param {AlterCollectionDto} entity
+ * @param {string} dbVersion
+ * @return {{
+ *   name: string,
+ *   keyType: string,
+ *   columns: Array<{
+ *     isActivated: boolean,
+ *     name: string,
+ *   }>,
+ *   include: Array<{
+ *     isActivated: boolean,
+ *     name: string,
+ *   }>,
+ *   storageParameters: string,
+ *   tablespace: string,
+ * }}
  * */
-const getCreateRegularUniqueKeyDDLProviderConfig =
-	_ => (columnName, columnJsonSchema, entityName, entity, dbVersion) => {
-		const { clean, getDbVersion } = require('../../../utils/general');
-		const keyHelper = require('../../../ddlProvider/ddlHelpers/keyHelper')(_, clean);
-		const constraintName = getConstraintNameForRegularUniqueKey(columnJsonSchema, entityName);
-		const uniqueColumns = [
-			{
-				name: columnName,
-				isActivated: columnJsonSchema.isActivated,
-			},
-		];
+const getCreateRegularUniqueKeyDDLProviderConfig = (columnName, columnJsonSchema, entityName, entity, dbVersion) => {
+	const constraintName = getConstraintNameForRegularUniqueKey(columnJsonSchema, entityName);
+	const uniqueColumns = [
+		{
+			name: columnName,
+			isActivated: columnJsonSchema.isActivated,
+		},
+	];
 
-		let storageParameters = '';
-		let indexTablespace = '';
-		let includeColumns = [];
-		let deferrable = '';
-		let deferrableConstraintCheckTime = '';
-		let nullsDistinct = '';
+	let storageParameters = '';
+	let indexTablespace = '';
+	let includeColumns = [];
+	let deferrable = '';
+	let deferrableConstraintCheckTime = '';
+	let nullsDistinct = '';
 
-		const constraintOptions = columnJsonSchema.uniqueKeyOptions;
-		if (constraintOptions?.length && constraintOptions?.length > 0) {
-			/**
-			 * @type {AlterCollectionColumnKeyOptionDto}
-			 * */
-			const constraintOption = constraintOptions[0];
-			if (constraintOption.indexStorageParameters) {
-				storageParameters = constraintOption.indexStorageParameters;
-			}
-			if (constraintOption.indexTablespace) {
-				indexTablespace = constraintOption.indexTablespace;
-			}
-			if (constraintOption.indexInclude) {
-				includeColumns = _.toPairs(entity.role.properties)
-					.filter(([name, jsonSchema]) =>
-						Boolean(constraintOption.indexInclude.find(keyDto => keyDto.keyId === jsonSchema.GUID)),
-					)
-					.map(([name, jsonSchema]) => ({
-						name,
-						isActivated: jsonSchema.isActivated,
-					}));
-			}
-
-			deferrable = constraintOption.deferrable;
-			deferrableConstraintCheckTime = constraintOption.deferrableConstraintCheckTime;
-			nullsDistinct = constraintOption.nullsDistinct;
+	const constraintOptions = columnJsonSchema.uniqueKeyOptions;
+	if (constraintOptions?.length && constraintOptions?.length > 0) {
+		/**
+		 * @type {AlterCollectionColumnKeyOptionDto}
+		 * */
+		const constraintOption = constraintOptions[0];
+		if (constraintOption.indexStorageParameters) {
+			storageParameters = constraintOption.indexStorageParameters;
+		}
+		if (constraintOption.indexTablespace) {
+			indexTablespace = constraintOption.indexTablespace;
+		}
+		if (constraintOption.indexInclude) {
+			includeColumns = _.toPairs(entity.role.properties)
+				.filter(([name, jsonSchema]) =>
+					Boolean(constraintOption.indexInclude.find(keyDto => keyDto.keyId === jsonSchema.GUID)),
+				)
+				.map(([name, jsonSchema]) => ({
+					name,
+					isActivated: jsonSchema.isActivated,
+				}));
 		}
 
-		const keyType = keyHelper.getUniqueKeyType({ nullsDistinct }, getDbVersion(dbVersion));
+		deferrable = constraintOption.deferrable;
+		deferrableConstraintCheckTime = constraintOption.deferrableConstraintCheckTime;
+		nullsDistinct = constraintOption.nullsDistinct;
+	}
 
-		return {
-			name: constraintName,
-			keyType,
-			columns: uniqueColumns,
-			include: includeColumns,
-			storageParameters,
-			tablespace: indexTablespace,
-			deferrable,
-			deferrableConstraintCheckTime,
-		};
+	const keyType = keyHelper.getUniqueKeyType({ nullsDistinct }, getDbVersion(dbVersion));
+
+	return {
+		name: constraintName,
+		keyType,
+		columns: uniqueColumns,
+		include: includeColumns,
+		storageParameters,
+		tablespace: indexTablespace,
+		deferrable,
+		deferrableConstraintCheckTime,
 	};
+};
 
 /**
- * @return {(columnJsonSchema: AlterCollectionColumnDto, collection: AlterCollectionDto) => boolean}
+ * @param {AlterCollectionColumnDto} columnJsonSchema
+ * @param {AlterCollectionDto} collection
+ * @return {boolean}
  * */
-const wasFieldChangedToBeARegularUniqueKey = _ => (columnJsonSchema, collection) => {
+const wasFieldChangedToBeARegularUniqueKey = (columnJsonSchema, collection) => {
 	const oldName = columnJsonSchema.compMod.oldField.name;
 	const oldColumnJsonSchema = collection.role.properties[oldName];
 
@@ -441,9 +439,11 @@ const wasFieldChangedToBeARegularUniqueKey = _ => (columnJsonSchema, collection)
 };
 
 /**
- * @return {(columnJsonSchema: AlterCollectionColumnDto, collection: AlterCollectionDto) => KeyTransitionDto}
+ * @param {AlterCollectionColumnDto} columnJsonSchema
+ * @param {AlterCollectionDto} collection
+ * @return {KeyTransitionDto}
  * */
-const wasRegularUniqueKeyChangedInTransitionFromCompositeToRegular = _ => (columnJsonSchema, collection) => {
+const wasRegularUniqueKeyChangedInTransitionFromCompositeToRegular = (columnJsonSchema, collection) => {
 	const oldName = columnJsonSchema.compMod.oldField.name;
 	const oldColumnJsonSchema = collection.role.properties[oldName];
 
@@ -495,9 +495,11 @@ const wasRegularUniqueKeyChangedInTransitionFromCompositeToRegular = _ => (colum
 };
 
 /**
- * @return {(columnJsonSchema: AlterCollectionColumnDto, collection: AlterCollectionDto) => KeyTransitionDto}
+ * @param {AlterCollectionColumnDto} columnJsonSchema
+ * @param {AlterCollectionDto} collection
+ * @return {KeyTransitionDto}
  * */
-const wasRegularUniqueKeyChangedInTransitionFromRegularToComposite = _ => (columnJsonSchema, collection) => {
+const wasRegularUniqueKeyChangedInTransitionFromRegularToComposite = (columnJsonSchema, collection) => {
 	const oldName = columnJsonSchema.compMod.oldField.name;
 	const oldColumnJsonSchema = collection.role.properties[oldName];
 
@@ -549,9 +551,11 @@ const wasRegularUniqueKeyChangedInTransitionFromRegularToComposite = _ => (colum
 };
 
 /**
- * @return {(columnJsonSchema: AlterCollectionColumnDto, collection: AlterCollectionDto) => boolean}
+ * @param {AlterCollectionColumnDto} columnJsonSchema
+ * @param {AlterCollectionDto} collection
+ * @return {boolean}
  * */
-const isFieldNoLongerARegularUniqueKey = _ => (columnJsonSchema, collection) => {
+const isFieldNoLongerARegularUniqueKey = (columnJsonSchema, collection) => {
 	const oldName = columnJsonSchema.compMod.oldField.name;
 
 	const oldJsonSchema = collection.role.properties[oldName];
@@ -562,9 +566,11 @@ const isFieldNoLongerARegularUniqueKey = _ => (columnJsonSchema, collection) => 
 };
 
 /**
- * @return {(columnJsonSchema: AlterCollectionColumnDto, collection: AlterCollectionDto) => boolean}
+ * @param {AlterCollectionColumnDto} columnJsonSchema
+ * @param {AlterCollectionDto} collection
+ * @return {boolean}
  * */
-const wasRegularUniqueKeyModified = _ => (columnJsonSchema, collection) => {
+const wasRegularUniqueKeyModified = (columnJsonSchema, collection) => {
 	const oldName = columnJsonSchema.compMod.oldField.name;
 	const oldJsonSchema = collection.role.properties[oldName] || {};
 
@@ -583,89 +589,85 @@ const wasRegularUniqueKeyModified = _ => (columnJsonSchema, collection) => {
 };
 
 /**
- * @return {(collection: AlterCollectionDto, dbVersion: string) => Array<KeyScriptModificationDto>}
+ * @param {AlterCollectionDto} collection
+ * @param {string} dbVersion
+ * @return {Array<KeyScriptModificationDto>}
  * */
-const getAddUniqueKeyScriptDtos = (_, ddlProvider) => (collection, dbVersion) => {
-	const { getFullCollectionName, getSchemaOfAlterCollection, getEntityName } = require('../../../utils/general');
-
+const getAddUniqueKeyScriptDtos = (collection, dbVersion) => {
 	const collectionSchema = getSchemaOfAlterCollection(collection);
 	const fullTableName = getFullCollectionName(collectionSchema);
 	const entityName = getEntityName(collectionSchema);
 
 	return _.toPairs(collection.properties)
 		.filter(([name, jsonSchema]) => {
-			if (wasFieldChangedToBeARegularUniqueKey(_)(jsonSchema, collection)) {
+			if (wasFieldChangedToBeARegularUniqueKey(jsonSchema, collection)) {
 				return true;
 			}
-			const transitionToRegularDto = wasRegularUniqueKeyChangedInTransitionFromCompositeToRegular(_)(
+			const transitionToRegularDto = wasRegularUniqueKeyChangedInTransitionFromCompositeToRegular(
 				jsonSchema,
 				collection,
 			);
 			if (transitionToRegularDto.didTransitionHappen) {
 				return transitionToRegularDto.wasUniqueKeyChangedInTransition;
 			}
-			return wasRegularUniqueKeyModified(_)(jsonSchema, collection);
+			return wasRegularUniqueKeyModified(jsonSchema, collection);
 		})
 		.map(([name, jsonSchema]) => {
-			const ddlConfig = getCreateRegularUniqueKeyDDLProviderConfig(_)(
+			const ddlConfig = getCreateRegularUniqueKeyDDLProviderConfig(
 				name,
 				jsonSchema,
 				entityName,
 				collection,
 				dbVersion,
 			);
-			const statementDto = ddlProvider.createKeyConstraint(fullTableName, collection.isActivated, ddlConfig);
+			const statementDto = alterKeyConstraint(fullTableName, collection.isActivated, ddlConfig);
 			return new KeyScriptModificationDto(statementDto.statement, fullTableName, false, statementDto.isActivated);
 		})
 		.filter(scriptDto => Boolean(scriptDto.script));
 };
 
 /**
- * @return {(collection: AlterCollectionDto) => Array<KeyScriptModificationDto>}
+ * @param {AlterCollectionDto} collection
+ * @return {Array<KeyScriptModificationDto>}
  * */
-const getDropUniqueKeyScriptDto = (_, ddlProvider) => collection => {
-	const {
-		getFullCollectionName,
-		getSchemaOfAlterCollection,
-		getEntityName,
-		wrapInQuotes,
-	} = require('../../../utils/general');
-
+const getDropUniqueKeyScriptDto = collection => {
 	const collectionSchema = getSchemaOfAlterCollection(collection);
 	const fullTableName = getFullCollectionName(collectionSchema);
 	const entityName = getEntityName(collectionSchema);
 
 	return _.toPairs(collection.properties)
 		.filter(([name, jsonSchema]) => {
-			if (isFieldNoLongerARegularUniqueKey(_)(jsonSchema, collection)) {
+			if (isFieldNoLongerARegularUniqueKey(jsonSchema, collection)) {
 				return true;
 			}
-			const transitionToRegularDto = wasRegularUniqueKeyChangedInTransitionFromRegularToComposite(_)(
+			const transitionToRegularDto = wasRegularUniqueKeyChangedInTransitionFromRegularToComposite(
 				jsonSchema,
 				collection,
 			);
 			if (transitionToRegularDto.didTransitionHappen) {
 				return transitionToRegularDto.wasUniqueKeyChangedInTransition;
 			}
-			return wasRegularUniqueKeyModified(_)(jsonSchema, collection);
+			return wasRegularUniqueKeyModified(jsonSchema, collection);
 		})
 		.map(([name, jsonSchema]) => {
 			const oldName = jsonSchema.compMod.oldField.name;
 			const oldJsonSchema = collection.role.properties[oldName];
 			const ddlConstraintName = wrapInQuotes(getConstraintNameForRegularUniqueKey(oldJsonSchema, entityName));
 
-			const script = ddlProvider.dropKeyConstraint(fullTableName, ddlConstraintName);
+			const script = dropKeyConstraint(fullTableName, ddlConstraintName);
 			return new KeyScriptModificationDto(script, fullTableName, true, collection.isActivated);
 		})
 		.filter(scriptDto => Boolean(scriptDto.script));
 };
 
 /**
- * @return {(collection: AlterCollectionDto, dbVersion: string) => Array<KeyScriptModificationDto>}
+ * @param {AlterCollectionDto} collection
+ * @param {string} dbVersion
+ * @return {Array<KeyScriptModificationDto>}
  * */
-const getModifyUniqueKeyScriptDtos = (_, ddlProvider) => (collection, dbVersion) => {
-	const dropUniqueKeyScriptDtos = getDropUniqueKeyScriptDto(_, ddlProvider)(collection);
-	const addUniqueKeyScriptDtos = getAddUniqueKeyScriptDtos(_, ddlProvider)(collection, dbVersion);
+const getModifyUniqueKeyScriptDtos = (collection, dbVersion) => {
+	const dropUniqueKeyScriptDtos = getDropUniqueKeyScriptDto(collection);
+	const addUniqueKeyScriptDtos = getAddUniqueKeyScriptDtos(collection, dbVersion);
 
 	return [...dropUniqueKeyScriptDtos, ...addUniqueKeyScriptDtos].filter(Boolean);
 };
@@ -688,26 +690,23 @@ const sortModifyUniqueKeyConstraints = constraintDtos => {
 };
 
 /**
- * @return {({ collection, dbVersion }: { collection: AlterCollectionDto, dbVersion: string }) => Array<AlterScriptDto>}
+ * @param {AlterCollectionDto} collection
+ * @param {string} dbVersion
+ * @return {Array<AlterScriptDto>}
  * */
-const getModifyUniqueKeyConstraintsScriptDtos =
-	({ _, ddlProvider }) =>
-	({ collection, dbVersion }) => {
-		const modifyCompositeUniqueKeyScriptDtos = getModifyCompositeUniqueKeyScriptDtos(_, ddlProvider)(
-			collection,
-			dbVersion,
-		);
-		const modifyUniqueKeyScriptDtos = getModifyUniqueKeyScriptDtos(_, ddlProvider)(collection, dbVersion);
+const getModifyUniqueKeyConstraintsScriptDtos = ({ collection, dbVersion }) => {
+	const modifyCompositeUniqueKeyScriptDtos = getModifyCompositeUniqueKeyScriptDtos(collection, dbVersion);
+	const modifyUniqueKeyScriptDtos = getModifyUniqueKeyScriptDtos(collection, dbVersion);
 
-		const allDtos = [...modifyCompositeUniqueKeyScriptDtos, ...modifyUniqueKeyScriptDtos];
-		const sortedAllDtos = sortModifyUniqueKeyConstraints(allDtos);
+	const allDtos = [...modifyCompositeUniqueKeyScriptDtos, ...modifyUniqueKeyScriptDtos];
+	const sortedAllDtos = sortModifyUniqueKeyConstraints(allDtos);
 
-		return sortedAllDtos
-			.map(dto => {
-				return AlterScriptDto.getInstance([dto.script], dto.isActivated, dto.isDropScript);
-			})
-			.filter(Boolean);
-	};
+	return sortedAllDtos
+		.map(dto => {
+			return AlterScriptDto.getInstance([dto.script], dto.isActivated, dto.isDropScript);
+		})
+		.filter(Boolean);
+};
 
 module.exports = {
 	getModifyUniqueKeyConstraintsScriptDtos,

@@ -1,85 +1,78 @@
+const _ = require('lodash');
 const { AlterScriptDto } = require('../../types/AlterScriptDto');
 const { App } = require('../../../types/coreApplicationTypes');
+const { getDbName, getGroupItemsByCompMode } = require('../../../utils/general');
+const {
+	createSequenceScript,
+	dropSequenceScript,
+	alterSequenceScript,
+} = require('../../../ddlProvider/ddlHelpers/sequenceHelper');
+
 const sequencesCompModKey = 'sequences';
 
 /**
- * @param {{ app: App }}
- * @return {({ container }: { container: object }) => AlterScriptDto[]}
+ * @param {Object} props
+ * @param {Object} props.container
+ * @return {AlterScriptDto[]}
  * */
-const getAddContainerSequencesScriptDtos =
-	({ app }) =>
-	({ container }) => {
-		const _ = app.require('lodash');
-		const ddlProvider = require('../../../ddlProvider')(null, null, app);
-		const { getDbName } = require('../../../utils/general');
-		const schemaName = getDbName([container.role]);
+const getAddContainerSequencesScriptDtos = ({ container }) => {
+	const schemaName = getDbName([container.role]);
 
-		return (container.role?.sequences || [])
-			.map(sequence => ddlProvider.createSchemaSequence({ schemaName, sequence }))
-			.map(script => AlterScriptDto.getInstance([script], true, false))
-			.filter(Boolean);
-	};
+	return (container.role?.sequences || [])
+		.map(sequence => createSequenceScript({ schemaName, sequence }))
+		.map(script => AlterScriptDto.getInstance([script], true, false))
+		.filter(Boolean);
+};
 
 /**
- * @param {{ app: App }}
- * @return {({ container }: { container: object }) => AlterScriptDto[]}
+ * @param {Object} props
+ * @param {Object} props.container
+ * @return {AlterScriptDto[]}
  * */
-const getModifyContainerSequencesScriptDtos =
-	({ app }) =>
-	({ container }) => {
-		const _ = app.require('lodash');
-		const ddlProvider = require('../../../ddlProvider')(null, null, app);
-		const { getDbName, getGroupItemsByCompMode } = require('../../../utils/general');
+const getModifyContainerSequencesScriptDtos = ({ container }) => {
+	const schemaName = getDbName([container.role]);
+	const sequencesCompMod = container.role?.compMod?.[sequencesCompModKey] || {};
+	const { new: newItems = [], old: oldItems = [] } = sequencesCompMod;
 
-		const schemaName = getDbName([container.role]);
-		const sequencesCompMod = container.role?.compMod?.[sequencesCompModKey] || {};
-		const { new: newItems = [], old: oldItems = [] } = sequencesCompMod;
+	const { removed, added, modified } = getGroupItemsByCompMode({
+		newItems,
+		oldItems,
+	});
 
-		const { removed, added, modified } = getGroupItemsByCompMode({
-			newItems,
-			oldItems,
-		});
+	const removedScriptDtos = removed
+		.map(sequence => dropSequenceScript({ schemaName, sequence }))
+		.map(script => AlterScriptDto.getInstance([script], true, true));
+	const addedScriptDtos = added
+		.map(sequence => createSequenceScript({ schemaName, sequence }))
+		.map(script => AlterScriptDto.getInstance([script], true, false));
 
-		const removedScriptDtos = removed
-			.map(sequence => {
-				return ddlProvider.dropSchemaSequence({ schemaName, sequence });
-			})
-			.map(script => AlterScriptDto.getInstance([script], true, true));
-		const addedScriptDtos = added
-			.map(sequence => ddlProvider.createSchemaSequence({ schemaName, sequence }))
-			.map(script => AlterScriptDto.getInstance([script], true, false));
+	const modifiedScriptDtos = modified
+		.map(sequence => {
+			const oldSequence = _.find(oldItems, { id: sequence.id }) || {};
+			return alterSequenceScript({
+				schemaName,
+				sequence,
+				oldSequence,
+			});
+		})
+		.map(script => AlterScriptDto.getInstance([script], true, false));
 
-		const modifiedScriptDtos = modified
-			.map(sequence => {
-				const oldSequence = _.find(oldItems, { id: sequence.id }) || {};
-				return ddlProvider.alterSchemaSequence({
-					schemaName,
-					sequence,
-					oldSequence,
-				});
-			})
-			.map(script => AlterScriptDto.getInstance([script], true, false));
-
-		return [...modifiedScriptDtos, ...removedScriptDtos, ...addedScriptDtos].filter(Boolean);
-	};
+	return [...modifiedScriptDtos, ...removedScriptDtos, ...addedScriptDtos].filter(Boolean);
+};
 
 /**
- * @param {{ app: App }}
- * @return {({ container }: { container: object }) => AlterScriptDto[]}
+ * @param {Object} props
+ * @param {Object} props.container
+ * @return {AlterScriptDto[]}
  * */
-const getDeleteContainerSequencesScriptDtos =
-	({ app }) =>
-	({ container }) => {
-		const _ = app.require('lodash');
-		const ddlProvider = require('../../../ddlProvider')(null, null, app);
-		const { getDbName } = require('../../../utils/general');
-		const schemaName = getDbName([container.role]);
+const getDeleteContainerSequencesScriptDtos = ({ container }) => {
+	const schemaName = getDbName([container.role]);
 
-		return (container.role?.sequences || [])
-			.map(sequence => ddlProvider.dropSchemaSequence({ schemaName, sequence }))
-			.map(script => AlterScriptDto.getInstance([script], true, true))
-			.filter(Boolean);
-	};
+	return (container.role?.sequences || [])
+		.map(sequence => dropSequenceScript({ schemaName, sequence }))
+		.map(script => AlterScriptDto.getInstance([script], true, true))
+		.filter(Boolean);
+};
 
 module.exports = {
 	getAddContainerSequencesScriptDtos,

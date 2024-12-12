@@ -1,8 +1,4 @@
-let _ = null;
-
-const setDependencies = app => {
-	_ = app.require('lodash');
-};
+const _ = require('lodash');
 
 const getTriggers = (triggers, triggersAdditionalData) => {
 	return _.chain(triggers)
@@ -46,6 +42,5 @@ const getFunctionFromTrigger = executeStatement => {
 };
 
 module.exports = {
-	setDependencies,
 	getTriggers,
 };
