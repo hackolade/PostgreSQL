@@ -48,8 +48,8 @@ const addArrayDecorator = (type, array_type) => {
 	return `${type}${arrayDecorator}`;
 };
 
-const decorateVector = (subtype, dimension) => {
-	return `${subtype}(${dimension})`;
+const decorateVector = (type, dimension) => {
+	return `${type}(${dimension})`;
 };
 
 const canHaveLength = type => ['char', 'varchar', 'bit', 'varbit'].includes(type);
@@ -75,7 +75,8 @@ const decorateType = (type, columnDefinition) => {
 	} else if (canHaveTimePrecision(type) && (_.isNumber(timePrecision) || timezone)) {
 		type = addWithTimezone(addPrecision(type, timePrecision), timezone);
 	} else if (isVector(type)) {
-		type = dimension ? decorateVector(subtype, dimension) : subtype;
+		const resolvedType = subtype || type;
+		type = dimension ? decorateVector(resolvedType, dimension) : resolvedType;
 	}
 
 	return addArrayDecorator(type, array_type);

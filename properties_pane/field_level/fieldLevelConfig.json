@@ -5612,7 +5612,7 @@ making sure that you maintain a proper JSON format.
 				"propertyName": "Subtype",
 				"propertyKeyword": "subtype",
 				"propertyType": "select",
-				"options": ["vector", "halfvec", "sparsevec"],
+				"options": ["", "halfvec", "sparsevec"],
 				"cleanDependency": true
 			},
 			{
@@ -5635,6 +5635,11 @@ making sure that you maintain a proper JSON format.
 			"maxItems",
 			"uniqueItems",
 			"additionalItems",
+			{
+				"propertyName": "Default",
+				"propertyKeyword": "default",
+				"propertyType": "text"
+			},
 			{
 				"propertyName": "Comments",
 				"propertyKeyword": "description",
