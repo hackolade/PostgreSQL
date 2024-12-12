@@ -18,7 +18,7 @@ const createSchemaOnly = schemaName => {
 
 /**
  * @param {string} schemaName
- * @return string
+ * @return {AlterScriptDto | undefined}
  * */
 const dropSchema = schemaName => {
 	const templateConfig = {
