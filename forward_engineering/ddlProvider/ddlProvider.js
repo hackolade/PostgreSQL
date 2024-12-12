@@ -626,6 +626,8 @@ module.exports = (baseProvider, options, app) => {
 				dbVersion,
 				generatedColumn: Boolean(jsonSchema.generatedColumn),
 				columnGenerationExpression: jsonSchema.columnGenerationExpression,
+				dimension: jsonSchema.dimension,
+				subtype: jsonSchema.subtype,
 			};
 		},
 

@@ -48,11 +48,16 @@ const addArrayDecorator = (type, array_type) => {
 	return `${type}${arrayDecorator}`;
 };
 
+const decorateVector = (subtype, dimension) => {
+	return `${subtype}(${dimension})`;
+};
+
 const canHaveLength = type => ['char', 'varchar', 'bit', 'varbit'].includes(type);
 const canHavePrecision = type => type === 'numeric';
 const canHaveTimePrecision = type => ['time', 'timestamp'].includes(type);
 const canHaveScale = type => type === 'numeric';
 const canHaveTypeModifier = type => ['geography', 'geometry'].includes(type);
+const canHaveDimension = type => type === 'vector';
 
 const decorateType = (type, columnDefinition) => {
 	if (canHaveLength(type) && _.isNumber(columnDefinition.length)) {
@@ -72,6 +77,9 @@ const decorateType = (type, columnDefinition) => {
 		(_.isNumber(columnDefinition.timePrecision) || columnDefinition.timezone)
 	) {
 		type = addWithTimezone(addPrecision(type, columnDefinition.timePrecision), columnDefinition.timezone);
+	}
+	if (canHaveDimension(type)) {
+		return decorateVector(columnDefinition.subtype, columnDefinition.dimension);
 	}
 
 	return addArrayDecorator(type, columnDefinition.array_type);

@@ -19,6 +19,14 @@
 		"vector": {
 			"childValueType": "numeric",
 			"childValueMode": "real"
+		},
+		"halfvec": {
+			"childValueType": "numeric",
+			"childValueMode": "real"
+		},
+		"sparsevec": {
+			"childValueType": "numeric",
+			"childValueMode": "real"
 		}
 	},
 	"dependency": {

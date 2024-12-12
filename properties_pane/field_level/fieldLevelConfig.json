@@ -5616,11 +5616,9 @@ making sure that you maintain a proper JSON format.
 			},
 			{
 				"propertyName": "Subtype",
-				"propertyKeyword": "mode",
+				"propertyKeyword": "subtype",
 				"propertyType": "select",
 				"options": ["vector", "halfvec", "sparsevec"],
-				"data": "options",
-				"valueType": "array",
 				"cleanDependency": true
 			},
 			{
