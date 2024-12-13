@@ -94,6 +94,10 @@ const getValue = value => {
 };
 
 const createIndex = (tableName, index, dbData, isParentActivated = true) => {
+	if (!index.columns.length) {
+		return '';
+	}
+
 	const isUnique = index.unique && index.index_method === 'btree';
 	const name = wrapInQuotes(index.indxName);
 	const unique = isUnique ? ' UNIQUE' : '';

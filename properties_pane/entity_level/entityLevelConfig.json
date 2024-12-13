@@ -1024,6 +1024,10 @@ making sure that you maintain a proper JSON format.
 						"dependency": {
 							"key": "index_method",
 							"value": "btree"
+						},
+						"validation": {
+							"required": true,
+							"minLength": 1
 						}
 					},
 					{
@@ -1068,6 +1072,10 @@ making sure that you maintain a proper JSON format.
 									"value": "brin"
 								}
 							]
+						},
+						"validation": {
+							"required": true,
+							"minLength": 1
 						}
 					},
 					{
