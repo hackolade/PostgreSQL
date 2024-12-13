@@ -5610,9 +5610,9 @@ making sure that you maintain a proper JSON format.
 			"type",
 			{
 				"propertyName": "Subtype",
-				"propertyKeyword": "mode",
+				"propertyKeyword": "subtype",
 				"propertyType": "select",
-				"options": ["", "halfvec", "sparsevec"],
+				"options": ["vector", "halfvec", "sparsevec"],
 				"cleanDependency": true
 			},
 			{
@@ -5624,7 +5624,41 @@ making sure that you maintain a proper JSON format.
 				"typeDecorator": true,
 				"minValue": 0,
 				"step": 1,
-				"maxValue": 16000
+				"maxValue": 2000,
+				"dependency": {
+					"key": "subtype",
+					"value": "vector"
+				}
+			},
+			{
+				"propertyName": "Dimension",
+				"propertyKeyword": "dimension",
+				"propertyType": "numeric",
+				"valueType": "integer",
+				"allowNegative": false,
+				"typeDecorator": true,
+				"minValue": 0,
+				"step": 1,
+				"maxValue": 4000,
+				"dependency": {
+					"key": "subtype",
+					"value": "halfvec"
+				}
+			},
+			{
+				"propertyName": "Dimension",
+				"propertyKeyword": "dimension",
+				"propertyType": "numeric",
+				"valueType": "integer",
+				"allowNegative": false,
+				"typeDecorator": true,
+				"minValue": 0,
+				"step": 1,
+				"maxValue": 1000,
+				"dependency": {
+					"key": "subtype",
+					"value": "sparsevec"
+				}
 			},
 			{
 				"propertyName": "Not null",
