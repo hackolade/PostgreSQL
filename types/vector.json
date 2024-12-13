@@ -30,6 +30,11 @@
 			"childValueMode": "real"
 		}
 	},
+	"compatibleWith": {
+		"type": "char",
+		"parentType": "string",
+		"mode": "bit"
+	},
 	"dependency": {
 		"type": "not",
 		"values": [
