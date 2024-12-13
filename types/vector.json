@@ -17,7 +17,7 @@
 		"dimension": 1
 	},
 	"subtypes": {
-		"": {
+		"vector": {
 			"childValueType": "numeric",
 			"childValueMode": "real"
 		},

@@ -61,7 +61,7 @@ const canHaveTypeModifier = type => ['geography', 'geometry'].includes(type);
 const isVector = type => ['vector', 'halfvec', 'sparsevec'].includes(type);
 
 const decorateType = (type, columnDefinition) => {
-	const { length, precision, scale, typeModifier, srid, timezone, timePrecision, dimension, array_type } =
+	const { length, precision, scale, typeModifier, srid, timezone, timePrecision, dimension, subtype, array_type } =
 		columnDefinition;
 
 	if (canHaveLength(type) && _.isNumber(length)) {
@@ -75,7 +75,7 @@ const decorateType = (type, columnDefinition) => {
 	} else if (canHaveTimePrecision(type) && (_.isNumber(timePrecision) || timezone)) {
 		type = addWithTimezone(addPrecision(type, timePrecision), timezone);
 	} else if (isVector(type)) {
-		type = dimension ? decorateVector(type, dimension) : type;
+		type = dimension ? decorateVector(subtype, dimension) : subtype;
 	}
 
 	return addArrayDecorator(type, array_type);
