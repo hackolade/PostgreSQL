@@ -127,6 +127,42 @@
 			},
 			{
 				"from": {
+					"type": "vector",
+					"subtype": "vector<int8>"
+				},
+				"to": {
+					"subtype": "vector"
+				}
+			},
+			{
+				"from": {
+					"type": "vector",
+					"subtype": "vector<float>"
+				},
+				"to": {
+					"subtype": "vector"
+				}
+			},
+			{
+				"from": {
+					"type": "vector",
+					"subtype": "vector<float32>"
+				},
+				"to": {
+					"subtype": "vector"
+				}
+			},
+			{
+				"from": {
+					"type": "vector",
+					"subtype": "vector<float64>"
+				},
+				"to": {
+					"subtype": "vector"
+				}
+			},
+			{
+				"from": {
 					"type": "numeric"
 				},
 				"to": {
