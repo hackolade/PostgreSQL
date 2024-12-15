@@ -94,7 +94,9 @@ const getValue = value => {
 };
 
 const createIndex = (tableName, index, dbData, isParentActivated = true) => {
-	if (!index.columns.length) {
+	const isNameEmpty = !index.indxName && index.ifNotExist;
+
+	if (!index.columns.length || isNameEmpty) {
 		return '';
 	}
 
