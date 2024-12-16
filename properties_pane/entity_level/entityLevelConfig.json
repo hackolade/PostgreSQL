@@ -885,8 +885,13 @@ making sure that you maintain a proper JSON format.
 						"propertyTooltip": "Optional, if not specified an automatic name will be assigned. Index name are needed to drop indexes and appear in error messages when a constraint is violated.",
 						"propertyType": "text",
 						"dependency": {
-							"key": "ifNotExist",
-							"value": false
+							"type": "not",
+							"values": [
+								{
+									"key": "ifNotExist",
+									"value": true
+								}
+							]
 						}
 					},
 					{
