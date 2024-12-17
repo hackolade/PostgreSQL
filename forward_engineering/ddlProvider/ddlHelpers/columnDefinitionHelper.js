@@ -2,6 +2,7 @@ const _ = require('lodash');
 const { commentIfDeactivated, wrapInQuotes, wrapComment } = require('../../utils/general');
 const assignTemplates = require('../../utils/assignTemplates');
 const templates = require('../templates');
+const { isVector, isString, isDateTime } = require('./typeHelper');
 
 const addLength = (type, length) => {
 	return `${type}(${length})`;
@@ -58,8 +59,6 @@ const canHaveTimePrecision = type => ['time', 'timestamp'].includes(type);
 const canHaveScale = type => type === 'numeric';
 const canHaveTypeModifier = type => ['geography', 'geometry'].includes(type);
 
-const isVector = type => ['vector', 'halfvec', 'sparsevec'].includes(type);
-
 const decorateType = (type, columnDefinition) => {
 	const { length, precision, scale, typeModifier, srid, timezone, timePrecision, dimension, subtype, array_type } =
 		columnDefinition;
@@ -80,9 +79,6 @@ const decorateType = (type, columnDefinition) => {
 
 	return addArrayDecorator(type, array_type);
 };
-
-const isString = type => ['char', 'varchar', 'text', 'bit', 'varbit'].includes(type);
-const isDateTime = type => ['date', 'time', 'timestamp', 'interval'].includes(type);
 
 const decorateDefault = (type, defaultValue, isArrayType) => {
 	const constantsValues = ['current_timestamp', 'current_user', 'null'];

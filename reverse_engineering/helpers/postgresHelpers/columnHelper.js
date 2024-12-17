@@ -1,4 +1,5 @@
 const _ = require('lodash');
+const { isVector } = require('../../../forward_engineering/ddlProvider/ddlHelpers/typeHelper');
 
 const columnPropertiesMapper = {
 	column_default: 'default',
@@ -15,8 +16,21 @@ const columnPropertiesMapper = {
 	numeric_scale: 'scale',
 	datetime_precision: 'timePrecision',
 	attribute_mode: {
-		keyword: 'timePrecision',
-		check: (column, value) => value !== -1 && canHaveTimePrecision(column.data_type),
+		keyword: ({ column }) => {
+			if (isVector(column.udt_name)) {
+				return 'dimension';
+			}
+			return 'timePrecision';
+		},
+		check: (column, value) => {
+			if (!value || value === -1) {
+				return false;
+			}
+			if (isVector(column.udt_name)) {
+				return true;
+			}
+			return canHaveTimePrecision(column.data_type);
+		},
 	},
 	interval_type: 'intervalOptions',
 	collation_name: 'collationRule',
@@ -28,6 +42,8 @@ const columnPropertiesMapper = {
 	domain_name: 'domain_name',
 };
 
+const keysToExclude = ['numberOfArrayDimensions', 'udt_name'];
+
 const getColumnValue = (column, key, value) => {
 	if (columnPropertiesMapper[key]?.check) {
 		return columnPropertiesMapper[key].check(column, value) ? value : '';
@@ -36,16 +52,28 @@ const getColumnValue = (column, key, value) => {
 	return _.get(columnPropertiesMapper, `${key}.values.${value}`, value);
 };
 
+const getColumnKey = ({ column, key }) => {
+	const mappedKey = columnPropertiesMapper[key];
+	if (mappedKey?.keyword) {
+		if (typeof mappedKey.keyword === 'function') {
+			return mappedKey.keyword({ column });
+		}
+		return mappedKey.keyword;
+	}
+	return mappedKey;
+};
+
 const mapColumnData = userDefinedTypes => column => {
 	return _.chain(column)
 		.toPairs()
-		.map(([key, value]) => [
-			columnPropertiesMapper[key]?.keyword || columnPropertiesMapper[key],
-			getColumnValue(column, key, value),
-		])
+		.map(([key, value]) => [getColumnKey({ column, key }), getColumnValue(column, key, value)])
 		.filter(([key, value]) => key && !_.isNil(value))
 		.fromPairs()
-		.thru(setColumnType(userDefinedTypes))
+		.thru(col => {
+			const columnWithType = setColumnType(userDefinedTypes)(col);
+			keysToExclude.forEach(key => delete columnWithType[key]);
+			return columnWithType;
+		})
 		.value();
 };
 
@@ -187,6 +215,12 @@ const mapType = (userDefinedTypes, type) => {
 		case 'regrole':
 		case 'regtype':
 			return { type: 'oid', mode: type };
+		case 'vector':
+			return { type: 'vector', subtype: 'vector' };
+		case 'halfvec':
+			return { type: 'vector', subtype: 'halfvec' };
+		case 'sparsevec':
+			return { type: 'vector', subtype: 'sparsevec' };
 
 		default: {
 			if (_.some(userDefinedTypes, { name: type })) {
