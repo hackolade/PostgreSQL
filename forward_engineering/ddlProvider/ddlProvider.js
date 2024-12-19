@@ -67,7 +67,7 @@ module.exports = (baseProvider, options, app) => {
 			});
 		},
 
-		createSchema({ schemaName, ifNotExist, comments, udfs, procedures, sequences, isActivated }) {
+		createSchema({ schemaName, ifNotExist, comments, udfs, procedures, sequences, isActivated = true }) {
 			const comment = assignTemplates(templates.comment, {
 				object: 'SCHEMA',
 				objectName: wrapInQuotes(schemaName),
