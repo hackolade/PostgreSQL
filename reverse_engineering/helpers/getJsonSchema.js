@@ -1,3 +1,6 @@
+const _ = require('lodash');
+const { isVector } = require('../../forward_engineering/ddlProvider/ddlHelpers/typeHelper');
+
 const getJsonSchema = columns => {
 	const properties = columns.reduce((properties, column) => {
 		if (column.properties) {
@@ -6,6 +9,16 @@ const getJsonSchema = columns => {
 				[column.name]: {
 					...column,
 					...getJsonSchema(column.properties),
+				},
+			};
+		}
+
+		if (isVector(column.type)) {
+			return {
+				...properties,
+				[column.name]: {
+					...column,
+					items: _.fill(Array(column.dimension), { type: 'number', mode: 'real' }),
 				},
 			};
 		}
