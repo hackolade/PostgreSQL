@@ -47,8 +47,7 @@
 					"type": "vector"
 				},
 				"to": {
-					"to": "vector",
-					"subtype": ""
+					"subtype": "vector<real>"
 				}
 			}
 		]
