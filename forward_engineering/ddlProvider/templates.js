@@ -2,7 +2,7 @@ module.exports = {
 	createDatabase:
 		'CREATE DATABASE ${name}${template}${encoding}${locale}${collate}${characterClassification}${tablespace};\n',
 
-	createSchema: 'CREATE SCHEMA${ifNotExist} ${name};\nSET search_path TO ${name};\n\n${comment}\n',
+	createSchema: 'CREATE SCHEMA${ifNotExist} ${name};\nSET search_path TO ${name}, public;\n\n${comment}\n',
 
 	comment: 'COMMENT ON ${object} ${objectName} IS ${comment};\n',
 

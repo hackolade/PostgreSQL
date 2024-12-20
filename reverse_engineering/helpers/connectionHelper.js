@@ -135,25 +135,24 @@ const retryOnSslError = (config, logger, error) => {
 	throw error;
 };
 
-const createConnectionPool = (config, logger) => {
+const createConnectionPool = async (config, logger) => {
 	const pool = new pg.Pool(config);
 
-	return pool
-		.connect()
-		.then(client => {
-			client.release();
+	try {
+		const client = await pool.connect();
 
-			return pool;
-		})
-		.catch(async error => {
-			await pool.end();
+		client.release();
 
-			if (config.isRetry) {
-				throw error;
-			}
+		return pool;
+	} catch (error) {
+		await pool.end();
 
-			return retryOnSslError(config, logger, error);
-		});
+		if (config.isRetry) {
+			throw error;
+		}
+
+		return retryOnSslError(config, logger, error);
+	}
 };
 
 module.exports = {
