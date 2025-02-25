@@ -1,3 +1,9 @@
+/**
+ * @typedef {import('../../types').ColumnDefinition} ColumnDefinition
+ * @typedef {import('../../types').JsonSchema} JsonSchema
+ * @typedef {import('../../types').ConstraintDto} ConstraintDto
+ */
+
 const _ = require('lodash');
 const { clean } = require('../../utils/general');
 
@@ -185,6 +191,61 @@ const getTableKeyConstraints = (jsonSchema, dbVersion) => {
 	];
 };
 
+/**
+ * @param {{ jsonSchema: JsonSchema }}
+ * @returns {ConstraintDto[]}
+ */
+const getCompositeKeyConstraints = ({ jsonSchema }) => {
+	const compositePrimaryKeys = getCompositePrimaryKeys(jsonSchema);
+	const compositeUniqueKeys = getCompositeUniqueKeys(jsonSchema);
+
+	return [...compositePrimaryKeys, ...compositeUniqueKeys];
+};
+
+/**
+ * @param {{ columnDefinition: ColumnDefinition; jsonSchema: JsonSchema }}
+ * @returns {ConstraintDto | undefined}
+ */
+const getPrimaryKeyConstraint = ({ columnDefinition, jsonSchema }) => {
+	if (!isPrimaryKey(columnDefinition)) {
+		return;
+	}
+
+	return hydratePrimaryKeyOptions(
+		_.get(columnDefinition, 'primaryKeyOptions.[0]', {}),
+		'',
+		columnDefinition.isActivated,
+		jsonSchema,
+	);
+};
+
+/**
+ * @param {{ columnDefinition: ColumnDefinition; jsonSchema: JsonSchema }}
+ * @returns {ConstraintDto | undefined}
+ */
+const getUniqueKeyConstraint = ({ columnDefinition, jsonSchema }) => {
+	if (!isUniqueKey(columnDefinition)) {
+		return;
+	}
+
+	return hydrateUniqueOptions({
+		options: _.get(columnDefinition, 'uniqueKeyOptions.[0]', {}),
+		isActivated: columnDefinition.isActivated,
+		jsonSchema,
+	});
+};
+
+/**
+ * @param {{ columnDefinition: ColumnDefinition; jsonSchema: JsonSchema }}
+ * @returns {ConstraintDto[]}
+ */
+const getColumnConstraints = ({ columnDefinition, jsonSchema }) => {
+	const primaryKeyConstraint = getPrimaryKeyConstraint({ columnDefinition, jsonSchema });
+	const uniqueKeyConstraint = getUniqueKeyConstraint({ columnDefinition, jsonSchema });
+
+	return [primaryKeyConstraint, uniqueKeyConstraint].filter(Boolean);
+};
+
 module.exports = {
 	getTableKeyConstraints,
 	isInlineUnique,
@@ -193,4 +254,6 @@ module.exports = {
 	hydratePrimaryKeyOptions,
 	hydrateUniqueOptions,
 	getUniqueKeyType,
+	getCompositeKeyConstraints,
+	getColumnConstraints,
 };
