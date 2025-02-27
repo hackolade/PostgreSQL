@@ -24,7 +24,13 @@
             "nestedCollections": false,
             "disablePatternField": true,
             "disableMultipleTypes": true,
-            "enableForwardEngineering": true,
+            "enableForwardEngineering": {
+                "jsonDocument": true,
+                "jsonSchema": true,
+                "excel": true,
+                "plugin": true,
+                "dbt": true
+            },
             "disableReverseEngineering": false,
             "disableChoices": true,
             "enableJsonType": true,
