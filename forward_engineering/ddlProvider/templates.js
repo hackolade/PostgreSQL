@@ -96,6 +96,9 @@ module.exports = {
 	createView:
 		'CREATE${orReplace}${temporary} VIEW ${name}${withOptions}\nAS ${selectStatement}${checkOption};\n\n${comment}\n',
 
+	createMaterializedView:
+		'CREATE MATERIALIZED VIEW${ifNotExist} ${name}${options}\nAS ${selectStatement}${withDataClause};\n\n${comment}\n',
+
 	viewSelectStatement: 'SELECT ${keys}\n\tFROM ${tableName}',
 
 	dropView: 'DROP VIEW IF EXISTS ${viewName};',

@@ -46,6 +46,7 @@ const {
 } = require('./ddlHelpers/columnDefinitionHelper');
 const { getTriggersScript, hydrateTriggers } = require('./ddlHelpers/triggerHelper');
 const { getLocaleProperties } = require('./ddlHelpers/databaseHelper');
+const materializedViewHelper = require('./ddlHelpers/materializedViewHelper');
 
 module.exports = (baseProvider, options, app) => {
 	return {
@@ -494,6 +495,22 @@ module.exports = (baseProvider, options, app) => {
 				}
 			};
 
+			if (viewData.materialized) {
+				const createViewScript = commentIfDeactivated(
+					assignTemplates(templates.createMaterializedView, {
+						name: viewName,
+						ifNotExist: viewData.ifNotExist ? ' IF NOT EXISTS' : '',
+						options: materializedViewHelper.getOptions({ viewData }),
+						comment: viewData.comment ? comment : '',
+						withDataClause: materializedViewHelper.getWithDataClause({ viewData }),
+						selectStatement,
+					}),
+					{ isActivated: !deactivatedWholeStatement },
+				);
+
+				return createViewScript + '\n';
+			}
+
 			const createViewScript = commentIfDeactivated(
 				assignTemplates(templates.createView, {
 					name: viewName,
@@ -741,6 +758,12 @@ module.exports = (baseProvider, options, app) => {
 				withCheckOption: detailsTab.withCheckOption,
 				checkTestingScope: detailsTab.withCheckOption ? detailsTab.checkTestingScope : '',
 				schemaName: viewData.schemaData.schemaName,
+				materialized: detailsTab.materialized,
+				ifNotExist: detailsTab.ifNotExist,
+				usingMethod: detailsTab.usingMethod,
+				storage_parameter: detailsTab.storage_parameter,
+				tablespace_name: detailsTab.tablespace_name,
+				withDataOption: detailsTab.withDataOption,
 				triggers,
 			};
 		},

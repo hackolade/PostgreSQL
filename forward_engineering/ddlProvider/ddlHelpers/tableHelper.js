@@ -119,6 +119,8 @@ const getStorageParameters = value => {
 };
 
 module.exports = {
+	getBasicValue,
 	getTableTemporaryValue,
 	getTableOptions,
+	getStorageParameters,
 };
