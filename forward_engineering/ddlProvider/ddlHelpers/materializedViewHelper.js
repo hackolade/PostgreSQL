@@ -12,7 +12,7 @@ const getOptions = ({ viewData }) => {
 	const configs = [
 		{ key: 'usingMethod', getValue: getBasicValue('USING') },
 		{ key: 'storage_parameter', getValue: getStorageParameters },
-		{ key: 'tablespace_name', getValue: getBasicValue('TABLESPACE') },
+		{ key: 'view_tablespace_name', getValue: getBasicValue('TABLESPACE') },
 	];
 
 	const statements = configs

@@ -762,7 +762,7 @@ module.exports = (baseProvider, options, app) => {
 				ifNotExist: detailsTab.ifNotExist,
 				usingMethod: detailsTab.usingMethod,
 				storage_parameter: detailsTab.storage_parameter,
-				tablespace_name: detailsTab.tablespace_name,
+				view_tablespace_name: detailsTab.view_tablespace_name,
 				withDataOption: detailsTab.withDataOption,
 				triggers,
 			};
