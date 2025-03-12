@@ -28,6 +28,7 @@ const { getTriggers } = require('./postgresHelpers/triggerHelper');
 const queryConstants = require('./queryConstants');
 const { reorganizeConstraints } = require('./postgresHelpers/reorganizeConstraints');
 const { mapSequenceData } = require('./postgresHelpers/sequenceHelper');
+const { TABLE_TYPE } = require('../constants/tableType');
 
 let useSshTunnel = false;
 let logger = null;
@@ -84,7 +85,7 @@ module.exports = {
 	async getTablesNames(schemaName) {
 		const tables = await db.query(queryConstants.GET_TABLE_NAMES, [schemaName]);
 
-		const tableTypesToExclude = ['FOREIGN TABLE'];
+		const tableTypesToExclude = [TABLE_TYPE.foreignTable];
 
 		return tables
 			.filter(({ table_type }) => !_.includes(tableTypesToExclude, table_type))
@@ -372,7 +373,9 @@ module.exports = {
 
 		viewName = removeViewNameSuffix(viewName);
 
-		const viewData = await db.query(queryConstants.GET_VIEW_DATA, [viewName, schemaName], true);
+		const viewData =
+			(await db.query(queryConstants.GET_VIEW_DATA, [viewName, schemaName], true)) ??
+			(await db.query(queryConstants.GET_MATERIALIZED_VIEW_DATA, [viewName, schemaName], true));
 		const viewDefinitionFallback =
 			!viewData.view_definition &&
 			(await db.queryTolerant(queryConstants.GET_VIEW_SELECT_STMT_FALLBACK, [viewName, schemaName], true));
@@ -384,9 +387,14 @@ module.exports = {
 			viewOptions?.oid,
 			ignoreUdfUdpTriggers,
 		);
+		const tableToastOptions = await db.queryTolerant(
+			queryConstants.GET_TABLE_TOAST_OPTIONS,
+			[viewName, schemaOid],
+			true,
+		);
 
 		const script = generateCreateViewScript(viewName, viewData, viewDefinitionFallback);
-		const data = prepareViewData(viewData, viewOptions, triggers);
+		const data = prepareViewData(viewData, viewOptions, triggers, tableToastOptions);
 
 		if (!script) {
 			logger.info('View select statement was not retrieved', { schemaName, viewName });
