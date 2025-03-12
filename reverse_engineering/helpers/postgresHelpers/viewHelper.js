@@ -28,15 +28,21 @@ const prepareViewData = (viewData, viewOptions, triggers, tableToastOptions) => 
 		temporary: viewOptions?.persistence === 't',
 		recursive: isViewRecursive(viewData),
 		description: viewOptions?.description,
-		materialized: viewData.table_type === TABLE_TYPE.materializedView,
-		view_tablespace_name: viewData.view_tablespace_name,
-		withDataOption: viewData.is_populated,
-		storage_parameter: prepareStorageParameters(viewOptions?.view_options, tableToastOptions),
-
 		triggers,
+		...prepareMaterializedViewData({ viewData, viewOptions, tableToastOptions }),
 	};
-
 	return clearEmptyPropertiesInObject(data);
+};
+
+const prepareMaterializedViewData = ({ viewData, viewOptions, tableToastOptions }) => {
+	return {
+		...(viewData.table_type && { materialized: viewData.table_type === TABLE_TYPE.materializedView }),
+		...(viewData.view_tablespace_name && { view_tablespace_name: viewData.view_tablespace_name }),
+		...(viewData.is_populated && { withDataOption: viewData.is_populated }),
+		...(viewOptions?.view_options && {
+			storage_parameter: prepareStorageParameters(viewOptions.view_options, tableToastOptions),
+		}),
+	};
 };
 
 const getCheckTestingScope = check_option => {

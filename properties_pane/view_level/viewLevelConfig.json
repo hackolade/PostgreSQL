@@ -135,7 +135,6 @@ making sure that you maintain a proper JSON format.
 				"propertyKeyword": "ifNotExist",
 				"propertyTooltip": "When the IF NOT EXISTS clause is used, PostgreSQL will return a warning instead of an error if the specified view already exists.",
 				"propertyType": "checkbox",
-				"defaultValue": true,
 				"dependency": {
 					"key": "materialized",
 					"value": true
@@ -512,7 +511,6 @@ making sure that you maintain a proper JSON format.
 				"propertyName": "Tablespace",
 				"propertyKeyword": "view_tablespace_name",
 				"propertyTooltip": "Enter the name of an existing tablespace location for the database, or pg_default",
-				"defaultValue": "pg_default",
 				"propertyType": "text",
 				"dependency": {
 					"key": "materialized",
@@ -638,7 +636,7 @@ making sure that you maintain a proper JSON format.
 				"propertyType": "select",
 				"options": ["", "LOCAL", "CASCADED"],
 				"dependency": {
-					"type": "or",
+					"type": "and",
 					"values": [
 						{
 							"key": "withCheckOption",
