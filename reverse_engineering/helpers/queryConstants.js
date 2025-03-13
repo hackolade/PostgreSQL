@@ -147,7 +147,7 @@ const queryConstants = {
                       ON inherited_tables.child_name = pg_catalog.pg_class.relname
         WHERE  inherited_tables.child_name IS NULL
                AND pg_catalog.pg_class.relispartition = false
-               AND pg_catalog.pg_class.relkind IN ( 'r', 'v', 'm', 'p' )
+               AND pg_catalog.pg_class.relkind IN ( 'r', 'v', 't', 'm', 'p' )
                AND pg_catalog.pg_namespace.nspname = $1;`,
 	GET_NAMESPACE_OID: 'SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = $1',
 	GET_TABLE_LEVEL_DATA: `
