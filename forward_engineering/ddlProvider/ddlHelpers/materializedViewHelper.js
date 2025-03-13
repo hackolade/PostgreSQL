@@ -1,7 +1,6 @@
 /**
  * @typedef {Record<string, unknown>} ViewData
  */
-const { trim } = require('lodash');
 const { getStorageParameters, getBasicValue } = require('./tableHelper');
 
 /**
@@ -18,9 +17,10 @@ const getOptions = ({ viewData }) => {
 	const statements = configs
 		.map(config => config.getValue(viewData[config.key], viewData))
 		.filter(Boolean)
-		.join('\n');
+		.join('\n')
+		.trim();
 
-	return trim(statements) ? ` ${trim(statements)}` : '';
+	return statements ? ` ${statements}` : '';
 };
 
 /**
