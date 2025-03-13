@@ -253,7 +253,7 @@ const queryConstants = {
         ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace
         WHERE 
             pg_catalog.pg_class.relkind = 'm'
-            and pg_catalog.pg_class.relname = $1
+        AND pg_catalog.pg_class.relname = $1
         AND pg_catalog.pg_namespace.nspname = $2;`,
 	GET_FUNCTIONS_WITH_PROCEDURES: getGET_FUNCTIONS_WITH_PROCEDURES({ extensionsToExclude: ['vector'] }),
 	GET_FUNCTIONS_WITH_PROCEDURES_ARGS: `
