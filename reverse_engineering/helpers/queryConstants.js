@@ -133,23 +133,22 @@ const queryConstants = {
 	GET_VERSION_AS_NUM: 'SHOW server_version_num;',
 	GET_SCHEMA_NAMES: 'SELECT schema_name FROM information_schema.schemata;',
 	GET_TABLE_NAMES: `
-        SELECT tables.table_name, tables.table_type FROM information_schema.tables AS tables
-        INNER JOIN
-        (SELECT
-                pg_class.relname AS table_name,
-                 pg_namespace.nspname AS table_schema
-        FROM pg_catalog.pg_class AS pg_class
-        INNER JOIN pg_catalog.pg_namespace AS pg_namespace
-                ON (pg_namespace.oid = pg_class.relnamespace)
-        WHERE pg_class.relispartition = false
-                AND pg_class.relkind = ANY('{"r","v","t","m","p"}'))
-        AS catalog_table_data
-        ON (catalog_table_data.table_name = tables.table_name AND catalog_table_data.table_schema = tables.table_schema)
-	LEFT JOIN (SELECT relname AS child_name FROM pg_catalog.pg_inherits AS inherit
-		LEFT JOIN pg_catalog.pg_class AS child ON (child.oid = inherit.inhrelid)) AS inherited_tables
-	ON (inherited_tables.child_name = tables.table_name)
-	WHERE inherited_tables.child_name IS NULL
-        AND tables.table_schema = $1;`,
+        SELECT
+               pg_catalog.pg_class.relname     AS table_name,
+               pg_catalog.pg_class.relkind     AS table_type
+        FROM   pg_catalog.pg_class
+               INNER JOIN pg_catalog.pg_namespace
+                       ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace
+               LEFT JOIN (SELECT relname AS child_name
+                          FROM   pg_catalog.pg_inherits AS inherit
+                                 LEFT JOIN pg_catalog.pg_class AS child
+                                        ON child.oid = inherit.inhrelid) AS
+                         inherited_tables
+                      ON inherited_tables.child_name = pg_catalog.pg_class.relname
+        WHERE  inherited_tables.child_name IS NULL
+               AND pg_catalog.pg_class.relispartition = false
+               AND pg_catalog.pg_class.relkind IN ( 'r', 'v', 't', 'm', 'p' )
+               AND pg_catalog.pg_namespace.nspname = $1;`,
 	GET_NAMESPACE_OID: 'SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = $1',
 	GET_TABLE_LEVEL_DATA: `
         SELECT pc.oid, pc.relpersistence, pc.reloptions, pt.spcname, pg_get_expr(pc.relpartbound, pc.oid) AS partition_expr
@@ -240,6 +239,22 @@ const queryConstants = {
             obj_description(oid, 'pg_class') AS description
         FROM pg_catalog.pg_class
         WHERE relname = $1 AND relnamespace = $2;`,
+	GET_MATERIALIZED_VIEW_DATA: `
+        SELECT 
+            pg_catalog.pg_class.reltablespace as view_tablespace_name,
+            pg_catalog.pg_class.relispopulated as is_populated,
+            pg_catalog.pg_class.relkind as table_type,
+            pg_catalog.pg_class.oid,
+            pg_catalog.pg_get_viewdef(pg_catalog.pg_class.oid, true) AS view_definition
+        FROM 
+            pg_catalog.pg_class
+        JOIN 
+            pg_catalog.pg_namespace
+        ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace
+        WHERE 
+            pg_catalog.pg_class.relkind = 'm'
+        AND pg_catalog.pg_class.relname = $1
+        AND pg_catalog.pg_namespace.nspname = $2;`,
 	GET_FUNCTIONS_WITH_PROCEDURES: getGET_FUNCTIONS_WITH_PROCEDURES({ extensionsToExclude: ['vector'] }),
 	GET_FUNCTIONS_WITH_PROCEDURES_ARGS: `
         SELECT parameter_name,
