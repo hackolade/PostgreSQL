@@ -508,7 +508,7 @@ module.exports = (baseProvider, options, app) => {
 					{ isActivated: !deactivatedWholeStatement },
 				);
 
-				return createViewScript + '\n';
+				return _.trim(createViewScript) + '\n';
 			}
 
 			const createViewScript = commentIfDeactivated(
