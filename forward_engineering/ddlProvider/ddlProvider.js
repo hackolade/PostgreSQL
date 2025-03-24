@@ -1,114 +1,54 @@
+const _ = require('lodash');
 const defaultTypes = require('../configs/defaultTypes');
 const descriptors = require('../configs/descriptors');
 const templates = require('./templates');
 const { Sequence } = require('../types/schemaSequenceTypes');
+const { joinActivatedAndDeactivatedStatements } = require('../utils/joinActivatedAndDeactivatedStatements');
+const {
+	tab,
+	commentIfDeactivated,
+	checkAllKeysDeactivated,
+	divideIntoActivatedAndDeactivated,
+	hasType,
+	wrap,
+	wrapComment,
+	wrapInQuotes,
+	getNamePrefixedWithSchemaName,
+	getViewData,
+	getDbVersion,
+} = require('../utils/general');
+const assignTemplates = require('../utils/assignTemplates');
+const {
+	generateConstraintsString,
+	foreignKeysToString,
+	foreignActiveKeysToString,
+	createKeyConstraint,
+	getConstraintsWarnings,
+	additionalPropertiesForForeignKey,
+} = require('./ddlHelpers/constraintsHelper');
+const keyHelper = require('./ddlHelpers/keyHelper');
+const { getFunctionsScript } = require('./ddlHelpers/functionHelper');
+const { getProceduresScript } = require('./ddlHelpers/procedureHelper');
+const {
+	getSequencesScript,
+	createSequenceScript,
+	dropSequenceScript,
+	alterSequenceScript,
+} = require('./ddlHelpers/sequenceHelper');
+const { getTableTemporaryValue, getTableOptions } = require('./ddlHelpers/tableHelper');
+const { getUserDefinedType, isNotPlainType } = require('./ddlHelpers/udtHelper');
+const { dropIndex, createIndex } = require('./ddlHelpers/indexHelper');
+const {
+	decorateType,
+	decorateDefault,
+	getColumnComments,
+	replaceTypeByVersion,
+} = require('./ddlHelpers/columnDefinitionHelper');
+const { getTriggersScript, hydrateTriggers } = require('./ddlHelpers/triggerHelper');
+const { getLocaleProperties } = require('./ddlHelpers/databaseHelper');
+const materializedViewHelper = require('./ddlHelpers/materializedViewHelper');
 
 module.exports = (baseProvider, options, app) => {
-	const _ = app.require('lodash');
-	const {
-		tab,
-		commentIfDeactivated,
-		checkAllKeysDeactivated,
-		divideIntoActivatedAndDeactivated,
-		hasType,
-		wrap,
-		clean,
-		wrapComment,
-		getFunctionArguments,
-		wrapInQuotes,
-		getNamePrefixedWithSchemaName,
-		getColumnsList,
-		getViewData,
-	} = require('../utils/general');
-	const assignTemplates = require('../utils/assignTemplates');
-
-	const {
-		generateConstraintsString,
-		foreignKeysToString,
-		foreignActiveKeysToString,
-		createKeyConstraint,
-		getConstraintsWarnings,
-		additionalPropertiesForForeignKey,
-	} = require('./ddlHelpers/constraintsHelper')({
-		_,
-		commentIfDeactivated,
-		checkAllKeysDeactivated,
-		assignTemplates,
-		getColumnsList,
-		wrapInQuotes,
-	});
-	const keyHelper = require('./ddlHelpers/keyHelper')(_, clean);
-
-	const { getFunctionsScript } = require('./ddlHelpers/functionHelper')({
-		_,
-		templates,
-		assignTemplates,
-		getFunctionArguments,
-		getNamePrefixedWithSchemaName,
-		wrapComment,
-	});
-
-	const { getProceduresScript } = require('./ddlHelpers/procedureHelper')({
-		_,
-		templates,
-		assignTemplates,
-		getFunctionArguments,
-		getNamePrefixedWithSchemaName,
-	});
-
-	const { getSequencesScript, createSequenceScript, dropSequenceScript, alterSequenceScript } =
-		require('./ddlHelpers/sequenceHelper')({
-			_,
-			templates,
-			assignTemplates,
-			getNamePrefixedWithSchemaName,
-			wrapInQuotes,
-		});
-
-	const { getTableTemporaryValue, getTableOptions } = require('./ddlHelpers/tableHelper')({
-		_,
-		checkAllKeysDeactivated,
-		getColumnsList,
-	});
-
-	const { getUserDefinedType, isNotPlainType } = require('./ddlHelpers/udtHelper')({
-		_,
-		commentIfDeactivated,
-		assignTemplates,
-		templates,
-		getNamePrefixedWithSchemaName,
-		wrapComment,
-	});
-
-	const { getIndexKeys, getIndexOptions, getWithOptions } = require('./ddlHelpers/indexHelper')({
-		_,
-		wrapInQuotes,
-		checkAllKeysDeactivated,
-		getColumnsList,
-	});
-
-	const { decorateType, decorateDefault, getColumnComments, replaceTypeByVersion } =
-		require('./ddlHelpers/columnDefinitionHelper')({
-			_,
-			wrap,
-			assignTemplates,
-			templates,
-			commentIfDeactivated,
-			wrapInQuotes,
-			wrapComment,
-		});
-
-	const { getTriggersScript, hydrateTriggers } = require('./ddlHelpers/triggerHelper')({
-		_,
-		wrap,
-		assignTemplates,
-		templates,
-		getNamePrefixedWithSchemaName,
-		commentIfDeactivated,
-	});
-
-	const { getLocaleProperties } = require('./ddlHelpers/databaseHelper')();
-
 	return {
 		createDatabase(modelData) {
 			if (!modelData.databaseName) {
@@ -128,7 +68,7 @@ module.exports = (baseProvider, options, app) => {
 			});
 		},
 
-		createSchema({ schemaName, ifNotExist, comments, udfs, procedures, sequences }) {
+		createSchema({ schemaName, ifNotExist, comments, udfs, procedures, sequences, isActivated = true }) {
 			const comment = assignTemplates(templates.comment, {
 				object: 'SCHEMA',
 				objectName: wrapInQuotes(schemaName),
@@ -144,12 +84,14 @@ module.exports = (baseProvider, options, app) => {
 			const createFunctionStatement = getFunctionsScript(schemaName, udfs);
 			const createProceduresStatement = getProceduresScript(schemaName, procedures);
 
-			return _.chain([schemaStatement, createFunctionStatement, createProceduresStatement])
+			const statement = _.chain([schemaStatement, createFunctionStatement, createProceduresStatement])
 				.compact()
 				.map(_.trim)
 				.join('\n\n')
 				.trim()
 				.value();
+
+			return commentIfDeactivated(statement, { isActivated });
 		},
 
 		createTable(
@@ -216,12 +158,13 @@ module.exports = (baseProvider, options, app) => {
 				partitionOf && !keyConstraintsValue && !checkConstraintsValue && !foreignKeyConstraintsString;
 			const openParenthesis = isEmptyPartitionBody ? '' : '(';
 			const closeParenthesis = isEmptyPartitionBody ? '' : ')';
+			const columnStatements = joinActivatedAndDeactivatedStatements({ statements: columns, indent: '\n\t' });
 
 			const tableStatement = assignTemplates(template, {
 				temporary: getTableTemporaryValue(temporary, unlogged),
 				ifNotExist: ifNotExistStr,
 				name: tableName,
-				columnDefinitions: !partitionOf ? '\t' + _.join(columns, ',\n\t') : '',
+				columnDefinitions: !partitionOf ? '\t' + columnStatements : '',
 				keyConstraints: keyConstraintsValue,
 				checkConstraints: checkConstraintsValue,
 				foreignKeyConstraints: foreignKeyConstraintsString,
@@ -323,42 +266,7 @@ module.exports = (baseProvider, options, app) => {
 		 * @return {string}
 		 * */
 		createIndex(tableName, index, dbData, isParentActivated = true) {
-			const isUnique = index.unique && index.index_method === 'btree';
-			const name = wrapInQuotes(index.indxName);
-			const unique = isUnique ? ' UNIQUE' : '';
-			const concurrently = index.concurrently ? ' CONCURRENTLY' : '';
-			const ifNotExist = index.ifNotExist ? ' IF NOT EXISTS' : '';
-			const only = index.only ? ' ONLY' : '';
-			const using = index.index_method ? ` USING ${_.toUpper(index.index_method)}` : '';
-			const { getDbVersion } = require('../utils/general');
-			const dbVersion = getDbVersion(_.get(dbData, 'dbVersion', ''));
-			const nullsDistinct = isUnique && index.nullsDistinct && dbVersion >= 15 ? `\n ${index.nullsDistinct}` : '';
-
-			const keys = getIndexKeys(
-				index.index_method === 'btree'
-					? index.columns
-					: _.map(index.columns, column => _.omit(column, 'sortOrder', 'nullsOrder')),
-				isParentActivated,
-			);
-			const options = getIndexOptions(index, isParentActivated);
-
-			return commentIfDeactivated(
-				assignTemplates(templates.index, {
-					unique,
-					concurrently,
-					ifNotExist,
-					name,
-					only,
-					using,
-					keys,
-					options,
-					nullsDistinct,
-					tableName: getNamePrefixedWithSchemaName(tableName, index.schemaName),
-				}),
-				{
-					isActivated: index.isActivated,
-				},
-			);
+			return createIndex(tableName, index, dbData, isParentActivated);
 		},
 
 		createCheckConstraint(checkConstraint) {
@@ -567,7 +475,6 @@ module.exports = (baseProvider, options, app) => {
 				: '';
 			const security_barrier = viewData.viewOptions?.security_barrier ? `security_barrier` : '';
 			const dbVersionWhereSecurityInvokerAppeared = 15;
-			const { getDbVersion } = require('../utils/general');
 			const security_invoker =
 				viewData.viewOptions?.security_invoker &&
 				getDbVersion(dbData.dbVersion) >= dbVersionWhereSecurityInvokerAppeared
@@ -587,6 +494,22 @@ module.exports = (baseProvider, options, app) => {
 					return '';
 				}
 			};
+
+			if (viewData.materialized) {
+				const createViewScript = commentIfDeactivated(
+					assignTemplates(templates.createMaterializedView, {
+						name: viewName,
+						ifNotExist: viewData.ifNotExist ? ' IF NOT EXISTS' : '',
+						options: materializedViewHelper.getOptions({ viewData }),
+						comment: viewData.comment ? comment : '',
+						withDataClause: materializedViewHelper.getWithDataClause({ viewData }),
+						selectStatement,
+					}),
+					{ isActivated: !deactivatedWholeStatement },
+				);
+
+				return _.trim(createViewScript) + '\n';
+			}
 
 			const createViewScript = commentIfDeactivated(
 				assignTemplates(templates.createView, {
@@ -666,7 +589,6 @@ module.exports = (baseProvider, options, app) => {
 			const timePrecision = _.includes(timeTypes, columnDefinition.type) ? jsonSchema.timePrecision : '';
 			const timezone = _.includes(timeTypes, columnDefinition.type) ? jsonSchema.timezone : '';
 			const intervalOptions = columnDefinition.type === 'interval' ? jsonSchema.intervalOptions : '';
-			const { getDbVersion } = require('../utils/general');
 			const dbVersion = getDbVersion(schemaData.dbVersion);
 			const primaryKeyOptions = _.omit(
 				keyHelper.hydratePrimaryKeyOptions(
@@ -723,6 +645,8 @@ module.exports = (baseProvider, options, app) => {
 				dbVersion,
 				generatedColumn: Boolean(jsonSchema.generatedColumn),
 				columnGenerationExpression: jsonSchema.columnGenerationExpression,
+				dimension: jsonSchema.dimension,
+				subtype: jsonSchema.subtype,
 			};
 		},
 
@@ -762,6 +686,7 @@ module.exports = (baseProvider, options, app) => {
 				procedures: data?.procedures || [],
 				sequences: data?.sequences || [],
 				dbVersion,
+				isActivated: containerData.isActivated,
 			};
 		},
 
@@ -782,7 +707,6 @@ module.exports = (baseProvider, options, app) => {
 				? getNamePrefixedWithSchemaName(partitionParent.collectionName, partitionParent.bucketName)
 				: '';
 			const triggers = hydrateTriggers(entityData, tableData.relatedSchemas);
-			const { getDbVersion } = require('../utils/general');
 			const dbVersion = getDbVersion(_.get(tableData, 'dbData.dbVersion', ''));
 
 			return {
@@ -834,228 +758,18 @@ module.exports = (baseProvider, options, app) => {
 				withCheckOption: detailsTab.withCheckOption,
 				checkTestingScope: detailsTab.withCheckOption ? detailsTab.checkTestingScope : '',
 				schemaName: viewData.schemaData.schemaName,
+				materialized: detailsTab.materialized,
+				ifNotExist: detailsTab.ifNotExist,
+				usingMethod: detailsTab.usingMethod,
+				storage_parameter: detailsTab.storage_parameter,
+				view_tablespace_name: detailsTab.view_tablespace_name,
+				withDataOption: detailsTab.withDataOption,
 				triggers,
 			};
 		},
 
 		commentIfDeactivated(statement, data, isPartOfLine) {
 			return statement;
-		},
-
-		/**
-		 * @param tableName {string}
-		 * @param columnName {string}
-		 * @param dataType {string}
-		 * @param dataTypeProperties {{
-		 *     length?: number,
-		 *     scale?: number,
-		 *     precision?: number
-		 * }}
-		 * @return string
-		 * */
-		alterColumnType(tableName, columnName, dataType, dataTypeProperties) {
-			let dataTypeString = dataType;
-			if (dataTypeProperties.length) {
-				dataTypeString += `(${dataTypeProperties.length})`;
-			} else if (dataTypeProperties.precision && dataTypeProperties.scale) {
-				dataTypeString += `(${dataTypeProperties.precision},${dataTypeProperties.scale})`;
-			} else if (dataTypeProperties.precision) {
-				dataTypeString += `(${dataTypeProperties.precision})`;
-			}
-
-			return assignTemplates(templates.alterColumnType, {
-				tableName,
-				columnName,
-				dataType: dataTypeString,
-			});
-		},
-
-		/**
-		 * @param tableName {string}
-		 * @param columnName {string}
-		 * @return string
-		 * */
-		setNotNullConstraint(tableName, columnName) {
-			return assignTemplates(templates.addNotNullConstraint, {
-				tableName,
-				columnName,
-			});
-		},
-
-		/**
-		 * @param tableName {string}
-		 * @param columnName {string}
-		 * @return string
-		 * */
-		dropNotNullConstraint(tableName, columnName) {
-			return assignTemplates(templates.dropNotNullConstraint, {
-				tableName,
-				columnName,
-			});
-		},
-
-		/**
-		 * @param tableName {string}
-		 * @param oldColumnName {string}
-		 * @param newColumnName {string}
-		 * @return string
-		 * */
-		renameColumn(tableName, oldColumnName, newColumnName) {
-			return assignTemplates(templates.renameColumn, {
-				tableName,
-				oldColumnName,
-				newColumnName,
-			});
-		},
-
-		/**
-		 * @param tableName {string}
-		 * @param constraintName {string}
-		 * @param expression {expression}
-		 * @return string
-		 * */
-		addCheckConstraint(tableName, constraintName, expression) {
-			const templateConfig = {
-				tableName,
-				constraintName,
-				expression,
-			};
-			return assignTemplates(templates.addCheckConstraint, templateConfig);
-		},
-
-		/**
-		 * @param tableName {string}
-		 * @param constraintName {string}
-		 * @return string
-		 * */
-		dropConstraint(tableName, constraintName) {
-			const templateConfig = {
-				tableName,
-				constraintName,
-			};
-			return assignTemplates(templates.dropConstraint, templateConfig);
-		},
-
-		/**
-		 * @param tableName {string}
-		 * @param comment {string}
-		 * @return string
-		 * */
-		updateTableComment(tableName, comment) {
-			const templateConfig = {
-				tableName,
-				comment,
-			};
-			return assignTemplates(templates.updateCommentOnTable, templateConfig);
-		},
-
-		/**
-		 * @param tableName {string}
-		 * @return string
-		 * */
-		dropTableComment(tableName) {
-			const templateConfig = {
-				tableName,
-				comment: 'NULL',
-			};
-			return assignTemplates(templates.updateCommentOnTable, templateConfig);
-		},
-
-		/**
-		 * @param columnName {string}
-		 * @param comment {string}
-		 * @return string
-		 * */
-		updateColumnComment(columnName, comment) {
-			const templateConfig = {
-				columnName,
-				comment,
-			};
-			return assignTemplates(templates.updateCommentOnColumn, templateConfig);
-		},
-
-		/**
-		 * @param columnName {string}
-		 * @return string
-		 * */
-		dropColumnComment(columnName) {
-			const templateConfig = {
-				columnName,
-				comment: 'NULL',
-			};
-			return assignTemplates(templates.updateCommentOnColumn, templateConfig);
-		},
-
-		/**
-		 * @param schemaName {string}
-		 * @param comment {string}
-		 * @return string
-		 * */
-		updateSchemaComment(schemaName, comment) {
-			const templateConfig = {
-				schemaName,
-				comment,
-			};
-			return assignTemplates(templates.updateCommentOnSchema, templateConfig);
-		},
-
-		/**
-		 * @param schemaName {string}
-		 * @return string
-		 * */
-		dropSchemaComment(schemaName) {
-			const templateConfig = {
-				schemaName,
-				comment: 'NULL',
-			};
-			return assignTemplates(templates.updateCommentOnSchema, templateConfig);
-		},
-
-		/**
-		 * @param viewName {string}
-		 * @param comment {string}
-		 * @return string
-		 * */
-		updateViewComment(viewName, comment) {
-			const templateConfig = {
-				viewName,
-				comment,
-			};
-			return assignTemplates(templates.updateCommentOnView, templateConfig);
-		},
-
-		/**
-		 * @param viewName {string}
-		 * @return string
-		 * */
-		dropViewComment(viewName) {
-			const templateConfig = {
-				viewName,
-				comment: 'NULL',
-			};
-			return assignTemplates(templates.updateCommentOnView, templateConfig);
-		},
-
-		/**
-		 * @param schemaName {string}
-		 * @return string
-		 * */
-		createSchemaOnly(schemaName) {
-			const templateConfig = {
-				schemaName,
-			};
-			return assignTemplates(templates.createSchemaOnly, templateConfig);
-		},
-
-		/**
-		 * @param schemaName {string}
-		 * @return string
-		 * */
-		dropSchema(schemaName) {
-			const templateConfig = {
-				schemaName,
-			};
-			return assignTemplates(templates.dropSchema, templateConfig);
 		},
 
 		/**
@@ -1094,6 +808,15 @@ module.exports = (baseProvider, options, app) => {
 			};
 			return assignTemplates(templates.dropColumn, templateConfig);
 		},
+
+		/**
+		 * @param indexName {string}
+		 * @return {string}
+		 * */
+		dropIndex({ indexName }) {
+			return dropIndex({ indexName });
+		},
+		// <<<--- In provider api
 
 		/**
 		 * @param udtName {string}
@@ -1187,51 +910,6 @@ module.exports = (baseProvider, options, app) => {
 		},
 
 		/**
-		 * @param tableName {string}
-		 * @param isParentActivated {boolean}
-		 * @param keyData {{
-		 *         name: string,
-		 *         keyType: string,
-		 *         columns: Array<{
-		 *      		isActivated: boolean,
-		 *      		name: string,
-		 *  	   }>,
-		 *         include: Array<{
-		 *              isActivated: boolean,
-		 *              name: string,
-		 *         }>,
-		 *         storageParameters: string,
-		 *         tablespace: string,
-		 * }}
-		 * @return {{
-		 *     statement: string,
-		 *     isActivated: boolean,
-		 * }}
-		 * */
-		createKeyConstraint(tableName, isParentActivated, keyData) {
-			const constraintStatementDto = createKeyConstraint(templates, isParentActivated)(keyData);
-			return {
-				statement: assignTemplates(templates.addPkConstraint, {
-					constraintStatement: (constraintStatementDto.statement || '').trim(),
-					tableName,
-				}),
-				isActivated: constraintStatementDto.isActivated,
-			};
-		},
-
-		/**
-		 * @param tableName {string}
-		 * @param constraintName {string}
-		 * */
-		dropKeyConstraint(tableName, constraintName) {
-			const templatesConfig = {
-				tableName,
-				constraintName,
-			};
-			return assignTemplates(templates.dropConstraint, templatesConfig);
-		},
-
-		/**
 		 * @param {{ schemaName: string, sequences: Sequence[] }}
 		 * @returns {string}
 		 */
@@ -1261,110 +939,6 @@ module.exports = (baseProvider, options, app) => {
 		 */
 		alterSchemaSequence({ schemaName, sequence, oldSequence }) {
 			return alterSequenceScript({ schemaName, sequence, oldSequence });
-		},
-
-		/**
-		 * @param indexName {string}
-		 * @return {string}
-		 * */
-		dropIndex({ indexName }) {
-			const templatesConfig = {
-				indexName,
-			};
-			return assignTemplates(templates.dropIndex, templatesConfig);
-		},
-
-		/**
-		 * @param schemaName {string}
-		 * @param oldIndexName {string}
-		 * @param newIndexName {string}
-		 * @return {string}
-		 * */
-		alterIndexRename({ schemaName, oldIndexName, newIndexName }) {
-			const ddlSchemaName = wrapInQuotes(schemaName);
-			const ddlOldIndexName = getNamePrefixedWithSchemaName(wrapInQuotes(oldIndexName), ddlSchemaName);
-			const ddlNewIndexName = wrapInQuotes(newIndexName);
-
-			const templatesConfig = {
-				oldIndexName: ddlOldIndexName,
-				newIndexName: ddlNewIndexName,
-			};
-			return assignTemplates(templates.alterIndexRename, templatesConfig);
-		},
-
-		/**
-		 * @param schemaName {string}
-		 * @param indexName {string}
-		 * @param tablespaceName {string}
-		 * @return {string}
-		 * */
-		alterIndexTablespace({ schemaName, indexName, tablespaceName }) {
-			const ddlSchemaName = wrapInQuotes(schemaName);
-			const ddlIndexName = getNamePrefixedWithSchemaName(wrapInQuotes(indexName), ddlSchemaName);
-
-			const templatesConfig = {
-				indexName: ddlIndexName,
-				tablespaceName,
-			};
-			return assignTemplates(templates.alterIndexTablespace, templatesConfig);
-		},
-
-		/**
-		 * @param schemaName {string}
-		 * @param indexName {string}
-		 * @param index {Object}
-		 * @return {string}
-		 * */
-		alterIndexStorageParams({ schemaName, indexName, index }) {
-			const ddlSchemaName = wrapInQuotes(schemaName);
-			const ddlIndexName = getNamePrefixedWithSchemaName(wrapInQuotes(indexName), ddlSchemaName);
-
-			const ddlIndexStorageParameters = getWithOptions(index);
-			const templatesConfig = {
-				indexName: ddlIndexName,
-				options: ddlIndexStorageParameters,
-			};
-			return assignTemplates(templates.alterIndexStorageParams, templatesConfig);
-		},
-
-		/**
-		 * @param schemaName {string}
-		 * @param indexName {string}
-		 * @return {string}
-		 * */
-		reindexIndex({ schemaName, indexName }) {
-			const ddlSchemaName = wrapInQuotes(schemaName);
-			const ddlIndexName = getNamePrefixedWithSchemaName(wrapInQuotes(indexName), ddlSchemaName);
-
-			const templatesConfig = {
-				indexName: ddlIndexName,
-			};
-			return assignTemplates(templates.reindexIndex, templatesConfig);
-		},
-
-		/**
-		 * @param {{ tableName: string, columnName: string, defaultValue: string }}
-		 * @return string
-		 * */
-		updateColumnDefaultValue({ tableName, columnName, defaultValue }) {
-			const templateConfig = {
-				tableName,
-				columnName,
-				defaultValue,
-			};
-			return assignTemplates(templates.updateColumnDefaultValue, templateConfig);
-		},
-
-		/**
-		 * @param {{ tableName: string, columnName: string }}
-		 * @return string
-		 * */
-		dropColumnDefaultValue({ tableName, columnName }) {
-			const templateConfig = {
-				tableName,
-				columnName,
-			};
-			return assignTemplates(templates.dropColumnDefaultValue, templateConfig);
 		},
 	};
 };

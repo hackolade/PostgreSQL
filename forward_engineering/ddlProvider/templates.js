@@ -2,7 +2,7 @@ module.exports = {
 	createDatabase:
 		'CREATE DATABASE ${name}${template}${encoding}${locale}${collate}${characterClassification}${tablespace};\n',
 
-	createSchema: 'CREATE SCHEMA${ifNotExist} ${name};\nSET search_path TO ${name};\n\n${comment}\n',
+	createSchema: 'CREATE SCHEMA${ifNotExist} ${name};\nSET search_path TO ${name}, public;\n\n${comment}\n',
 
 	comment: 'COMMENT ON ${object} ${objectName} IS ${comment};\n',
 
@@ -95,6 +95,9 @@ module.exports = {
 
 	createView:
 		'CREATE${orReplace}${temporary} VIEW ${name}${withOptions}\nAS ${selectStatement}${checkOption};\n\n${comment}\n',
+
+	createMaterializedView:
+		'CREATE MATERIALIZED VIEW${ifNotExist} ${name}${options}\nAS ${selectStatement}${withDataClause};\n\n${comment}\n',
 
 	viewSelectStatement: 'SELECT ${keys}\n\tFROM ${tableName}',
 

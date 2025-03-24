@@ -231,4 +231,7 @@ module.exports = {
 	domain: {
 		mode: 'domain',
 	},
+	vector: {
+		mode: 'vector',
+	},
 };

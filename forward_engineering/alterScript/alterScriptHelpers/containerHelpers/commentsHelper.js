@@ -1,46 +1,73 @@
 const { AlterScriptDto } = require('../../types/AlterScriptDto');
+const { wrapComment, wrapInQuotes } = require('../../../utils/general');
+const assignTemplates = require('../../../utils/assignTemplates');
+const templates = require('../../../ddlProvider/templates');
 
 const extractDescription = container => {
 	return container?.role?.compMod?.description || {};
 };
 
 /**
- * @return {(collection: Object) => AlterScriptDto | undefined}
+ * @param {string} schemaName
+ * @param {string} comment
+ * @return string
  * */
-const getUpsertCommentsScriptDto = (_, ddlProvider) => container => {
-	const { wrapComment, wrapInQuotes } = require('../../../utils/general');
+const updateSchemaComment = (schemaName, comment) => {
+	const templateConfig = {
+		schemaName,
+		comment,
+	};
+	return assignTemplates(templates.updateCommentOnSchema, templateConfig);
+};
 
+/**
+ * @param {Object} container
+ * @return {AlterScriptDto | undefined}
+ * */
+const getUpsertCommentsScriptDto = container => {
 	const description = extractDescription(container);
 	if (description.new && description.new !== description.old) {
 		const wrappedComment = wrapComment(description.new);
 		const wrappedSchemaName = wrapInQuotes(container.role.name);
-		const script = ddlProvider.updateSchemaComment(wrappedSchemaName, wrappedComment);
+		const script = updateSchemaComment(wrappedSchemaName, wrappedComment);
 		return AlterScriptDto.getInstance([script], true, false);
 	}
 	return undefined;
 };
 
 /**
- * @return {(collection: Object) => AlterScriptDto | undefined}
+ * @param schemaName {string}
+ * @return string
  * */
-const getDropCommentsScriptDto = (_, ddlProvider) => container => {
-	const { wrapInQuotes } = require('../../../utils/general');
+const dropSchemaComment = schemaName => {
+	const templateConfig = {
+		schemaName,
+		comment: 'NULL',
+	};
+	return assignTemplates(templates.updateCommentOnSchema, templateConfig);
+};
 
+/**
+ * @param {Object} container
+ * @return {AlterScriptDto | undefined}
+ * */
+const getDropCommentsScriptDto = container => {
 	const description = extractDescription(container);
 	if (description.old && !description.new) {
 		const wrappedSchemaName = wrapInQuotes(container.role.name);
-		const script = ddlProvider.dropSchemaComment(wrappedSchemaName);
+		const script = dropSchemaComment(wrappedSchemaName);
 		return AlterScriptDto.getInstance([script], true, true);
 	}
 	return undefined;
 };
 
 /**
- * @return {(collection: Object) => AlterScriptDto[]}
+ * @param {Object} container
+ * @return {AlterScriptDto[]}
  * */
-const getModifySchemaCommentsScriptDtos = (_, ddlProvider) => container => {
-	const upsertCommentScript = getUpsertCommentsScriptDto(_, ddlProvider)(container);
-	const dropCommentScript = getDropCommentsScriptDto(_, ddlProvider)(container);
+const getModifySchemaCommentsScriptDtos = container => {
+	const upsertCommentScript = getUpsertCommentsScriptDto(container);
+	const dropCommentScript = getDropCommentsScriptDto(container);
 	return [upsertCommentScript, dropCommentScript].filter(Boolean);
 };
 

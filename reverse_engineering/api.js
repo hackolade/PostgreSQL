@@ -1,5 +1,4 @@
-'use strict';
-
+const _ = require('lodash');
 const { createLogger } = require('./helpers/loggerHelper');
 const postgresService = require('./helpers/postgresService');
 
@@ -23,7 +22,6 @@ module.exports = {
 				logger,
 			});
 
-			postgresService.setDependencies(app);
 			await postgresService.connect(connectionInfo, sshService, postgresLogger);
 			await postgresService.pingDb();
 			await postgresService.logVersion();
@@ -49,7 +47,6 @@ module.exports = {
 				logger,
 			});
 
-			postgresService.setDependencies(app);
 			await postgresService.connect(connectionInfo, sshService, postgresLogger);
 			await postgresService.logVersion();
 
@@ -78,7 +75,6 @@ module.exports = {
 				logger,
 			});
 
-			postgresService.setDependencies(app);
 			if (!connectionInfo.ssh) {
 				await postgresService.connect(connectionInfo, sshService, postgresLogger);
 			}
@@ -198,7 +194,7 @@ module.exports = {
 									bucketInfo,
 									modelDefinitions,
 								}))
-								.sort(data => (app.require('lodash').isEmpty(data.entityLevel.inherits) ? -1 : 1));
+								.sort(data => (_.isEmpty(data.entityLevel.inherits) ? -1 : 1));
 
 							if (views?.length) {
 								const viewPackage = {

@@ -1,5 +1,7 @@
+const _ = require('lodash');
 const { getModifyViewCommentsScriptDtos } = require('./viewHelpers/commentsHelper');
 const { AlterScriptDto } = require('../types/AlterScriptDto');
+const { wrapInQuotes } = require('../../utils/general');
 
 /**
  * @return {(view: Object) => AlterScriptDto | undefined}
@@ -22,9 +24,7 @@ const getAddViewScriptDto = app => view => {
  * @return {(view: Object) => AlterScriptDto | undefined}
  * */
 const getDeleteViewScriptDto = app => view => {
-	const _ = app.require('lodash');
 	const ddlProvider = require('../../ddlProvider/ddlProvider')(null, null, app);
-	const { wrapInQuotes } = require('../../utils/general');
 	const viewName = wrapInQuotes(view.code || view.name);
 
 	const script = ddlProvider.dropView(viewName);
@@ -32,13 +32,11 @@ const getDeleteViewScriptDto = app => view => {
 };
 
 /**
- * @return {(view: Object) => AlterScriptDto[]}
+ * @param {Object} view
+ * @return {AlterScriptDto[]}
  * */
-const getModifyViewScriptDtos = app => view => {
-	const _ = app.require('lodash');
-	const ddlProvider = require('../../ddlProvider/ddlProvider')(null, null, app);
-
-	const modifyCommentsScriptDtos = getModifyViewCommentsScriptDtos(_, ddlProvider)(view);
+const getModifyViewScriptDtos = view => {
+	const modifyCommentsScriptDtos = getModifyViewCommentsScriptDtos(view);
 
 	return [...modifyCommentsScriptDtos].filter(Boolean);
 };

@@ -29,7 +29,8 @@
 				"composite",
 				"range_udt",
 				"domain",
-				"object"
+				"object",
+				"vector"
 			]
 		}
 	}

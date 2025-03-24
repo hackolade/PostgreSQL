@@ -1,26 +1,12 @@
+const _ = require('lodash');
 const { createClient } = require('./connectionHelper');
 const db = require('./db');
 const { getJsonSchema } = require('./getJsonSchema');
+const { mapColumnData, setSubtypeFromSampledJsonValues } = require('./postgresHelpers/columnHelper');
+const { clearEmptyPropertiesInObject } = require('./postgresHelpers/common');
+const { prepareForeignKeys } = require('./postgresHelpers/foreignKeysHelper');
+const { mapFunctionData, mapProcedureData } = require('./postgresHelpers/functionHelper');
 const {
-	setDependencies: setDependenciesInColumnHelper,
-	mapColumnData,
-	setSubtypeFromSampledJsonValues,
-} = require('./postgresHelpers/columnHelper');
-const {
-	setDependencies: setDependenciesInCommonHelper,
-	clearEmptyPropertiesInObject,
-} = require('./postgresHelpers/common');
-const {
-	setDependencies: setDependenciesInForeignKeysHelper,
-	prepareForeignKeys,
-} = require('./postgresHelpers/foreignKeysHelper');
-const {
-	setDependencies: setFunctionHelperDependencies,
-	mapFunctionData,
-	mapProcedureData,
-} = require('./postgresHelpers/functionHelper');
-const {
-	setDependencies: setDependenciesInTableHelper,
 	prepareTablePartition,
 	checkHaveJsonTypes,
 	prepareTableConstraints,
@@ -29,13 +15,8 @@ const {
 	prepareTableIndexes,
 	prepareTableInheritance,
 } = require('./postgresHelpers/tableHelper');
+const { getUserDefinedTypes, isTypeComposite } = require('./postgresHelpers/userDefinedTypesHelper');
 const {
-	setDependencies: setDependenciesInUserDefinedTypesHelper,
-	getUserDefinedTypes,
-	isTypeComposite,
-} = require('./postgresHelpers/userDefinedTypesHelper');
-const {
-	setDependencies: setViewDependenciesInViewHelper,
 	isViewByTableType,
 	isViewByName,
 	removeViewNameSuffix,
@@ -43,29 +24,17 @@ const {
 	setViewSuffix,
 	prepareViewData,
 } = require('./postgresHelpers/viewHelper');
-const { setDependencies: setDependenciesInTriggerHelper, getTriggers } = require('./postgresHelpers/triggerHelper');
+const { getTriggers } = require('./postgresHelpers/triggerHelper');
 const queryConstants = require('./queryConstants');
 const { reorganizeConstraints } = require('./postgresHelpers/reorganizeConstraints');
 const { mapSequenceData } = require('./postgresHelpers/sequenceHelper');
+const { TABLE_TYPE } = require('../constants/tableType');
 
 let useSshTunnel = false;
-let _ = null;
 let logger = null;
 let version = 16;
 
 module.exports = {
-	setDependencies(app) {
-		_ = app.require('lodash');
-		setDependenciesInCommonHelper(app);
-		setDependenciesInTableHelper(app);
-		setDependenciesInColumnHelper(app);
-		setDependenciesInForeignKeysHelper(app);
-		setViewDependenciesInViewHelper(app);
-		setFunctionHelperDependencies(app);
-		setDependenciesInUserDefinedTypesHelper(app);
-		setDependenciesInTriggerHelper(app);
-	},
-
 	async connect(connectionInfo, sshService, specificLogger) {
 		if (db.isClientInitialized()) {
 			await this.disconnect(sshService);
@@ -116,7 +85,7 @@ module.exports = {
 	async getTablesNames(schemaName) {
 		const tables = await db.query(queryConstants.GET_TABLE_NAMES, [schemaName]);
 
-		const tableTypesToExclude = ['FOREIGN TABLE'];
+		const tableTypesToExclude = [TABLE_TYPE.foreignTable];
 
 		return tables
 			.filter(({ table_type }) => !_.includes(tableTypesToExclude, table_type))
@@ -404,7 +373,9 @@ module.exports = {
 
 		viewName = removeViewNameSuffix(viewName);
 
-		const viewData = await db.query(queryConstants.GET_VIEW_DATA, [viewName, schemaName], true);
+		const viewData =
+			(await db.query(queryConstants.GET_VIEW_DATA, [viewName, schemaName], true)) ??
+			(await db.query(queryConstants.GET_MATERIALIZED_VIEW_DATA, [viewName, schemaName], true));
 		const viewDefinitionFallback =
 			!viewData.view_definition &&
 			(await db.queryTolerant(queryConstants.GET_VIEW_SELECT_STMT_FALLBACK, [viewName, schemaName], true));
@@ -416,9 +387,14 @@ module.exports = {
 			viewOptions?.oid,
 			ignoreUdfUdpTriggers,
 		);
+		const tableToastOptions = await db.queryTolerant(
+			queryConstants.GET_TABLE_TOAST_OPTIONS,
+			[viewName, schemaOid],
+			true,
+		);
 
 		const script = generateCreateViewScript(viewName, viewData, viewDefinitionFallback);
-		const data = prepareViewData(viewData, viewOptions, triggers);
+		const data = prepareViewData(viewData, viewOptions, triggers, tableToastOptions);
 
 		if (!script) {
 			logger.info('View select statement was not retrieved', { schemaName, viewName });
@@ -470,11 +446,7 @@ const isSystemSchema = schema_name => {
 		return true;
 	}
 
-	if (_.includes(['information_schema'], schema_name)) {
-		return true;
-	}
-
-	return false;
+	return _.includes(['information_schema'], schema_name);
 };
 
 const getGetIndexesQuery = postgresVersion => {
@@ -487,8 +459,8 @@ const getGetIndexesQuery = postgresVersion => {
 	}
 };
 
-const getGetFunctionsAdditionalDataQuery = postgreVersion => {
-	return postgreVersion === 10
+const getGetFunctionsAdditionalDataQuery = postgresVersion => {
+	return postgresVersion === 10
 		? queryConstants.GET_FUNCTIONS_WITH_PROCEDURES_ADDITIONAL_V_10
 		: queryConstants.GET_FUNCTIONS_WITH_PROCEDURES_ADDITIONAL;
 };

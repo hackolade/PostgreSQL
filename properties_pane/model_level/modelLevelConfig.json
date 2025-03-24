@@ -71,7 +71,25 @@ making sure that you maintain a proper JSON format.
 				"propertyTooltip": "DB version",
 				"propertyType": "select",
 				"options": ["v10.x", "v11.x", "v12.x", "v13.x", "v14.x", "v15.x", "v16.x"],
-				"disabledOption": false
+				"disabledOption": false,
+				"adapters": [
+					{
+						"dependency": {
+							"type": "or",
+							"values": [
+								{
+									"key": "dbVersion",
+									"value": "v10.x"
+								},
+								{
+									"key": "dbVersion",
+									"value": "v11.x"
+								}
+							]
+						},
+						"adapter": "adaptUnavailableTypes"
+					}
+				]
 			},
 			{
 				"propertyName": "Database name",
