@@ -49,6 +49,15 @@
 				"to": {
 					"subtype": "vector<real>"
 				}
+			},
+			{
+				"from": {
+					"mode": "varchar",
+					"length": 10485760
+				},
+				"to": {
+					"hasMaxLength": true
+				}
 			}
 		]
 	}

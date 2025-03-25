@@ -171,6 +171,24 @@
 				"parent": {
 					"type": "vector"
 				}
+			},
+			{
+				"from": {
+					"type": "varchar",
+					"hasMaxLength": true
+				},
+				"to": {
+					"length": 10485760
+				}
+			},
+			{
+				"from": {
+					"type": "nvarchar",
+					"hasMaxLength": true
+				},
+				"to": {
+					"length": 10485760
+				}
 			}
 		]
 	},
