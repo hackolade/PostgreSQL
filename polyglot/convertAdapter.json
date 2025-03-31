@@ -58,6 +58,15 @@
 				"to": {
 					"hasMaxLength": true
 				}
+			},
+			{
+				"from": {
+					"mode": "char",
+					"length": 10485760
+				},
+				"to": {
+					"hasMaxLength": true
+				}
 			}
 		]
 	}
