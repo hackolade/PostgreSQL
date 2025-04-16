@@ -692,6 +692,32 @@ making sure that you maintain a proper JSON format.
 					}
 				]
 			},
+			{
+				"propertyName": "Alternate Key",
+				"propertyKeyword": "alternateKey",
+				"defaultValue": false,
+				"enableForReference": true,
+				"propertyType": "checkbox",
+				"dependency": {
+					"type": "or",
+					"values": [
+						{
+							"key": "unique",
+							"value": true
+						},
+						{
+							"key": "compositeUniqueKey",
+							"value": true
+						}
+					]
+				},
+				"disabledOnCondition": [
+					{
+						"key": "compositeUniqueKey",
+						"value": true
+					}
+				]
+			},
 			"foreignCollection",
 			"foreignField",
 			"relationshipType",
@@ -1279,6 +1305,32 @@ making sure that you maintain a proper JSON format.
 					}
 				]
 			},
+			{
+				"propertyName": "Alternate Key",
+				"propertyKeyword": "alternateKey",
+				"defaultValue": false,
+				"enableForReference": true,
+				"propertyType": "checkbox",
+				"dependency": {
+					"type": "or",
+					"values": [
+						{
+							"key": "unique",
+							"value": true
+						},
+						{
+							"key": "compositeUniqueKey",
+							"value": true
+						}
+					]
+				},
+				"disabledOnCondition": [
+					{
+						"key": "compositeUniqueKey",
+						"value": true
+					}
+				]
+			},
 			"foreignCollection",
 			"foreignField",
 			"relationshipType",
@@ -1824,6 +1876,32 @@ making sure that you maintain a proper JSON format.
 						"propertyType": "select",
 						"defaultValue": "",
 						"options": ["", "NULLS DISTINCT", "NULLS NOT DISTINCT"]
+					}
+				]
+			},
+			{
+				"propertyName": "Alternate Key",
+				"propertyKeyword": "alternateKey",
+				"defaultValue": false,
+				"enableForReference": true,
+				"propertyType": "checkbox",
+				"dependency": {
+					"type": "or",
+					"values": [
+						{
+							"key": "unique",
+							"value": true
+						},
+						{
+							"key": "compositeUniqueKey",
+							"value": true
+						}
+					]
+				},
+				"disabledOnCondition": [
+					{
+						"key": "compositeUniqueKey",
+						"value": true
 					}
 				]
 			},
@@ -2414,6 +2492,32 @@ making sure that you maintain a proper JSON format.
 					}
 				]
 			},
+			{
+				"propertyName": "Alternate Key",
+				"propertyKeyword": "alternateKey",
+				"defaultValue": false,
+				"enableForReference": true,
+				"propertyType": "checkbox",
+				"dependency": {
+					"type": "or",
+					"values": [
+						{
+							"key": "unique",
+							"value": true
+						},
+						{
+							"key": "compositeUniqueKey",
+							"value": true
+						}
+					]
+				},
+				"disabledOnCondition": [
+					{
+						"key": "compositeUniqueKey",
+						"value": true
+					}
+				]
+			},
 			"pattern",
 			"enum",
 			"sample",
@@ -2532,6 +2636,32 @@ making sure that you maintain a proper JSON format.
 				"addTimestampButton": true,
 				"propertyType": "details",
 				"template": "textarea"
+			},
+			{
+				"propertyName": "Alternate Key",
+				"propertyKeyword": "alternateKey",
+				"defaultValue": false,
+				"enableForReference": true,
+				"propertyType": "checkbox",
+				"dependency": {
+					"type": "or",
+					"values": [
+						{
+							"key": "unique",
+							"value": true
+						},
+						{
+							"key": "compositeUniqueKey",
+							"value": true
+						}
+					]
+				},
+				"disabledOnCondition": [
+					{
+						"key": "compositeUniqueKey",
+						"value": true
+					}
+				]
 			}
 		],
 		"range": [
@@ -3055,6 +3185,32 @@ making sure that you maintain a proper JSON format.
 						"propertyType": "select",
 						"defaultValue": "",
 						"options": ["", "NULLS DISTINCT", "NULLS NOT DISTINCT"]
+					}
+				]
+			},
+			{
+				"propertyName": "Alternate Key",
+				"propertyKeyword": "alternateKey",
+				"defaultValue": false,
+				"enableForReference": true,
+				"propertyType": "checkbox",
+				"dependency": {
+					"type": "or",
+					"values": [
+						{
+							"key": "unique",
+							"value": true
+						},
+						{
+							"key": "compositeUniqueKey",
+							"value": true
+						}
+					]
+				},
+				"disabledOnCondition": [
+					{
+						"key": "compositeUniqueKey",
+						"value": true
 					}
 				]
 			},
@@ -3612,6 +3768,32 @@ making sure that you maintain a proper JSON format.
 					}
 				]
 			},
+			{
+				"propertyName": "Alternate Key",
+				"propertyKeyword": "alternateKey",
+				"defaultValue": false,
+				"enableForReference": true,
+				"propertyType": "checkbox",
+				"dependency": {
+					"type": "or",
+					"values": [
+						{
+							"key": "unique",
+							"value": true
+						},
+						{
+							"key": "compositeUniqueKey",
+							"value": true
+						}
+					]
+				},
+				"disabledOnCondition": [
+					{
+						"key": "compositeUniqueKey",
+						"value": true
+					}
+				]
+			},
 			"foreignCollection",
 			"foreignField",
 			"relationshipType",
@@ -3798,6 +3980,32 @@ making sure that you maintain a proper JSON format.
 				"addTimestampButton": true,
 				"propertyType": "details",
 				"template": "textarea"
+			},
+			{
+				"propertyName": "Alternate Key",
+				"propertyKeyword": "alternateKey",
+				"defaultValue": false,
+				"enableForReference": true,
+				"propertyType": "checkbox",
+				"dependency": {
+					"type": "or",
+					"values": [
+						{
+							"key": "unique",
+							"value": true
+						},
+						{
+							"key": "compositeUniqueKey",
+							"value": true
+						}
+					]
+				},
+				"disabledOnCondition": [
+					{
+						"key": "compositeUniqueKey",
+						"value": true
+					}
+				]
 			}
 		],
 		"inet": [
@@ -4322,6 +4530,32 @@ making sure that you maintain a proper JSON format.
 						"propertyType": "select",
 						"defaultValue": "",
 						"options": ["", "NULLS DISTINCT", "NULLS NOT DISTINCT"]
+					}
+				]
+			},
+			{
+				"propertyName": "Alternate Key",
+				"propertyKeyword": "alternateKey",
+				"defaultValue": false,
+				"enableForReference": true,
+				"propertyType": "checkbox",
+				"dependency": {
+					"type": "or",
+					"values": [
+						{
+							"key": "unique",
+							"value": true
+						},
+						{
+							"key": "compositeUniqueKey",
+							"value": true
+						}
+					]
+				},
+				"disabledOnCondition": [
+					{
+						"key": "compositeUniqueKey",
+						"value": true
 					}
 				]
 			},
@@ -4856,6 +5090,32 @@ making sure that you maintain a proper JSON format.
 						"propertyType": "select",
 						"defaultValue": "",
 						"options": ["", "NULLS DISTINCT", "NULLS NOT DISTINCT"]
+					}
+				]
+			},
+			{
+				"propertyName": "Alternate Key",
+				"propertyKeyword": "alternateKey",
+				"defaultValue": false,
+				"enableForReference": true,
+				"propertyType": "checkbox",
+				"dependency": {
+					"type": "or",
+					"values": [
+						{
+							"key": "unique",
+							"value": true
+						},
+						{
+							"key": "compositeUniqueKey",
+							"value": true
+						}
+					]
+				},
+				"disabledOnCondition": [
+					{
+						"key": "compositeUniqueKey",
+						"value": true
 					}
 				]
 			},
@@ -5414,6 +5674,32 @@ making sure that you maintain a proper JSON format.
 					}
 				]
 			},
+			{
+				"propertyName": "Alternate Key",
+				"propertyKeyword": "alternateKey",
+				"defaultValue": false,
+				"enableForReference": true,
+				"propertyType": "checkbox",
+				"dependency": {
+					"type": "or",
+					"values": [
+						{
+							"key": "unique",
+							"value": true
+						},
+						{
+							"key": "compositeUniqueKey",
+							"value": true
+						}
+					]
+				},
+				"disabledOnCondition": [
+					{
+						"key": "compositeUniqueKey",
+						"value": true
+					}
+				]
+			},
 			"foreignCollection",
 			"foreignField",
 			"relationshipType",
@@ -5601,6 +5887,32 @@ making sure that you maintain a proper JSON format.
 				"propertyName": "JSON Type",
 				"propertyKeyword": "physicalType",
 				"hidden": true
+			},
+			{
+				"propertyName": "Alternate Key",
+				"propertyKeyword": "alternateKey",
+				"defaultValue": false,
+				"enableForReference": true,
+				"propertyType": "checkbox",
+				"dependency": {
+					"type": "or",
+					"values": [
+						{
+							"key": "unique",
+							"value": true
+						},
+						{
+							"key": "compositeUniqueKey",
+							"value": true
+						}
+					]
+				},
+				"disabledOnCondition": [
+					{
+						"key": "compositeUniqueKey",
+						"value": true
+					}
+				]
 			}
 		],
 		"vector": [
@@ -5690,6 +6002,32 @@ making sure that you maintain a proper JSON format.
 				"addTimestampButton": true,
 				"propertyType": "details",
 				"template": "textarea"
+			},
+			{
+				"propertyName": "Alternate Key",
+				"propertyKeyword": "alternateKey",
+				"defaultValue": false,
+				"enableForReference": true,
+				"propertyType": "checkbox",
+				"dependency": {
+					"type": "or",
+					"values": [
+						{
+							"key": "unique",
+							"value": true
+						},
+						{
+							"key": "compositeUniqueKey",
+							"value": true
+						}
+					]
+				},
+				"disabledOnCondition": [
+					{
+						"key": "compositeUniqueKey",
+						"value": true
+					}
+				]
 			}
 		],
 		"xml": [
@@ -5801,6 +6139,32 @@ making sure that you maintain a proper JSON format.
 				"addTimestampButton": true,
 				"propertyType": "details",
 				"template": "textarea"
+			},
+			{
+				"propertyName": "Alternate Key",
+				"propertyKeyword": "alternateKey",
+				"defaultValue": false,
+				"enableForReference": true,
+				"propertyType": "checkbox",
+				"dependency": {
+					"type": "or",
+					"values": [
+						{
+							"key": "unique",
+							"value": true
+						},
+						{
+							"key": "compositeUniqueKey",
+							"value": true
+						}
+					]
+				},
+				"disabledOnCondition": [
+					{
+						"key": "compositeUniqueKey",
+						"value": true
+					}
+				]
 			}
 		],
 		"___1": [],
