@@ -864,6 +864,13 @@ making sure that you maintain a proper JSON format.
 							"key": "deferrable",
 							"value": "DEFERRABLE"
 						}
+					},
+					{
+						"propertyName": "Alternate key",
+						"propertyKeyword": "alternateKey",
+						"propertyTooltip": "",
+						"propertyType": "checkbox",
+						"setFieldPropertyBy": "compositeUniqueKey"
 					}
 				]
 			}
