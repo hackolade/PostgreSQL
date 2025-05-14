@@ -43,14 +43,6 @@ module.exports = {
 	},
 
 	applyToInstance(connectionInfo, logger, callback, app) {
-		logger.clear();
-		logger.log(
-			'info',
-			_.omit(connectionInfo, 'script', 'containerData'),
-			'connectionInfo',
-			connectionInfo.hiddenKeys,
-		);
-
 		const postgresLogger = createLogger({
 			title: 'Apply to instance',
 			hiddenKeys: connectionInfo.hiddenKeys,
