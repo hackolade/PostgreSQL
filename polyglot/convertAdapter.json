@@ -76,7 +76,18 @@
 				"to": {
 					"hasMaxLength": true
 				}
-			}
+			},
+			[
+				"constructArrayFromArrayType",
+				{
+					"dependency": {
+						"key": "array_type",
+						"exist": true
+					},
+					"keywordOfArrayType": "array_type",
+					"typeOfPolyglotArray": "array"
+				}
+			]
 		]
 	}
 }
