@@ -189,7 +189,86 @@
 				"to": {
 					"length": 10485760
 				}
-			}
+			},
+			[
+				"deconstructArrayIntoArrayType",
+				{
+					"arrayDependency": {
+						"type": "or",
+						"values": [
+							{
+								"type": "and",
+								"values": [
+									{
+										"key": "type",
+										"value": "array"
+									},
+									{
+										"key": "childType",
+										"value": "array"
+									}
+								]
+							},
+							{
+								"type": "and",
+								"values": [
+									{
+										"key": "type",
+										"value": "array"
+									},
+									{
+										"key": "childType",
+										"value": "list"
+									}
+								]
+							},
+							{
+								"type": "and",
+								"values": [
+									{
+										"key": "type",
+										"value": "array"
+									},
+									{
+										"key": "childType",
+										"value": "set"
+									}
+								]
+							},
+							{
+								"type": "and",
+								"values": [
+									{
+										"key": "type",
+										"value": "array"
+									},
+									{
+										"key": "childType",
+										"value": "tuple"
+									}
+								]
+							}
+						]
+					},
+					"childDependency": {
+						"type": "not",
+						"values": {
+							"type": "or",
+							"values": [
+								{
+									"key": "type",
+									"value": "document"
+								},
+								{
+									"key": "type",
+									"value": "array"
+								}
+							]
+						}
+					},
+					"keyword": "array_type"
+				}
+			]
 		]
 	},
 	"postConvert": {
