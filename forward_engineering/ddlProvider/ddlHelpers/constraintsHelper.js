@@ -3,17 +3,22 @@ const { commentIfDeactivated, checkAllKeysDeactivated, getColumnsList, wrapInQuo
 const assignTemplates = require('../../utils/assignTemplates');
 const templates = require('../templates');
 
-const generateConstraintsString = (dividedConstraints, isParentActivated) => {
+const generateConstraintsString = ({
+	dividedConstraints,
+	isParentActivated,
+	activatedConstraintsPrefix = ',\n\t',
+	deactivatedConstraintsPrefix = '\n\t',
+}) => {
 	const deactivatedItemsAsString = commentIfDeactivated((dividedConstraints?.deactivatedItems || []).join(',\n\t'), {
 		isActivated: !isParentActivated,
 		isPartOfLine: true,
 	});
 	const activatedConstraints = dividedConstraints?.activatedItems?.length
-		? ',\n\t' + dividedConstraints.activatedItems.join(',\n\t')
+		? activatedConstraintsPrefix + dividedConstraints.activatedItems.join(',\n\t')
 		: '';
 
 	const deactivatedConstraints = dividedConstraints?.deactivatedItems?.length
-		? '\n\t' + deactivatedItemsAsString
+		? deactivatedConstraintsPrefix + deactivatedItemsAsString
 		: '';
 
 	return activatedConstraints + deactivatedConstraints;
