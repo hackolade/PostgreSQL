@@ -16,6 +16,7 @@ const {
 	getNamePrefixedWithSchemaName,
 	getViewData,
 	getDbVersion,
+	addCommaPrefix,
 } = require('../utils/general');
 const assignTemplates = require('../utils/assignTemplates');
 const {
@@ -137,19 +138,29 @@ module.exports = (baseProvider, options, app) => {
 			const constraintWarnings = getConstraintsWarnings(
 				keyConstraints.filter(({ errorMessage }) => errorMessage),
 			);
-			const keyConstraintsString = `${generateConstraintsString(
-				dividedKeysConstraints,
-				isActivated,
-			)}${constraintWarnings}`;
+			const doKeyConstraintsHaveWarnings = Boolean(constraintWarnings);
+			const keyConstraintsString = `${generateConstraintsString({
+				dividedConstraints: dividedKeysConstraints,
+				isParentActivated: isActivated,
+			})}${addCommaPrefix(constraintWarnings, doKeyConstraintsHaveWarnings)}`;
 			const keyConstraintsValue = partitionOf ? keyConstraintsString?.slice(1) : keyConstraintsString;
 
 			const dividedForeignKeys = divideIntoActivatedAndDeactivated(foreignKeyConstraints, key => key.statement);
-			const foreignKeyConstraintsString = generateConstraintsString(dividedForeignKeys, isActivated);
+			const shouldAddCommaPrefixToForeignKeysConstraints =
+				!doKeyConstraintsHaveWarnings || checkConstraints.length !== 0;
+			const foreignKeyConstraintsString = generateConstraintsString({
+				dividedConstraints: dividedForeignKeys,
+				isParentActivated: isActivated,
+				activatedConstraintsPrefix: addCommaPrefix('\n\t', shouldAddCommaPrefixToForeignKeysConstraints),
+			});
 
 			const columnDescriptions = '\n' + getColumnComments(tableName, columnDefinitions);
 			const template = partitionOf ? templates.createTablePartitionOf : templates.createTable;
 
-			const checkConstraintPrefix = partitionOf && !keyConstraintsString ? '\n\t' : ',\n\t';
+			const checkConstraintPrefix =
+				partitionOf && !keyConstraintsString
+					? '\n\t'
+					: `${addCommaPrefix('\n\t', !doKeyConstraintsHaveWarnings)}`;
 			const checkConstraintsValue = !_.isEmpty(checkConstraints)
 				? wrap(_.join(checkConstraints, ',\n\t'), checkConstraintPrefix, '')
 				: '';

@@ -118,6 +118,8 @@ const wrap = (str, start = "'", end = "'") => {
 	}
 };
 
+const addCommaPrefix = (string, shouldAddComma) => (shouldAddComma ? `,${string}` : string);
+
 const checkFieldPropertiesChanged = (compMod, propertiesToCheck) => {
 	return propertiesToCheck.some(prop => compMod?.oldField[prop] !== compMod?.newField[prop]);
 };
@@ -298,4 +300,5 @@ module.exports = {
 	getSchemaNameFromCollection,
 	getGroupItemsByCompMode,
 	wrapInSingleQuotes,
+	addCommaPrefix,
 };
