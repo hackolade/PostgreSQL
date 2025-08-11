@@ -42,7 +42,8 @@
             "views": {
                 "enabled": true,
                 "viewLevel": "model",
-                "disablePipelines": true
+                "disablePipelines": true,
+                "includeViews": true
             },
             "relationships": {
                 "compositeRelationships": {
