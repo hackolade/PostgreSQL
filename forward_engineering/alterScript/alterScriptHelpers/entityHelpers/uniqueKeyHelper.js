@@ -39,6 +39,7 @@ const extractOptionsForComparisonWithRegularUniqueKeyOptions = optionHolder => {
 		indexStorageParameters: optionHolder.indexStorageParameters,
 		indexTablespace: optionHolder.indexTablespace,
 		indexInclude: optionHolder.indexInclude,
+		nullsDistinct: optionHolder.nullsDistinct,
 	};
 };
 
