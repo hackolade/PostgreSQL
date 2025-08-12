@@ -17,6 +17,7 @@ const {
 	getDbVersion,
 	wrapInQuotes,
 } = require('../../../utils/general');
+const { areConstraintOptionsEqual } = require('./areConstraintOptionsEqual');
 
 const amountOfColumnsInRegularUniqueKey = 1;
 
@@ -100,7 +101,8 @@ const wasCompositeUniqueKeyChangedInTransitionFromCompositeToRegular = collectio
 		}
 		const oldCompositeUniqueKeyAsRegularUniqueKeyOptions =
 			getCustomPropertiesOfCompositeUniqueKeyForComparisonWithRegularUniqueKeyOptions(compositeUniqueKey);
-		return _(oldCompositeUniqueKeyAsRegularUniqueKeyOptions).differenceWith(constraintOptions, _.isEqual).isEmpty();
+
+		return areConstraintOptionsEqual(oldCompositeUniqueKeyAsRegularUniqueKeyOptions, constraintOptions);
 	});
 
 	return UniqueKeyTransitionDto.transition(!areOptionsEqual);
@@ -144,7 +146,8 @@ const wasCompositeUniqueKeyChangedInTransitionFromRegularToComposite = collectio
 		}
 		const oldCompositeUniqueKeyAsRegularUniqueKeyOptions =
 			getCustomPropertiesOfCompositeUniqueKeyForComparisonWithRegularUniqueKeyOptions(compositeUniqueKey);
-		return _(oldCompositeUniqueKeyAsRegularUniqueKeyOptions).differenceWith(constraintOptions, _.isEqual).isEmpty();
+
+		return areConstraintOptionsEqual(oldCompositeUniqueKeyAsRegularUniqueKeyOptions, constraintOptions);
 	});
 
 	return UniqueKeyTransitionDto.transition(!areOptionsEqual);
@@ -584,8 +587,8 @@ const wasRegularUniqueKeyModified = (columnJsonSchema, collection) => {
 		getCustomPropertiesOfRegularUniqueKeyForComparisonWithRegularUniqueKeyOptions(columnJsonSchema);
 	const oldConstraintOptions =
 		getCustomPropertiesOfRegularUniqueKeyForComparisonWithRegularUniqueKeyOptions(oldJsonSchema);
-	const areOptionsEqual = _(oldConstraintOptions).differenceWith(constraintOptions, _.isEqual).isEmpty();
-	return !areOptionsEqual;
+
+	return !areConstraintOptionsEqual(oldConstraintOptions, constraintOptions);
 };
 
 /**

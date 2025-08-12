@@ -15,6 +15,7 @@ const {
 	wrapInQuotes,
 } = require('../../../utils/general');
 const { alterKeyConstraint, dropKeyConstraint } = require('../../../ddlProvider/ddlHelpers/constraintsHelper');
+const { areConstraintOptionsEqual } = require('./areConstraintOptionsEqual');
 
 const amountOfColumnsInRegularPk = 1;
 
@@ -97,7 +98,8 @@ const wasCompositePkChangedInTransitionFromCompositeToRegular = collection => {
 		}
 		const oldCompositePkAsRegularPkOptions =
 			getCustomPropertiesOfCompositePkForComparisonWithRegularPkOptions(compositePk);
-		return _(oldCompositePkAsRegularPkOptions).differenceWith(constraintOptions, _.isEqual).isEmpty();
+
+		return areConstraintOptionsEqual(oldCompositePkAsRegularPkOptions, constraintOptions);
 	});
 
 	return PrimaryKeyTransitionDto.transition(!areOptionsEqual);
@@ -140,7 +142,8 @@ const wasCompositePkChangedInTransitionFromRegularToComposite = collection => {
 		}
 		const oldCompositePkAsRegularPkOptions =
 			getCustomPropertiesOfCompositePkForComparisonWithRegularPkOptions(compositePk);
-		return _(oldCompositePkAsRegularPkOptions).differenceWith(constraintOptions, _.isEqual).isEmpty();
+
+		return areConstraintOptionsEqual(oldCompositePkAsRegularPkOptions, constraintOptions);
 	});
 
 	return PrimaryKeyTransitionDto.transition(!areOptionsEqual);
@@ -452,7 +455,8 @@ const wasRegularPkChangedInTransitionFromCompositeToRegular = (columnJsonSchema,
 			}
 			const oldCompositePkAsRegularPkOptions =
 				getCustomPropertiesOfCompositePkForComparisonWithRegularPkOptions(oldCompositePk);
-			return _(oldCompositePkAsRegularPkOptions).differenceWith(constraintOptions, _.isEqual).isEmpty();
+
+			return areConstraintOptionsEqual(oldCompositePkAsRegularPkOptions, constraintOptions);
 		});
 		return PrimaryKeyTransitionDto.transition(!areOptionsEqual);
 	}
@@ -505,7 +509,8 @@ const wasRegularPkChangedInTransitionFromRegularToComposite = (columnJsonSchema,
 			}
 			const oldCompositePkAsRegularPkOptions =
 				getCustomPropertiesOfCompositePkForComparisonWithRegularPkOptions(oldCompositePk);
-			return _(oldCompositePkAsRegularPkOptions).differenceWith(constraintOptions, _.isEqual).isEmpty();
+
+			return areConstraintOptionsEqual(oldCompositePkAsRegularPkOptions, constraintOptions);
 		});
 		return PrimaryKeyTransitionDto.transition(!areOptionsEqual);
 	}
@@ -545,8 +550,8 @@ const wasRegularPkModified = (columnJsonSchema, collection) => {
 	}
 	const constraintOptions = getCustomPropertiesOfRegularPkForComparisonWithRegularPkOptions(columnJsonSchema);
 	const oldConstraintOptions = getCustomPropertiesOfRegularPkForComparisonWithRegularPkOptions(oldJsonSchema);
-	const areOptionsEqual = _(oldConstraintOptions).differenceWith(constraintOptions, _.isEqual).isEmpty();
-	return !areOptionsEqual;
+
+	return !areConstraintOptionsEqual(oldConstraintOptions, constraintOptions);
 };
 
 /**
