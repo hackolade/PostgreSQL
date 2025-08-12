@@ -487,9 +487,8 @@ const wasRegularUniqueKeyChangedInTransitionFromCompositeToRegular = (columnJson
 			}
 			const oldCompositeUniqueKeyAsRegularUniqueKeyOptions =
 				getCustomPropertiesOfCompositeUniqueKeyForComparisonWithRegularUniqueKeyOptions(oldCompositeUniqueKey);
-			return _(oldCompositeUniqueKeyAsRegularUniqueKeyOptions)
-				.differenceWith(constraintOptions, _.isEqual)
-				.isEmpty();
+
+			return areConstraintOptionsEqual(oldCompositeUniqueKeyAsRegularUniqueKeyOptions, constraintOptions);
 		});
 		return UniqueKeyTransitionDto.transition(!areOptionsEqual);
 	}
@@ -543,10 +542,10 @@ const wasRegularUniqueKeyChangedInTransitionFromRegularToComposite = (columnJson
 			}
 			const oldCompositeUniqueKeyAsRegularUniqueKeyOptions =
 				getCustomPropertiesOfCompositeUniqueKeyForComparisonWithRegularUniqueKeyOptions(oldCompositeUniqueKey);
-			return _(oldCompositeUniqueKeyAsRegularUniqueKeyOptions)
-				.differenceWith(constraintOptions, _.isEqual)
-				.isEmpty();
+
+			return areConstraintOptionsEqual(oldCompositeUniqueKeyAsRegularUniqueKeyOptions, constraintOptions);
 		});
+
 		return UniqueKeyTransitionDto.transition(!areOptionsEqual);
 	}
 
