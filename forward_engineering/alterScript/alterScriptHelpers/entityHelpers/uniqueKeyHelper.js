@@ -7,7 +7,7 @@ const {
 	AlterCollectionColumnKeyOptionDto,
 	AlterCollectionRoleCompModUniqueKey,
 } = require('../../types/AlterCollectionDto');
-const { KeyTransitionDto, KeyScriptModificationDto } = require('../../types/AlterKeyDto');
+const { UniqueKeyTransitionDto, KeyScriptModificationDto } = require('../../types/AlterKeyDto');
 const { dropKeyConstraint, alterKeyConstraint } = require('../../../ddlProvider/ddlHelpers/constraintsHelper');
 const keyHelper = require('../../../ddlProvider/ddlHelpers/keyHelper');
 const {
@@ -64,7 +64,7 @@ const getCustomPropertiesOfCompositeUniqueKeyForComparisonWithRegularUniqueKeyOp
 
 /**
  * @param {AlterCollectionDto} collection
- * @return {KeyTransitionDto}
+ * @return {UniqueKeyTransitionDto}
  * */
 const wasCompositeUniqueKeyChangedInTransitionFromCompositeToRegular = collection => {
 	/**
@@ -79,18 +79,18 @@ const wasCompositeUniqueKeyChangedInTransitionFromCompositeToRegular = collectio
 	if (idsOfColumns.length !== amountOfColumnsInRegularUniqueKey) {
 		// We return false, because it wouldn't count as transition between regular UniqueKey and composite UniqueKey
 		// if composite UniqueKey did not constraint exactly 1 column
-		return KeyTransitionDto.noTransition();
+		return UniqueKeyTransitionDto.noTransition();
 	}
 	const idOfUniqueKeyColumn = idsOfColumns[0];
 	const newColumnJsonSchema = Object.values(collection.properties).find(
 		columnJsonSchema => columnJsonSchema.GUID === idOfUniqueKeyColumn,
 	);
 	if (!newColumnJsonSchema) {
-		return KeyTransitionDto.noTransition();
+		return UniqueKeyTransitionDto.noTransition();
 	}
 	const isNewColumnARegularUniqueKey = newColumnJsonSchema?.unique && !newColumnJsonSchema?.compositeUniqueKey;
 	if (!isNewColumnARegularUniqueKey) {
-		return KeyTransitionDto.noTransition();
+		return UniqueKeyTransitionDto.noTransition();
 	}
 	const constraintOptions =
 		getCustomPropertiesOfRegularUniqueKeyForComparisonWithRegularUniqueKeyOptions(newColumnJsonSchema);
@@ -103,12 +103,12 @@ const wasCompositeUniqueKeyChangedInTransitionFromCompositeToRegular = collectio
 		return _(oldCompositeUniqueKeyAsRegularUniqueKeyOptions).differenceWith(constraintOptions, _.isEqual).isEmpty();
 	});
 
-	return KeyTransitionDto.transition(!areOptionsEqual);
+	return UniqueKeyTransitionDto.transition(!areOptionsEqual);
 };
 
 /**
  * @param {AlterCollectionDto} collection
- * @return {KeyTransitionDto}
+ * @return {UniqueKeyTransitionDto}
  * */
 const wasCompositeUniqueKeyChangedInTransitionFromRegularToComposite = collection => {
 	/**
@@ -123,18 +123,18 @@ const wasCompositeUniqueKeyChangedInTransitionFromRegularToComposite = collectio
 	if (idsOfColumns.length !== amountOfColumnsInRegularUniqueKey) {
 		// We return false, because it wouldn't count as transition between regular UniqueKey and composite UniqueKey
 		// if composite UniqueKey does not constraint exactly 1 column
-		return KeyTransitionDto.noTransition();
+		return UniqueKeyTransitionDto.noTransition();
 	}
 	const idOfUniqueKeyColumn = idsOfColumns[0];
 	const oldColumnJsonSchema = Object.values(collection.role.properties).find(
 		columnJsonSchema => columnJsonSchema.GUID === idOfUniqueKeyColumn,
 	);
 	if (!oldColumnJsonSchema) {
-		return KeyTransitionDto.noTransition();
+		return UniqueKeyTransitionDto.noTransition();
 	}
 	const isOldColumnARegularUniqueKey = oldColumnJsonSchema?.unique && !oldColumnJsonSchema?.compositeUniqueKey;
 	if (!isOldColumnARegularUniqueKey) {
-		return KeyTransitionDto.noTransition();
+		return UniqueKeyTransitionDto.noTransition();
 	}
 	const constraintOptions =
 		getCustomPropertiesOfRegularUniqueKeyForComparisonWithRegularUniqueKeyOptions(oldColumnJsonSchema);
@@ -147,7 +147,7 @@ const wasCompositeUniqueKeyChangedInTransitionFromRegularToComposite = collectio
 		return _(oldCompositeUniqueKeyAsRegularUniqueKeyOptions).differenceWith(constraintOptions, _.isEqual).isEmpty();
 	});
 
-	return KeyTransitionDto.transition(!areOptionsEqual);
+	return UniqueKeyTransitionDto.transition(!areOptionsEqual);
 };
 
 /**
@@ -441,7 +441,7 @@ const wasFieldChangedToBeARegularUniqueKey = (columnJsonSchema, collection) => {
 /**
  * @param {AlterCollectionColumnDto} columnJsonSchema
  * @param {AlterCollectionDto} collection
- * @return {KeyTransitionDto}
+ * @return {UniqueKeyTransitionDto}
  * */
 const wasRegularUniqueKeyChangedInTransitionFromCompositeToRegular = (columnJsonSchema, collection) => {
 	const oldName = columnJsonSchema.compMod.oldField.name;
@@ -451,7 +451,7 @@ const wasRegularUniqueKeyChangedInTransitionFromCompositeToRegular = (columnJson
 	const wasTheFieldAnyUniqueKey = oldColumnJsonSchema?.unique || oldColumnJsonSchema.compositeUniqueKey;
 
 	if (!(isRegularUniqueKey && wasTheFieldAnyUniqueKey)) {
-		return KeyTransitionDto.noTransition();
+		return UniqueKeyTransitionDto.noTransition();
 	}
 
 	/**
@@ -488,16 +488,16 @@ const wasRegularUniqueKeyChangedInTransitionFromCompositeToRegular = (columnJson
 				.differenceWith(constraintOptions, _.isEqual)
 				.isEmpty();
 		});
-		return KeyTransitionDto.transition(!areOptionsEqual);
+		return UniqueKeyTransitionDto.transition(!areOptionsEqual);
 	}
 
-	return KeyTransitionDto.noTransition();
+	return UniqueKeyTransitionDto.noTransition();
 };
 
 /**
  * @param {AlterCollectionColumnDto} columnJsonSchema
  * @param {AlterCollectionDto} collection
- * @return {KeyTransitionDto}
+ * @return {UniqueKeyTransitionDto}
  * */
 const wasRegularUniqueKeyChangedInTransitionFromRegularToComposite = (columnJsonSchema, collection) => {
 	const oldName = columnJsonSchema.compMod.oldField.name;
@@ -507,7 +507,7 @@ const wasRegularUniqueKeyChangedInTransitionFromRegularToComposite = (columnJson
 	const isTheFieldAnyUniqueKey = Boolean(columnJsonSchema?.unique);
 
 	if (!(wasRegularUniqueKey && isTheFieldAnyUniqueKey)) {
-		return KeyTransitionDto.noTransition();
+		return UniqueKeyTransitionDto.noTransition();
 	}
 
 	/**
@@ -544,10 +544,10 @@ const wasRegularUniqueKeyChangedInTransitionFromRegularToComposite = (columnJson
 				.differenceWith(constraintOptions, _.isEqual)
 				.isEmpty();
 		});
-		return KeyTransitionDto.transition(!areOptionsEqual);
+		return UniqueKeyTransitionDto.transition(!areOptionsEqual);
 	}
 
-	return KeyTransitionDto.noTransition();
+	return UniqueKeyTransitionDto.noTransition();
 };
 
 /**

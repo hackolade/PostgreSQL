@@ -5,11 +5,6 @@ class KeyTransitionDto {
 	didTransitionHappen;
 
 	/**
-	 * @type {boolean | undefined}
-	 * */
-	wasPkChangedInTransition;
-
-	/**
 	 * @return {KeyTransitionDto}
 	 * */
 	static noTransition() {
@@ -19,13 +14,47 @@ class KeyTransitionDto {
 	}
 
 	/**
-	 * @param {boolean} wasPkChangedInTransition
 	 * @return {KeyTransitionDto}
+	 * */
+	static transition() {
+		return {
+			didTransitionHappen: true,
+		};
+	}
+}
+
+class PrimaryKeyTransitionDto extends KeyTransitionDto {
+	/**
+	 * @type {boolean | undefined}
+	 * */
+	wasPkChangedInTransition;
+
+	/**
+	 * @param {boolean} wasPkChangedInTransition
+	 * @return {PrimaryKeyTransitionDto}
 	 * */
 	static transition(wasPkChangedInTransition) {
 		return {
 			didTransitionHappen: true,
 			wasPkChangedInTransition,
+		};
+	}
+}
+
+class UniqueKeyTransitionDto extends KeyTransitionDto {
+	/**
+	 * @type {boolean | undefined}
+	 * */
+	wasUniqueKeyChangedInTransition;
+
+	/**
+	 * @param {boolean} wasUniqueKeyChangedInTransition
+	 * @return {UniqueKeyTransitionDto}
+	 * */
+	static transition(wasUniqueKeyChangedInTransition) {
+		return {
+			didTransitionHappen: true,
+			wasUniqueKeyChangedInTransition,
 		};
 	}
 }
@@ -67,5 +96,6 @@ class KeyScriptModificationDto {
 
 module.exports = {
 	KeyScriptModificationDto,
-	KeyTransitionDto,
+	PrimaryKeyTransitionDto,
+	UniqueKeyTransitionDto,
 };
