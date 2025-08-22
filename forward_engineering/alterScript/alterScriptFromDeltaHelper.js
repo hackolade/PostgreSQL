@@ -11,6 +11,7 @@ const {
 	getDeleteColumnScriptDtos,
 	getModifyColumnScriptDtos,
 	getModifyCollectionScriptDtos,
+	getModifyCollectionKeysScriptDtos,
 } = require('./alterScriptHelpers/alterEntityHelper');
 const {
 	getDeleteUdtScriptDto,
@@ -111,6 +112,12 @@ const getAlterCollectionsScriptDtos = ({
 		.map(getDeleteCollectionScriptDto(app));
 
 	const modifyCollectionScriptDtos = modifyScriptsData.flatMap(getModifyCollectionScriptDtos({ dbVersion }));
+	const modifyCollectionKeysScriptDtos = modifyScriptsData.flatMap(getModifyCollectionKeysScriptDtos({ dbVersion }));
+
+	const [dropKeyScriptDtos, modifyKeyScriptDtos] = _.partition(
+		modifyCollectionKeysScriptDtos,
+		item => item.scripts[0]?.isDropScript,
+	);
 
 	const addColumnScriptDtos = createScriptsData
 		.filter(item => !item?.compMod?.created)
@@ -130,9 +137,11 @@ const getAlterCollectionsScriptDtos = ({
 		...createCollectionsScriptDtos,
 		...deleteCollectionScriptDtos,
 		...modifyCollectionScriptDtos,
+		...dropKeyScriptDtos,
 		...addColumnScriptDtos,
 		...deleteColumnScriptDtos,
 		...modifyColumnScriptDtos,
+		...modifyKeyScriptDtos,
 	].filter(Boolean);
 };
 
