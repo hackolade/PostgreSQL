@@ -135,9 +135,9 @@ const getAlterCollectionsScriptDtos = ({
 
 	return [
 		...createCollectionsScriptDtos,
+		...dropKeyScriptDtos,
 		...deleteCollectionScriptDtos,
 		...modifyCollectionScriptDtos,
-		...dropKeyScriptDtos,
 		...addColumnScriptDtos,
 		...deleteColumnScriptDtos,
 		...modifyColumnScriptDtos,
