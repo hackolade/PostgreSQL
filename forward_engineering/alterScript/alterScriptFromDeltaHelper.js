@@ -114,11 +114,6 @@ const getAlterCollectionsScriptDtos = ({
 	const modifyCollectionScriptDtos = modifyScriptsData.flatMap(getModifyCollectionScriptDtos({ dbVersion }));
 	const modifyCollectionKeysScriptDtos = modifyScriptsData.flatMap(getModifyCollectionKeysScriptDtos({ dbVersion }));
 
-	const [dropKeyScriptDtos, modifyKeyScriptDtos] = _.partition(
-		modifyCollectionKeysScriptDtos,
-		item => item.scripts[0]?.isDropScript,
-	);
-
 	const addColumnScriptDtos = createScriptsData
 		.filter(item => !item?.compMod?.created)
 		.flatMap(
@@ -135,13 +130,12 @@ const getAlterCollectionsScriptDtos = ({
 
 	return [
 		...createCollectionsScriptDtos,
-		...dropKeyScriptDtos,
 		...deleteCollectionScriptDtos,
 		...modifyCollectionScriptDtos,
 		...addColumnScriptDtos,
+		...modifyCollectionKeysScriptDtos,
 		...deleteColumnScriptDtos,
 		...modifyColumnScriptDtos,
-		...modifyKeyScriptDtos,
 	].filter(Boolean);
 };
 
