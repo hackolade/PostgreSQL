@@ -88,19 +88,24 @@ const getModifyCollectionScriptDtos =
 	collection => {
 		const modifyCheckConstraintScriptDtos = getModifyCheckConstraintScriptDtos(collection);
 		const modifyCommentScriptDtos = getModifyEntityCommentsScriptDtos(collection);
+		return [...modifyCheckConstraintScriptDtos, ...modifyCommentScriptDtos].filter(Boolean);
+	};
+
+/**
+ * @return {(collection: AlterCollectionDto) => AlterScriptDto[]}
+ * */
+const getModifyCollectionKeysScriptDtos =
+	({ dbVersion }) =>
+	collection => {
 		const modifyPKConstraintDtos = getModifyPkConstraintsScriptDtos(collection);
 		const modifyUniqueKeyConstraintDtos = getModifyUniqueKeyConstraintsScriptDtos({
 			collection,
 			dbVersion,
 		});
 		const modifyIndexesScriptDtos = getModifyIndexesScriptDtos({ collection, dbVersion });
-		return [
-			...modifyCheckConstraintScriptDtos,
-			...modifyCommentScriptDtos,
-			...modifyPKConstraintDtos,
-			...modifyUniqueKeyConstraintDtos,
-			...modifyIndexesScriptDtos,
-		].filter(Boolean);
+		return [...modifyPKConstraintDtos, ...modifyUniqueKeyConstraintDtos, ...modifyIndexesScriptDtos].filter(
+			Boolean,
+		);
 	};
 
 /**
@@ -298,4 +303,5 @@ module.exports = {
 	getAddColumnScriptDtos,
 	getDeleteColumnScriptDtos,
 	getModifyColumnScriptDtos,
+	getModifyCollectionKeysScriptDtos,
 };
