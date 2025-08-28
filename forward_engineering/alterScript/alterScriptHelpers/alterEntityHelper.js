@@ -300,8 +300,8 @@ module.exports = {
 	getAddCollectionScriptDto,
 	getDeleteCollectionScriptDto,
 	getModifyCollectionScriptDtos,
-	getModifyCollectionKeysScriptDtos,
 	getAddColumnScriptDtos,
 	getDeleteColumnScriptDtos,
 	getModifyColumnScriptDtos,
+	getModifyCollectionKeysScriptDtos,
 };
