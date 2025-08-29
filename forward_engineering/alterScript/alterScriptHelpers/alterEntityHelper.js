@@ -147,8 +147,7 @@ const getAddColumnsByConditionScriptDtos =
 			.map(columnDefinition => ddlProvider.addColumn(fullName, columnDefinition))
 			.map(addColumnScript => AlterScriptDto.getInstance([addColumnScript], true, false));
 
-		const indexesOnNewlyCreatedColumns = getNewlyCreatedIndexesScripts({ dbVersion, collection });
-		return scripts.concat(indexesOnNewlyCreatedColumns).filter(Boolean);
+		return scripts.filter(Boolean);
 	};
 
 /**
