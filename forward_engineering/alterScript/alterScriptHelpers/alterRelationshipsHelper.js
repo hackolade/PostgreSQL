@@ -8,7 +8,7 @@ const { getNamePrefixedWithSchemaName, wrapInQuotes } = require('../../utils/gen
  * @return string
  * */
 const getRelationshipName = relationship => {
-	return relationship.role.name;
+	return relationship.role.code || relationship.role.name;
 };
 
 /**
