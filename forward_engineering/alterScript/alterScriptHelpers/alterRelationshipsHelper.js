@@ -8,7 +8,7 @@ const { getNamePrefixedWithSchemaName, wrapInQuotes } = require('../../utils/gen
  * @return string
  * */
 const getRelationshipName = relationship => {
-	return relationship.role.name;
+	return relationship.role.code || relationship.role.name;
 };
 
 /**
@@ -32,7 +32,7 @@ const getFullChildTableName = relationship => {
 const getAddSingleForeignKeyStatementDto = ddlProvider => relationship => {
 	const compMod = relationship.role.compMod;
 
-	const relationshipName = compMod.name?.new || getRelationshipName(relationship) || '';
+	const relationshipName = compMod.code?.new || compMod.name?.new || getRelationshipName(relationship) || '';
 
 	return ddlProvider.createForeignKey({
 		name: relationshipName,
@@ -59,7 +59,7 @@ const canRelationshipBeAdded = relationship => {
 		return false;
 	}
 	return [
-		compMod.name?.new || getRelationshipName(relationship),
+		compMod.code?.new || compMod.name?.new || getRelationshipName(relationship),
 		compMod.parent?.bucket,
 		compMod.parent?.collection,
 		compMod.parent?.collection?.fkFields?.length,
@@ -94,7 +94,7 @@ const getDeleteSingleForeignKeyStatementDto = ddlProvider => relationship => {
 
 	const ddlChildEntityName = getFullChildTableName(relationship);
 
-	const relationshipName = compMod.name?.old || getRelationshipName(relationship) || '';
+	const relationshipName = compMod.code?.old || compMod.name?.old || getRelationshipName(relationship) || '';
 	const ddlRelationshipName = wrapInQuotes(relationshipName);
 	const statement = ddlProvider.dropForeignKey(ddlChildEntityName, ddlRelationshipName);
 
@@ -116,7 +116,7 @@ const canRelationshipBeDeleted = relationship => {
 		return false;
 	}
 	return [
-		compMod.name?.old || getRelationshipName(relationship),
+		compMod.code?.old || compMod.name?.old || getRelationshipName(relationship),
 		compMod.child?.bucket,
 		compMod.child?.collection,
 	].every(property => Boolean(property));
