@@ -184,6 +184,7 @@ const queryConstants = {
                                                                AND pg_description.objoid = pg_attribute.attrelid)
         WHERE pg_attribute.attrelid = $1;`,
 	GET_TABLE_COLUMNS_FROM_CATALOG: `
+        -- This is information_schema.columns view but without permissions
         SELECT 
             a.attname AS column_name,
             a.attnum AS ordinal_position,
