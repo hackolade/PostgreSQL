@@ -23,6 +23,7 @@ const {
 	generateCreateViewScript,
 	setViewSuffix,
 	prepareViewData,
+	isViewRecursive,
 } = require('./postgresHelpers/viewHelper');
 const { getTriggers } = require('./postgresHelpers/triggerHelper');
 const queryConstants = require('./queryConstants');
@@ -329,6 +330,18 @@ module.exports = {
 		logger.progress('Get columns', schemaName, tableName);
 
 		const tableColumns = await db.query(queryConstants.GET_TABLE_COLUMNS, [tableName, schemaName]);
+
+		// If information_schema.columns returns empty results, it might be due to permission issues
+		// Fall back to pg_catalog tables which are more accessible
+		if (tableColumns.length === 0) {
+			logger.info('No columns returned from information_schema.columns, falling back to pg_catalog tables', {
+				schemaName,
+				tableName,
+			});
+
+			return await this._getTableColumnsFromCatalog(tableName, schemaName, tableOid);
+		}
+
 		const tableColumnsAdditionalData = await db.queryTolerant(queryConstants.GET_TABLE_COLUMNS_ADDITIONAL_DATA, [
 			tableOid,
 		]);
@@ -339,6 +352,12 @@ module.exports = {
 				...(_.find(tableColumnsAdditionalData, { name: columnData.column_name }) || {}),
 			};
 		});
+	},
+
+	async _getTableColumnsFromCatalog(tableName, schemaName, tableOid) {
+		logger.progress('Get columns from pg_catalog', schemaName, tableName);
+
+		return await db.query(queryConstants.GET_TABLE_COLUMNS_FROM_CATALOG, [tableOid]);
 	},
 
 	async _getDocuments(schemaName, tableName, attributes, recordSamplingSettings) {
@@ -377,7 +396,7 @@ module.exports = {
 			(await db.query(queryConstants.GET_VIEW_DATA, [viewName, schemaName], true)) ??
 			(await db.query(queryConstants.GET_MATERIALIZED_VIEW_DATA, [viewName, schemaName], true));
 		const viewDefinitionFallback =
-			!viewData.view_definition &&
+			!viewData?.view_definition &&
 			(await db.queryTolerant(queryConstants.GET_VIEW_SELECT_STMT_FALLBACK, [viewName, schemaName], true));
 		const viewOptions = await db.queryTolerant(queryConstants.GET_VIEW_OPTIONS, [viewName, schemaOid], true);
 		const triggers = await this._getTriggers(
@@ -394,7 +413,8 @@ module.exports = {
 		);
 
 		const script = generateCreateViewScript(viewName, viewData, viewDefinitionFallback);
-		const data = prepareViewData(viewData, viewOptions, triggers, tableToastOptions);
+		const isRecursive = isViewRecursive(viewData?.view_definition || viewDefinitionFallback);
+		const data = prepareViewData({ viewData, viewOptions, triggers, tableToastOptions, isRecursive });
 
 		if (!script) {
 			logger.info('View select statement was not retrieved', { schemaName, viewName });

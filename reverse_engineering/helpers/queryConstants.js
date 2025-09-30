@@ -183,6 +183,207 @@ const queryConstants = {
         LEFT JOIN pg_catalog.pg_description AS pg_description ON (pg_description.objsubid=pg_attribute.attnum
                                                                AND pg_description.objoid = pg_attribute.attrelid)
         WHERE pg_attribute.attrelid = $1;`,
+	GET_TABLE_COLUMNS_FROM_CATALOG: `
+        SELECT 
+            a.attname AS column_name,
+            a.attnum AS ordinal_position,
+            pg_get_expr(ad.adbin, ad.adrelid) AS column_default,
+            CASE 
+                WHEN a.attnotnull THEN 'NO'
+                ELSE 'YES'
+            END AS is_nullable,
+            CASE 
+                WHEN t.typtype = 'd' THEN 
+                    CASE 
+                        WHEN bt.typelem <> 0 AND bt.typlen = -1 THEN 'ARRAY'
+                        ELSE 
+                            CASE bt.typname
+                                WHEN 'bpchar' THEN 'character'
+                                WHEN 'varchar' THEN 'character varying'
+                                WHEN 'varbit' THEN 'bit varying'
+                                WHEN 'timestamptz' THEN 'timestamp with time zone'
+                                WHEN 'timestamp' THEN 'timestamp without time zone'
+                                WHEN 'timetz' THEN 'time with time zone'
+                                WHEN 'time' THEN 'time without time zone'
+                                WHEN 'int4' THEN 'integer'
+                                WHEN 'int2' THEN 'smallint'
+                                WHEN 'int8' THEN 'bigint'
+                                WHEN 'float4' THEN 'real'
+                                WHEN 'float8' THEN 'double precision'
+                                WHEN 'bool' THEN 'boolean'
+                                ELSE bt.typname
+                            END
+                    END
+                WHEN a.attndims > 0 THEN 'ARRAY'
+                ELSE 
+                    CASE t.typname
+                        WHEN 'bpchar' THEN 'character'
+                        WHEN 'varchar' THEN 'character varying'
+                        WHEN 'varbit' THEN 'bit varying'
+                        WHEN 'timestamptz' THEN 'timestamp with time zone'
+                        WHEN 'timestamp' THEN 'timestamp without time zone'
+                        WHEN 'timetz' THEN 'time with time zone'
+                        WHEN 'time' THEN 'time without time zone'
+                        WHEN 'int4' THEN 'integer'
+                        WHEN 'int2' THEN 'smallint'
+                        WHEN 'int8' THEN 'bigint'
+                        WHEN 'float4' THEN 'real'
+                        WHEN 'float8' THEN 'double precision'
+                        WHEN 'bool' THEN 'boolean'
+                        ELSE t.typname
+                    END
+            END AS data_type,
+            CASE 
+                WHEN t.typtype = 'd' THEN 
+                    CASE 
+                        WHEN bt.typelem <> 0 AND bt.typlen = -1 THEN NULL
+                        ELSE 
+                            CASE 
+                                WHEN bt.typbasetype = ANY ('{int,int4,int2,int8,float4,float8,numeric,decimal}'::regtype[]) 
+                                THEN CASE WHEN bt.typtypmod = -1 THEN NULL ELSE ((bt.typtypmod - 4) >> 16) & 65535 END
+                                ELSE NULL
+                            END
+                    END
+                WHEN a.atttypid = ANY ('{int,int4,int2,int8,float4,float8,numeric,decimal}'::regtype[]) 
+                THEN 
+                    CASE 
+                        WHEN a.atttypid = ANY ('{int4,int}'::regtype[]) THEN 32
+                        WHEN a.atttypid = 'int2'::regtype THEN 16
+                        WHEN a.atttypid = 'int8'::regtype THEN 64
+                        WHEN a.atttypid = 'float4'::regtype THEN 24
+                        WHEN a.atttypid = 'float8'::regtype THEN 53
+                        ELSE CASE WHEN a.atttypmod = -1 THEN NULL ELSE ((a.atttypmod - 4) >> 16) & 65535 END
+                    END
+                ELSE NULL
+            END AS numeric_precision,
+            CASE 
+                WHEN t.typtype = 'd' THEN 
+                    CASE 
+                        WHEN bt.typelem <> 0 AND bt.typlen = -1 THEN NULL
+                        ELSE 
+                            CASE 
+                                WHEN bt.typbasetype = ANY ('{numeric,decimal}'::regtype[]) 
+                                THEN CASE WHEN bt.typtypmod = -1 THEN NULL ELSE (bt.typtypmod - 4) & 65535 END
+                                ELSE NULL
+                            END
+                    END
+                WHEN a.atttypid = ANY ('{numeric,decimal}'::regtype[]) 
+                THEN CASE WHEN a.atttypmod = -1 THEN NULL ELSE (a.atttypmod - 4) & 65535 END
+                WHEN a.atttypid = ANY ('{int,int4,int2,int8}'::regtype[]) 
+                THEN 0
+                ELSE NULL
+            END AS numeric_scale,
+            CASE 
+                WHEN t.typtype = 'd' THEN 
+                    CASE 
+                        WHEN bt.typelem <> 0 AND bt.typlen = -1 THEN NULL
+                        ELSE 
+                            CASE 
+                                WHEN bt.typbasetype = ANY ('{timestamp,timestamptz,time,timetz}'::regtype[]) 
+                                THEN CASE WHEN bt.typtypmod = -1 THEN NULL ELSE bt.typtypmod END
+                                ELSE NULL
+                            END
+                    END
+                WHEN a.atttypid = ANY ('{timestamp,timestamptz,time,timetz}'::regtype[]) 
+                THEN CASE WHEN a.atttypmod = -1 THEN NULL ELSE a.atttypmod END
+                ELSE NULL
+            END AS datetime_precision,
+            a.atttypmod AS attribute_mode,
+            CASE 
+                WHEN t.typtype = 'd' THEN 
+                    CASE 
+                        WHEN bt.typelem <> 0 AND bt.typlen = -1 THEN NULL
+                        ELSE 
+                            CASE 
+                                WHEN bt.typbasetype = 'interval'::regtype 
+                                THEN 
+                                    CASE (bt.typtypmod & 65535)
+                                        WHEN 32 THEN 'YEAR'
+                                        WHEN 64 THEN 'MONTH' 
+                                        WHEN 128 THEN 'DAY'
+                                        WHEN 256 THEN 'HOUR'
+                                        WHEN 512 THEN 'MINUTE'
+                                        WHEN 1024 THEN 'SECOND'
+                                        WHEN 2048 THEN 'YEAR TO MONTH'
+                                        WHEN 4096 THEN 'DAY TO HOUR'
+                                        WHEN 8192 THEN 'DAY TO MINUTE'
+                                        WHEN 16384 THEN 'DAY TO SECOND'
+                                        WHEN 32768 THEN 'HOUR TO MINUTE'
+                                        WHEN 65536 THEN 'HOUR TO SECOND'
+                                        WHEN 131072 THEN 'MINUTE TO SECOND'
+                                        ELSE NULL
+                                    END
+                                ELSE NULL
+                            END
+                    END
+                WHEN a.atttypid = 'interval'::regtype 
+                THEN 
+                    CASE (a.atttypmod & 65535)
+                        WHEN 32 THEN 'YEAR'
+                        WHEN 64 THEN 'MONTH' 
+                        WHEN 128 THEN 'DAY'
+                        WHEN 256 THEN 'HOUR'
+                        WHEN 512 THEN 'MINUTE'
+                        WHEN 1024 THEN 'SECOND'
+                        WHEN 2048 THEN 'YEAR TO MONTH'
+                        WHEN 4096 THEN 'DAY TO HOUR'
+                        WHEN 8192 THEN 'DAY TO MINUTE'
+                        WHEN 16384 THEN 'DAY TO SECOND'
+                        WHEN 32768 THEN 'HOUR TO MINUTE'
+                        WHEN 65536 THEN 'HOUR TO SECOND'
+                        WHEN 131072 THEN 'MINUTE TO SECOND'
+                        ELSE NULL
+                    END
+                ELSE NULL
+            END AS interval_type,
+            CASE 
+                WHEN c.collname <> 'default' THEN c.collname
+                ELSE NULL
+            END AS collation_name,
+            a.attndims AS number_of_array_dimensions,
+            CASE 
+                WHEN t.typtype = 'd' THEN 
+                    CASE 
+                        WHEN bt.typelem <> 0 AND bt.typlen = -1 THEN bt.typname
+                        ELSE bt.typname
+                    END
+                ELSE t.typname
+            END AS udt_name,
+            CASE 
+                WHEN t.typtype = 'd' THEN 
+                    CASE 
+                        WHEN bt.typelem <> 0 AND bt.typlen = -1 THEN NULL
+                        ELSE 
+                            CASE 
+                                WHEN bt.typbasetype = ANY ('{bpchar,varchar,char,text}'::regtype[]) 
+                                THEN CASE WHEN bt.typtypmod = -1 THEN NULL ELSE bt.typtypmod - 4 END
+                                WHEN bt.typbasetype = ANY ('{bit,varbit}'::regtype[])
+                                THEN CASE WHEN bt.typtypmod = -1 THEN NULL ELSE bt.typtypmod END
+                                ELSE NULL
+                            END
+                    END
+                WHEN a.atttypid = ANY ('{bpchar,varchar,char,text}'::regtype[]) 
+                THEN CASE WHEN a.atttypmod = -1 THEN NULL ELSE a.atttypmod - 4 END
+                WHEN a.atttypid = ANY ('{bit,varbit}'::regtype[])
+                THEN CASE WHEN a.atttypmod = -1 THEN NULL ELSE a.atttypmod END
+                ELSE NULL
+            END AS character_maximum_length,
+            CASE 
+                WHEN t.typtype = 'd' THEN t.typname
+                ELSE NULL
+            END AS domain_name,
+            pg_description.description
+        FROM pg_catalog.pg_attribute a
+        JOIN pg_catalog.pg_type t ON a.atttypid = t.oid
+        LEFT JOIN pg_catalog.pg_type bt ON t.typbasetype = bt.oid
+        LEFT JOIN pg_catalog.pg_attrdef ad ON a.attrelid = ad.adrelid AND a.attnum = ad.adnum
+        LEFT JOIN pg_catalog.pg_collation c ON a.attcollation = c.oid
+        LEFT JOIN pg_catalog.pg_description ON (pg_description.objsubid = a.attnum
+                                               AND pg_description.objoid = a.attrelid)
+        WHERE a.attrelid = $1 
+          AND a.attnum > 0 
+          AND NOT a.attisdropped
+        ORDER BY a.attnum;`,
 	GET_DESCRIPTION_BY_OID: `SELECT obj_description($1)`,
 	GET_ROWS_COUNT: fullTableName => `SELECT COUNT(*) AS quantity FROM ${fullTableName};`,
 	GET_SAMPLED_DATA: (fullTableName, jsonColumns) => `SELECT ${jsonColumns} FROM ${fullTableName} LIMIT $1;`,

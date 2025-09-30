@@ -11,7 +11,7 @@ const removeViewNameSuffix = name => name.slice(0, -VIEW_SUFFIX.length);
 const setViewSuffix = name => `${name}${VIEW_SUFFIX}`;
 
 const generateCreateViewScript = (viewName, viewData, viewDefinitionFallback = {}) => {
-	const selectStatement = _.trim(viewData.view_definition || viewDefinitionFallback.definition || '');
+	const selectStatement = _.trim(viewData?.view_definition || viewDefinitionFallback.definition || '');
 
 	if (!selectStatement) {
 		return '';
@@ -20,13 +20,13 @@ const generateCreateViewScript = (viewName, viewData, viewDefinitionFallback = {
 	return `CREATE VIEW ${wrapInQuotes(viewName)} AS ${selectStatement}`;
 };
 
-const prepareViewData = (viewData, viewOptions, triggers, tableToastOptions) => {
+const prepareViewData = ({ viewData, viewOptions, triggers, tableToastOptions, isRecursive }) => {
 	const data = {
-		withCheckOption: viewData.check_option !== 'NONE' || _.isNil(viewData.check_option),
-		checkTestingScope: getCheckTestingScope(viewData.check_option),
+		withCheckOption: viewData?.check_option !== 'NONE' || _.isNil(viewData?.check_option),
+		checkTestingScope: getCheckTestingScope(viewData?.check_option),
 		viewOptions: _.fromPairs(_.map(viewOptions?.view_options, splitByEqualitySymbol)),
 		temporary: viewOptions?.persistence === 't',
-		recursive: isViewRecursive(viewData),
+		recursive: isRecursive,
 		description: viewOptions?.description,
 		triggers,
 		...prepareMaterializedViewData({ viewData, viewOptions, tableToastOptions }),
@@ -36,9 +36,9 @@ const prepareViewData = (viewData, viewOptions, triggers, tableToastOptions) => 
 
 const prepareMaterializedViewData = ({ viewData, viewOptions, tableToastOptions }) => {
 	return {
-		...(viewData.table_type && { materialized: viewData.table_type === TABLE_TYPE.materializedView }),
-		...(viewData.view_tablespace_name && { view_tablespace_name: viewData.view_tablespace_name }),
-		...(viewData.is_populated && { withDataOption: viewData.is_populated }),
+		...(viewData?.table_type && { materialized: viewData.table_type === TABLE_TYPE.materializedView }),
+		...(viewData?.view_tablespace_name && { view_tablespace_name: viewData.view_tablespace_name }),
+		...(viewData?.is_populated && { withDataOption: viewData.is_populated }),
 		...(viewOptions?.view_options && {
 			storage_parameter: prepareStorageParameters(viewOptions.view_options, tableToastOptions),
 		}),
@@ -53,8 +53,8 @@ const getCheckTestingScope = check_option => {
 	return check_option;
 };
 
-const isViewRecursive = viewData => {
-	return _.startsWith(_.trim(viewData.view_definition), 'WITH RECURSIVE');
+const isViewRecursive = viewDefinition => {
+	return _.startsWith(_.trim(viewDefinition), 'WITH RECURSIVE');
 };
 
 const splitByEqualitySymbol = item => _.split(item, '=');
@@ -66,4 +66,5 @@ module.exports = {
 	generateCreateViewScript,
 	setViewSuffix,
 	prepareViewData,
+	isViewRecursive,
 };
