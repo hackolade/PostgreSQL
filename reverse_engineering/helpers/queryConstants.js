@@ -421,9 +421,11 @@ const queryConstants = {
                 pcon.confmatchtype AS relationship_match,
                 pc_foreign_table.relname AS foreign_table_name,
                 ARRAY(
-                    SELECT column_name::text FROM unnest(pcon.confkey) AS column_position
-                    JOIN information_schema.columns ON (ordinal_position = column_position)
-                    WHERE table_name = pc_foreign_table.relname AND table_schema = foreign_table_namespace.nspname)::text[] AS foreign_columns,
+                    SELECT pg_attribute.attname::text 
+                    FROM unnest(pcon.confkey) AS column_position
+                    JOIN pg_catalog.pg_attribute ON (pg_attribute.attnum = column_position AND pg_attribute.attrelid = pcon.confrelid)
+                    WHERE NOT pg_attribute.attisdropped
+                    ORDER BY array_position(pcon.confkey, column_position))::text[] AS foreign_columns,
                 foreign_table_namespace.nspname AS foreign_table_schema
             FROM pg_catalog.pg_constraint AS pcon
             LEFT JOIN pg_catalog.pg_class AS pc ON pcon.conindid = pc.oid
