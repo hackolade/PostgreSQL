@@ -357,7 +357,7 @@ module.exports = {
 	async _getTableColumnsFromCatalog(tableName, schemaName, tableOid) {
 		logger.progress('Get columns from pg_catalog', schemaName, tableName);
 
-		return await db.query(queryConstants.GET_TABLE_COLUMNS_FROM_CATALOG, [tableOid]);
+		return await db.queryTolerant(queryConstants.GET_TABLE_COLUMNS_FROM_CATALOG, [tableOid]);
 	},
 
 	async _getDocuments(schemaName, tableName, attributes, recordSamplingSettings) {
