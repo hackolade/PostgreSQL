@@ -297,42 +297,50 @@ const queryConstants = {
                             CASE 
                                 WHEN bt.typbasetype = 'interval'::regtype 
                                 THEN 
-                                    CASE (bt.typtypmod & 65535)
-                                        WHEN 32 THEN 'YEAR'
-                                        WHEN 64 THEN 'MONTH' 
-                                        WHEN 128 THEN 'DAY'
-                                        WHEN 256 THEN 'HOUR'
-                                        WHEN 512 THEN 'MINUTE'
-                                        WHEN 1024 THEN 'SECOND'
-                                        WHEN 2048 THEN 'YEAR TO MONTH'
-                                        WHEN 4096 THEN 'DAY TO HOUR'
-                                        WHEN 8192 THEN 'DAY TO MINUTE'
-                                        WHEN 16384 THEN 'DAY TO SECOND'
-                                        WHEN 32768 THEN 'HOUR TO MINUTE'
-                                        WHEN 65536 THEN 'HOUR TO SECOND'
-                                        WHEN 131072 THEN 'MINUTE TO SECOND'
-                                        ELSE NULL
+                                    CASE 
+                                        WHEN bt.typtypmod = -1 THEN NULL
+                                        ELSE
+                                            CASE 
+                                                WHEN format_type(bt.typbasetype, bt.typtypmod) ~ 'year' AND format_type(bt.typbasetype, bt.typtypmod) ~ 'month' THEN 'YEAR TO MONTH'
+                                                WHEN format_type(bt.typbasetype, bt.typtypmod) ~ 'day' AND format_type(bt.typbasetype, bt.typtypmod) ~ 'hour' AND format_type(bt.typbasetype, bt.typtypmod) ~ 'minute' AND format_type(bt.typbasetype, bt.typtypmod) ~ 'second' THEN 'DAY TO SECOND'
+                                                WHEN format_type(bt.typbasetype, bt.typtypmod) ~ 'day' AND format_type(bt.typbasetype, bt.typtypmod) ~ 'hour' AND format_type(bt.typbasetype, bt.typtypmod) ~ 'minute' THEN 'DAY TO MINUTE'
+                                                WHEN format_type(bt.typbasetype, bt.typtypmod) ~ 'day' AND format_type(bt.typbasetype, bt.typtypmod) ~ 'hour' THEN 'DAY TO HOUR'
+                                                WHEN format_type(bt.typbasetype, bt.typtypmod) ~ 'hour' AND format_type(bt.typbasetype, bt.typtypmod) ~ 'minute' AND format_type(bt.typbasetype, bt.typtypmod) ~ 'second' THEN 'HOUR TO SECOND'
+                                                WHEN format_type(bt.typbasetype, bt.typtypmod) ~ 'hour' AND format_type(bt.typbasetype, bt.typtypmod) ~ 'minute' THEN 'HOUR TO MINUTE'
+                                                WHEN format_type(bt.typbasetype, bt.typtypmod) ~ 'minute' AND format_type(bt.typbasetype, bt.typtypmod) ~ 'second' THEN 'MINUTE TO SECOND'
+                                                WHEN format_type(bt.typbasetype, bt.typtypmod) ~ 'year' THEN 'YEAR'
+                                                WHEN format_type(bt.typbasetype, bt.typtypmod) ~ 'month' THEN 'MONTH'
+                                                WHEN format_type(bt.typbasetype, bt.typtypmod) ~ 'day' THEN 'DAY'
+                                                WHEN format_type(bt.typbasetype, bt.typtypmod) ~ 'hour' THEN 'HOUR'
+                                                WHEN format_type(bt.typbasetype, bt.typtypmod) ~ 'minute' THEN 'MINUTE'
+                                                WHEN format_type(bt.typbasetype, bt.typtypmod) ~ 'second' THEN 'SECOND'
+                                                ELSE NULL
+                                            END
                                     END
                                 ELSE NULL
                             END
                     END
                 WHEN a.atttypid = 'interval'::regtype 
                 THEN 
-                    CASE (a.atttypmod & 65535)
-                        WHEN 32 THEN 'YEAR'
-                        WHEN 64 THEN 'MONTH' 
-                        WHEN 128 THEN 'DAY'
-                        WHEN 256 THEN 'HOUR'
-                        WHEN 512 THEN 'MINUTE'
-                        WHEN 1024 THEN 'SECOND'
-                        WHEN 2048 THEN 'YEAR TO MONTH'
-                        WHEN 4096 THEN 'DAY TO HOUR'
-                        WHEN 8192 THEN 'DAY TO MINUTE'
-                        WHEN 16384 THEN 'DAY TO SECOND'
-                        WHEN 32768 THEN 'HOUR TO MINUTE'
-                        WHEN 65536 THEN 'HOUR TO SECOND'
-                        WHEN 131072 THEN 'MINUTE TO SECOND'
-                        ELSE NULL
+                    CASE 
+                        WHEN a.atttypmod = -1 THEN NULL
+                        ELSE
+                            CASE 
+                                WHEN format_type(a.atttypid, a.atttypmod) ~ 'year' AND format_type(a.atttypid, a.atttypmod) ~ 'month' THEN 'YEAR TO MONTH'
+                                WHEN format_type(a.atttypid, a.atttypmod) ~ 'day' AND format_type(a.atttypid, a.atttypmod) ~ 'hour' AND format_type(a.atttypid, a.atttypmod) ~ 'minute' AND format_type(a.atttypid, a.atttypmod) ~ 'second' THEN 'DAY TO SECOND'
+                                WHEN format_type(a.atttypid, a.atttypmod) ~ 'day' AND format_type(a.atttypid, a.atttypmod) ~ 'hour' AND format_type(a.atttypid, a.atttypmod) ~ 'minute' THEN 'DAY TO MINUTE'
+                                WHEN format_type(a.atttypid, a.atttypmod) ~ 'day' AND format_type(a.atttypid, a.atttypmod) ~ 'hour' THEN 'DAY TO HOUR'
+                                WHEN format_type(a.atttypid, a.atttypmod) ~ 'hour' AND format_type(a.atttypid, a.atttypmod) ~ 'minute' AND format_type(a.atttypid, a.atttypmod) ~ 'second' THEN 'HOUR TO SECOND'
+                                WHEN format_type(a.atttypid, a.atttypmod) ~ 'hour' AND format_type(a.atttypid, a.atttypmod) ~ 'minute' THEN 'HOUR TO MINUTE'
+                                WHEN format_type(a.atttypid, a.atttypmod) ~ 'minute' AND format_type(a.atttypid, a.atttypmod) ~ 'second' THEN 'MINUTE TO SECOND'
+                                WHEN format_type(a.atttypid, a.atttypmod) ~ 'year' THEN 'YEAR'
+                                WHEN format_type(a.atttypid, a.atttypmod) ~ 'month' THEN 'MONTH'
+                                WHEN format_type(a.atttypid, a.atttypmod) ~ 'day' THEN 'DAY'
+                                WHEN format_type(a.atttypid, a.atttypmod) ~ 'hour' THEN 'HOUR'
+                                WHEN format_type(a.atttypid, a.atttypmod) ~ 'minute' THEN 'MINUTE'
+                                WHEN format_type(a.atttypid, a.atttypmod) ~ 'second' THEN 'SECOND'
+                                ELSE NULL
+                            END
                     END
                 ELSE NULL
             END AS interval_type,
