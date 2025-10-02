@@ -146,5 +146,20 @@
 	"CONTEXT_MENU___CONVERT_PATTERN_TO_REGULAR_FIELD": "Convert to Regular Column",
 	"FE_LEVEL_SELECTOR_TITLE": "Schemas",
 	"FE_LEVEL_SELECTOR_CONTAINER": "Individual",
-	"FE_LEVEL_SELECTOR_MODEL": "Combined"
+	"FE_LEVEL_SELECTOR_MODEL": "Combined",
+
+	"MAIN_MENU___ATTRIBUTES": "Column in Table Boxes",
+	"MAIN_MENU___DESCRIPTIONS": "Description in Table Boxes",
+	"MAIN_MENU___HIDE_ALL_ATTRIBUTES": "Empty Table Boxes",
+	"MAIN_MENU___REQUIRED_ATTRIBUTES": "Required Columns",
+	"MAIN_MENU___NULLABLE_ATTRIBUTES": "Nullable Columns",
+	"TOOLBAR___ATTRIBUTES": "Column in table boxes",
+	"TOOLBAR___DESCRIPTIONS": "Description in table boxes",
+	"TOOLBAR___HIDE_ALL_ATTRIBUTES": "Empty table boxes",
+	"TOOLBAR___REQUIRED_ATTRIBUTES": "Required columns",
+	"TOOLBAR___NULLABLE_ATTRIBUTES": "Nullable columns",
+	"MODAL_WINDOW___OPTIONS_DISPLAY_ERD_V_ENTITY_BOX_CONTENT": "Display of table box content",
+	"MODAL_WINDOW___OPTIONS_DISPLAY_ERD_V_FIELDS": "Columns",
+	"MODAL_WINDOW___OPTIONS_DISPLAY_REQUIRED_ATTRIBUTES": "Required columns",
+	"MODAL_WINDOW___OPTIONS_DISPLAY_NULLABLE_ATTRIBUTES": "Nullable columns"
 }
