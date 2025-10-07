@@ -1,6 +1,7 @@
 const { toPairs } = require('lodash');
 const { AlterScriptDto } = require('../../types/AlterScriptDto');
-const { getFullTableName, wrapInQuotes, wrapInSingleQuotes } = require('../../../utils/general');
+const { getFullTableName, wrapInQuotes } = require('../../../utils/general');
+const { decorateDefault } = require('../../../ddlProvider/ddlHelpers/columnDefinitionHelper');
 const assignTemplates = require('../../../utils/assignTemplates');
 const templates = require('../../../ddlProvider/templates');
 
@@ -35,10 +36,12 @@ const getUpdatedDefaultColumnValueScriptDtos = ({ collection }) =>
 		})
 		.map(([columnName, jsonSchema]) => {
 			const newDefaultValue = jsonSchema.default;
+			const type = jsonSchema.mode || jsonSchema.childType || jsonSchema.type;
+			const isArrayType = Array.isArray(jsonSchema.array_type) && jsonSchema.array_type.length > 0;
 			const scriptGenerationConfig = {
 				tableName: getFullTableName(collection),
 				columnName: wrapInQuotes(columnName),
-				defaultValue: wrapInSingleQuotes({ name: newDefaultValue }),
+				defaultValue: decorateDefault(type, newDefaultValue, isArrayType),
 			};
 			return updateColumnDefaultValue(scriptGenerationConfig);
 		})

@@ -290,8 +290,8 @@ const getModifyColumnScriptDtos =
 			...renameColumnScriptDtos,
 			...updateTypeScriptDtos,
 			...modifyNotNullScriptDtos,
-			...modifyCommentScriptDtos,
 			...modifyDefaultColumnValueScriptDtos,
+			...modifyCommentScriptDtos,
 		].filter(Boolean);
 	};
 
