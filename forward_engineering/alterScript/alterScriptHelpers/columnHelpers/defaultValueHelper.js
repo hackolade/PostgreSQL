@@ -1,6 +1,11 @@
 const { toPairs } = require('lodash');
 const { AlterScriptDto } = require('../../types/AlterScriptDto');
-const { getFullTableName, wrapInQuotes } = require('../../../utils/general');
+const {
+	getFullTableName,
+	wrapInQuotes,
+	isObjectInDeltaModelActivated,
+	isParentContainerActivated,
+} = require('../../../utils/general');
 const { decorateDefault } = require('../../../ddlProvider/ddlHelpers/columnDefinitionHelper');
 const assignTemplates = require('../../../utils/assignTemplates');
 const templates = require('../../../ddlProvider/templates');
@@ -26,8 +31,11 @@ const updateColumnDefaultValue = ({ tableName, columnName, defaultValue }) => {
  * @param {Object} props.collection
  * @returns { Array<AlterScriptDto> }
  * */
-const getUpdatedDefaultColumnValueScriptDtos = ({ collection }) =>
-	toPairs(collection.properties)
+const getUpdatedDefaultColumnValueScriptDtos = ({ collection }) => {
+	const isContainerActivated = isParentContainerActivated(collection);
+	const isCollectionActivated = isObjectInDeltaModelActivated(collection);
+
+	return toPairs(collection.properties)
 		.filter(([_name, jsonSchema]) => {
 			const newDefault = jsonSchema.default;
 			const oldName = jsonSchema.compMod.oldField.name;
@@ -43,10 +51,12 @@ const getUpdatedDefaultColumnValueScriptDtos = ({ collection }) =>
 				columnName: wrapInQuotes(columnName),
 				defaultValue: decorateDefault(type, newDefaultValue, isArrayType),
 			};
-			return updateColumnDefaultValue(scriptGenerationConfig);
+			const isActivated = isContainerActivated && isCollectionActivated && jsonSchema.isActivated;
+			return { script: updateColumnDefaultValue(scriptGenerationConfig), isActivated };
 		})
-		.map(script => AlterScriptDto.getInstance([script], true, false))
+		.map(({ script, isActivated }) => AlterScriptDto.getInstance([script], isActivated, false))
 		.filter(Boolean);
+};
 
 /**
  * @param {Object} props
@@ -67,8 +77,11 @@ const dropColumnDefaultValue = ({ tableName, columnName }) => {
  * @param {Object} props.collection
  * @returns { Array<AlterScriptDto> }
  * */
-const getDeletedDefaultColumnValueScriptDtos = ({ collection }) =>
-	toPairs(collection.properties)
+const getDeletedDefaultColumnValueScriptDtos = ({ collection }) => {
+	const isContainerActivated = isParentContainerActivated(collection);
+	const isCollectionActivated = isObjectInDeltaModelActivated(collection);
+
+	return toPairs(collection.properties)
 		.filter(([_name, jsonSchema]) => {
 			const newDefault = jsonSchema.default;
 			const oldName = jsonSchema.compMod.oldField.name;
@@ -77,15 +90,17 @@ const getDeletedDefaultColumnValueScriptDtos = ({ collection }) =>
 			const hasNewValue = newDefault !== undefined;
 			return hasPrevValue && !hasNewValue;
 		})
-		.map(([columnName]) => {
+		.map(([columnName, jsonSchema]) => {
 			const scriptGenerationConfig = {
 				tableName: getFullTableName(collection),
 				columnName: wrapInQuotes(columnName),
 			};
-			return dropColumnDefaultValue(scriptGenerationConfig);
+			const isActivated = isContainerActivated && isCollectionActivated && jsonSchema.isActivated;
+			return { script: dropColumnDefaultValue(scriptGenerationConfig), isActivated };
 		})
-		.map(script => AlterScriptDto.getInstance([script], true, true))
+		.map(({ script, isActivated }) => AlterScriptDto.getInstance([script], isActivated, true))
 		.filter(Boolean);
+};
 
 /**
  * @param {Object} props

@@ -1,6 +1,11 @@
 const _ = require('lodash');
 const { AlterScriptDto } = require('../../types/AlterScriptDto');
-const { getFullColumnName, wrapComment } = require('../../../utils/general');
+const {
+	getFullColumnName,
+	wrapComment,
+	isObjectInDeltaModelActivated,
+	isParentContainerActivated,
+} = require('../../../utils/general');
 const assignTemplates = require('../../../utils/assignTemplates');
 const templates = require('../../../ddlProvider/templates');
 
@@ -22,6 +27,8 @@ const updateColumnComment = (columnName, comment) => {
  * @return {AlterScriptDto[]}
  * */
 const getUpdatedCommentOnColumnScriptDtos = collection => {
+	const isContainerActivated = isParentContainerActivated(collection);
+	const isCollectionActivated = isObjectInDeltaModelActivated(collection);
 	return _.toPairs(collection.properties)
 		.filter(([name, jsonSchema]) => {
 			const newComment = jsonSchema.description;
@@ -33,9 +40,10 @@ const getUpdatedCommentOnColumnScriptDtos = collection => {
 			const newComment = jsonSchema.description;
 			const ddlComment = wrapComment(newComment);
 			const columnName = getFullColumnName(collection, name);
-			return updateColumnComment(columnName, ddlComment);
+			const isActivated = isContainerActivated && isCollectionActivated && jsonSchema.isActivated;
+			return { script: updateColumnComment(columnName, ddlComment), isActivated };
 		})
-		.map(script => AlterScriptDto.getInstance([script], true, false));
+		.map(({ script, isActivated }) => AlterScriptDto.getInstance([script], isActivated, false));
 };
 
 /**
@@ -55,6 +63,8 @@ const dropColumnComment = columnName => {
  * @return {AlterScriptDto[]}
  * */
 const getDeletedCommentOnColumnScriptDtos = collection => {
+	const isContainerActivated = isParentContainerActivated(collection);
+	const isCollectionActivated = isObjectInDeltaModelActivated(collection);
 	return _.toPairs(collection.properties)
 		.filter(([name, jsonSchema]) => {
 			const newComment = jsonSchema.description;
@@ -64,9 +74,10 @@ const getDeletedCommentOnColumnScriptDtos = collection => {
 		})
 		.map(([name, jsonSchema]) => {
 			const columnName = getFullColumnName(collection, name);
-			return dropColumnComment(columnName);
+			const isActivated = isContainerActivated && isCollectionActivated && jsonSchema.isActivated;
+			return { script: dropColumnComment(columnName), isActivated };
 		})
-		.map(script => AlterScriptDto.getInstance([script], true, true));
+		.map(({ script, isActivated }) => AlterScriptDto.getInstance([script], isActivated, true));
 };
 
 /**

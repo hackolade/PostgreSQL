@@ -1,6 +1,12 @@
 const _ = require('lodash');
 const { AlterScriptDto } = require('../../types/AlterScriptDto');
-const { checkFieldPropertiesChanged, getFullTableName, wrapInQuotes } = require('../../../utils/general');
+const {
+	checkFieldPropertiesChanged,
+	getFullTableName,
+	wrapInQuotes,
+	isObjectInDeltaModelActivated,
+	isParentContainerActivated,
+} = require('../../../utils/general');
 const assignTemplates = require('../../../utils/assignTemplates');
 const templates = require('../../../ddlProvider/templates');
 
@@ -63,6 +69,8 @@ const hasPrecisionOrScaleChanged = (collection, oldFieldName, currentJsonSchema)
  * */
 const getUpdateTypesScriptDtos = collection => {
 	const fullTableName = getFullTableName(collection);
+	const isContainerActivated = isParentContainerActivated(collection);
+	const isCollectionActivated = isObjectInDeltaModelActivated(collection);
 
 	return _.toPairs(collection.properties)
 		.filter(([name, jsonSchema]) => {
@@ -79,9 +87,10 @@ const getUpdateTypesScriptDtos = collection => {
 			const typeName = jsonSchema.compMod.newField.mode || jsonSchema.compMod.newField.type;
 			const columnName = wrapInQuotes(name);
 			const typeConfig = _.pick(jsonSchema, ['length', 'precision', 'scale']);
-			return alterColumnType(fullTableName, columnName, typeName, typeConfig);
+			const isActivated = isContainerActivated && isCollectionActivated && jsonSchema.isActivated;
+			return { script: alterColumnType(fullTableName, columnName, typeName, typeConfig), isActivated };
 		})
-		.map(script => AlterScriptDto.getInstance([script], true, false));
+		.map(({ script, isActivated }) => AlterScriptDto.getInstance([script], isActivated, false));
 };
 
 module.exports = {

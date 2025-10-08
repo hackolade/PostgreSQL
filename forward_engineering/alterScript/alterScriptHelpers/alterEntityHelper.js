@@ -15,7 +15,14 @@ const {
 	getAdditionalDataForDdlProvider,
 } = require('./entityHelpers/indexesHelper');
 const { getModifiedDefaultColumnValueScriptDtos } = require('./columnHelpers/defaultValueHelper');
-const { getEntityName, getFullTableName, getNamePrefixedWithSchemaName, wrapInQuotes } = require('../../utils/general');
+const {
+	getEntityName,
+	getFullTableName,
+	getNamePrefixedWithSchemaName,
+	wrapInQuotes,
+	isParentContainerActivated,
+	isObjectInDeltaModelActivated,
+} = require('../../utils/general');
 
 /**
  * @return {(collection: AlterCollectionDto) => AlterScriptDto | undefined}
@@ -124,6 +131,9 @@ const getAddColumnsByConditionScriptDtos =
 		const fullName = getNamePrefixedWithSchemaName(tableName, schemaName);
 		const schemaData = { schemaName, dbVersion };
 
+		const isContainerActivated = isParentContainerActivated(collection);
+		const isCollectionActivated = isObjectInDeltaModelActivated(collection);
+
 		const scripts = _.toPairs(collection.properties)
 			.filter(([name, jsonSchema]) => predicate([name, jsonSchema]))
 			.map(([name, jsonSchema]) => {
@@ -134,7 +144,7 @@ const getAddColumnsByConditionScriptDtos =
 					externalDefinitions,
 				});
 
-				return createColumnDefinitionBySchema({
+				const columnDefinition = createColumnDefinitionBySchema({
 					name,
 					jsonSchema,
 					parentJsonSchema: collectionSchema,
@@ -142,10 +152,14 @@ const getAddColumnsByConditionScriptDtos =
 					schemaData,
 					definitionJsonSchema,
 				});
+				const isActivated = isContainerActivated && isCollectionActivated && jsonSchema.isActivated;
+				return { columnDefinition, isActivated };
 			})
-			.map(ddlProvider.convertColumnDefinition)
-			.map(columnDefinition => ddlProvider.addColumn(fullName, columnDefinition))
-			.map(addColumnScript => AlterScriptDto.getInstance([addColumnScript], true, false));
+			.map(({ columnDefinition, isActivated }) => ({
+				script: ddlProvider.addColumn(fullName, ddlProvider.convertColumnDefinition(columnDefinition)),
+				isActivated,
+			}))
+			.map(({ script, isActivated }) => AlterScriptDto.getInstance([script], isActivated, false));
 
 		return scripts.filter(Boolean);
 	};
@@ -204,13 +218,17 @@ const getDeleteColumnsByConditionScriptDtos = app => (collection, predicate) => 
 	const schemaName = collectionSchema.compMod?.keyspaceName;
 	const fullTableName = getNamePrefixedWithSchemaName(tableName, schemaName);
 
+	const isContainerActivated = isParentContainerActivated(collection);
+	const isCollectionActivated = isObjectInDeltaModelActivated(collection);
+
 	return _.toPairs(collection.properties)
 		.filter(([name, jsonSchema]) => predicate([name, jsonSchema]))
-		.map(([name]) => {
+		.map(([name, jsonSchema]) => {
 			const columnNameForDDL = wrapInQuotes(name);
-			return ddlProvider.dropColumn(fullTableName, columnNameForDDL);
+			const isActivated = isContainerActivated && isCollectionActivated && jsonSchema.isActivated;
+			return { script: ddlProvider.dropColumn(fullTableName, columnNameForDDL), isActivated };
 		})
-		.map(dropColumnScript => AlterScriptDto.getInstance([dropColumnScript], true, true))
+		.map(({ script, isActivated }) => AlterScriptDto.getInstance([script], isActivated, true))
 		.filter(Boolean);
 };
 

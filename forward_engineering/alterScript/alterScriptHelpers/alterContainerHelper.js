@@ -29,20 +29,22 @@ const dropSchema = schemaName => {
 
 /**
  * @param {string} containerName
+ * @param {boolean} isActivated
  * @return {AlterScriptDto | undefined}
  * */
-const getAddContainerScriptDto = containerName => {
+const getAddContainerScriptDto = (containerName, isActivated = true) => {
 	const script = createSchemaOnly(wrapInQuotes(containerName));
-	return AlterScriptDto.getInstance([script], true, false);
+	return AlterScriptDto.getInstance([script], isActivated, false);
 };
 
 /**
  * @param {string} containerName
+ * @param {boolean} isActivated
  * @return {AlterScriptDto | undefined}
  * */
-const getDeleteContainerScriptDto = containerName => {
+const getDeleteContainerScriptDto = (containerName, isActivated = true) => {
 	const script = dropSchema(wrapInQuotes(containerName));
-	return AlterScriptDto.getInstance([script], true, true);
+	return AlterScriptDto.getInstance([script], isActivated, true);
 };
 
 /**

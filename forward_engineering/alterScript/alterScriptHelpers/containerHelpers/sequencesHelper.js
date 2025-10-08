@@ -1,7 +1,7 @@
 const _ = require('lodash');
 const { AlterScriptDto } = require('../../types/AlterScriptDto');
 const { App } = require('../../../types/coreApplicationTypes');
-const { getDbName, getGroupItemsByCompMode } = require('../../../utils/general');
+const { getDbName, getGroupItemsByCompMode, isObjectInDeltaModelActivated } = require('../../../utils/general');
 const {
 	createSequenceScript,
 	dropSequenceScript,
@@ -17,10 +17,11 @@ const sequencesCompModKey = 'sequences';
  * */
 const getAddContainerSequencesScriptDtos = ({ container }) => {
 	const schemaName = getDbName([container.role]);
+	const isContainerActivated = isObjectInDeltaModelActivated(container);
 
 	return (container.role?.sequences || [])
 		.map(sequence => createSequenceScript({ schemaName, sequence }))
-		.map(script => AlterScriptDto.getInstance([script], true, false))
+		.map(script => AlterScriptDto.getInstance([script], isContainerActivated, false))
 		.filter(Boolean);
 };
 
@@ -31,6 +32,7 @@ const getAddContainerSequencesScriptDtos = ({ container }) => {
  * */
 const getModifyContainerSequencesScriptDtos = ({ container }) => {
 	const schemaName = getDbName([container.role]);
+	const isContainerActivated = isObjectInDeltaModelActivated(container);
 	const sequencesCompMod = container.role?.compMod?.[sequencesCompModKey] || {};
 	const { new: newItems = [], old: oldItems = [] } = sequencesCompMod;
 
@@ -41,10 +43,10 @@ const getModifyContainerSequencesScriptDtos = ({ container }) => {
 
 	const removedScriptDtos = removed
 		.map(sequence => dropSequenceScript({ schemaName, sequence }))
-		.map(script => AlterScriptDto.getInstance([script], true, true));
+		.map(script => AlterScriptDto.getInstance([script], isContainerActivated, true));
 	const addedScriptDtos = added
 		.map(sequence => createSequenceScript({ schemaName, sequence }))
-		.map(script => AlterScriptDto.getInstance([script], true, false));
+		.map(script => AlterScriptDto.getInstance([script], isContainerActivated, false));
 
 	const modifiedScriptDtos = modified
 		.map(sequence => {
@@ -55,7 +57,7 @@ const getModifyContainerSequencesScriptDtos = ({ container }) => {
 				oldSequence,
 			});
 		})
-		.map(script => AlterScriptDto.getInstance([script], true, false));
+		.map(script => AlterScriptDto.getInstance([script], isContainerActivated, false));
 
 	return [...modifiedScriptDtos, ...removedScriptDtos, ...addedScriptDtos].filter(Boolean);
 };
@@ -67,10 +69,11 @@ const getModifyContainerSequencesScriptDtos = ({ container }) => {
  * */
 const getDeleteContainerSequencesScriptDtos = ({ container }) => {
 	const schemaName = getDbName([container.role]);
+	const isContainerActivated = isObjectInDeltaModelActivated(container);
 
 	return (container.role?.sequences || [])
 		.map(sequence => dropSequenceScript({ schemaName, sequence }))
-		.map(script => AlterScriptDto.getInstance([script], true, true))
+		.map(script => AlterScriptDto.getInstance([script], isContainerActivated, true))
 		.filter(Boolean);
 };
 

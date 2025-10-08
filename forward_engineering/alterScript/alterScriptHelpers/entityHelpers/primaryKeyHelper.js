@@ -13,6 +13,8 @@ const {
 	getSchemaOfAlterCollection,
 	getEntityName,
 	wrapInQuotes,
+	isParentContainerActivated,
+	isObjectInDeltaModelActivated,
 } = require('../../../utils/general');
 const { alterKeyConstraint, dropKeyConstraint } = require('../../../ddlProvider/ddlHelpers/constraintsHelper');
 const { areConstraintOptionsEqual } = require('./areConstraintOptionsEqual');
@@ -251,10 +253,13 @@ const getAddCompositePkScriptDtos = collection => {
 	const fullTableName = getFullCollectionName(collectionSchema);
 	const entityName = getEntityName(collectionSchema);
 
+	const isContainerActivated = isParentContainerActivated(collection);
+	const isCollectionActivated = isContainerActivated && isObjectInDeltaModelActivated(collection);
+
 	return newPrimaryKeys
 		.map(newPk => {
 			const ddlConfig = getCreateCompositePKDDLProviderConfig(newPk, entityName, collection);
-			const statementDto = alterKeyConstraint(fullTableName, collection.isActivated, ddlConfig);
+			const statementDto = alterKeyConstraint(fullTableName, isCollectionActivated, ddlConfig);
 			return new KeyScriptModificationDto(statementDto.statement, fullTableName, false, statementDto.isActivated);
 		})
 		.filter(scriptDto => Boolean(scriptDto.script));
@@ -286,6 +291,9 @@ const getDropCompositePkScriptDtos = collection => {
 	const fullTableName = getFullCollectionName(collectionSchema);
 	const entityName = getEntityName(collectionSchema);
 
+	const isContainerActivated = isParentContainerActivated(collection);
+	const isCollectionActivated = isContainerActivated && isObjectInDeltaModelActivated(collection);
+
 	return oldPrimaryKeys
 		.map(oldPk => {
 			let constraintName = getDefaultConstraintName(entityName);
@@ -294,7 +302,7 @@ const getDropCompositePkScriptDtos = collection => {
 			}
 			const ddlConstraintName = wrapInQuotes(constraintName);
 			const script = dropKeyConstraint(fullTableName, ddlConstraintName);
-			return new KeyScriptModificationDto(script, fullTableName, true, collection.isActivated);
+			return new KeyScriptModificationDto(script, fullTableName, true, isCollectionActivated);
 		})
 		.filter(scriptDto => Boolean(scriptDto.script));
 };
@@ -563,6 +571,9 @@ const getAddPkScriptDtos = collection => {
 	const fullTableName = getFullCollectionName(collectionSchema);
 	const entityName = getEntityName(collectionSchema);
 
+	const isContainerActivated = isParentContainerActivated(collection);
+	const isCollectionActivated = isContainerActivated && isObjectInDeltaModelActivated(collection);
+
 	return _.toPairs(collection.properties)
 		.filter(([name, jsonSchema]) => {
 			if (wasFieldChangedToBeARegularPk(jsonSchema, collection)) {
@@ -579,7 +590,7 @@ const getAddPkScriptDtos = collection => {
 		})
 		.map(([name, jsonSchema]) => {
 			const ddlConfig = getCreateRegularPKDDLProviderConfig(name, jsonSchema, entityName, collection);
-			const statementDto = alterKeyConstraint(fullTableName, collection.isActivated, ddlConfig);
+			const statementDto = alterKeyConstraint(fullTableName, isCollectionActivated, ddlConfig);
 			return new KeyScriptModificationDto(statementDto.statement, fullTableName, false, statementDto.isActivated);
 		})
 		.filter(scriptDto => Boolean(scriptDto.script));
@@ -593,6 +604,9 @@ const getDropPkScriptDto = collection => {
 	const collectionSchema = getSchemaOfAlterCollection(collection);
 	const fullTableName = getFullCollectionName(collectionSchema);
 	const entityName = getEntityName(collectionSchema);
+
+	const isContainerActivated = isParentContainerActivated(collection);
+	const isCollectionActivated = isContainerActivated && isObjectInDeltaModelActivated(collection);
 
 	return _.toPairs(collection.properties)
 		.filter(([name, jsonSchema]) => {
@@ -614,7 +628,7 @@ const getDropPkScriptDto = collection => {
 			const ddlConstraintName = wrapInQuotes(getConstraintNameForRegularPk(oldJsonSchema, entityName));
 
 			const script = dropKeyConstraint(fullTableName, ddlConstraintName);
-			return new KeyScriptModificationDto(script, fullTableName, true, collection.isActivated);
+			return new KeyScriptModificationDto(script, fullTableName, true, isCollectionActivated);
 		})
 		.filter(scriptDto => Boolean(scriptDto.script));
 };

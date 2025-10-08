@@ -96,7 +96,7 @@ const createKeyConstraint = (templates, isParentActivated) => keyData => {
 			deferrable,
 			deferrableConstraintCheckTime,
 		}),
-		isActivated: !isAllColumnsDeactivated,
+		isActivated: !isAllColumnsDeactivated && isParentActivated,
 	};
 };
 
