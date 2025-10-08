@@ -427,6 +427,12 @@
 									{
 										"key": "type",
 										"value": "bucket"
+									},
+									{
+										"level": "parent",
+										"key": "type",
+										"value": "definitions",
+										"inDepthParentSearch": true
 									}
 								]
 							},
