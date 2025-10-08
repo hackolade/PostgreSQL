@@ -198,7 +198,6 @@ const getAlterModelDefinitionsScriptDtos = ({
 	internalDefinitions,
 	externalDefinitions,
 }) => {
-	debugger;
 	const createUdtScriptDtos = []
 		.concat(collection.properties?.modelDefinitions?.properties?.added?.items)
 		.filter(Boolean)
