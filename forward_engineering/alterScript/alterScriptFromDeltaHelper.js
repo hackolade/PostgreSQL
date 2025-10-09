@@ -133,9 +133,9 @@ const getAlterCollectionsScriptDtos = ({
 		...deleteCollectionScriptDtos,
 		...modifyCollectionScriptDtos,
 		...addColumnScriptDtos,
-		...modifyCollectionKeysScriptDtos,
 		...deleteColumnScriptDtos,
 		...modifyColumnScriptDtos,
+		...modifyCollectionKeysScriptDtos,
 	].filter(Boolean);
 };
 

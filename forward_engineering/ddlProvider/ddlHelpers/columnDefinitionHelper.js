@@ -2,7 +2,7 @@ const _ = require('lodash');
 const { commentIfDeactivated, wrapInQuotes, wrapComment } = require('../../utils/general');
 const assignTemplates = require('../../utils/assignTemplates');
 const templates = require('../templates');
-const { isVector, isString, isDateTime } = require('./typeHelper');
+const { isVector, isString, isDateTime, isUUID, isInet } = require('./typeHelper');
 
 const addLength = (type, length) => {
 	return `${type}(${length})`;
@@ -82,11 +82,15 @@ const decorateType = (type, columnDefinition) => {
 
 const decorateDefault = (type, defaultValue, isArrayType) => {
 	const constantsValues = ['current_timestamp', 'current_user', 'null'];
-	if ((isString(type) || isDateTime(type)) && !constantsValues.includes(_.toLower(defaultValue)) && !isArrayType) {
-		return wrapComment(defaultValue);
-	} else {
+
+	const isConstantValue = constantsValues.includes(_.toLower(defaultValue));
+	const isQuotableType = isString(type) || isDateTime(type) || isUUID(type) || isInet(type);
+
+	if (!isQuotableType || isConstantValue || isArrayType) {
 		return defaultValue;
 	}
+
+	return wrapComment(defaultValue);
 };
 
 const getColumnComments = (tableName, columnDefinitions) => {
