@@ -16,6 +16,8 @@ const {
 	getEntityName,
 	getDbVersion,
 	wrapInQuotes,
+	isParentContainerActivated,
+	isObjectInDeltaModelActivated,
 } = require('../../../utils/general');
 const { areConstraintOptionsEqual } = require('./areConstraintOptionsEqual');
 
@@ -264,6 +266,9 @@ const getAddCompositeUniqueKeyScriptDtos = (collection, dbVersion) => {
 	const fullTableName = getFullCollectionName(collectionSchema);
 	const entityName = getEntityName(collectionSchema);
 
+	const isContainerActivated = isParentContainerActivated(collection);
+	const isCollectionActivated = isContainerActivated && isObjectInDeltaModelActivated(collection);
+
 	return newUniqueKeys
 		.map(newUniqueKey => {
 			const ddlConfig = getCreateCompositeUniqueKeyDDLProviderConfig(
@@ -272,7 +277,7 @@ const getAddCompositeUniqueKeyScriptDtos = (collection, dbVersion) => {
 				collection,
 				dbVersion,
 			);
-			const statementDto = alterKeyConstraint(fullTableName, collection.isActivated, ddlConfig);
+			const statementDto = alterKeyConstraint(fullTableName, isCollectionActivated, ddlConfig);
 			return new KeyScriptModificationDto(statementDto.statement, fullTableName, false, statementDto.isActivated);
 		})
 		.filter(scriptDto => Boolean(scriptDto.script));
@@ -304,6 +309,9 @@ const getDropCompositeUniqueKeyScriptDtos = collection => {
 	const fullTableName = getFullCollectionName(collectionSchema);
 	const entityName = getEntityName(collectionSchema);
 
+	const isContainerActivated = isParentContainerActivated(collection);
+	const isCollectionActivated = isContainerActivated && isObjectInDeltaModelActivated(collection);
+
 	return oldUniqueKeys
 		.map(oldUniqueKey => {
 			let constraintName = getDefaultConstraintName(entityName);
@@ -312,7 +320,7 @@ const getDropCompositeUniqueKeyScriptDtos = collection => {
 			}
 			const ddlConstraintName = wrapInQuotes(constraintName);
 			const script = dropKeyConstraint(fullTableName, ddlConstraintName);
-			return new KeyScriptModificationDto(script, fullTableName, true, collection.isActivated);
+			return new KeyScriptModificationDto(script, fullTableName, true, isCollectionActivated);
 		})
 		.filter(scriptDto => Boolean(scriptDto.script));
 };
@@ -601,6 +609,9 @@ const getAddUniqueKeyScriptDtos = (collection, dbVersion) => {
 	const fullTableName = getFullCollectionName(collectionSchema);
 	const entityName = getEntityName(collectionSchema);
 
+	const isContainerActivated = isParentContainerActivated(collection);
+	const isCollectionActivated = isContainerActivated && isObjectInDeltaModelActivated(collection);
+
 	return _.toPairs(collection.properties)
 		.filter(([name, jsonSchema]) => {
 			if (wasFieldChangedToBeARegularUniqueKey(jsonSchema, collection)) {
@@ -623,7 +634,7 @@ const getAddUniqueKeyScriptDtos = (collection, dbVersion) => {
 				collection,
 				dbVersion,
 			);
-			const statementDto = alterKeyConstraint(fullTableName, collection.isActivated, ddlConfig);
+			const statementDto = alterKeyConstraint(fullTableName, isCollectionActivated, ddlConfig);
 			return new KeyScriptModificationDto(statementDto.statement, fullTableName, false, statementDto.isActivated);
 		})
 		.filter(scriptDto => Boolean(scriptDto.script));
@@ -637,6 +648,9 @@ const getDropUniqueKeyScriptDto = collection => {
 	const collectionSchema = getSchemaOfAlterCollection(collection);
 	const fullTableName = getFullCollectionName(collectionSchema);
 	const entityName = getEntityName(collectionSchema);
+
+	const isContainerActivated = isParentContainerActivated(collection);
+	const isCollectionActivated = isContainerActivated && isObjectInDeltaModelActivated(collection);
 
 	return _.toPairs(collection.properties)
 		.filter(([name, jsonSchema]) => {
@@ -658,7 +672,7 @@ const getDropUniqueKeyScriptDto = collection => {
 			const ddlConstraintName = wrapInQuotes(getConstraintNameForRegularUniqueKey(oldJsonSchema, entityName));
 
 			const script = dropKeyConstraint(fullTableName, ddlConstraintName);
-			return new KeyScriptModificationDto(script, fullTableName, true, collection.isActivated);
+			return new KeyScriptModificationDto(script, fullTableName, true, isCollectionActivated);
 		})
 		.filter(scriptDto => Boolean(scriptDto.script));
 };

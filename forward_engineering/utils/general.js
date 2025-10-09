@@ -269,6 +269,16 @@ const getGroupItemsByCompMode = ({ newItems = [], oldItems = [] }) => {
 	};
 };
 
+const isObjectInDeltaModelActivated = modelObject => {
+	return modelObject.compMod?.isActivated?.new ?? modelObject.role?.isActivated;
+};
+
+const isParentContainerActivated = collection => {
+	return (
+		collection?.compMod?.bucketProperties?.isActivated ?? collection?.role?.compMod?.bucketProperties?.isActivated
+	);
+};
+
 module.exports = {
 	getDbName,
 	getDbData,
@@ -301,4 +311,6 @@ module.exports = {
 	getGroupItemsByCompMode,
 	wrapInSingleQuotes,
 	addCommaPrefix,
+	isObjectInDeltaModelActivated,
+	isParentContainerActivated,
 };

@@ -1,7 +1,12 @@
 const _ = require('lodash');
 const { AlterCollectionDto } = require('../../types/AlterCollectionDto');
 const { AlterScriptDto } = require('../../types/AlterScriptDto');
-const { getFullTableName, wrapInQuotes } = require('../../../utils/general');
+const {
+	getFullTableName,
+	wrapInQuotes,
+	isParentContainerActivated,
+	isObjectInDeltaModelActivated,
+} = require('../../../utils/general');
 const assignTemplates = require('../../../utils/assignTemplates');
 const templates = require('../../../ddlProvider/templates');
 
@@ -142,11 +147,17 @@ const getModifyCheckConstraintScriptDtos = collection => {
 	const fullTableName = getFullTableName(collection);
 	const constraintHistory = mapCheckConstraintNamesToChangeHistory(collection);
 
+	const isContainerActivated = isParentContainerActivated(collection);
+	const isCollectionActivated = isObjectInDeltaModelActivated(collection);
+
 	const addCheckConstraintScripts = getAddCheckConstraintScriptDtos(constraintHistory, fullTableName);
 	const dropCheckConstraintScripts = getDropCheckConstraintScriptDtos(constraintHistory, fullTableName);
 	const updateCheckConstraintScripts = getUpdateCheckConstraintScriptDtos(constraintHistory, fullTableName);
 
-	return [...addCheckConstraintScripts, ...dropCheckConstraintScripts, ...updateCheckConstraintScripts];
+	return [...addCheckConstraintScripts, ...dropCheckConstraintScripts, ...updateCheckConstraintScripts].map(dto => ({
+		...dto,
+		isActivated: isContainerActivated && isCollectionActivated,
+	}));
 };
 
 module.exports = {

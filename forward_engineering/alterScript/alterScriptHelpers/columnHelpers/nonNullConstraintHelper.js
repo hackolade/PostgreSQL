@@ -1,6 +1,11 @@
 const _ = require('lodash');
 const { AlterScriptDto } = require('../../types/AlterScriptDto');
-const { getFullTableName, wrapInQuotes } = require('../../../utils/general');
+const {
+	getFullTableName,
+	wrapInQuotes,
+	isObjectInDeltaModelActivated,
+	isParentContainerActivated,
+} = require('../../../utils/general');
 const assignTemplates = require('../../../utils/assignTemplates');
 const templates = require('../../../ddlProvider/templates');
 
@@ -35,6 +40,9 @@ const dropNotNullConstraint = (tableName, columnName) => {
 const getModifyNonNullColumnsScriptDtos = collection => {
 	const fullTableName = getFullTableName(collection);
 
+	const isContainerActivated = isParentContainerActivated(collection);
+	const isCollectionActivated = isObjectInDeltaModelActivated(collection);
+
 	const currentRequiredColumnNames = collection.required || [];
 	const previousRequiredColumnNames = collection.role.required || [];
 
@@ -48,8 +56,11 @@ const getModifyNonNullColumnsScriptDtos = collection => {
 			const shouldAddForNewName = columnNamesToAddNotNullConstraint.includes(name);
 			return shouldAddForNewName && !shouldRemoveForOldName;
 		})
-		.map(([columnName]) => setNotNullConstraint(fullTableName, wrapInQuotes(columnName)))
-		.map(script => AlterScriptDto.getInstance([script], true, false));
+		.map(([columnName, jsonSchema]) => {
+			const isActivated = isContainerActivated && isCollectionActivated && jsonSchema.isActivated;
+			return { script: setNotNullConstraint(fullTableName, wrapInQuotes(columnName)), isActivated };
+		})
+		.map(({ script, isActivated }) => AlterScriptDto.getInstance([script], isActivated, false));
 
 	const removeNotNullConstraint = _.toPairs(collection.properties)
 		.filter(([name, jsonSchema]) => {
@@ -58,8 +69,11 @@ const getModifyNonNullColumnsScriptDtos = collection => {
 			const shouldAddForNewName = columnNamesToAddNotNullConstraint.includes(name);
 			return shouldRemoveForOldName && !shouldAddForNewName;
 		})
-		.map(([name]) => dropNotNullConstraint(fullTableName, wrapInQuotes(name)))
-		.map(script => AlterScriptDto.getInstance([script], true, true));
+		.map(([name, jsonSchema]) => {
+			const isActivated = isContainerActivated && isCollectionActivated && jsonSchema.isActivated;
+			return { script: dropNotNullConstraint(fullTableName, wrapInQuotes(name)), isActivated };
+		})
+		.map(({ script, isActivated }) => AlterScriptDto.getInstance([script], isActivated, true));
 
 	return [...addNotNullConstraintsScript, ...removeNotNullConstraint];
 };

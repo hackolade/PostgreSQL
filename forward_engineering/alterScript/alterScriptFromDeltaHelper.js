@@ -38,6 +38,7 @@ const {
 	getDeleteContainerSequencesScriptDtos,
 	getAddContainerSequencesScriptDtos,
 } = require('./alterScriptHelpers/containerHelpers/sequencesHelper');
+const { isObjectInDeltaModelActivated } = require('../utils/general');
 
 /**
  * @param dto {{
@@ -53,12 +54,20 @@ const getAlterContainersScriptDtos = ({ collection }) => {
 	const addContainersScriptDtos = []
 		.concat(addedContainers)
 		.filter(Boolean)
-		.map(container => getAddContainerScriptDto(Object.keys(container.properties)[0]));
+		.map(container => {
+			const [containerName, containerData] = Object.entries(container.properties)[0];
+			const isActivated = isObjectInDeltaModelActivated(containerData);
+			return getAddContainerScriptDto(containerName, isActivated);
+		});
 
 	const deleteContainersScriptDtos = []
 		.concat(deletedContainers)
 		.filter(Boolean)
-		.map(container => getDeleteContainerScriptDto(Object.keys(container.properties)[0]));
+		.map(container => {
+			const [containerName, containerData] = Object.entries(container.properties)[0];
+			const isActivated = isObjectInDeltaModelActivated(containerData);
+			return getDeleteContainerScriptDto(containerName, isActivated);
+		});
 
 	const modifyContainersScriptDtos = []
 		.concat(modifiedContainers)

@@ -1,7 +1,12 @@
 const _ = require('lodash');
 const { AlterScriptDto } = require('../../types/AlterScriptDto');
 const { AlterCollectionDto } = require('../../types/AlterCollectionDto');
-const { getFullTableName, wrapComment } = require('../../../utils/general');
+const {
+	getFullTableName,
+	wrapComment,
+	isObjectInDeltaModelActivated,
+	isParentContainerActivated,
+} = require('../../../utils/general');
 const assignTemplates = require('../../../utils/assignTemplates');
 const templates = require('../../../ddlProvider/templates');
 
@@ -36,8 +41,11 @@ const getUpdatedCommentOnCollectionScriptDto = collection => {
 	const tableName = getFullTableName(collection);
 	const comment = wrapComment(newComment);
 
+	const isContainerActivated = isParentContainerActivated(collection);
+	const isCollectionActivated = isContainerActivated && isObjectInDeltaModelActivated(collection);
+
 	const script = updateTableComment(tableName, comment);
-	return AlterScriptDto.getInstance([script], true, false);
+	return AlterScriptDto.getInstance([script], isCollectionActivated, false);
 };
 
 /**
@@ -69,8 +77,11 @@ const getDeletedCommentOnCollectionScriptDto = collection => {
 
 	const tableName = getFullTableName(collection);
 
+	const isContainerActivated = isParentContainerActivated(collection);
+	const isCollectionActivated = isContainerActivated && isObjectInDeltaModelActivated(collection);
+
 	const script = dropTableComment(tableName);
-	return AlterScriptDto.getInstance([script], true, true);
+	return AlterScriptDto.getInstance([script], isCollectionActivated, true);
 };
 
 /**

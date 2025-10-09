@@ -1,5 +1,5 @@
 const { AlterScriptDto } = require('../../types/AlterScriptDto');
-const { wrapComment, wrapInQuotes } = require('../../../utils/general');
+const { wrapComment, wrapInQuotes, isObjectInDeltaModelActivated } = require('../../../utils/general');
 const assignTemplates = require('../../../utils/assignTemplates');
 const templates = require('../../../ddlProvider/templates');
 
@@ -30,7 +30,8 @@ const getUpsertCommentsScriptDto = container => {
 		const wrappedComment = wrapComment(description.new);
 		const wrappedSchemaName = wrapInQuotes(container.role.name);
 		const script = updateSchemaComment(wrappedSchemaName, wrappedComment);
-		return AlterScriptDto.getInstance([script], true, false);
+		const isContainerActivated = isObjectInDeltaModelActivated(container);
+		return AlterScriptDto.getInstance([script], isContainerActivated, false);
 	}
 	return undefined;
 };
@@ -56,7 +57,8 @@ const getDropCommentsScriptDto = container => {
 	if (description.old && !description.new) {
 		const wrappedSchemaName = wrapInQuotes(container.role.name);
 		const script = dropSchemaComment(wrappedSchemaName);
-		return AlterScriptDto.getInstance([script], true, true);
+		const isContainerActivated = isObjectInDeltaModelActivated(container);
+		return AlterScriptDto.getInstance([script], isContainerActivated, true);
 	}
 	return undefined;
 };
