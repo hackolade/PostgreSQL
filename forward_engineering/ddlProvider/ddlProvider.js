@@ -224,9 +224,12 @@ module.exports = (baseProvider, options, app) => {
 			const defaultValue = !_.isUndefined(columnDefinition.default)
 				? ' DEFAULT ' + decorateDefault(type, columnDefinition.default, isArrayType)
 				: '';
-			const checkConstraint = !_.isEmpty(columnDefinition.checkConstraint)
-				? ' ' + this.createCheckConstraint(_.first(columnDefinition.checkConstraint)).trim()
+
+			const checkConstraintData = _.first(columnDefinition.checkConstraint);
+			const checkConstraint = checkConstraintData?.expression
+				? ' ' + this.createCheckConstraint(checkConstraintData).trim()
 				: '';
+
 			const generatedColumnClause =
 				columnDefinition.dbVersion >= 12 &&
 				columnDefinition.generatedColumn &&
