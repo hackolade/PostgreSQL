@@ -20,9 +20,7 @@ const mapIndexKey = ({ name, sortOrder, nullsOrder, collation, opclass }) => {
 	return `${wrapInQuotes(name)}${collationStr}${opclassStr}${sortOrderStr}${nullsOrderStr}`;
 };
 
-const getIndexKeys = ({ columns = [], isParentActivated }) => {
-	const isAllColumnsDeactivated = checkAllKeysDeactivated(columns);
-
+const getIndexKeys = ({ columns = [], isParentActivated, isAllColumnsDeactivated }) => {
 	return getColumnsList(columns, isAllColumnsDeactivated, isParentActivated, mapIndexKey);
 };
 
@@ -114,9 +112,12 @@ const createIndex = (tableName, index, dbData, isParentActivated = true) => {
 			? index.columns
 			: _.map(index.columns, column => _.omit(column, 'sortOrder', 'nullsOrder'));
 
+	const isAllColumnsDeactivated = checkAllKeysDeactivated(indexColumns);
+
 	const keys = getIndexKeys({
 		columns: indexColumns,
 		isParentActivated,
+		isAllColumnsDeactivated,
 	});
 	const options = getIndexOptions(index, isParentActivated);
 
@@ -134,7 +135,7 @@ const createIndex = (tableName, index, dbData, isParentActivated = true) => {
 			tableName: getNamePrefixedWithSchemaName(tableName, index.schemaName),
 		}),
 		{
-			isActivated: index.isActivated,
+			isActivated: index.isActivated && isParentActivated && !isAllColumnsDeactivated,
 		},
 	);
 };
