@@ -19,7 +19,7 @@ module.exports = {
 	generatedColumnClause: ' GENERATED ALWAYS AS (${generationExpression}) STORED',
 
 	columnDefinition:
-		'${name} ${type}${collation}${generatedColumnClause}${primaryKey}${uniqueKey}${defaultValue}${notNull}',
+		'${name} ${type}${collation}${generatedColumnClause}${primaryKey}${uniqueKey}${defaultValue}${notNull}${checkConstraint}',
 
 	checkConstraint: '${name} CHECK (${expression})${noInherit}',
 
