@@ -95,7 +95,7 @@ const wasCompositePkChangedInTransitionFromCompositeToRegular = collection => {
 	}
 	const constraintOptions = getCustomPropertiesOfRegularPkForComparisonWithRegularPkOptions(newColumnJsonSchema);
 	const areOptionsEqual = oldPrimaryKeys.some(compositePk => {
-		if (compositePk.compositePrimaryKey.length !== amountOfColumnsInRegularPk) {
+		if (compositePk.compositePrimaryKey?.length !== amountOfColumnsInRegularPk) {
 			return false;
 		}
 		const oldCompositePkAsRegularPkOptions =
@@ -139,7 +139,7 @@ const wasCompositePkChangedInTransitionFromRegularToComposite = collection => {
 	}
 	const constraintOptions = getCustomPropertiesOfRegularPkForComparisonWithRegularPkOptions(oldColumnJsonSchema);
 	const areOptionsEqual = newPrimaryKeys.some(compositePk => {
-		if (compositePk.compositePrimaryKey.length !== amountOfColumnsInRegularPk) {
+		if (compositePk.compositePrimaryKey?.length !== amountOfColumnsInRegularPk) {
 			return false;
 		}
 		const oldCompositePkAsRegularPkOptions =
@@ -187,7 +187,7 @@ const getCreateCompositePKDDLProviderConfig = (primaryKey, entityName, entity) =
 	const constraintName = getConstraintNameForCompositePk(primaryKey, entityName);
 	const pkColumns = _.toPairs(entity.role.properties)
 		.filter(([name, jsonSchema]) =>
-			Boolean(primaryKey.compositePrimaryKey.find(keyDto => keyDto.keyId === jsonSchema.GUID)),
+			Boolean(primaryKey.compositePrimaryKey?.find(keyDto => keyDto.keyId === jsonSchema.GUID)),
 		)
 		.map(([name, jsonSchema]) => ({
 			name,
@@ -444,10 +444,10 @@ const wasRegularPkChangedInTransitionFromCompositeToRegular = (columnJsonSchema,
 	 * */
 	const oldPrimaryKeys = pkDto.old || [];
 	const wasTheFieldACompositePrimaryKey = oldPrimaryKeys.some(compPk =>
-		compPk.compositePrimaryKey.some(pk => pk.keyId === oldColumnJsonSchema.GUID),
+		compPk.compositePrimaryKey?.some(pk => pk.keyId === oldColumnJsonSchema.GUID),
 	);
 	const isTheFieldACompositePrimaryKey = newPrimaryKeys.some(compPk =>
-		compPk.compositePrimaryKey.some(pk => pk.keyId === columnJsonSchema.GUID),
+		compPk.compositePrimaryKey?.some(pk => pk.keyId === columnJsonSchema.GUID),
 	);
 
 	const wasCompositePkRemoved = wasTheFieldACompositePrimaryKey && !isTheFieldACompositePrimaryKey;
@@ -458,7 +458,7 @@ const wasRegularPkChangedInTransitionFromCompositeToRegular = (columnJsonSchema,
 		// to amount of regular pk columns, we must recreate PK
 		const constraintOptions = getCustomPropertiesOfRegularPkForComparisonWithRegularPkOptions(columnJsonSchema);
 		const areOptionsEqual = oldPrimaryKeys.some(oldCompositePk => {
-			if (oldCompositePk.compositePrimaryKey.length !== amountOfColumnsInRegularPk) {
+			if (oldCompositePk.compositePrimaryKey?.length !== amountOfColumnsInRegularPk) {
 				return false;
 			}
 			const oldCompositePkAsRegularPkOptions =
@@ -498,10 +498,10 @@ const wasRegularPkChangedInTransitionFromRegularToComposite = (columnJsonSchema,
 	 * */
 	const oldPrimaryKeys = pkDto.old || [];
 	const wasTheFieldACompositePrimaryKey = oldPrimaryKeys.some(compPk =>
-		compPk.compositePrimaryKey.some(pk => pk.keyId === oldColumnJsonSchema.GUID),
+		compPk.compositePrimaryKey?.some(pk => pk.keyId === oldColumnJsonSchema.GUID),
 	);
 	const isTheFieldACompositePrimaryKey = newPrimaryKeys.some(compPk =>
-		compPk.compositePrimaryKey.some(pk => pk.keyId === columnJsonSchema.GUID),
+		compPk.compositePrimaryKey?.some(pk => pk.keyId === columnJsonSchema.GUID),
 	);
 
 	const wasCompositePkAdded = isTheFieldACompositePrimaryKey && !wasTheFieldACompositePrimaryKey;
@@ -512,7 +512,7 @@ const wasRegularPkChangedInTransitionFromRegularToComposite = (columnJsonSchema,
 		// to amount of regular pk columns, we must recreate PK
 		const constraintOptions = getCustomPropertiesOfRegularPkForComparisonWithRegularPkOptions(oldColumnJsonSchema);
 		const areOptionsEqual = newPrimaryKeys.some(oldCompositePk => {
-			if (oldCompositePk.compositePrimaryKey.length !== amountOfColumnsInRegularPk) {
+			if (oldCompositePk.compositePrimaryKey?.length !== amountOfColumnsInRegularPk) {
 				return false;
 			}
 			const oldCompositePkAsRegularPkOptions =
