@@ -245,11 +245,21 @@
 			"adapters": [
 				{
 					"dependency": {
-						"key": "chkConstr",
-						"valueType": "array"
+						"type": "or",
+						"values": [
+							{
+								"key": "chkConstr",
+								"valueType": "array"
+							},
+							{
+								"key": "checkConstraint",
+								"valueType": "array"
+							}
+						]
 					},
 					"defaultValue": {
-						"chkConstr": []
+						"chkConstr": [],
+						"checkConstraint": []
 					}
 				}
 			]

@@ -694,10 +694,11 @@ making sure that you maintain a proper JSON format.
 			},
 			{
 				"propertyName": "Check constraint",
-				"propertyType": "block",
+				"propertyType": "group",
 				"propertyKeyword": "checkConstraint",
 				"enableForReference": true,
 				"propertyTooltip": "Check constraint",
+				"groupItemLimit": 1,
 				"structure": [
 					{
 						"propertyName": "Name",
@@ -1335,15 +1336,32 @@ making sure that you maintain a proper JSON format.
 			},
 			{
 				"propertyName": "Check constraint",
-				"propertyKeyword": "check",
-				"propertyType": "details",
-				"template": "textarea",
-				"markdown": false
-			},
-			{
-				"propertyName": "Check constraint name",
-				"propertyKeyword": "checkConstraintName",
-				"propertyType": "text"
+				"propertyType": "group",
+				"propertyKeyword": "checkConstraint",
+				"enableForReference": true,
+				"propertyTooltip": "Check constraint",
+				"groupItemLimit": 1,
+				"structure": [
+					{
+						"propertyName": "Name",
+						"propertyKeyword": "name",
+						"propertyType": "text"
+					},
+					{
+						"propertyName": "Expression",
+						"propertyKeyword": "expression",
+						"propertyTooltip": "Expression",
+						"propertyType": "details",
+						"template": "textarea",
+						"markdown": false
+					},
+					{
+						"propertyName": "No inherit",
+						"propertyKeyword": "noInherit",
+						"propertyTooltip": "No inherit",
+						"propertyType": "checkbox"
+					}
+				]
 			},
 			{
 				"propertyName": "Alternate Key",
@@ -1921,15 +1939,32 @@ making sure that you maintain a proper JSON format.
 			},
 			{
 				"propertyName": "Check constraint",
-				"propertyKeyword": "check",
-				"propertyType": "details",
-				"template": "textarea",
-				"markdown": false
-			},
-			{
-				"propertyName": "Check constraint name",
-				"propertyKeyword": "checkConstraintName",
-				"propertyType": "text"
+				"propertyType": "group",
+				"propertyKeyword": "checkConstraint",
+				"enableForReference": true,
+				"propertyTooltip": "Check constraint",
+				"groupItemLimit": 1,
+				"structure": [
+					{
+						"propertyName": "Name",
+						"propertyKeyword": "name",
+						"propertyType": "text"
+					},
+					{
+						"propertyName": "Expression",
+						"propertyKeyword": "expression",
+						"propertyTooltip": "Expression",
+						"propertyType": "details",
+						"template": "textarea",
+						"markdown": false
+					},
+					{
+						"propertyName": "No inherit",
+						"propertyKeyword": "noInherit",
+						"propertyTooltip": "No inherit",
+						"propertyType": "checkbox"
+					}
+				]
 			},
 			{
 				"propertyName": "Alternate Key",
@@ -2546,15 +2581,32 @@ making sure that you maintain a proper JSON format.
 			},
 			{
 				"propertyName": "Check constraint",
-				"propertyKeyword": "check",
-				"propertyType": "details",
-				"template": "textarea",
-				"markdown": false
-			},
-			{
-				"propertyName": "Check constraint name",
-				"propertyKeyword": "checkConstraintName",
-				"propertyType": "text"
+				"propertyType": "group",
+				"propertyKeyword": "checkConstraint",
+				"enableForReference": true,
+				"propertyTooltip": "Check constraint",
+				"groupItemLimit": 1,
+				"structure": [
+					{
+						"propertyName": "Name",
+						"propertyKeyword": "name",
+						"propertyType": "text"
+					},
+					{
+						"propertyName": "Expression",
+						"propertyKeyword": "expression",
+						"propertyTooltip": "Expression",
+						"propertyType": "details",
+						"template": "textarea",
+						"markdown": false
+					},
+					{
+						"propertyName": "No inherit",
+						"propertyKeyword": "noInherit",
+						"propertyTooltip": "No inherit",
+						"propertyType": "checkbox"
+					}
+				]
 			},
 			{
 				"propertyName": "Alternate Key",
@@ -2703,15 +2755,32 @@ making sure that you maintain a proper JSON format.
 			},
 			{
 				"propertyName": "Check constraint",
-				"propertyKeyword": "check",
-				"propertyType": "details",
-				"template": "textarea",
-				"markdown": false
-			},
-			{
-				"propertyName": "Check constraint name",
-				"propertyKeyword": "checkConstraintName",
-				"propertyType": "text"
+				"propertyType": "group",
+				"propertyKeyword": "checkConstraint",
+				"enableForReference": true,
+				"propertyTooltip": "Check constraint",
+				"groupItemLimit": 1,
+				"structure": [
+					{
+						"propertyName": "Name",
+						"propertyKeyword": "name",
+						"propertyType": "text"
+					},
+					{
+						"propertyName": "Expression",
+						"propertyKeyword": "expression",
+						"propertyTooltip": "Expression",
+						"propertyType": "details",
+						"template": "textarea",
+						"markdown": false
+					},
+					{
+						"propertyName": "No inherit",
+						"propertyKeyword": "noInherit",
+						"propertyTooltip": "No inherit",
+						"propertyType": "checkbox"
+					}
+				]
 			},
 			{
 				"propertyName": "Alternate Key",
@@ -3266,15 +3335,32 @@ making sure that you maintain a proper JSON format.
 			},
 			{
 				"propertyName": "Check constraint",
-				"propertyKeyword": "check",
-				"propertyType": "details",
-				"template": "textarea",
-				"markdown": false
-			},
-			{
-				"propertyName": "Check constraint name",
-				"propertyKeyword": "checkConstraintName",
-				"propertyType": "text"
+				"propertyType": "group",
+				"propertyKeyword": "checkConstraint",
+				"enableForReference": true,
+				"propertyTooltip": "Check constraint",
+				"groupItemLimit": 1,
+				"structure": [
+					{
+						"propertyName": "Name",
+						"propertyKeyword": "name",
+						"propertyType": "text"
+					},
+					{
+						"propertyName": "Expression",
+						"propertyKeyword": "expression",
+						"propertyTooltip": "Expression",
+						"propertyType": "details",
+						"template": "textarea",
+						"markdown": false
+					},
+					{
+						"propertyName": "No inherit",
+						"propertyKeyword": "noInherit",
+						"propertyTooltip": "No inherit",
+						"propertyType": "checkbox"
+					}
+				]
 			},
 			{
 				"propertyName": "Alternate Key",
@@ -3858,15 +3944,32 @@ making sure that you maintain a proper JSON format.
 			},
 			{
 				"propertyName": "Check constraint",
-				"propertyKeyword": "check",
-				"propertyType": "details",
-				"template": "textarea",
-				"markdown": false
-			},
-			{
-				"propertyName": "Check constraint name",
-				"propertyKeyword": "checkConstraintName",
-				"propertyType": "text"
+				"propertyType": "group",
+				"propertyKeyword": "checkConstraint",
+				"enableForReference": true,
+				"propertyTooltip": "Check constraint",
+				"groupItemLimit": 1,
+				"structure": [
+					{
+						"propertyName": "Name",
+						"propertyKeyword": "name",
+						"propertyType": "text"
+					},
+					{
+						"propertyName": "Expression",
+						"propertyKeyword": "expression",
+						"propertyTooltip": "Expression",
+						"propertyType": "details",
+						"template": "textarea",
+						"markdown": false
+					},
+					{
+						"propertyName": "No inherit",
+						"propertyKeyword": "noInherit",
+						"propertyTooltip": "No inherit",
+						"propertyType": "checkbox"
+					}
+				]
 			},
 			{
 				"propertyName": "Alternate Key",
@@ -4083,15 +4186,32 @@ making sure that you maintain a proper JSON format.
 			},
 			{
 				"propertyName": "Check constraint",
-				"propertyKeyword": "check",
-				"propertyType": "details",
-				"template": "textarea",
-				"markdown": false
-			},
-			{
-				"propertyName": "Check constraint name",
-				"propertyKeyword": "checkConstraintName",
-				"propertyType": "text"
+				"propertyType": "group",
+				"propertyKeyword": "checkConstraint",
+				"enableForReference": true,
+				"propertyTooltip": "Check constraint",
+				"groupItemLimit": 1,
+				"structure": [
+					{
+						"propertyName": "Name",
+						"propertyKeyword": "name",
+						"propertyType": "text"
+					},
+					{
+						"propertyName": "Expression",
+						"propertyKeyword": "expression",
+						"propertyTooltip": "Expression",
+						"propertyType": "details",
+						"template": "textarea",
+						"markdown": false
+					},
+					{
+						"propertyName": "No inherit",
+						"propertyKeyword": "noInherit",
+						"propertyTooltip": "No inherit",
+						"propertyType": "checkbox"
+					}
+				]
 			},
 			{
 				"propertyName": "Alternate Key",
@@ -4647,15 +4767,32 @@ making sure that you maintain a proper JSON format.
 			},
 			{
 				"propertyName": "Check constraint",
-				"propertyKeyword": "check",
-				"propertyType": "details",
-				"template": "textarea",
-				"markdown": false
-			},
-			{
-				"propertyName": "Check constraint name",
-				"propertyKeyword": "checkConstraintName",
-				"propertyType": "text"
+				"propertyType": "group",
+				"propertyKeyword": "checkConstraint",
+				"enableForReference": true,
+				"propertyTooltip": "Check constraint",
+				"groupItemLimit": 1,
+				"structure": [
+					{
+						"propertyName": "Name",
+						"propertyKeyword": "name",
+						"propertyType": "text"
+					},
+					{
+						"propertyName": "Expression",
+						"propertyKeyword": "expression",
+						"propertyTooltip": "Expression",
+						"propertyType": "details",
+						"template": "textarea",
+						"markdown": false
+					},
+					{
+						"propertyName": "No inherit",
+						"propertyKeyword": "noInherit",
+						"propertyTooltip": "No inherit",
+						"propertyType": "checkbox"
+					}
+				]
 			},
 			{
 				"propertyName": "Alternate Key",
@@ -5219,15 +5356,32 @@ making sure that you maintain a proper JSON format.
 			},
 			{
 				"propertyName": "Check constraint",
-				"propertyKeyword": "check",
-				"propertyType": "details",
-				"template": "textarea",
-				"markdown": false
-			},
-			{
-				"propertyName": "Check constraint name",
-				"propertyKeyword": "checkConstraintName",
-				"propertyType": "text"
+				"propertyType": "group",
+				"propertyKeyword": "checkConstraint",
+				"enableForReference": true,
+				"propertyTooltip": "Check constraint",
+				"groupItemLimit": 1,
+				"structure": [
+					{
+						"propertyName": "Name",
+						"propertyKeyword": "name",
+						"propertyType": "text"
+					},
+					{
+						"propertyName": "Expression",
+						"propertyKeyword": "expression",
+						"propertyTooltip": "Expression",
+						"propertyType": "details",
+						"template": "textarea",
+						"markdown": false
+					},
+					{
+						"propertyName": "No inherit",
+						"propertyKeyword": "noInherit",
+						"propertyTooltip": "No inherit",
+						"propertyType": "checkbox"
+					}
+				]
 			},
 			{
 				"propertyName": "Alternate Key",
@@ -5812,15 +5966,32 @@ making sure that you maintain a proper JSON format.
 			},
 			{
 				"propertyName": "Check constraint",
-				"propertyKeyword": "check",
-				"propertyType": "details",
-				"template": "textarea",
-				"markdown": false
-			},
-			{
-				"propertyName": "Check constraint name",
-				"propertyKeyword": "checkConstraintName",
-				"propertyType": "text"
+				"propertyType": "group",
+				"propertyKeyword": "checkConstraint",
+				"enableForReference": true,
+				"propertyTooltip": "Check constraint",
+				"groupItemLimit": 1,
+				"structure": [
+					{
+						"propertyName": "Name",
+						"propertyKeyword": "name",
+						"propertyType": "text"
+					},
+					{
+						"propertyName": "Expression",
+						"propertyKeyword": "expression",
+						"propertyTooltip": "Expression",
+						"propertyType": "details",
+						"template": "textarea",
+						"markdown": false
+					},
+					{
+						"propertyName": "No inherit",
+						"propertyKeyword": "noInherit",
+						"propertyTooltip": "No inherit",
+						"propertyType": "checkbox"
+					}
+				]
 			},
 			{
 				"propertyName": "Alternate Key",
@@ -6038,15 +6209,32 @@ making sure that you maintain a proper JSON format.
 			},
 			{
 				"propertyName": "Check constraint",
-				"propertyKeyword": "check",
-				"propertyType": "details",
-				"template": "textarea",
-				"markdown": false
-			},
-			{
-				"propertyName": "Check constraint name",
-				"propertyKeyword": "checkConstraintName",
-				"propertyType": "text"
+				"propertyType": "group",
+				"propertyKeyword": "checkConstraint",
+				"enableForReference": true,
+				"propertyTooltip": "Check constraint",
+				"groupItemLimit": 1,
+				"structure": [
+					{
+						"propertyName": "Name",
+						"propertyKeyword": "name",
+						"propertyType": "text"
+					},
+					{
+						"propertyName": "Expression",
+						"propertyKeyword": "expression",
+						"propertyTooltip": "Expression",
+						"propertyType": "details",
+						"template": "textarea",
+						"markdown": false
+					},
+					{
+						"propertyName": "No inherit",
+						"propertyKeyword": "noInherit",
+						"propertyTooltip": "No inherit",
+						"propertyType": "checkbox"
+					}
+				]
 			},
 			{
 				"propertyName": "Alternate Key",
@@ -6166,15 +6354,32 @@ making sure that you maintain a proper JSON format.
 			},
 			{
 				"propertyName": "Check constraint",
-				"propertyKeyword": "check",
-				"propertyType": "details",
-				"template": "textarea",
-				"markdown": false
-			},
-			{
-				"propertyName": "Check constraint name",
-				"propertyKeyword": "checkConstraintName",
-				"propertyType": "text"
+				"propertyType": "group",
+				"propertyKeyword": "checkConstraint",
+				"enableForReference": true,
+				"propertyTooltip": "Check constraint",
+				"groupItemLimit": 1,
+				"structure": [
+					{
+						"propertyName": "Name",
+						"propertyKeyword": "name",
+						"propertyType": "text"
+					},
+					{
+						"propertyName": "Expression",
+						"propertyKeyword": "expression",
+						"propertyTooltip": "Expression",
+						"propertyType": "details",
+						"template": "textarea",
+						"markdown": false
+					},
+					{
+						"propertyName": "No inherit",
+						"propertyKeyword": "noInherit",
+						"propertyTooltip": "No inherit",
+						"propertyType": "checkbox"
+					}
+				]
 			},
 			{
 				"propertyName": "Alternate Key",
@@ -6315,15 +6520,32 @@ making sure that you maintain a proper JSON format.
 			},
 			{
 				"propertyName": "Check constraint",
-				"propertyKeyword": "check",
-				"propertyType": "details",
-				"template": "textarea",
-				"markdown": false
-			},
-			{
-				"propertyName": "Check constraint name",
-				"propertyKeyword": "checkConstraintName",
-				"propertyType": "text"
+				"propertyType": "group",
+				"propertyKeyword": "checkConstraint",
+				"enableForReference": true,
+				"propertyTooltip": "Check constraint",
+				"groupItemLimit": 1,
+				"structure": [
+					{
+						"propertyName": "Name",
+						"propertyKeyword": "name",
+						"propertyType": "text"
+					},
+					{
+						"propertyName": "Expression",
+						"propertyKeyword": "expression",
+						"propertyTooltip": "Expression",
+						"propertyType": "details",
+						"template": "textarea",
+						"markdown": false
+					},
+					{
+						"propertyName": "No inherit",
+						"propertyKeyword": "noInherit",
+						"propertyTooltip": "No inherit",
+						"propertyType": "checkbox"
+					}
+				]
 			},
 			{
 				"propertyName": "Alternate Key",
@@ -6463,15 +6685,32 @@ making sure that you maintain a proper JSON format.
 			},
 			{
 				"propertyName": "Check constraint",
-				"propertyKeyword": "check",
-				"propertyType": "details",
-				"template": "textarea",
-				"markdown": false
-			},
-			{
-				"propertyName": "Check constraint name",
-				"propertyKeyword": "checkConstraintName",
-				"propertyType": "text"
+				"propertyType": "group",
+				"propertyKeyword": "checkConstraint",
+				"enableForReference": true,
+				"propertyTooltip": "Check constraint",
+				"groupItemLimit": 1,
+				"structure": [
+					{
+						"propertyName": "Name",
+						"propertyKeyword": "name",
+						"propertyType": "text"
+					},
+					{
+						"propertyName": "Expression",
+						"propertyKeyword": "expression",
+						"propertyTooltip": "Expression",
+						"propertyType": "details",
+						"template": "textarea",
+						"markdown": false
+					},
+					{
+						"propertyName": "No inherit",
+						"propertyKeyword": "noInherit",
+						"propertyTooltip": "No inherit",
+						"propertyType": "checkbox"
+					}
+				]
 			}
 		],
 		"enum": [
@@ -6528,15 +6767,32 @@ making sure that you maintain a proper JSON format.
 			},
 			{
 				"propertyName": "Check constraint",
-				"propertyKeyword": "check",
-				"propertyType": "details",
-				"template": "textarea",
-				"markdown": false
-			},
-			{
-				"propertyName": "Check constraint name",
-				"propertyKeyword": "checkConstraintName",
-				"propertyType": "text"
+				"propertyType": "group",
+				"propertyKeyword": "checkConstraint",
+				"enableForReference": true,
+				"propertyTooltip": "Check constraint",
+				"groupItemLimit": 1,
+				"structure": [
+					{
+						"propertyName": "Name",
+						"propertyKeyword": "name",
+						"propertyType": "text"
+					},
+					{
+						"propertyName": "Expression",
+						"propertyKeyword": "expression",
+						"propertyTooltip": "Expression",
+						"propertyType": "details",
+						"template": "textarea",
+						"markdown": false
+					},
+					{
+						"propertyName": "No inherit",
+						"propertyKeyword": "noInherit",
+						"propertyTooltip": "No inherit",
+						"propertyType": "checkbox"
+					}
+				]
 			}
 		],
 		"range_udt": [
@@ -6571,15 +6827,32 @@ making sure that you maintain a proper JSON format.
 			"default",
 			{
 				"propertyName": "Check constraint",
-				"propertyKeyword": "check",
-				"propertyType": "details",
-				"template": "textarea",
-				"markdown": false
-			},
-			{
-				"propertyName": "Check constraint name",
-				"propertyKeyword": "checkConstraintName",
-				"propertyType": "text"
+				"propertyType": "group",
+				"propertyKeyword": "checkConstraint",
+				"enableForReference": true,
+				"propertyTooltip": "Check constraint",
+				"groupItemLimit": 1,
+				"structure": [
+					{
+						"propertyName": "Name",
+						"propertyKeyword": "name",
+						"propertyType": "text"
+					},
+					{
+						"propertyName": "Expression",
+						"propertyKeyword": "expression",
+						"propertyTooltip": "Expression",
+						"propertyType": "details",
+						"template": "textarea",
+						"markdown": false
+					},
+					{
+						"propertyName": "No inherit",
+						"propertyKeyword": "noInherit",
+						"propertyTooltip": "No inherit",
+						"propertyType": "checkbox"
+					}
+				]
 			},
 			{
 				"propertyName": "Comments",
