@@ -99,7 +99,7 @@ const wasCompositeUniqueKeyChangedInTransitionFromCompositeToRegular = collectio
 	const constraintOptions =
 		getCustomPropertiesOfRegularUniqueKeyForComparisonWithRegularUniqueKeyOptions(newColumnJsonSchema);
 	const areOptionsEqual = oldUniqueKeys.some(compositeUniqueKey => {
-		if (compositeUniqueKey.compositeUniqueKey.length !== amountOfColumnsInRegularUniqueKey) {
+		if (compositeUniqueKey.compositeUniqueKey?.length !== amountOfColumnsInRegularUniqueKey) {
 			return false;
 		}
 		const oldCompositeUniqueKeyAsRegularUniqueKeyOptions =
@@ -144,7 +144,7 @@ const wasCompositeUniqueKeyChangedInTransitionFromRegularToComposite = collectio
 	const constraintOptions =
 		getCustomPropertiesOfRegularUniqueKeyForComparisonWithRegularUniqueKeyOptions(oldColumnJsonSchema);
 	const areOptionsEqual = newUniqueKeys.some(compositeUniqueKey => {
-		if (compositeUniqueKey.compositeUniqueKey.length !== amountOfColumnsInRegularUniqueKey) {
+		if (compositeUniqueKey.compositeUniqueKey?.length !== amountOfColumnsInRegularUniqueKey) {
 			return false;
 		}
 		const oldCompositeUniqueKeyAsRegularUniqueKeyOptions =
@@ -192,7 +192,7 @@ const getCreateCompositeUniqueKeyDDLProviderConfig = (uniqueKey, entityName, ent
 	const constraintName = getConstraintNameForCompositeUniqueKey(uniqueKey, entityName);
 	const uniqueColumns = _.toPairs(entity.role.properties)
 		.filter(([name, jsonSchema]) =>
-			Boolean(uniqueKey.compositeUniqueKey.find(keyDto => keyDto.keyId === jsonSchema.GUID)),
+			Boolean(uniqueKey.compositeUniqueKey?.find(keyDto => keyDto.keyId === jsonSchema.GUID)),
 		)
 		.map(([name, jsonSchema]) => ({
 			name,
@@ -476,10 +476,10 @@ const wasRegularUniqueKeyChangedInTransitionFromCompositeToRegular = (columnJson
 	 * */
 	const oldUniqueKeys = uniqueDto.old || [];
 	const wasTheFieldACompositeUniqueKey = oldUniqueKeys.some(compUniqueKey =>
-		compUniqueKey.compositeUniqueKey.some(unique => unique.keyId === oldColumnJsonSchema.GUID),
+		compUniqueKey.compositeUniqueKey?.some(unique => unique.keyId === oldColumnJsonSchema.GUID),
 	);
 	const isTheFieldACompositeUniqueKey = newUniqueKeys.some(compUniqueKey =>
-		compUniqueKey.compositeUniqueKey.some(unique => unique.keyId === columnJsonSchema.GUID),
+		compUniqueKey.compositeUniqueKey?.some(unique => unique.keyId === columnJsonSchema.GUID),
 	);
 
 	const wasCompositeUniqueKeyRemoved = wasTheFieldACompositeUniqueKey && !isTheFieldACompositeUniqueKey;
@@ -491,7 +491,7 @@ const wasRegularUniqueKeyChangedInTransitionFromCompositeToRegular = (columnJson
 		const constraintOptions =
 			getCustomPropertiesOfRegularUniqueKeyForComparisonWithRegularUniqueKeyOptions(columnJsonSchema);
 		const areOptionsEqual = oldUniqueKeys.some(oldCompositeUniqueKey => {
-			if (oldCompositeUniqueKey.compositeUniqueKey.length !== amountOfColumnsInRegularUniqueKey) {
+			if (oldCompositeUniqueKey.compositeUniqueKey?.length !== amountOfColumnsInRegularUniqueKey) {
 				return false;
 			}
 			const oldCompositeUniqueKeyAsRegularUniqueKeyOptions =
@@ -531,10 +531,10 @@ const wasRegularUniqueKeyChangedInTransitionFromRegularToComposite = (columnJson
 	 * */
 	const oldUniqueKeys = uniqueDto.old || [];
 	const wasTheFieldACompositeUniqueKey = oldUniqueKeys.some(compUniqueKey =>
-		compUniqueKey.compositeUniqueKey.some(unique => unique.keyId === oldColumnJsonSchema.GUID),
+		compUniqueKey.compositeUniqueKey?.some(unique => unique.keyId === oldColumnJsonSchema.GUID),
 	);
 	const isTheFieldACompositeUniqueKey = newUniqueKeys.some(compUniqueKey =>
-		compUniqueKey.compositeUniqueKey.some(unique => unique.keyId === columnJsonSchema.GUID),
+		compUniqueKey.compositeUniqueKey?.some(unique => unique.keyId === columnJsonSchema.GUID),
 	);
 
 	const wasCompositeUniqueKeyAdded = isTheFieldACompositeUniqueKey && !wasTheFieldACompositeUniqueKey;
@@ -546,7 +546,7 @@ const wasRegularUniqueKeyChangedInTransitionFromRegularToComposite = (columnJson
 		const constraintOptions =
 			getCustomPropertiesOfRegularUniqueKeyForComparisonWithRegularUniqueKeyOptions(oldColumnJsonSchema);
 		const areOptionsEqual = newUniqueKeys.some(oldCompositeUniqueKey => {
-			if (oldCompositeUniqueKey.compositeUniqueKey.length !== amountOfColumnsInRegularUniqueKey) {
+			if (oldCompositeUniqueKey.compositeUniqueKey?.length !== amountOfColumnsInRegularUniqueKey) {
 				return false;
 			}
 			const oldCompositeUniqueKeyAsRegularUniqueKeyOptions =
