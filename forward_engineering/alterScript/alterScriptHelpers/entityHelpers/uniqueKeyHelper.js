@@ -79,7 +79,7 @@ const wasCompositeUniqueKeyChangedInTransitionFromCompositeToRegular = collectio
 	 * @type {AlterCollectionRoleCompModUniqueKeyDto[]}
 	 * */
 	const oldUniqueKeys = uniqueDto.old || [];
-	const idsOfColumns = oldUniqueKeys.flatMap(unique => unique.compositeUniqueKey.map(dto => dto.keyId));
+	const idsOfColumns = oldUniqueKeys.flatMap(unique => unique.compositeUniqueKey?.map(dto => dto.keyId) || []);
 	if (idsOfColumns.length !== amountOfColumnsInRegularUniqueKey) {
 		// We return false, because it wouldn't count as transition between regular UniqueKey and composite UniqueKey
 		// if composite UniqueKey did not constraint exactly 1 column
@@ -124,7 +124,7 @@ const wasCompositeUniqueKeyChangedInTransitionFromRegularToComposite = collectio
 	 * @type {AlterCollectionRoleCompModUniqueKeyDto[]}
 	 * */
 	const newUniqueKeys = uniqueDto.new || [];
-	const idsOfColumns = newUniqueKeys.flatMap(unique => unique.compositeUniqueKey.map(dto => dto.keyId));
+	const idsOfColumns = newUniqueKeys.flatMap(unique => unique.compositeUniqueKey?.map(dto => dto.keyId) || []);
 	if (idsOfColumns.length !== amountOfColumnsInRegularUniqueKey) {
 		// We return false, because it wouldn't count as transition between regular UniqueKey and composite UniqueKey
 		// if composite UniqueKey does not constraint exactly 1 column
