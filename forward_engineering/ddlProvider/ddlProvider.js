@@ -434,8 +434,8 @@ module.exports = (baseProvider, options, app) => {
 				additionalPropertiesForForeignKey(customProperties);
 
 			const foreignKeyStatement = assignTemplates(templates.createForeignKey, {
-				primaryTable: getNamePrefixedWithSchemaName(primaryTable, primarySchemaName || schemaData.schemaName),
-				foreignTable: getNamePrefixedWithSchemaName(foreignTable, foreignSchemaName || schemaData.schemaName),
+				primaryTable: getNamePrefixedWithSchemaName(primaryTable, primarySchemaName || schemaData?.schemaName),
+				foreignTable: getNamePrefixedWithSchemaName(foreignTable, foreignSchemaName || schemaData?.schemaName),
 				name: name ? wrapInQuotes(name) : '',
 				foreignKey: areKeysActivated ? foreignKeysToString(foreignKey) : foreignActiveKeysToString(foreignKey),
 				primaryKey: areKeysActivated ? foreignKeysToString(primaryKey) : foreignActiveKeysToString(primaryKey),
