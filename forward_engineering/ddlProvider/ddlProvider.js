@@ -522,18 +522,15 @@ module.exports = (baseProvider, options, app) => {
 				return _.trim(createViewScript) + '\n';
 			}
 
-			const createViewScript = commentIfDeactivated(
-				assignTemplates(templates.createView, {
-					name: viewName,
-					orReplace: viewData.orReplace ? ' OR REPLACE' : '',
-					temporary: viewData.temporary ? ' TEMPORARY' : '',
-					checkOption: getCheckOption(viewData),
-					comment: viewData.comment ? comment : '',
-					withOptions,
-					selectStatement,
-				}),
-				{ isActivated: !deactivatedWholeStatement },
-			);
+			const createViewScript = assignTemplates(templates.createView, {
+				name: viewName,
+				orReplace: viewData.orReplace ? ' OR REPLACE' : '',
+				temporary: viewData.temporary ? ' TEMPORARY' : '',
+				checkOption: getCheckOption(viewData),
+				comment: viewData.comment ? comment : '',
+				withOptions,
+				selectStatement,
+			});
 
 			const createTriggersStatements = getTriggersScript({
 				dbVersion: viewData.dbVersion,
@@ -541,7 +538,10 @@ module.exports = (baseProvider, options, app) => {
 				triggers: viewData.triggers,
 			});
 
-			return [createViewScript, createTriggersStatements].map(_.trim).join('\n\n').trim() + '\n';
+			return commentIfDeactivated(
+				[createViewScript, createTriggersStatements].map(_.trim).join('\n\n').trim() + '\n',
+				{ isActivated: !deactivatedWholeStatement },
+			);
 		},
 
 		/**
