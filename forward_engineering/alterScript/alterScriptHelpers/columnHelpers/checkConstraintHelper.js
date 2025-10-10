@@ -105,7 +105,7 @@ const mapColumnCheckConstraintsToChangeHistory = collection => {
  * */
 const getDropColumnCheckConstraintScriptDtos = (constraintHistory, fullTableName) => {
 	return constraintHistory
-		.filter(historyEntry => historyEntry.old && !historyEntry.new)
+		.filter(historyEntry => historyEntry.old?.expression && !historyEntry.new?.expression)
 		.map(historyEntry => {
 			const wrappedConstraintName = getConstraintName(
 				historyEntry.old.name,
@@ -124,7 +124,7 @@ const getDropColumnCheckConstraintScriptDtos = (constraintHistory, fullTableName
  * */
 const getAddColumnCheckConstraintScriptDtos = (constraintHistory, fullTableName) => {
 	return constraintHistory
-		.filter(historyEntry => historyEntry.new && !historyEntry.old)
+		.filter(historyEntry => historyEntry.new?.expression && !historyEntry.old?.expression)
 		.map(historyEntry => {
 			const { name, expression, noInherit } = historyEntry.new;
 			const constraintName = getConstraintName(name, historyEntry.columnName, fullTableName);
@@ -142,7 +142,7 @@ const getAddColumnCheckConstraintScriptDtos = (constraintHistory, fullTableName)
 const getUpdateColumnCheckConstraintScriptDtos = (constraintHistory, fullTableName) => {
 	return constraintHistory
 		.filter(historyEntry => {
-			if (historyEntry.old && historyEntry.new) {
+			if (historyEntry.old?.expression && historyEntry.new?.expression) {
 				const oldExpression = historyEntry.old.expression;
 				const newExpression = historyEntry.new.expression;
 				const oldNoInherit = historyEntry.old.noInherit;
