@@ -76,7 +76,7 @@ const wasCompositePkChangedInTransitionFromCompositeToRegular = collection => {
 	 * @type {AlterCollectionRoleCompModPKDto[]}
 	 * */
 	const oldPrimaryKeys = pkDto.old || [];
-	const idsOfColumns = oldPrimaryKeys.flatMap(pk => pk.compositePrimaryKey.map(dto => dto.keyId));
+	const idsOfColumns = oldPrimaryKeys.flatMap(pk => pk.compositePrimaryKey?.map(dto => dto.keyId) || []);
 	if (idsOfColumns.length !== amountOfColumnsInRegularPk) {
 		// We return false, because it wouldn't count as transition between regular PK and composite PK
 		// if composite PK did not constraint exactly 1 column
@@ -120,7 +120,7 @@ const wasCompositePkChangedInTransitionFromRegularToComposite = collection => {
 	 * @type {AlterCollectionRoleCompModPKDto[]}
 	 * */
 	const newPrimaryKeys = pkDto.new || [];
-	const idsOfColumns = newPrimaryKeys.flatMap(pk => pk.compositePrimaryKey.map(dto => dto.keyId));
+	const idsOfColumns = newPrimaryKeys.flatMap(pk => pk.compositePrimaryKey?.map(dto => dto.keyId) || []);
 	if (idsOfColumns.length !== amountOfColumnsInRegularPk) {
 		// We return false, because it wouldn't count as transition between regular PK and composite PK
 		// if composite PK does not constraint exactly 1 column
