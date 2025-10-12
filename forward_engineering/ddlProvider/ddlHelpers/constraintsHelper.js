@@ -101,6 +101,30 @@ const createKeyConstraint = (templates, isParentActivated) => keyData => {
 };
 
 /**
+ * Cleans the check constraint expression by removing surrounding parentheses and trimming whitespace.
+ * @param expression {string}
+ * @returns string
+ */
+const cleanCheckConstraint = (expression = '') => _.trim(expression).replace(/^\(([\s\S]*)\)$/, '$1');
+
+/**
+ * Creates an inline check constraint statement.
+ * @param checkConstraint {{
+ *     name?: string,
+ *     expression?: string,
+ *     noInherit?: boolean,
+ * }}
+ * @returns string
+ */
+const createInlineCheckConstraint = checkConstraint => {
+	if (!checkConstraint?.expression) {
+		return '';
+	}
+
+	return ` CHECK (${cleanCheckConstraint(checkConstraint.expression)})${checkConstraint?.noInherit ? ' NO INHERIT' : ''}`;
+};
+
+/**
  * @param tableName {string}
  * @param isParentActivated {boolean}
  * @param keyData {{
@@ -196,4 +220,6 @@ module.exports = {
 	dropKeyConstraint,
 	getConstraintsWarnings,
 	additionalPropertiesForForeignKey,
+	cleanCheckConstraint,
+	createInlineCheckConstraint,
 };

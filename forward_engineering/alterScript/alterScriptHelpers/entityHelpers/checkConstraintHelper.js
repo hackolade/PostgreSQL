@@ -15,6 +15,7 @@ const templates = require('../../../ddlProvider/templates');
  *     id: string,
  *     chkConstrName: string,
  *     constrExpression: string,
+ *     noInherit?: boolean,
  * }} CheckConstraint
  *
  * @typedef {{
@@ -79,13 +80,15 @@ const getDropCheckConstraintScriptDtos = (constraintHistory, fullTableName) => {
  * @param tableName {string}
  * @param constraintName {string}
  * @param expression {expression}
+ * @param noInherit {boolean}
  * @return string
  * */
-const addCheckConstraint = (tableName, constraintName, expression) => {
+const addCheckConstraint = (tableName, constraintName, expression, noInherit = false) => {
 	const templateConfig = {
 		tableName,
 		constraintName,
 		expression,
+		noInherit: noInherit ? ' NO INHERIT' : '',
 	};
 	return assignTemplates(templates.addCheckConstraint, templateConfig);
 };
@@ -99,8 +102,8 @@ const getAddCheckConstraintScriptDtos = (constraintHistory, fullTableName) => {
 	return constraintHistory
 		.filter(historyEntry => historyEntry.new && !historyEntry.old)
 		.map(historyEntry => {
-			const { chkConstrName, constrExpression } = historyEntry.new;
-			return addCheckConstraint(fullTableName, wrapInQuotes(chkConstrName), constrExpression);
+			const { chkConstrName, constrExpression, noInherit } = historyEntry.new;
+			return addCheckConstraint(fullTableName, wrapInQuotes(chkConstrName), constrExpression, noInherit);
 		})
 		.map(script => AlterScriptDto.getInstance([script], true, false));
 };
@@ -116,7 +119,9 @@ const getUpdateCheckConstraintScriptDtos = (constraintHistory, fullTableName) =>
 			if (historyEntry.old && historyEntry.new) {
 				const oldExpression = historyEntry.old.constrExpression;
 				const newExpression = historyEntry.new.constrExpression;
-				return oldExpression !== newExpression;
+				const oldNoInherit = historyEntry.old.noInherit;
+				const newNoInherit = historyEntry.new.noInherit;
+				return oldExpression !== newExpression || oldNoInherit !== newNoInherit;
 			}
 			return false;
 		})
@@ -124,11 +129,16 @@ const getUpdateCheckConstraintScriptDtos = (constraintHistory, fullTableName) =>
 			const { chkConstrName: oldConstrainName } = historyEntry.old;
 			const dropConstraintScript = dropConstraint(fullTableName, wrapInQuotes(oldConstrainName));
 
-			const { chkConstrName: newConstrainName, constrExpression: newConstraintExpression } = historyEntry.new;
+			const {
+				chkConstrName: newConstrainName,
+				constrExpression: newConstraintExpression,
+				noInherit: newNoInherit,
+			} = historyEntry.new;
 			const addConstraintScript = addCheckConstraint(
 				fullTableName,
 				wrapInQuotes(newConstrainName),
 				newConstraintExpression,
+				newNoInherit,
 			);
 
 			return [
