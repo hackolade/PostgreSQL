@@ -75,8 +75,8 @@ const createKeyConstraint = (templates, isParentActivated) => keyData => {
 			isActivated: false,
 		};
 	}
-	const isAllColumnsDeactivated = checkAllKeysDeactivated(keyData.columns || []);
 	const constraintName = wrapInQuotes(_.trim(keyData.name));
+	const isAllColumnsDeactivated = checkAllKeysDeactivated(keyData.columns || []);
 	const columns = !_.isEmpty(keyData.columns)
 		? getColumnsList(keyData.columns, isAllColumnsDeactivated, isParentActivated)
 		: '';
