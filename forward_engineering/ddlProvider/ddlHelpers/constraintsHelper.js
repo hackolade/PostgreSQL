@@ -69,8 +69,14 @@ const foreignActiveKeysToString = keys => {
  * }}
  * */
 const createKeyConstraint = (templates, isParentActivated) => keyData => {
-	const constraintName = wrapInQuotes(_.trim(keyData.name));
+	if (_.isEmpty(keyData.columns)) {
+		return {
+			statement: '',
+			isActivated: false,
+		};
+	}
 	const isAllColumnsDeactivated = checkAllKeysDeactivated(keyData.columns || []);
+	const constraintName = wrapInQuotes(_.trim(keyData.name));
 	const columns = !_.isEmpty(keyData.columns)
 		? getColumnsList(keyData.columns, isAllColumnsDeactivated, isParentActivated)
 		: '';
@@ -149,10 +155,12 @@ const createInlineCheckConstraint = checkConstraint => {
 const alterKeyConstraint = (tableName, isParentActivated, keyData) => {
 	const constraintStatementDto = createKeyConstraint(templates, isParentActivated)(keyData);
 	return {
-		statement: assignTemplates(templates.addPkConstraint, {
-			constraintStatement: (constraintStatementDto.statement || '').trim(),
-			tableName,
-		}),
+		statement: constraintStatementDto.statement
+			? assignTemplates(templates.addPkConstraint, {
+					constraintStatement: constraintStatementDto.statement.trim(),
+					tableName,
+				})
+			: '',
 		isActivated: constraintStatementDto.isActivated,
 	};
 };
