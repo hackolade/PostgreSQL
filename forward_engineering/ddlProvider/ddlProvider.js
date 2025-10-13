@@ -26,6 +26,8 @@ const {
 	createKeyConstraint,
 	getConstraintsWarnings,
 	additionalPropertiesForForeignKey,
+	cleanCheckConstraint,
+	createInlineCheckConstraint,
 } = require('./ddlHelpers/constraintsHelper');
 const keyHelper = require('./ddlHelpers/keyHelper');
 const { getFunctionsScript } = require('./ddlHelpers/functionHelper');
@@ -222,6 +224,12 @@ module.exports = (baseProvider, options, app) => {
 			const defaultValue = !_.isUndefined(columnDefinition.default)
 				? ' DEFAULT ' + decorateDefault(type, columnDefinition.default, isArrayType)
 				: '';
+
+			const checkConstraintData = _.first(columnDefinition.checkConstraint);
+			const checkConstraint = checkConstraintData?.expression
+				? ' ' + this.createCheckConstraint(checkConstraintData).trim()
+				: '';
+
 			const generatedColumnClause =
 				columnDefinition.dbVersion >= 12 &&
 				columnDefinition.generatedColumn &&
@@ -241,6 +249,7 @@ module.exports = (baseProvider, options, app) => {
 					uniqueKey,
 					collation,
 					defaultValue,
+					checkConstraint,
 				}),
 				{
 					isActivated: columnDefinition.isActivated,
@@ -283,7 +292,7 @@ module.exports = (baseProvider, options, app) => {
 		createCheckConstraint(checkConstraint) {
 			return assignTemplates(templates.checkConstraint, {
 				name: checkConstraint.name ? `CONSTRAINT ${wrapInQuotes(checkConstraint.name)}` : '',
-				expression: _.trim(checkConstraint.expression).replace(/^\(([\s\S]*)\)$/, '$1'),
+				expression: cleanCheckConstraint(checkConstraint.expression),
 				noInherit: checkConstraint.noInherit ? ' NO INHERIT' : '',
 			});
 		},
@@ -630,6 +639,7 @@ module.exports = (baseProvider, options, app) => {
 				uniqueKeyOptions,
 				nullable: columnDefinition.nullable,
 				default: columnDefinition.default,
+				checkConstraint: jsonSchema.checkConstraint,
 				comment: jsonSchema.refDescription || jsonSchema.description || definitionJsonSchema.description,
 				isActivated: columnDefinition.isActivated,
 				scale: columnDefinition.scale,

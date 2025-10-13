@@ -5,6 +5,7 @@ const { getUpdateTypesScriptDtos } = require('./columnHelpers/alterTypeHelper');
 const { getModifyNonNullColumnsScriptDtos } = require('./columnHelpers/nonNullConstraintHelper');
 const { getModifiedCommentOnColumnScriptDtos } = require('./columnHelpers/commentsHelper');
 const { getRenameColumnScriptDtos } = require('./columnHelpers/renameColumnHelper');
+const { getModifyColumnCheckConstraintScriptDtos } = require('./columnHelpers/checkConstraintHelper');
 const { AlterScriptDto } = require('../types/AlterScriptDto');
 const { AlterCollectionDto } = require('../types/AlterCollectionDto');
 const { getModifyPkConstraintsScriptDtos } = require('./entityHelpers/primaryKeyHelper');
@@ -303,12 +304,14 @@ const getModifyColumnScriptDtos =
 		const modifyDefaultColumnValueScriptDtos = getModifiedDefaultColumnValueScriptDtos({
 			collection,
 		});
+		const modifyColumnCheckConstraintScriptDtos = getModifyColumnCheckConstraintScriptDtos(collection);
 
 		return [
 			...renameColumnScriptDtos,
 			...updateTypeScriptDtos,
 			...modifyNotNullScriptDtos,
 			...modifyDefaultColumnValueScriptDtos,
+			...modifyColumnCheckConstraintScriptDtos,
 			...modifyCommentScriptDtos,
 		].filter(Boolean);
 	};

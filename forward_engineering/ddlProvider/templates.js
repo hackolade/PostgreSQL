@@ -19,7 +19,7 @@ module.exports = {
 	generatedColumnClause: ' GENERATED ALWAYS AS (${generationExpression}) STORED',
 
 	columnDefinition:
-		'${name} ${type}${collation}${generatedColumnClause}${primaryKey}${uniqueKey}${defaultValue}${notNull}',
+		'${name} ${type}${collation}${generatedColumnClause}${primaryKey}${uniqueKey}${defaultValue}${notNull}${checkConstraint}',
 
 	checkConstraint: '${name} CHECK (${expression})${noInherit}',
 
@@ -37,7 +37,8 @@ module.exports = {
 
 	renameColumn: 'ALTER TABLE IF EXISTS ${tableName} RENAME COLUMN ${oldColumnName} TO ${newColumnName};',
 
-	addCheckConstraint: 'ALTER TABLE IF EXISTS ${tableName} ADD CONSTRAINT ${constraintName} CHECK (${expression});',
+	addCheckConstraint:
+		'ALTER TABLE IF EXISTS ${tableName} ADD CONSTRAINT ${constraintName} CHECK (${expression})${noInherit};',
 
 	dropConstraint: 'ALTER TABLE IF EXISTS ${tableName} DROP CONSTRAINT IF EXISTS ${constraintName};',
 
