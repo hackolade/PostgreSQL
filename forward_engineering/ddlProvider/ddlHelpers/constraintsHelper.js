@@ -150,7 +150,7 @@ const alterKeyConstraint = (tableName, isParentActivated, keyData) => {
 	const constraintStatementDto = createKeyConstraint(templates, isParentActivated)(keyData);
 	return {
 		statement: assignTemplates(templates.addPkConstraint, {
-			constraintStatement: (constraintStatementDto.statement || '').trim(),
+			constraintStatement: constraintStatementDto.statement.trim(),
 			tableName,
 		}),
 		isActivated: constraintStatementDto.isActivated,
