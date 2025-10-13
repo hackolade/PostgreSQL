@@ -277,10 +277,13 @@ const getAddCompositeUniqueKeyScriptDtos = (collection, dbVersion) => {
 				collection,
 				dbVersion,
 			);
+			if (_.isEmpty(ddlConfig.columns)) {
+				return null;
+			}
 			const statementDto = alterKeyConstraint(fullTableName, isCollectionActivated, ddlConfig);
 			return new KeyScriptModificationDto(statementDto.statement, fullTableName, false, statementDto.isActivated);
 		})
-		.filter(scriptDto => Boolean(scriptDto.script));
+		.filter(scriptDto => Boolean(scriptDto?.script));
 };
 
 /**
