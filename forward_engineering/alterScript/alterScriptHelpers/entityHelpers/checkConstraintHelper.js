@@ -68,7 +68,7 @@ const mapCheckConstraintNamesToChangeHistory = collection => {
  * */
 const getDropCheckConstraintScriptDtos = (constraintHistory, fullTableName) => {
 	return constraintHistory
-		.filter(historyEntry => historyEntry.old && !historyEntry.new)
+		.filter(historyEntry => historyEntry.old?.constrExpression && !historyEntry.new?.constrExpression)
 		.map(historyEntry => {
 			const wrappedConstraintName = wrapInQuotes(historyEntry.old.chkConstrName);
 			return dropConstraint(fullTableName, wrappedConstraintName);
@@ -100,7 +100,12 @@ const addCheckConstraint = (tableName, constraintName, expression, noInherit = f
  * */
 const getAddCheckConstraintScriptDtos = (constraintHistory, fullTableName) => {
 	return constraintHistory
-		.filter(historyEntry => historyEntry.new && !historyEntry.old)
+		.filter(
+			historyEntry =>
+				historyEntry.new?.chkConstrName &&
+				historyEntry.new?.constrExpression &&
+				!historyEntry.old?.constrExpression,
+		)
 		.map(historyEntry => {
 			const { chkConstrName, constrExpression, noInherit } = historyEntry.new;
 			return addCheckConstraint(fullTableName, wrapInQuotes(chkConstrName), constrExpression, noInherit);
@@ -116,7 +121,7 @@ const getAddCheckConstraintScriptDtos = (constraintHistory, fullTableName) => {
 const getUpdateCheckConstraintScriptDtos = (constraintHistory, fullTableName) => {
 	return constraintHistory
 		.filter(historyEntry => {
-			if (historyEntry.old && historyEntry.new) {
+			if (historyEntry.old?.constrExpression && historyEntry.new?.constrExpression) {
 				const oldExpression = historyEntry.old.constrExpression;
 				const newExpression = historyEntry.new.constrExpression;
 				const oldNoInherit = historyEntry.old.noInherit;
