@@ -100,12 +100,7 @@ const addCheckConstraint = (tableName, constraintName, expression, noInherit = f
  * */
 const getAddCheckConstraintScriptDtos = (constraintHistory, fullTableName) => {
 	return constraintHistory
-		.filter(
-			historyEntry =>
-				historyEntry.new?.chkConstrName &&
-				historyEntry.new?.constrExpression &&
-				!historyEntry.old?.constrExpression,
-		)
+		.filter(historyEntry => historyEntry.new?.constrExpression && !historyEntry.old?.constrExpression)
 		.map(historyEntry => {
 			const { chkConstrName, constrExpression, noInherit } = historyEntry.new;
 			return addCheckConstraint(fullTableName, wrapInQuotes(chkConstrName), constrExpression, noInherit);
