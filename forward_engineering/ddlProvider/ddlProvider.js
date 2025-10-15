@@ -290,11 +290,15 @@ module.exports = (baseProvider, options, app) => {
 		},
 
 		createCheckConstraint(checkConstraint) {
-			return assignTemplates(templates.checkConstraint, {
-				name: checkConstraint.name ? `CONSTRAINT ${wrapInQuotes(checkConstraint.name)}` : '',
-				expression: cleanCheckConstraint(checkConstraint.expression),
-				noInherit: checkConstraint.noInherit ? ' NO INHERIT' : '',
-			});
+			const expression = cleanCheckConstraint(checkConstraint.expression);
+			return (
+				expression &&
+				assignTemplates(templates.checkConstraint, {
+					name: checkConstraint.name ? `CONSTRAINT ${wrapInQuotes(checkConstraint.name)}` : '',
+					expression,
+					noInherit: checkConstraint.noInherit ? ' NO INHERIT' : '',
+				})
+			);
 		},
 
 		/**
