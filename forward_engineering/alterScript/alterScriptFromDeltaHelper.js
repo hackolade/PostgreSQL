@@ -428,13 +428,12 @@ const getInlineRelationships = ({ collection, options }) => {
 
 	const addedCollectionIDs = []
 		.concat(collection.properties?.entities?.properties?.added?.items)
-		.filter(item => Object.values(item.properties)?.[0]?.compMod?.created)
+		.filter(item => item && Object.values(item.properties)?.[0]?.compMod?.created)
 		.map(item => Object.values(item.properties)[0].role.id);
 
 	const addedRelationships = []
 		.concat(collection.properties?.relationships?.properties?.added?.items)
-		.filter(Boolean)
-		.map(item => Object.values(item.properties)[0])
+		.map(item => item && Object.values(item.properties)[0])
 		.filter(r => r?.role?.compMod?.created && addedCollectionIDs.includes(r?.role?.childCollection));
 
 	return addedRelationships;
