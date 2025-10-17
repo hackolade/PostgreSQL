@@ -200,13 +200,13 @@ const getAlterCollectionsScriptDtos = ({
 	);
 
 	return [
+		...createCollectionsScriptDtos,
 		...deleteCollectionScriptDtos,
 		...modifyCollectionScriptDtos,
 		...addColumnScriptDtos,
 		...deleteColumnScriptDtos,
 		...modifyColumnScriptDtos,
 		...modifyCollectionKeysScriptDtos,
-		...createCollectionsScriptDtos,
 	].filter(Boolean);
 };
 

@@ -100,7 +100,7 @@ const getAddColumnToTypeScriptDtos =
 					definitionJsonSchema,
 				});
 			})
-			.map(ddlProvider.convertColumnDefinition)
+			.map(def => ddlProvider.convertColumnDefinition(def))
 			.map(columnDefinition => ddlProvider.alterTypeAddAttribute(fullName, columnDefinition))
 			.map(script => AlterScriptDto.getInstance([script], udt.isActivated, false))
 			.filter(Boolean);

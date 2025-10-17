@@ -81,7 +81,7 @@ const getAddCollectionScriptDto =
 			});
 		const tableData = {
 			name: getEntityName(jsonSchema),
-			columns: columnDefinitions.map(ddlProvider.convertColumnDefinition),
+			columns: columnDefinitions.map(def => ddlProvider.convertColumnDefinition(def)),
 			checkConstraints: checkConstraints,
 			foreignKeyConstraints,
 			schemaData,
