@@ -52,6 +52,42 @@
 			},
 			{
 				"from": {
+					"type": "inet"
+				},
+				"to": {
+					"format": "ipv4"
+				}
+			},
+			{
+				"from": {
+					"type": "datetime"
+				},
+				"to": {
+					"tPrecision": { "type": "Source", "path": "timePrecision" }
+				}
+			},
+			{
+				"from": {
+					"type": "datetime",
+					"mode": "timestamp",
+					"timezone": "WITH TIME ZONE"
+				},
+				"to": {
+					"mode": "timestamp with time zone"
+				}
+			},
+			{
+				"from": {
+					"type": "datetime",
+					"mode": "timestamp",
+					"timezone": "WITHOUT TIME ZONE"
+				},
+				"to": {
+					"mode": "timestamp without time zone"
+				}
+			},
+			{
+				"from": {
 					"mode": "varchar",
 					"length": 10485760
 				},

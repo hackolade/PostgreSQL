@@ -190,6 +190,77 @@
 					"length": 10485760
 				}
 			},
+			{
+				"from": {
+					"type": "varchar",
+					"format": "ipv4"
+				},
+				"to": {
+					"mode": "inet"
+				}
+			},
+			{
+				"from": {
+					"type": "nvarchar",
+					"format": "ipv4"
+				},
+				"to": {
+					"mode": "inet"
+				}
+			},
+			{
+				"from": {
+					"type": "time"
+				},
+				"to": {
+					"timePrecision": { "type": "Source", "path": "tPrecision" }
+				}
+			},
+			{
+				"from": {
+					"type": "timestamp_ntz"
+				},
+				"to": {
+					"timezone": "WITHOUT TIME ZONE",
+					"timePrecision": { "type": "Source", "path": "tPrecision" }
+				}
+			},
+			{
+				"from": {
+					"type": "timestamp_ltz"
+				},
+				"to": {
+					"timezone": "WITH TIME ZONE",
+					"timePrecision": { "type": "Source", "path": "tPrecision" }
+				}
+			},
+			{
+				"from": {
+					"type": "timestamp_tz"
+				},
+				"to": {
+					"timezone": "WITH TIME ZONE",
+					"timePrecision": { "type": "Source", "path": "tPrecision" }
+				}
+			},
+			{
+				"from": {
+					"type": "varchar",
+					"format": "duration"
+				},
+				"to": {
+					"mode": "interval"
+				}
+			},
+			{
+				"from": {
+					"type": "nvarchar",
+					"format": "duration"
+				},
+				"to": {
+					"mode": "interval"
+				}
+			},
 			[
 				"deconstructArrayIntoArrayType",
 				{
