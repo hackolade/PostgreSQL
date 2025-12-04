@@ -63,18 +63,22 @@ const decorateType = (type, columnDefinition) => {
 	const { length, precision, scale, typeModifier, srid, timezone, timePrecision, dimension, subtype, array_type } =
 		columnDefinition;
 
+	const safeType = wrapInQuotes(type);
+
 	if (canHaveLength(type) && _.isNumber(length)) {
-		type = addLength(type, length);
+		type = addLength(safeType, length);
 	} else if (canHavePrecision(type) && canHaveScale(type) && _.isNumber(precision)) {
-		type = addScalePrecision(type, precision, scale);
+		type = addScalePrecision(safeType, precision, scale);
 	} else if (canHavePrecision(type) && _.isNumber(precision)) {
-		type = addPrecision(type, precision);
+		type = addPrecision(safeType, precision);
 	} else if (canHaveTypeModifier(type)) {
-		type = addTypeModifier({ type, typeModifier, srid });
+		type = addTypeModifier({ type: safeType, typeModifier, srid });
 	} else if (canHaveTimePrecision(type) && (_.isNumber(timePrecision) || timezone)) {
-		type = addWithTimezone(addPrecision(type, timePrecision), timezone);
+		type = addWithTimezone(addPrecision(safeType, timePrecision), timezone);
 	} else if (isVector(type)) {
 		type = dimension ? decorateVector(subtype, dimension) : subtype;
+	} else {
+		type = safeType;
 	}
 
 	return addArrayDecorator(type, array_type);
