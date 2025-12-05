@@ -59,11 +59,13 @@ const canHaveTimePrecision = type => ['time', 'timestamp'].includes(type);
 const canHaveScale = type => type === 'numeric';
 const canHaveTypeModifier = type => ['geography', 'geometry'].includes(type);
 
+const isKnownMultiwordsType = type => 'double precision' === type;
+
 const decorateType = (type, columnDefinition) => {
 	const { length, precision, scale, typeModifier, srid, timezone, timePrecision, dimension, subtype, array_type } =
 		columnDefinition;
 
-	const safeType = wrapInQuotes(type);
+	const safeType = isKnownMultiwordsType(type) ? type : wrapInQuotes(type);
 
 	if (canHaveLength(type) && _.isNumber(length)) {
 		type = addLength(safeType, length);
