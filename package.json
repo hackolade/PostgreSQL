@@ -39,7 +39,7 @@
 			"reverseSchemaIntoOneColumn": true,
 			"disableDenormalization": true,
 			"enableComplexTypesNormalization": true,
-			"enableManyToManyRelationshipsNormalization": true,
+			"generateAssociativeEntitiesForManyToManyRelationships": true,
 			"views": {
 				"enabled": true,
 				"viewLevel": "model",
