@@ -18,7 +18,7 @@ const getDbName = containerData => {
 };
 
 const getEntityName = entityData => {
-	return (entityData && (entityData.code || entityData.collectionName)) || '';
+	return (entityData && (entityData.code || entityData.collectionName || entityData.name)) || '';
 };
 
 const getViewName = view => {
