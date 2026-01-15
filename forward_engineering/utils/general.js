@@ -173,7 +173,7 @@ const prepareComment = (comment = '') => comment.replaceAll(MUST_BE_ESCAPED, ch 
 
 const wrapComment = (comment = '') => {
 	const shouldBeEscaped = MUST_BE_ESCAPED.test(comment);
-	return shouldBeEscaped ? `E'${prepareComment(comment)}'` : comment;
+	return shouldBeEscaped ? `E'${prepareComment(comment)}'` : `'${comment}'`;
 };
 
 const getFunctionArguments = functionArguments => {
