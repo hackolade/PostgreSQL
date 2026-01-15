@@ -11,7 +11,15 @@ const _ = require('lodash');
 const { AlterCollectionDto, AlterCollectionRoleDto } = require('../alterScript/types/AlterCollectionDto');
 const { ReservedWordsAsArray } = require('../enums/reservedWords');
 
-const MUST_BE_ESCAPED = /[\t\n'\f\r]/gm;
+const MUST_BE_ESCAPED = /[\t\n'\\\f\r]/gm;
+const ESCAPE_MAP = {
+	'\n': '\\n',
+	'\t': '\\t',
+	'\r': '\\r',
+	'\f': '\\f',
+	'\\': '\\\\',
+	"'": "\\'",
+};
 
 const getDbName = containerData => {
 	return _.get(containerData, '[0].code') || _.get(containerData, '[0].name', '');
@@ -161,9 +169,12 @@ const getDbVersion = (dbVersion = '') => {
 	return Number(_.get(version, [0], 0));
 };
 
-const prepareComment = (comment = '') => comment.replace(MUST_BE_ESCAPED, character => `\\${character}`);
+const prepareComment = (comment = '') => comment.replaceAll(MUST_BE_ESCAPED, ch => ESCAPE_MAP[ch]);
 
-const wrapComment = comment => `E'${prepareComment(JSON.stringify(comment)).slice(1, -1)}'`;
+const wrapComment = (comment = '') => {
+	const shouldBeEscaped = MUST_BE_ESCAPED.test(comment);
+	return shouldBeEscaped ? `E'${prepareComment(comment)}'` : comment;
+};
 
 const getFunctionArguments = functionArguments => {
 	return _.map(functionArguments, arg => {
