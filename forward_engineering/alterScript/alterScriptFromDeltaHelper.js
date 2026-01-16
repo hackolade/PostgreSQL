@@ -207,12 +207,12 @@ const getAlterViewScriptDtos = (collection, app) => {
 	const modifyScriptsData = getItemProperties(viewsData?.modified);
 
 	const createViewsScriptDtos = getItemProperties(viewsData?.added)
-		.map(view => ({ ...view, ..._.omit(view.role, 'properties') }))
+		.map(view => ({ ...view, ...view.role }))
 		.filter(view => view.compMod?.created)
 		.map(getAddViewScriptDto(app));
 
 	const deleteViewsScriptDtos = getItemProperties(viewsData?.deleted)
-		.map(view => ({ ...view, ..._.omit(view.role, 'properties') }))
+		.map(view => ({ ...view, ...view.role }))
 		.map(getDeleteViewScriptDto(app));
 
 	const modifyViewsScriptDtos = modifyScriptsData
