@@ -1051,8 +1051,143 @@ making sure that you maintain a proper JSON format.
 							}
 						},
 						"dependency": {
-							"key": "index_method",
-							"value": "btree"
+							"type": "and",
+							"values": [
+								{
+									"key": "index_method",
+									"value": "btree"
+								},
+								{
+									"type": "or",
+									"values": [
+										{
+											"key": "indxExpression",
+											"isEmpty": true
+										},
+										{
+											"key": "indxExpression",
+											"exist": false
+										}
+									]
+								}
+							]
+						},
+						"validation": {
+							"required": true,
+							"minLength": 1
+						}
+					},
+					{
+						"propertyName": "Columns",
+						"propertyKeyword": "columns",
+						"propertyType": "fieldList",
+						"template": "orderedList",
+						"propertyTooltip": "The name of a column of the table.",
+						"attributeList": {
+							"sortOrder": {
+								"propertyType": "select",
+								"options": ["ASC", "DESC"],
+								"propertyTooltip": "Specifies sort order"
+							},
+							"nullsOrder": {
+								"propertyType": "select",
+								"options": ["", "NULLS FIRST", "NULLS LAST"],
+								"propertyTooltip": "Specifies that nulls sort order"
+							},
+							"collation": {
+								"propertyType": "text",
+								"placeholder": "Collation",
+								"propertyTooltip": "The name of the collation to use for the index."
+							},
+							"opclass": {
+								"propertyType": "text",
+								"placeholder": "Opclass",
+								"propertyTooltip": "The name of an operator class."
+							}
+						},
+						"dependency": {
+							"type": "and",
+							"values": [
+								{
+									"key": "index_method",
+									"value": "btree"
+								},
+								{
+									"type": "and",
+									"values": [
+										{
+											"key": "indxExpression",
+											"isEmpty": false
+										},
+										{
+											"key": "indxExpression",
+											"exist": true
+										}
+									]
+								}
+							]
+						}
+					},
+					{
+						"propertyName": "Columns",
+						"propertyKeyword": "columns",
+						"propertyType": "fieldList",
+						"template": "orderedList",
+						"propertyTooltip": "The name of a column of the table.",
+						"attributeList": {
+							"collation": {
+								"propertyType": "text",
+								"placeholder": "Collation",
+								"propertyTooltip": "The name of the collation to use for the index."
+							},
+							"opclass": {
+								"propertyType": "text",
+								"placeholder": "Opclass",
+								"propertyTooltip": "The name of an operator class."
+							}
+						},
+						"dependency": {
+							"type": "and",
+							"values": [
+								{
+									"type": "or",
+									"values": [
+										{
+											"key": "index_method",
+											"value": "hash"
+										},
+										{
+											"key": "index_method",
+											"value": "gist"
+										},
+										{
+											"key": "index_method",
+											"value": "spgist"
+										},
+										{
+											"key": "index_method",
+											"value": "gin"
+										},
+										{
+											"key": "index_method",
+											"value": "brin"
+										}
+									]
+								},
+								{
+									"type": "or",
+									"values": [
+										{
+											"key": "indxExpression",
+											"isEmpty": true
+										},
+										{
+											"key": "indxExpression",
+											"exist": false
+										}
+									]
+								}
+							]
 						},
 						"validation": {
 							"required": true,
@@ -1078,33 +1213,47 @@ making sure that you maintain a proper JSON format.
 							}
 						},
 						"dependency": {
-							"type": "or",
+							"type": "and",
 							"values": [
 								{
-									"key": "index_method",
-									"value": "hash"
+									"type": "or",
+									"values": [
+										{
+											"key": "index_method",
+											"value": "hash"
+										},
+										{
+											"key": "index_method",
+											"value": "gist"
+										},
+										{
+											"key": "index_method",
+											"value": "spgist"
+										},
+										{
+											"key": "index_method",
+											"value": "gin"
+										},
+										{
+											"key": "index_method",
+											"value": "brin"
+										}
+									]
 								},
 								{
-									"key": "index_method",
-									"value": "gist"
-								},
-								{
-									"key": "index_method",
-									"value": "spgist"
-								},
-								{
-									"key": "index_method",
-									"value": "gin"
-								},
-								{
-									"key": "index_method",
-									"value": "brin"
+									"type": "and",
+									"values": [
+										{
+											"key": "indxExpression",
+											"isEmpty": false
+										},
+										{
+											"key": "indxExpression",
+											"exist": true
+										}
+									]
 								}
 							]
-						},
-						"validation": {
-							"required": true,
-							"minLength": 1
 						}
 					},
 					{
@@ -1126,6 +1275,19 @@ making sure that you maintain a proper JSON format.
 								}
 							]
 						}
+					},
+					{
+						"propertyName": "Expressions",
+						"propertyKeyword": "indxExpression",
+						"propertyType": "group",
+						"propertyTooltip": "Specify more detailed expression for index",
+						"structure": [
+							{
+								"propertyName": "value",
+								"propertyKeyword": "value",
+								"propertyType": "text"
+							}
+						]
 					},
 					{
 						"propertyName": "Include non-key columns",
