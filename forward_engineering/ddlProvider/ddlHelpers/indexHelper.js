@@ -157,4 +157,5 @@ module.exports = {
 	getIndexKeys,
 	getIndexOptions,
 	getWithOptions,
+	mapIndexKey,
 };

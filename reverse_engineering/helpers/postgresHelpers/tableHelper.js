@@ -1,5 +1,6 @@
 const _ = require('lodash');
 const { clearEmptyPropertiesInObject, getColumnNameByPosition } = require('./common');
+const { mapIndexKey } = require('../../../forward_engineering/ddlProvider/ddlHelpers/indexHelper');
 
 const prepareStorageParameters = (reloptions, tableToastOptions) => {
 	if (!reloptions && !tableToastOptions) {
@@ -208,7 +209,7 @@ const getCheckConstraint = constraint => {
 
 const prepareTableIndexes = tableIndexesResult => {
 	return _.map(tableIndexesResult, indexData => {
-		const allColumns = mapIndexColumns(indexData);
+		const { columns: allColumns, indxExpression } = getIndexKeys(indexData);
 		const columns = _.slice(allColumns, 0, indexData.number_of_keys);
 		const include = _.chain(allColumns)
 			.slice(indexData.number_of_keys)
@@ -225,6 +226,7 @@ const prepareTableIndexes = tableIndexesResult => {
 			index_storage_parameter: getIndexStorageParameters(indexData.storage_parameters),
 			where: indexData.where_expression || '',
 			include,
+			indxExpression,
 			columns:
 				indexData.index_method === 'btree'
 					? columns
@@ -236,6 +238,29 @@ const prepareTableIndexes = tableIndexesResult => {
 	});
 };
 
+const getIndexKeys = indexData => {
+	const hasExpressions = _.some(
+		indexData.columns,
+		(columnName, columnIndex) => columnName !== indexData.expressions[columnIndex],
+	);
+
+	if (hasExpressions) {
+		return { columns: [], indxExpression: mapIndexExpressions(indexData) };
+	}
+
+	return { columns: mapIndexColumns(indexData), indxExpression: [] };
+};
+
+const mapIndexExpressions = indexData => {
+	return _.map(indexData.expressions, (expression, columnIndex) => {
+		const { sortOrder, nullsOrder, opclass, collation } = getIndexKeyOptions(indexData, columnIndex);
+		const options = mapIndexKey({ name: '', sortOrder, nullsOrder, collation, opclass });
+		const value = expression + options;
+
+		return { value };
+	});
+};
+
 const mapIndexColumns = indexData => {
 	return _.chain(indexData.columns)
 		.map((columnName, itemIndex) => {
@@ -243,10 +268,7 @@ const mapIndexColumns = indexData => {
 				return;
 			}
 
-			const sortOrder = _.get(indexData, `ascendings.${itemIndex}`, false) ? 'ASC' : 'DESC';
-			const nullsOrder = getNullsOrder(_.get(indexData, `nulls_first.${itemIndex}`));
-			const opclass = _.get(indexData, `opclasses.${itemIndex}`, '');
-			const collation = _.get(indexData, `collations.${itemIndex}`, '');
+			const { sortOrder, nullsOrder, opclass, collation } = getIndexKeyOptions(indexData, itemIndex);
 
 			return {
 				name: columnName,
@@ -258,6 +280,20 @@ const mapIndexColumns = indexData => {
 		})
 		.compact()
 		.value();
+};
+
+const getIndexKeyOptions = (indexData, columnIndex) => {
+	const sortOrder = _.get(indexData, `ascendings.${columnIndex}`, false) ? 'ASC' : 'DESC';
+	const nullsOrder = getNullsOrder(_.get(indexData, `nulls_first.${columnIndex}`));
+	const opclass = _.get(indexData, `opclasses.${columnIndex}`, '');
+	const collation = _.get(indexData, `collations.${columnIndex}`, '');
+
+	return {
+		sortOrder,
+		nullsOrder,
+		opclass,
+		collation,
+	};
 };
 
 const getNullsOrder = nulls_first => {
