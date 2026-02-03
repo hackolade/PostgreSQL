@@ -1078,6 +1078,7 @@ making sure that you maintain a proper JSON format.
 						}
 					},
 					{
+						//The config has been duplicated to disable columns validation for func indexes
 						"propertyName": "Columns",
 						"propertyKeyword": "columns",
 						"propertyType": "fieldList",
@@ -1195,6 +1196,7 @@ making sure that you maintain a proper JSON format.
 						}
 					},
 					{
+						//The config has been duplicated to disable columns validation for func indexes
 						"propertyName": "Columns",
 						"propertyKeyword": "columns",
 						"propertyType": "fieldList",
