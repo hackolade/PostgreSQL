@@ -248,7 +248,7 @@ const getIndexKeys = indexData => {
 		return { columns: [], indxExpression: mapIndexExpressions(indexData) };
 	}
 
-	return { columns: mapIndexColumns(indexData), indxExpression: [] };
+	return { columns: mapIndexColumns(indexData) };
 };
 
 const mapIndexExpressions = indexData => {
