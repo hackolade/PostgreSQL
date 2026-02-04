@@ -95,7 +95,7 @@
         "simple-git-hooks": "2.11.1"
     },
     "dependencies": {
-        "lodash": "4.17.21",
+        "lodash": "4.17.23",
         "pg": "8.12.0"
     }
 }
