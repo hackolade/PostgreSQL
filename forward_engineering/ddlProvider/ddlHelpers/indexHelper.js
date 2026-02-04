@@ -10,6 +10,15 @@ const {
 const assignTemplates = require('../../utils/assignTemplates');
 const templates = require('../templates');
 
+/**
+ * @param {object} params
+ * @param {Record<string, unknown>} params.index
+ * @returns {string[]}
+ */
+const getIndexExpressions = ({ index }) => {
+	return _.map(index.indxExpression, ({ value = '' }) => _.trim(value)).filter(Boolean);
+};
+
 const mapIndexKey = ({ name, sortOrder, nullsOrder, collation, opclass }) => {
 	const sortOrderStr = sortOrder ? ` ${sortOrder}` : '';
 	const nullsOrderStr = nullsOrder ? ` ${nullsOrder}` : '';
@@ -20,8 +29,10 @@ const mapIndexKey = ({ name, sortOrder, nullsOrder, collation, opclass }) => {
 	return `${wrapInQuotes(name)}${collationStr}${opclassStr}${sortOrderStr}${nullsOrderStr}`;
 };
 
-const getIndexKeys = ({ columns = [], isParentActivated, isAllColumnsDeactivated }) => {
-	return getColumnsList(columns, isAllColumnsDeactivated, isParentActivated, mapIndexKey);
+const getIndexKeys = ({ columns = [], indexExpressions, isParentActivated, isAllColumnsDeactivated }) => {
+	return indexExpressions.length
+		? ' (' + indexExpressions.join(', ') + ')'
+		: getColumnsList(columns, isAllColumnsDeactivated, isParentActivated, mapIndexKey);
 };
 
 const getIndexOptions = (index, isParentActivated) => {
@@ -93,8 +104,10 @@ const getValue = value => {
 
 const createIndex = (tableName, index, dbData, isParentActivated = true) => {
 	const isNameEmpty = !index.indxName && index.ifNotExist;
+	const indexExpressions = getIndexExpressions({ index });
+	const hasKeys = index.columns.length || indexExpressions.length;
 
-	if (!index.columns.length || isNameEmpty) {
+	if (!hasKeys || isNameEmpty) {
 		return '';
 	}
 
@@ -116,6 +129,7 @@ const createIndex = (tableName, index, dbData, isParentActivated = true) => {
 
 	const keys = getIndexKeys({
 		columns: indexColumns,
+		indexExpressions,
 		isParentActivated,
 		isAllColumnsDeactivated,
 	});
