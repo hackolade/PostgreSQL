@@ -619,6 +619,50 @@ making sure that you maintain a proper JSON format.
 				"propertyType": "details",
 				"template": "textarea",
 				"valueType": "string"
+			},
+			{
+				"propertyName": "Custom scripts",
+				"propertyType": "block",
+				"propertyKeyword": "customScripts",
+				"propertyTooltip": "",
+				"structure": [
+					{
+						"propertyName": "Before CREATE TABLE",
+						"propertyKeyword": "beforeCreateEntity",
+						"propertyType": "block",
+						"propertyTooltip": "",
+						"structure": [
+							{
+								"propertyName": "Script",
+								"propertyKeyword": "script",
+								"propertyType": "details",
+								"markdown": false,
+								"template": "codeEditor",
+								"templateOptions": {
+									"editorDialect": "sql"
+								}
+							}
+						]
+					},
+					{
+						"propertyName": "After CREATE TABLE",
+						"propertyKeyword": "afterCreateEntity",
+						"propertyType": "block",
+						"propertyTooltip": "",
+						"structure": [
+							{
+								"propertyName": "Script",
+								"propertyKeyword": "script",
+								"propertyType": "details",
+								"markdown": false,
+								"template": "codeEditor",
+								"templateOptions": {
+									"editorDialect": "sql"
+								}
+							}
+						]
+					}
+				]
 			}
 		],
 		"columnsRatio": [3.7, 5]
