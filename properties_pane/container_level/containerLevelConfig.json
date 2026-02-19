@@ -149,7 +149,8 @@ making sure that you maintain a proper JSON format.
 								"markdown": false,
 								"template": "codeEditor",
 								"templateOptions": {
-									"editorDialect": "sql"
+									"editorDialect": "sql",
+									"customScriptVariables": true
 								}
 							}
 						]
@@ -167,7 +168,8 @@ making sure that you maintain a proper JSON format.
 								"markdown": false,
 								"template": "codeEditor",
 								"templateOptions": {
-									"editorDialect": "sql"
+									"editorDialect": "sql",
+									"customScriptVariables": true
 								}
 							}
 						]
@@ -185,7 +187,8 @@ making sure that you maintain a proper JSON format.
 								"markdown": false,
 								"template": "codeEditor",
 								"templateOptions": {
-									"editorDialect": "sql"
+									"editorDialect": "sql",
+									"customScriptVariables": true
 								}
 							}
 						]
@@ -203,7 +206,8 @@ making sure that you maintain a proper JSON format.
 								"markdown": false,
 								"template": "codeEditor",
 								"templateOptions": {
-									"editorDialect": "sql"
+									"editorDialect": "sql",
+									"customScriptVariables": true
 								}
 							}
 						]
@@ -221,7 +225,8 @@ making sure that you maintain a proper JSON format.
 								"markdown": false,
 								"template": "codeEditor",
 								"templateOptions": {
-									"editorDialect": "sql"
+									"editorDialect": "sql",
+									"customScriptVariables": true
 								}
 							}
 						]
@@ -239,7 +244,8 @@ making sure that you maintain a proper JSON format.
 								"markdown": false,
 								"template": "codeEditor",
 								"templateOptions": {
-									"editorDialect": "sql"
+									"editorDialect": "sql",
+									"customScriptVariables": true
 								}
 							}
 						]
