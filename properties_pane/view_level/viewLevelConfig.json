@@ -670,6 +670,50 @@ making sure that you maintain a proper JSON format.
 			{
 				"propertyKeyword": "viewOn",
 				"hidden": true
+			},
+			{
+				"propertyName": "Custom scripts",
+				"propertyType": "block",
+				"propertyKeyword": "customScripts",
+				"propertyTooltip": "",
+				"structure": [
+					{
+						"propertyName": "Before CREATE VIEW",
+						"propertyKeyword": "beforeCreateView",
+						"propertyType": "block",
+						"propertyTooltip": "",
+						"structure": [
+							{
+								"propertyName": "Script",
+								"propertyKeyword": "script",
+								"propertyType": "details",
+								"markdown": false,
+								"template": "codeEditor",
+								"templateOptions": {
+									"editorDialect": "sql"
+								}
+							}
+						]
+					},
+					{
+						"propertyName": "After CREATE VIEW",
+						"propertyKeyword": "afterCreateView",
+						"propertyType": "block",
+						"propertyTooltip": "",
+						"structure": [
+							{
+								"propertyName": "Script",
+								"propertyKeyword": "script",
+								"propertyType": "details",
+								"markdown": false,
+								"template": "codeEditor",
+								"templateOptions": {
+									"editorDialect": "sql"
+								}
+							}
+						]
+					}
+				]
 			}
 		]
 	},
