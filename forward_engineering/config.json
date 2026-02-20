@@ -19,7 +19,6 @@
 	"applyToInstanceSettings": {
 		"scenario": "getDatabases"
 	},
-	"showIndexStatementsInEndDdl": true,
 	"combinedContainers": true,
 	"feLevelSelector": {
 		"container": true,

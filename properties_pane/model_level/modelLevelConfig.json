@@ -213,6 +213,166 @@ making sure that you maintain a proper JSON format.
 				"addTimestampButton": false,
 				"propertyType": "details",
 				"template": "textarea"
+			},
+			{
+				"propertyName": "Custom scripts",
+				"propertyType": "block",
+				"propertyKeyword": "customScripts",
+				"propertyTooltip": "",
+				"structure": [
+					{
+						"propertyName": "Header script",
+						"propertyKeyword": "headerScript",
+						"propertyType": "block",
+						"propertyTooltip": "",
+						"structure": [
+							{
+								"propertyName": "Script",
+								"propertyKeyword": "script",
+								"propertyType": "details",
+								"markdown": false,
+								"template": "codeEditor",
+								"templateOptions": {
+									"editorDialect": "sql",
+									"customScriptVariables": true
+								}
+							}
+						]
+					},
+					{
+						"propertyName": "Footer script",
+						"propertyKeyword": "footerScript",
+						"propertyType": "block",
+						"propertyTooltip": "",
+						"structure": [
+							{
+								"propertyName": "Script",
+								"propertyKeyword": "script",
+								"propertyType": "details",
+								"markdown": false,
+								"template": "codeEditor",
+								"templateOptions": {
+									"editorDialect": "sql",
+									"customScriptVariables": true
+								}
+							}
+						]
+					},
+					{
+						"propertyName": "Before each CREATE SCHEMA",
+						"propertyKeyword": "beforeCreateContainer",
+						"propertyType": "block",
+						"propertyTooltip": "",
+						"structure": [
+							{
+								"propertyName": "Script",
+								"propertyKeyword": "script",
+								"propertyType": "details",
+								"markdown": false,
+								"template": "codeEditor",
+								"templateOptions": {
+									"editorDialect": "sql",
+									"customScriptVariables": true
+								}
+							}
+						]
+					},
+					{
+						"propertyName": "After each CREATE SCHEMA",
+						"propertyKeyword": "afterCreateContainer",
+						"propertyType": "block",
+						"propertyTooltip": "",
+						"structure": [
+							{
+								"propertyName": "Script",
+								"propertyKeyword": "script",
+								"propertyType": "details",
+								"markdown": false,
+								"template": "codeEditor",
+								"templateOptions": {
+									"editorDialect": "sql",
+									"customScriptVariables": true
+								}
+							}
+						]
+					},
+					{
+						"propertyName": "Before each CREATE TABLE",
+						"propertyKeyword": "beforeCreateEntity",
+						"propertyType": "block",
+						"propertyTooltip": "",
+						"structure": [
+							{
+								"propertyName": "Script",
+								"propertyKeyword": "script",
+								"propertyType": "details",
+								"markdown": false,
+								"template": "codeEditor",
+								"templateOptions": {
+									"editorDialect": "sql",
+									"customScriptVariables": true
+								}
+							}
+						]
+					},
+					{
+						"propertyName": "After each CREATE TABLE",
+						"propertyKeyword": "afterCreateEntity",
+						"propertyType": "block",
+						"propertyTooltip": "",
+						"structure": [
+							{
+								"propertyName": "Script",
+								"propertyKeyword": "script",
+								"propertyType": "details",
+								"markdown": false,
+								"template": "codeEditor",
+								"templateOptions": {
+									"editorDialect": "sql",
+									"customScriptVariables": true
+								}
+							}
+						]
+					},
+					{
+						"propertyName": "Before each CREATE VIEW",
+						"propertyKeyword": "beforeCreateView",
+						"propertyType": "block",
+						"propertyTooltip": "",
+						"structure": [
+							{
+								"propertyName": "Script",
+								"propertyKeyword": "script",
+								"propertyType": "details",
+								"markdown": false,
+								"template": "codeEditor",
+								"templateOptions": {
+									"editorDialect": "sql",
+									"customScriptVariables": true
+								}
+							}
+						]
+					},
+					{
+						"propertyName": "After each CREATE VIEW",
+						"propertyKeyword": "afterCreateView",
+						"propertyType": "block",
+						"propertyTooltip": "",
+						"structure": [
+							{
+								"propertyName": "Script",
+								"propertyKeyword": "script",
+								"propertyType": "details",
+								"markdown": false,
+								"template": "codeEditor",
+								"templateOptions": {
+									"editorDialect": "sql",
+									"customScriptVariables": true
+								}
+							}
+						]
+					}
+				]
 			}
 		]
 	},
