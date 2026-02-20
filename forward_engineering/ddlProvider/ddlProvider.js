@@ -206,7 +206,9 @@ module.exports = (baseProvider, options, app) => {
 
 			return commentIfDeactivated(
 				[tableStatement, createTriggerStatements].map(_.trim).join('\n\n').trim() + '\n',
-				{ isActivated },
+				{
+					isActivated,
+				},
 			);
 		},
 
@@ -553,7 +555,9 @@ module.exports = (baseProvider, options, app) => {
 
 			return commentIfDeactivated(
 				[createViewScript, createTriggersStatements].map(_.trim).join('\n\n').trim() + '\n',
-				{ isActivated: !deactivatedWholeStatement },
+				{
+					isActivated: !deactivatedWholeStatement,
+				},
 			);
 		},
 
@@ -795,6 +799,10 @@ module.exports = (baseProvider, options, app) => {
 
 		commentIfDeactivated(statement, data, isPartOfLine) {
 			return statement;
+		},
+
+		commentStatement(statement) {
+			return commentIfDeactivated(statement, { isActivated: false });
 		},
 
 		/**
