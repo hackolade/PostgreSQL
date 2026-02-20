@@ -52,369 +52,369 @@ making sure that you maintain a proper JSON format.
 
 */
 [
-	{
-		"lowerTab": "Details",
-		"structure": [
-			{
-				"propertyName": "DB vendor",
-				"propertyKeyword": "dbVendor",
-				"shouldValidate": false,
-				"propertyTooltip": "DB vendor",
-				"propertyType": "select",
-				"options": ["PostgreSQL"],
-				"disabledOption": true
-			},
-			{
-				"propertyName": "DB version",
-				"propertyKeyword": "dbVersion",
-				"shouldValidate": false,
-				"propertyTooltip": "DB version",
-				"propertyType": "select",
-				"options": ["v10.x", "v11.x", "v12.x", "v13.x", "v14.x", "v15.x", "v16.x", "v17.x"],
-				"disabledOption": false,
-				"adapters": [
-					{
-						"dependency": {
-							"type": "or",
-							"values": [
-								{
-									"key": "dbVersion",
-									"value": "v10.x"
-								},
-								{
-									"key": "dbVersion",
-									"value": "v11.x"
-								}
-							]
-						},
-						"adapter": "adaptUnavailableTypes"
-					}
-				]
-			},
-			{
-				"propertyName": "Database name",
-				"propertyKeyword": "database_name",
-				"propertyTooltip": "Enter the PostgreSQL database for this model",
-				"propertyType": "text"
-			},
-			{
-				"propertyName": "Tablespace",
-				"propertyKeyword": "tablespace_name",
-				"propertyTooltip": "Enter the name of an existing tablespace location for the database, or pg_default",
-				"defaultValue": "pg_default",
-				"propertyType": "text"
-			},
-			{
-				"propertyName": "Encoding",
-				"propertyKeyword": "encoding",
-				"propertyTooltip": "Select from list of options",
-				"defaultValue": "UTF8",
-				"propertyType": "select",
-				"options": [
-					"BIG5",
-					"EUC_CN",
-					"EUC_JP",
-					"EUC_JIS_2004",
-					"EUC_KR",
-					"EUC_TW",
-					"GB18030",
-					"GBK",
-					"ISO_8859_5",
-					"ISO_8859_6",
-					"ISO_8859_7",
-					"ISO_8859_8",
-					"JOHAB",
-					"KOI8R",
-					"KOI8U",
-					"LATIN1",
-					"LATIN2",
-					"LATIN3",
-					"LATIN4",
-					"LATIN5",
-					"LATIN6",
-					"LATIN7",
-					"LATIN8",
-					"LATIN9",
-					"LATIN10",
-					"MULE_INTERNAL",
-					"SJIS",
-					"SHIFT_JIS_2004",
-					"SQL_ASCII",
-					"UHC",
-					"UTF8",
-					"WIN866",
-					"WIN874",
-					"WIN1250",
-					"WIN1251",
-					"WIN1252",
-					"WIN1253",
-					"WIN1254",
-					"WIN1255",
-					"WIN1256",
-					"WIN1257",
-					"WIN1258"
-				]
-			},
-			{
-				"propertyName": "Template",
-				"propertyKeyword": "template",
-				"propertyTooltip": "Enter a database template name if applicable",
-				"propertyType": "text"
-			},
-			{
-				"propertyName": "Locale",
-				"propertyKeyword": "locale",
-				"propertyTooltip": "Collation order (LC_COLLATE) to use in the new database. ",
-				"propertyType": "text"
-			},
-			{
-				"propertyName": "Collation",
-				"propertyKeyword": "LC_COLLATE",
-				"propertyTooltip": "Collation order (LC_COLLATE) to use in the new database. ",
-				"propertyType": "text",
-				"dependency": {
-					"type": "or",
-					"values": [
-						{
-							"key": "locale",
-							"exist": false
-						},
-						{
-							"key": "locale",
-							"value": ""
-						}
-					]
-				}
-			},
-			{
-				"propertyName": "Character type",
-				"propertyKeyword": "LC_CTYPE",
-				"propertyTooltip": "Character classification (LC_CTYPE) to use in the new database. ",
-				"propertyType": "text",
-				"dependency": {
-					"type": "or",
-					"values": [
-						{
-							"key": "locale",
-							"exist": false
-						},
-						{
-							"key": "locale",
-							"value": ""
-						}
-					]
-				}
-			},
-			{
-				"propertyName": "Comments",
-				"propertyKeyword": "comments",
-				"shouldValidate": false,
-				"propertyTooltip": "comments",
-				"addTimestampButton": false,
-				"propertyType": "details",
-				"template": "textarea"
-			},
-			{
-				"propertyName": "Custom scripts",
-				"propertyType": "block",
-				"propertyKeyword": "customScripts",
-				"propertyTooltip": "",
-				"structure": [
-					{
-						"propertyName": "Header script",
-						"propertyKeyword": "headerScript",
-						"propertyType": "block",
-						"propertyTooltip": "",
-						"structure": [
-							{
-								"propertyName": "Script",
-								"propertyKeyword": "script",
-								"propertyType": "details",
-								"markdown": false,
-								"template": "codeEditor",
-								"templateOptions": {
-									"editorDialect": "sql",
-									"customScriptVariables": true
-								}
-							}
-						]
-					},
-					{
-						"propertyName": "Footer script",
-						"propertyKeyword": "footerScript",
-						"propertyType": "block",
-						"propertyTooltip": "",
-						"structure": [
-							{
-								"propertyName": "Script",
-								"propertyKeyword": "script",
-								"propertyType": "details",
-								"markdown": false,
-								"template": "codeEditor",
-								"templateOptions": {
-									"editorDialect": "sql",
-									"customScriptVariables": true
-								}
-							}
-						]
-					},
-					{
-						"propertyName": "Before each CREATE SCHEMA",
-						"propertyKeyword": "beforeCreateContainer",
-						"propertyType": "block",
-						"propertyTooltip": "",
-						"structure": [
-							{
-								"propertyName": "Script",
-								"propertyKeyword": "script",
-								"propertyType": "details",
-								"markdown": false,
-								"template": "codeEditor",
-								"templateOptions": {
-									"editorDialect": "sql",
-									"customScriptVariables": true
-								}
-							}
-						]
-					},
-					{
-						"propertyName": "After each CREATE SCHEMA",
-						"propertyKeyword": "afterCreateContainer",
-						"propertyType": "block",
-						"propertyTooltip": "",
-						"structure": [
-							{
-								"propertyName": "Script",
-								"propertyKeyword": "script",
-								"propertyType": "details",
-								"markdown": false,
-								"template": "codeEditor",
-								"templateOptions": {
-									"editorDialect": "sql",
-									"customScriptVariables": true
-								}
-							}
-						]
-					},
-					{
-						"propertyName": "Before each CREATE TABLE",
-						"propertyKeyword": "beforeCreateEntity",
-						"propertyType": "block",
-						"propertyTooltip": "",
-						"structure": [
-							{
-								"propertyName": "Script",
-								"propertyKeyword": "script",
-								"propertyType": "details",
-								"markdown": false,
-								"template": "codeEditor",
-								"templateOptions": {
-									"editorDialect": "sql",
-									"customScriptVariables": true
-								}
-							}
-						]
-					},
-					{
-						"propertyName": "After each CREATE TABLE",
-						"propertyKeyword": "afterCreateEntity",
-						"propertyType": "block",
-						"propertyTooltip": "",
-						"structure": [
-							{
-								"propertyName": "Script",
-								"propertyKeyword": "script",
-								"propertyType": "details",
-								"markdown": false,
-								"template": "codeEditor",
-								"templateOptions": {
-									"editorDialect": "sql",
-									"customScriptVariables": true
-								}
-							}
-						]
-					},
-					{
-						"propertyName": "Before each CREATE VIEW",
-						"propertyKeyword": "beforeCreateView",
-						"propertyType": "block",
-						"propertyTooltip": "",
-						"structure": [
-							{
-								"propertyName": "Script",
-								"propertyKeyword": "script",
-								"propertyType": "details",
-								"markdown": false,
-								"template": "codeEditor",
-								"templateOptions": {
-									"editorDialect": "sql",
-									"customScriptVariables": true
-								}
-							}
-						]
-					},
-					{
-						"propertyName": "After each CREATE VIEW",
-						"propertyKeyword": "afterCreateView",
-						"propertyType": "block",
-						"propertyTooltip": "",
-						"structure": [
-							{
-								"propertyName": "Script",
-								"propertyKeyword": "script",
-								"propertyType": "details",
-								"markdown": false,
-								"template": "codeEditor",
-								"templateOptions": {
-									"editorDialect": "sql",
-									"customScriptVariables": true
-								}
-							}
-						]
-					}
-				]
-			}
-		]
-	},
-	{
-		"lowerTab": "Relationships",
-		"structure": [
-			{
-				"propertyName": "On Delete",
-				"propertyKeyword": "relationshipOnDelete",
-				"propertyType": "select",
-				"options": ["", "NO ACTION", "RESTRICT", "CASCADE", "SET NULL", "SET DEFAULT"]
-			},
-			{
-				"propertyName": "On Update",
-				"propertyKeyword": "relationshipOnUpdate",
-				"propertyType": "select",
-				"options": ["", "NO ACTION", "RESTRICT", "CASCADE", "SET NULL", "SET DEFAULT"]
-			},
-			{
-				"propertyName": "Match",
-				"propertyKeyword": "relationshipMatch",
-				"propertyType": "select",
-				"options": ["", "SIMPLE", "PARTIAL", "FULL"]
-			},
-			{
-				"propertyName": "Deferrable",
-				"propertyKeyword": "deferrable",
-				"propertyTooltip": "\nA constraint that is not deferrable will be checked immediately after every command. Checking of constraints that are deferrable can be postponed until the end of the transaction",
-				"propertyType": "select",
-				"options": ["", "DEFERRABLE", "NOT DEFERRABLE"]
-			},
-			{
-				"propertyName": "Check time",
-				"propertyKeyword": "deferrableConstraintCheckTime",
-				"propertyTooltip": "\nIf the constraint is INITIALLY IMMEDIATE, it is checked after each statement. This is the default. If the constraint is INITIALLY DEFERRED, it is checked only at the end of the transaction",
-				"propertyType": "select",
-				"options": ["", "INITIALLY IMMEDIATE", "INITIALLY DEFERRED"],
-				"dependency": {
-					"key": "customProperties.deferrable",
-					"value": "DEFERRABLE"
-				}
-			}
-		]
-	}
+  {
+    "lowerTab": "Details",
+    "structure": [
+      {
+        "propertyName": "DB vendor",
+        "propertyKeyword": "dbVendor",
+        "shouldValidate": false,
+        "propertyTooltip": "DB vendor",
+        "propertyType": "select",
+        "options": ["PostgreSQL"],
+        "disabledOption": true
+      },
+      {
+        "propertyName": "DB version",
+        "propertyKeyword": "dbVersion",
+        "shouldValidate": false,
+        "propertyTooltip": "DB version",
+        "propertyType": "select",
+        "options": ["v10.x", "v11.x", "v12.x", "v13.x", "v14.x", "v15.x", "v16.x", "v17.x"],
+        "disabledOption": false,
+        "adapters": [
+          {
+            "dependency": {
+              "type": "or",
+              "values": [
+                {
+                  "key": "dbVersion",
+                  "value": "v10.x"
+                },
+                {
+                  "key": "dbVersion",
+                  "value": "v11.x"
+                }
+              ]
+            },
+            "adapter": "adaptUnavailableTypes"
+          }
+        ]
+      },
+      {
+        "propertyName": "Database name",
+        "propertyKeyword": "database_name",
+        "propertyTooltip": "Enter the PostgreSQL database for this model",
+        "propertyType": "text"
+      },
+      {
+        "propertyName": "Tablespace",
+        "propertyKeyword": "tablespace_name",
+        "propertyTooltip": "Enter the name of an existing tablespace location for the database, or pg_default",
+        "defaultValue": "pg_default",
+        "propertyType": "text"
+      },
+      {
+        "propertyName": "Encoding",
+        "propertyKeyword": "encoding",
+        "propertyTooltip": "Select from list of options",
+        "defaultValue": "UTF8",
+        "propertyType": "select",
+        "options": [
+          "BIG5",
+          "EUC_CN",
+          "EUC_JP",
+          "EUC_JIS_2004",
+          "EUC_KR",
+          "EUC_TW",
+          "GB18030",
+          "GBK",
+          "ISO_8859_5",
+          "ISO_8859_6",
+          "ISO_8859_7",
+          "ISO_8859_8",
+          "JOHAB",
+          "KOI8R",
+          "KOI8U",
+          "LATIN1",
+          "LATIN2",
+          "LATIN3",
+          "LATIN4",
+          "LATIN5",
+          "LATIN6",
+          "LATIN7",
+          "LATIN8",
+          "LATIN9",
+          "LATIN10",
+          "MULE_INTERNAL",
+          "SJIS",
+          "SHIFT_JIS_2004",
+          "SQL_ASCII",
+          "UHC",
+          "UTF8",
+          "WIN866",
+          "WIN874",
+          "WIN1250",
+          "WIN1251",
+          "WIN1252",
+          "WIN1253",
+          "WIN1254",
+          "WIN1255",
+          "WIN1256",
+          "WIN1257",
+          "WIN1258"
+        ]
+      },
+      {
+        "propertyName": "Template",
+        "propertyKeyword": "template",
+        "propertyTooltip": "Enter a database template name if applicable",
+        "propertyType": "text"
+      },
+      {
+        "propertyName": "Locale",
+        "propertyKeyword": "locale",
+        "propertyTooltip": "Collation order (LC_COLLATE) to use in the new database. ",
+        "propertyType": "text"
+      },
+      {
+        "propertyName": "Collation",
+        "propertyKeyword": "LC_COLLATE",
+        "propertyTooltip": "Collation order (LC_COLLATE) to use in the new database. ",
+        "propertyType": "text",
+        "dependency": {
+          "type": "or",
+          "values": [
+            {
+              "key": "locale",
+              "exist": false
+            },
+            {
+              "key": "locale",
+              "value": ""
+            }
+          ]
+        }
+      },
+      {
+        "propertyName": "Character type",
+        "propertyKeyword": "LC_CTYPE",
+        "propertyTooltip": "Character classification (LC_CTYPE) to use in the new database. ",
+        "propertyType": "text",
+        "dependency": {
+          "type": "or",
+          "values": [
+            {
+              "key": "locale",
+              "exist": false
+            },
+            {
+              "key": "locale",
+              "value": ""
+            }
+          ]
+        }
+      },
+      {
+        "propertyName": "Custom scripts",
+        "propertyType": "block",
+        "propertyKeyword": "customScripts",
+        "propertyTooltip": "",
+        "structure": [
+          {
+            "propertyName": "Header script",
+            "propertyKeyword": "headerScript",
+            "propertyType": "block",
+            "propertyTooltip": "",
+            "structure": [
+              {
+                "propertyName": "Script",
+                "propertyKeyword": "script",
+                "propertyType": "details",
+                "markdown": false,
+                "template": "codeEditor",
+                "templateOptions": {
+                  "editorDialect": "sql",
+                  "customScriptVariables": true
+                }
+              }
+            ]
+          },
+          {
+            "propertyName": "Footer script",
+            "propertyKeyword": "footerScript",
+            "propertyType": "block",
+            "propertyTooltip": "",
+            "structure": [
+              {
+                "propertyName": "Script",
+                "propertyKeyword": "script",
+                "propertyType": "details",
+                "markdown": false,
+                "template": "codeEditor",
+                "templateOptions": {
+                  "editorDialect": "sql",
+                  "customScriptVariables": true
+                }
+              }
+            ]
+          },
+          {
+            "propertyName": "Before each CREATE SCHEMA",
+            "propertyKeyword": "beforeCreateContainer",
+            "propertyType": "block",
+            "propertyTooltip": "",
+            "structure": [
+              {
+                "propertyName": "Script",
+                "propertyKeyword": "script",
+                "propertyType": "details",
+                "markdown": false,
+                "template": "codeEditor",
+                "templateOptions": {
+                  "editorDialect": "sql",
+                  "customScriptVariables": true
+                }
+              }
+            ]
+          },
+          {
+            "propertyName": "After each CREATE SCHEMA",
+            "propertyKeyword": "afterCreateContainer",
+            "propertyType": "block",
+            "propertyTooltip": "",
+            "structure": [
+              {
+                "propertyName": "Script",
+                "propertyKeyword": "script",
+                "propertyType": "details",
+                "markdown": false,
+                "template": "codeEditor",
+                "templateOptions": {
+                  "editorDialect": "sql",
+                  "customScriptVariables": true
+                }
+              }
+            ]
+          },
+          {
+            "propertyName": "Before each CREATE TABLE",
+            "propertyKeyword": "beforeCreateEntity",
+            "propertyType": "block",
+            "propertyTooltip": "",
+            "structure": [
+              {
+                "propertyName": "Script",
+                "propertyKeyword": "script",
+                "propertyType": "details",
+                "markdown": false,
+                "template": "codeEditor",
+                "templateOptions": {
+                  "editorDialect": "sql",
+                  "customScriptVariables": true
+                }
+              }
+            ]
+          },
+          {
+            "propertyName": "After each CREATE TABLE",
+            "propertyKeyword": "afterCreateEntity",
+            "propertyType": "block",
+            "propertyTooltip": "",
+            "structure": [
+              {
+                "propertyName": "Script",
+                "propertyKeyword": "script",
+                "propertyType": "details",
+                "markdown": false,
+                "template": "codeEditor",
+                "templateOptions": {
+                  "editorDialect": "sql",
+                  "customScriptVariables": true
+                }
+              }
+            ]
+          },
+          {
+            "propertyName": "Before each CREATE VIEW",
+            "propertyKeyword": "beforeCreateView",
+            "propertyType": "block",
+            "propertyTooltip": "",
+            "structure": [
+              {
+                "propertyName": "Script",
+                "propertyKeyword": "script",
+                "propertyType": "details",
+                "markdown": false,
+                "template": "codeEditor",
+                "templateOptions": {
+                  "editorDialect": "sql",
+                  "customScriptVariables": true
+                }
+              }
+            ]
+          },
+          {
+            "propertyName": "After each CREATE VIEW",
+            "propertyKeyword": "afterCreateView",
+            "propertyType": "block",
+            "propertyTooltip": "",
+            "structure": [
+              {
+                "propertyName": "Script",
+                "propertyKeyword": "script",
+                "propertyType": "details",
+                "markdown": false,
+                "template": "codeEditor",
+                "templateOptions": {
+                  "editorDialect": "sql",
+                  "customScriptVariables": true
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "propertyName": "Comments",
+        "propertyKeyword": "comments",
+        "shouldValidate": false,
+        "propertyTooltip": "comments",
+        "addTimestampButton": false,
+        "propertyType": "details",
+        "template": "textarea"
+      }
+    ]
+  },
+  {
+    "lowerTab": "Relationships",
+    "structure": [
+      {
+        "propertyName": "On Delete",
+        "propertyKeyword": "relationshipOnDelete",
+        "propertyType": "select",
+        "options": ["", "NO ACTION", "RESTRICT", "CASCADE", "SET NULL", "SET DEFAULT"]
+      },
+      {
+        "propertyName": "On Update",
+        "propertyKeyword": "relationshipOnUpdate",
+        "propertyType": "select",
+        "options": ["", "NO ACTION", "RESTRICT", "CASCADE", "SET NULL", "SET DEFAULT"]
+      },
+      {
+        "propertyName": "Match",
+        "propertyKeyword": "relationshipMatch",
+        "propertyType": "select",
+        "options": ["", "SIMPLE", "PARTIAL", "FULL"]
+      },
+      {
+        "propertyName": "Deferrable",
+        "propertyKeyword": "deferrable",
+        "propertyTooltip": "\nA constraint that is not deferrable will be checked immediately after every command. Checking of constraints that are deferrable can be postponed until the end of the transaction",
+        "propertyType": "select",
+        "options": ["", "DEFERRABLE", "NOT DEFERRABLE"]
+      },
+      {
+        "propertyName": "Check time",
+        "propertyKeyword": "deferrableConstraintCheckTime",
+        "propertyTooltip": "\nIf the constraint is INITIALLY IMMEDIATE, it is checked after each statement. This is the default. If the constraint is INITIALLY DEFERRED, it is checked only at the end of the transaction",
+        "propertyType": "select",
+        "options": ["", "INITIALLY IMMEDIATE", "INITIALLY DEFERRED"],
+        "dependency": {
+          "key": "customProperties.deferrable",
+          "value": "DEFERRABLE"
+        }
+      }
+    ]
+  }
 ]

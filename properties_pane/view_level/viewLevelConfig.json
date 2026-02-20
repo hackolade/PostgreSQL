@@ -113,808 +113,808 @@ making sure that you maintain a proper JSON format.
 */
 
 [
-	{
-		"lowerTab": "Details",
-		"structure": [
-			{
-				"propertyName": "Comments",
-				"propertyKeyword": "description",
-				"propertyTooltip": "comments",
-				"propertyType": "details",
-				"addTimestampButton": false,
-				"template": "textarea"
-			},
-			{
-				"propertyName": "Materialized",
-				"propertyKeyword": "materialized",
-				"propertyTooltip": "Specify whether to create materialized view.",
-				"propertyType": "checkbox"
-			},
-			{
-				"propertyName": "If not exists",
-				"propertyKeyword": "ifNotExist",
-				"propertyTooltip": "When the IF NOT EXISTS clause is used, PostgreSQL will return a warning instead of an error if the specified view already exists.",
-				"propertyType": "checkbox",
-				"dependency": {
-					"key": "materialized",
-					"value": true
-				}
-			},
-			{
-				"propertyName": "Using method",
-				"propertyKeyword": "usingMethod",
-				"propertyTooltip": "Optional clause to specify the view access method to use to store the contents for the new view; the method needs be an access method of type VIEW.",
-				"propertyType": "text",
-				"dependency": {
-					"key": "materialized",
-					"value": true
-				}
-			},
-			{
-				"propertyName": "Storage parameters",
-				"propertyKeyword": "storage_parameter",
-				"propertyType": "block",
-				"propertyTooltip": "For each individual materialized view you create, you can set some materialized view options.",
-				"dependency": {
-					"key": "materialized",
-					"value": true
-				},
-				"structure": [
-					{
-						"propertyName": "Fill factor",
-						"propertyKeyword": "fillfactor",
-						"propertyType": "numeric",
-						"valueType": "number",
-						"propertyTooltip": "A percentage between 10 and 100. Complete packing (100) is the default.",
-						"minValue": 10,
-						"maxValue": 100,
-						"step": 1
-					},
-					{
-						"propertyName": "Parallel workers",
-						"propertyKeyword": "parallel_workers",
-						"propertyType": "numeric",
-						"valueType": "number",
-						"propertyTooltip": "This sets the number of workers that should be used to assist a parallel scan of this table.",
-						"minValue": 0,
-						"step": 1
-					},
-					{
-						"propertyName": "Enable autovacuum",
-						"propertyKeyword": "autovacuum_enabled",
-						"propertyType": "checkbox",
-						"propertyTooltip": "If true, the autovacuum daemon will perform automatic VACUUM and/or ANALYZE operations on this table.",
-						"defaultValue": false
-					},
-					{
-						"propertyName": "Autovacuum params",
-						"propertyKeyword": "autovacuum",
-						"propertyType": "block",
-						"propertyTooltip": "Vacuum parameters",
-						"dependency": {
-							"key": "autovacuum_enabled",
-							"value": true
-						},
-						"structure": [
-							{
-								"propertyName": "Vacuum index cleanup",
-								"propertyKeyword": "vacuum_index_cleanup",
-								"propertyType": "checkbox",
-								"propertyTooltip": "Disabling index cleanup can speed up VACUUM very significantly, but may also lead to severely bloated indexes if table modifications are frequent."
-							},
-							{
-								"propertyName": "Vacuum truncate",
-								"propertyKeyword": "vacuum_truncate",
-								"propertyType": "checkbox",
-								"propertyTooltip": "If true, VACUUM and autovacuum do the truncation and the disk space for the truncated pages is returned to the operating system."
-							},
-							{
-								"propertyName": "Vacuum threshold",
-								"propertyKeyword": "autovacuum_vacuum_threshold",
-								"propertyType": "numeric",
-								"valueType": "number",
-								"propertyTooltip": "Specifies the minimum number of updated or deleted tuples needed to trigger a VACUUM in any one table.",
-								"minValue": 0,
-								"step": 1
-							},
-							{
-								"propertyName": "Vacuum scale factor",
-								"propertyKeyword": "autovacuum_vacuum_scale_factor",
-								"propertyType": "numeric",
-								"valueType": "number",
-								"propertyTooltip": "Specifies a fraction of the table size to add to autovacuum_vacuum_threshold when deciding whether to trigger a VACUUM.",
-								"minValue": 0
-							},
-							{
-								"propertyName": "Insert threshold",
-								"propertyKeyword": "autovacuum_vacuum_insert_threshold",
-								"propertyType": "numeric",
-								"valueType": "number",
-								"propertyTooltip": "Specifies the number of inserted tuples needed to trigger a VACUUM in any one table. ",
-								"minValue": -1,
-								"step": 1
-							},
-							{
-								"propertyName": "Insert scale factor",
-								"propertyKeyword": "autovacuum_vacuum_insert_scale_factor",
-								"propertyType": "numeric",
-								"valueType": "number",
-								"propertyTooltip": "Specifies a fraction of the table size to add to autovacuum_vacuum_insert_threshold when deciding whether to trigger a VACUUM.",
-								"minValue": 0
-							},
-							{
-								"propertyName": "Analyze threshold",
-								"propertyKeyword": "autovacuum_analyze_threshold",
-								"propertyType": "numeric",
-								"valueType": "number",
-								"propertyTooltip": "Specifies the minimum number of inserted, updated or deleted tuples needed to trigger an ANALYZE in any one table. ",
-								"minValue": 0,
-								"step": 1
-							},
-							{
-								"propertyName": "Analyze scale factor",
-								"propertyKeyword": "autovacuum_analyze_scale_factor",
-								"propertyType": "numeric",
-								"valueType": "number",
-								"propertyTooltip": "Specifies a fraction of the table size to add to autovacuum_analyze_threshold when deciding whether to trigger an ANALYZE. ",
-								"minValue": 0
-							},
-							{
-								"propertyName": "Vacuum cost delay",
-								"propertyKeyword": "autovacuum_vacuum_cost_delay",
-								"propertyType": "numeric",
-								"valueType": "number",
-								"propertyTooltip": "Specifies the cost delay value that will be used in automatic VACUUM operations. If -1 is specified, the regular vacuum_cost_delay value will be used. The value is specified as milliseconds.",
-								"minValue": -1
-							},
-							{
-								"propertyName": "Vacuum cost limit",
-								"propertyKeyword": "autovacuum_vacuum_cost_limit",
-								"propertyType": "numeric",
-								"valueType": "number",
-								"propertyTooltip": "Specifies the cost limit value that will be used in automatic VACUUM operations. If -1 is specified (which is the default), the regular vacuum_cost_limit value will be used.",
-								"minValue": -1,
-								"step": 1
-							},
-							{
-								"propertyName": "Freeze min age",
-								"propertyKeyword": "autovacuum_freeze_min_age",
-								"propertyType": "numeric",
-								"valueType": "number",
-								"propertyTooltip": "Specifies the cutoff age (in transactions) that VACUUM should use to decide whether to freeze row versions while scanning a table.",
-								"minValue": 0,
-								"step": 1
-							},
-							{
-								"propertyName": "Freeze max age",
-								"propertyKeyword": "autovacuum_freeze_max_age",
-								"propertyType": "numeric",
-								"valueType": "number",
-								"propertyTooltip": "Specifies the maximum age (in transactions) that a table's pg_class.relfrozenxid field can attain before a VACUUM operation is forced to prevent transaction ID wraparound within the table.",
-								"minValue": 0,
-								"step": 1
-							},
-							{
-								"propertyName": "Freeze table age",
-								"propertyKeyword": "autovacuum_freeze_table_age",
-								"propertyType": "numeric",
-								"valueType": "number",
-								"propertyTooltip": "Although users can set this value anywhere from zero to two billion, VACUUM will silently limit the effective value to 95% of autovacuum_freeze_max_age.",
-								"minValue": 0,
-								"maxValue": 2000000000,
-								"step": 1
-							},
-							{
-								"propertyName": "Multixact freeze min age",
-								"propertyKeyword": "autovacuum_multixact_freeze_min_age",
-								"propertyType": "numeric",
-								"valueType": "number",
-								"propertyTooltip": "Specifies the cutoff age (in multixacts) that VACUUM should use to decide whether to replace multixact IDs with a newer transaction ID or multixact ID while scanning a table.",
-								"minValue": 0,
-								"step": 1
-							},
-							{
-								"propertyName": "Multixact freeze max age",
-								"propertyKeyword": "autovacuum_multixact_freeze_max_age",
-								"propertyType": "numeric",
-								"valueType": "number",
-								"propertyTooltip": "Specifies the maximum age (in multixacts) that a table's pg_class.relminmxid field can attain before a VACUUM operation is forced to prevent multixact ID wraparound within the table.",
-								"minValue": 0,
-								"maxValue": 4000000000,
-								"step": 1
-							},
-							{
-								"propertyName": "Multixact freeze table age",
-								"propertyKeyword": "autovacuum_multixact_freeze_table_age",
-								"propertyType": "numeric",
-								"valueType": "number",
-								"propertyTooltip": "Although users can set this value anywhere from zero to two billion, VACUUM will silently limit the effective value to 95% of autovacuum_multixact_freeze_max_age, so that a periodic manual VACUUM has a chance to run before an anti-wraparound is launched for the table.",
-								"minValue": 0
-							},
-							{
-								"propertyName": "Log min duration",
-								"propertyKeyword": "log_autovacuum_min_duration",
-								"propertyType": "numeric",
-								"valueType": "number",
-								"propertyTooltip": "It is taken as milliseconds. Causes each action executed by autovacuum to be logged if it ran for at least the specified amount of time. Setting this to zero logs all autovacuum actions. -1 (the default) disables logging autovacuum actions.",
-								"minValue": -1,
-								"step": 1
-							}
-						]
-					},
-					{
-						"propertyName": "Enable TOAST autovacuum",
-						"propertyKeyword": "toast_autovacuum_enabled",
-						"propertyType": "checkbox",
-						"propertyTooltip": "If true, the autovacuum daemon will perform automatic VACUUM and/or ANALYZE operations on this table.",
-						"defaultValue": false
-					},
-					{
-						"propertyName": "TOAST parameters",
-						"propertyKeyword": "toast",
-						"propertyType": "block",
-						"propertyTooltip": "Toast parameters",
-						"dependency": {
-							"key": "toast_autovacuum_enabled",
-							"value": true
-						},
-						"structure": [
-							{
-								"propertyName": "Toast tuple target",
-								"propertyKeyword": "toast_tuple_target",
-								"propertyType": "numeric",
-								"valueType": "number",
-								"propertyTooltip": "The toast_tuple_target specifies the minimum tuple length required before we try to compress and/or move long column values into TOAST tables, and is also the target length we try to reduce the length below once toasting begins.",
-								"minValue": 0,
-								"step": 1
-							},
-							{
-								"propertyName": "Vacuum index cleanup",
-								"propertyKeyword": "toast_vacuum_index_cleanup",
-								"propertyType": "checkbox",
-								"propertyTooltip": "Disabling index cleanup can speed up VACUUM very significantly, but may also lead to severely bloated indexes if table modifications are frequent."
-							},
-							{
-								"propertyName": "Vacuum truncate",
-								"propertyKeyword": "toast_vacuum_truncate",
-								"propertyType": "checkbox",
-								"propertyTooltip": "If true, VACUUM and autovacuum do the truncation and the disk space for the truncated pages is returned to the operating system."
-							},
-							{
-								"propertyName": "Vacuum threshold",
-								"propertyKeyword": "toast_autovacuum_vacuum_threshold",
-								"propertyType": "numeric",
-								"valueType": "number",
-								"propertyTooltip": "Specifies the minimum number of updated or deleted tuples needed to trigger a VACUUM in any one table.",
-								"minValue": 0,
-								"step": 1
-							},
-							{
-								"propertyName": "Vacuum scale factor",
-								"propertyKeyword": "toast_autovacuum_vacuum_scale_factor",
-								"propertyType": "numeric",
-								"valueType": "number",
-								"propertyTooltip": "Specifies a fraction of the table size to add to autovacuum_vacuum_threshold when deciding whether to trigger a VACUUM.",
-								"minValue": 0
-							},
-							{
-								"propertyName": "Insert threshold",
-								"propertyKeyword": "toast_autovacuum_vacuum_insert_threshold",
-								"propertyType": "numeric",
-								"valueType": "number",
-								"propertyTooltip": "Specifies the number of inserted tuples needed to trigger a VACUUM in any one table. ",
-								"minValue": -1,
-								"step": 1
-							},
-							{
-								"propertyName": "Insert scale factor",
-								"propertyKeyword": "toast_autovacuum_vacuum_insert_scale_factor",
-								"propertyType": "numeric",
-								"valueType": "number",
-								"propertyTooltip": "Specifies a fraction of the table size to add to autovacuum_vacuum_insert_threshold when deciding whether to trigger a VACUUM.",
-								"minValue": 0
-							},
-							{
-								"propertyName": "Vacuum cost delay",
-								"propertyKeyword": "toast_autovacuum_vacuum_cost_delay",
-								"propertyType": "numeric",
-								"valueType": "number",
-								"propertyTooltip": "Specifies the cost delay value that will be used in automatic VACUUM operations. If -1 is specified, the regular vacuum_cost_delay value will be used. The value is specified as milliseconds.",
-								"minValue": -1
-							},
-							{
-								"propertyName": "Vacuum cost limit",
-								"propertyKeyword": "toast_autovacuum_vacuum_cost_limit",
-								"propertyType": "numeric",
-								"valueType": "number",
-								"propertyTooltip": "Specifies the cost limit value that will be used in automatic VACUUM operations. If -1 is specified (which is the default), the regular vacuum_cost_limit value will be used.",
-								"minValue": -1,
-								"step": 1
-							},
-							{
-								"propertyName": "Freeze min age",
-								"propertyKeyword": "toast_autovacuum_freeze_min_age",
-								"propertyType": "numeric",
-								"valueType": "number",
-								"propertyTooltip": "Specifies the cutoff age (in transactions) that VACUUM should use to decide whether to freeze row versions while scanning a table.",
-								"minValue": 0,
-								"step": 1
-							},
-							{
-								"propertyName": "Freeze max age",
-								"propertyKeyword": "toast_autovacuum_freeze_max_age",
-								"propertyType": "numeric",
-								"valueType": "number",
-								"propertyTooltip": "Specifies the maximum age (in transactions) that a table's pg_class.relfrozenxid field can attain before a VACUUM operation is forced to prevent transaction ID wraparound within the table.",
-								"minValue": 0,
-								"step": 1
-							},
-							{
-								"propertyName": "Freeze table age",
-								"propertyKeyword": "toast_autovacuum_freeze_table_age",
-								"propertyType": "numeric",
-								"valueType": "number",
-								"propertyTooltip": "Although users can set this value anywhere from zero to two billion, VACUUM will silently limit the effective value to 95% of autovacuum_freeze_max_age.",
-								"minValue": 0,
-								"maxValue": 2000000000,
-								"step": 1
-							},
-							{
-								"propertyName": "Multixact freeze min age",
-								"propertyKeyword": "toast_autovacuum_multixact_freeze_min_age",
-								"propertyType": "numeric",
-								"valueType": "number",
-								"propertyTooltip": "Specifies the cutoff age (in multixacts) that VACUUM should use to decide whether to replace multixact IDs with a newer transaction ID or multixact ID while scanning a table.",
-								"minValue": 0,
-								"step": 1
-							},
-							{
-								"propertyName": "Multixact freeze max age",
-								"propertyKeyword": "toast_autovacuum_multixact_freeze_max_age",
-								"propertyType": "numeric",
-								"valueType": "number",
-								"propertyTooltip": "Specifies the maximum age (in multixacts) that a table's pg_class.relminmxid field can attain before a VACUUM operation is forced to prevent multixact ID wraparound within the table.",
-								"minValue": 0,
-								"maxValue": 4000000000,
-								"step": 1
-							},
-							{
-								"propertyName": "Multixact freeze table age",
-								"propertyKeyword": "toast_autovacuum_multixact_freeze_table_age",
-								"propertyType": "numeric",
-								"valueType": "number",
-								"propertyTooltip": "Although users can set this value anywhere from zero to two billion, VACUUM will silently limit the effective value to 95% of autovacuum_multixact_freeze_max_age, so that a periodic manual VACUUM has a chance to run before an anti-wraparound is launched for the table.",
-								"minValue": 0,
-								"maxValue": 2000000000,
-								"step": 1
-							},
-							{
-								"propertyName": "Log min duration",
-								"propertyKeyword": "toast_log_autovacuum_min_duration",
-								"propertyType": "numeric",
-								"valueType": "number",
-								"propertyTooltip": "It is taken as milliseconds. Causes each action executed by autovacuum to be logged if it ran for at least the specified amount of time. Setting this to zero logs all autovacuum actions. -1 (the default) disables logging autovacuum actions.",
-								"minValue": -1,
-								"step": 1
-							}
-						]
-					},
-					{
-						"propertyName": "User catalog table",
-						"propertyKeyword": "user_catalog_table",
-						"propertyType": "checkbox",
-						"propertyTooltip": "Declare the table as an additional catalog table for purposes of logical replication."
-					}
-				]
-			},
-			{
-				"propertyName": "Tablespace",
-				"propertyKeyword": "view_tablespace_name",
-				"propertyTooltip": "Enter the name of an existing tablespace location for the database, or pg_default",
-				"propertyType": "text",
-				"dependency": {
-					"key": "materialized",
-					"value": true
-				}
-			},
-			{
-				"propertyName": "Or replace",
-				"propertyKeyword": "orReplace",
-				"defaultValue": false,
-				"propertyType": "checkbox",
-				"dependency": {
-					"type": "not",
-					"values": [
-						{
-							"key": "materialized",
-							"value": true
-						}
-					]
-				}
-			},
-			{
-				"propertyName": "Temporary",
-				"propertyKeyword": "temporary",
-				"propertyType": "checkbox",
-				"dependency": {
-					"type": "not",
-					"values": [
-						{
-							"key": "materialized",
-							"value": true
-						}
-					]
-				}
-			},
-			{
-				"propertyName": "Recursive",
-				"propertyKeyword": "recursive",
-				"propertyType": "checkbox",
-				"dependency": {
-					"type": "not",
-					"values": [
-						{
-							"key": "materialized",
-							"value": true
-						}
-					]
-				}
-			},
-			{
-				"propertyName": "View option",
-				"propertyKeyword": "viewOptions",
-				"propertyType": "block",
-				"propertyTooltip": "This clause specifies optional parameters for a view",
-				"dependency": {
-					"type": "not",
-					"values": [
-						{
-							"key": "materialized",
-							"value": true
-						}
-					]
-				},
-				"structure": [
-					{
-						"propertyName": "Check testing scope",
-						"propertyKeyword": "check_option",
-						"propertyTooltip": "This option controls the behavior of automatically updatable views. When this option is specified, INSERT and UPDATE commands on the view will be checked to ensure that new rows satisfy the view-defining condition (that is, the new rows are checked to ensure that they are visible through the view). If they are not, the update will be rejected.",
-						"propertyType": "select",
-						"options": ["", "local", "cascaded"]
-					},
-					{
-						"propertyName": "Security barrier",
-						"propertyKeyword": "security_barrier",
-						"propertyType": "checkbox",
-						"propertyTooltip": "This should be used if the view is intended to provide row-level security."
-					},
-					{
-						"propertyName": "Security invoker",
-						"propertyKeyword": "security_invoker",
-						"propertyType": "checkbox",
-						"propertyTooltip": "This option causes the underlying base relations to be checked against the privileges of the user of the view rather than the view owner."
-					}
-				]
-			},
-			{
-				"propertyName": "As query",
-				"propertyKeyword": "selectStatement",
-				"propertyType": "details",
-				"propertyTooltip": "A SELECT or VALUES command which will provide the columns and rows of the view.",
-				"template": "textarea",
-				"markdown": false
-			},
-			{
-				"propertyName": "Populated with data at creation",
-				"propertyKeyword": "withDataOption",
-				"propertyType": "checkbox",
-				"propertyTooltip": "This clause specifies whether or not the materialized view should be populated at creation time. If not, the materialized view will be flagged as unscannable and cannot be queried until REFRESH MATERIALIZED VIEW is used.",
-				"dependency": {
-					"key": "materialized",
-					"value": true
-				}
-			},
-			{
-				"propertyName": "With check option",
-				"propertyKeyword": "withCheckOption",
-				"propertyTooltip": "This clause specifies optional parameters for a view; the following parameters are supported",
-				"propertyType": "checkbox",
-				"dependency": {
-					"type": "not",
-					"values": [
-						{
-							"key": "materialized",
-							"value": true
-						}
-					]
-				}
-			},
-			{
-				"propertyName": "Check testing scope",
-				"propertyKeyword": "checkTestingScope",
-				"propertyTooltip": "This option controls the behavior of automatically updatable views. When this option is specified, INSERT and UPDATE commands on the view will be checked to ensure that new rows satisfy the view-defining condition (that is, the new rows are checked to ensure that they are visible through the view). If they are not, the update will be rejected.",
-				"propertyType": "select",
-				"options": ["", "LOCAL", "CASCADED"],
-				"dependency": {
-					"type": "and",
-					"values": [
-						{
-							"key": "withCheckOption",
-							"value": true
-						},
-						{
-							"type": "not",
-							"values": [
-								{
-									"key": "materialized",
-									"value": true
-								}
-							]
-						}
-					]
-				}
-			},
-			{
-				"propertyName": "Remarks",
-				"propertyKeyword": "comments",
-				"propertyTooltip": "remarks",
-				"propertyType": "details",
-				"addTimestampButton": true,
-				"markdown": true,
-				"template": "textarea"
-			},
-			{
-				"propertyKeyword": "pipeline",
-				"hidden": true
-			},
-			{
-				"propertyKeyword": "viewOn",
-				"hidden": true
-			},
-			{
-				"propertyName": "Custom scripts",
-				"propertyType": "block",
-				"propertyKeyword": "customScripts",
-				"propertyTooltip": "",
-				"structure": [
-					{
-						"propertyName": "Before CREATE VIEW",
-						"propertyKeyword": "beforeCreateView",
-						"propertyType": "block",
-						"propertyTooltip": "",
-						"structure": [
-							{
-								"propertyName": "Script",
-								"propertyKeyword": "script",
-								"propertyType": "details",
-								"markdown": false,
-								"template": "codeEditor",
-								"templateOptions": {
-									"editorDialect": "sql",
-									"customScriptVariables": true
-								}
-							}
-						]
-					},
-					{
-						"propertyName": "After CREATE VIEW",
-						"propertyKeyword": "afterCreateView",
-						"propertyType": "block",
-						"propertyTooltip": "",
-						"structure": [
-							{
-								"propertyName": "Script",
-								"propertyKeyword": "script",
-								"propertyType": "details",
-								"markdown": false,
-								"template": "codeEditor",
-								"templateOptions": {
-									"editorDialect": "sql",
-									"customScriptVariables": true
-								}
-							}
-						]
-					}
-				]
-			}
-		]
-	},
-	{
-		"lowerTab": "Triggers",
-		"structure": [
-			{
-				"propertyName": "Triggers",
-				"propertyType": "group",
-				"propertyKeyword": "triggers",
-				"propertyTooltip": "",
-				"dependency": {
-					"type": "not",
-					"values": [
-						{
-							"key": "materialized",
-							"value": true
-						}
-					]
-				},
-				"structure": [
-					{
-						"propertyName": "Name",
-						"propertyKeyword": "name",
-						"propertyTooltip": "",
-						"propertyType": "text"
-					},
-					{
-						"propertyName": "Description",
-						"propertyKeyword": "triggerDescription",
-						"propertyTooltip": "description",
-						"propertyType": "details",
-						"template": "textarea"
-					},
-					{
-						"propertyName": "Or replace",
-						"propertyKeyword": "triggerOrReplace",
-						"propertyType": "checkbox",
-						"propertyTooltip": ""
-					},
-					{
-						"propertyName": "Constraint",
-						"propertyKeyword": "triggerConstraint",
-						"propertyType": "checkbox",
-						"propertyTooltip": "When the CONSTRAINT option is specified, this command creates a constraint trigger."
-					},
-					{
-						"propertyName": "Referenced table name",
-						"propertyKeyword": "triggerReferencedTable",
-						"propertyTooltip": "The (possibly schema-qualified) name of another table referenced by the constraint. This option is used for foreign-key constraints and is not recommended for general use.",
-						"propertyType": "selecthashed",
-						"template": "entities",
-						"withEmptyOption": true,
-						"excludeCurrent": false,
-						"dependency": {
-							"key": "triggerConstraint",
-							"value": true
-						}
-					},
-					{
-						"propertyName": "Trigger type",
-						"propertyKeyword": "triggerType",
-						"propertyTooltip": "Determines whether the function is called before, after, or instead of the event.",
-						"propertyType": "select",
-						"options": ["BEFORE", "AFTER", "INSTEAD OF"],
-						"defaultValue": "AFTER"
-					},
-					{
-						"propertyName": "Trigger events",
-						"propertyKeyword": "triggerEvents",
-						"propertyType": "group",
-						"structure": [
-							{
-								"propertyName": "Event",
-								"propertyKeyword": "triggerEvent",
-								"propertyTooltip": "This specifies the event that will fire the trigger",
-								"propertyType": "select",
-								"options": ["INSERT", "UPDATE", "DELETE", "TRUNCATE"]
-							}
-						]
-					},
-					{
-						"propertyName": "Update columns",
-						"propertyKeyword": "triggerUpdateColumns",
-						"propertyType": "fieldList",
-						"template": "orderedList",
-						"disabledItemStrategy": "default",
-						"isCompositeKey": true,
-						"setPrimaryKey": false,
-						"abbr": "",
-						"dependency": {
-							"key": "triggerEvents.*.triggerEvent",
-							"value": "UPDATE"
-						}
-					},
-					{
-						"propertyName": "Deferrable",
-						"propertyKeyword": "triggerDeferrable",
-						"propertyType": "checkbox",
-						"propertyTooltip": "This controls whether the constraint can be deferred. A constraint that is not deferrable will be checked immediately after every command.",
-						"dependency": {
-							"key": "triggerConstraint",
-							"value": true
-						}
-					},
-					{
-						"propertyName": "Deferrable",
-						"propertyKeyword": "triggerTimeConstraintCheck",
-						"propertyType": "select",
-						"options": ["", "INITIALLY IMMEDIATE", "INITIALLY DEFERRED"],
-						"propertyTooltip": "If a constraint is deferrable, this clause specifies the default time to check the constraint. If the constraint is INITIALLY IMMEDIATE, it is checked after each statement. This is the default. If the constraint is INITIALLY DEFERRED, it is checked only at the end of the transaction.",
-						"dependency": {
-							"type": "and",
-							"values": [
-								{
-									"key": "triggerConstraint",
-									"value": true
-								},
-								{
-									"key": "triggerDeferrable",
-									"value": true
-								}
-							]
-						}
-					},
-					{
-						"propertyName": "Referencing",
-						"propertyKeyword": "triggerReferencing",
-						"propertyType": "checkbox",
-						"propertyTooltip": "This keyword immediately precedes the declaration of one or two relation names that provide access to the transition relations of the triggering statement."
-					},
-					{
-						"propertyName": "Before-image transition relation",
-						"propertyKeyword": "triggerBeforeImageTransitionRelation",
-						"propertyType": "text",
-						"propertyTooltip": "Before-image transition relation name (OLD TABLE)",
-						"dependency": {
-							"key": "triggerReferencing",
-							"value": true
-						}
-					},
-					{
-						"propertyName": "After-image transition relation",
-						"propertyKeyword": "triggerAfterImageTransitionRelation",
-						"propertyType": "text",
-						"propertyTooltip": "After-image transition relation name (NEW TABLE)",
-						"dependency": {
-							"key": "triggerReferencing",
-							"value": true
-						}
-					},
-					{
-						"propertyName": "Trigger for each row/statement",
-						"propertyKeyword": "triggerEachRowStatement",
-						"propertyType": "select",
-						"propertyTooltip": "This specifies whether the trigger function should be fired once for every row affected by the trigger event, or just once per SQL statement.",
-						"options": ["FOR EACH STATEMENT", "FOR EACH ROW"],
-						"dependency": {
-							"type": "not",
-							"values": {
-								"type": "or",
-								"values": [
-									{
-										"key": "triggerConstraint",
-										"value": true
-									},
-									{
-										"key": "triggerType",
-										"value": "INSTEAD OF"
-									}
-								]
-							}
-						}
-					},
-					{
-						"propertyName": "Trigger WHEN condition",
-						"propertyKeyword": "triggerCondition",
-						"propertyTooltip": "A Boolean expression that determines whether the trigger function will actually be executed.",
-						"propertyType": "details",
-						"template": "textarea",
-						"markdown": false
-					},
-					{
-						"propertyName": "Function",
-						"propertyKeyword": "triggerFunction",
-						"propertyTooltip": "description",
-						"propertyType": "details",
-						"template": "textarea",
-						"markdown": false
-					},
-					{
-						"propertyName": "Remarks",
-						"propertyKeyword": "triggerComments",
-						"propertyTooltip": "comments",
-						"propertyType": "details",
-						"template": "textarea"
-					}
-				]
-			}
-		]
-	}
+  {
+    "lowerTab": "Details",
+    "structure": [
+      {
+        "propertyName": "Comments",
+        "propertyKeyword": "description",
+        "propertyTooltip": "comments",
+        "propertyType": "details",
+        "addTimestampButton": false,
+        "template": "textarea"
+      },
+      {
+        "propertyName": "Materialized",
+        "propertyKeyword": "materialized",
+        "propertyTooltip": "Specify whether to create materialized view.",
+        "propertyType": "checkbox"
+      },
+      {
+        "propertyName": "If not exists",
+        "propertyKeyword": "ifNotExist",
+        "propertyTooltip": "When the IF NOT EXISTS clause is used, PostgreSQL will return a warning instead of an error if the specified view already exists.",
+        "propertyType": "checkbox",
+        "dependency": {
+          "key": "materialized",
+          "value": true
+        }
+      },
+      {
+        "propertyName": "Using method",
+        "propertyKeyword": "usingMethod",
+        "propertyTooltip": "Optional clause to specify the view access method to use to store the contents for the new view; the method needs be an access method of type VIEW.",
+        "propertyType": "text",
+        "dependency": {
+          "key": "materialized",
+          "value": true
+        }
+      },
+      {
+        "propertyName": "Storage parameters",
+        "propertyKeyword": "storage_parameter",
+        "propertyType": "block",
+        "propertyTooltip": "For each individual materialized view you create, you can set some materialized view options.",
+        "dependency": {
+          "key": "materialized",
+          "value": true
+        },
+        "structure": [
+          {
+            "propertyName": "Fill factor",
+            "propertyKeyword": "fillfactor",
+            "propertyType": "numeric",
+            "valueType": "number",
+            "propertyTooltip": "A percentage between 10 and 100. Complete packing (100) is the default.",
+            "minValue": 10,
+            "maxValue": 100,
+            "step": 1
+          },
+          {
+            "propertyName": "Parallel workers",
+            "propertyKeyword": "parallel_workers",
+            "propertyType": "numeric",
+            "valueType": "number",
+            "propertyTooltip": "This sets the number of workers that should be used to assist a parallel scan of this table.",
+            "minValue": 0,
+            "step": 1
+          },
+          {
+            "propertyName": "Enable autovacuum",
+            "propertyKeyword": "autovacuum_enabled",
+            "propertyType": "checkbox",
+            "propertyTooltip": "If true, the autovacuum daemon will perform automatic VACUUM and/or ANALYZE operations on this table.",
+            "defaultValue": false
+          },
+          {
+            "propertyName": "Autovacuum params",
+            "propertyKeyword": "autovacuum",
+            "propertyType": "block",
+            "propertyTooltip": "Vacuum parameters",
+            "dependency": {
+              "key": "autovacuum_enabled",
+              "value": true
+            },
+            "structure": [
+              {
+                "propertyName": "Vacuum index cleanup",
+                "propertyKeyword": "vacuum_index_cleanup",
+                "propertyType": "checkbox",
+                "propertyTooltip": "Disabling index cleanup can speed up VACUUM very significantly, but may also lead to severely bloated indexes if table modifications are frequent."
+              },
+              {
+                "propertyName": "Vacuum truncate",
+                "propertyKeyword": "vacuum_truncate",
+                "propertyType": "checkbox",
+                "propertyTooltip": "If true, VACUUM and autovacuum do the truncation and the disk space for the truncated pages is returned to the operating system."
+              },
+              {
+                "propertyName": "Vacuum threshold",
+                "propertyKeyword": "autovacuum_vacuum_threshold",
+                "propertyType": "numeric",
+                "valueType": "number",
+                "propertyTooltip": "Specifies the minimum number of updated or deleted tuples needed to trigger a VACUUM in any one table.",
+                "minValue": 0,
+                "step": 1
+              },
+              {
+                "propertyName": "Vacuum scale factor",
+                "propertyKeyword": "autovacuum_vacuum_scale_factor",
+                "propertyType": "numeric",
+                "valueType": "number",
+                "propertyTooltip": "Specifies a fraction of the table size to add to autovacuum_vacuum_threshold when deciding whether to trigger a VACUUM.",
+                "minValue": 0
+              },
+              {
+                "propertyName": "Insert threshold",
+                "propertyKeyword": "autovacuum_vacuum_insert_threshold",
+                "propertyType": "numeric",
+                "valueType": "number",
+                "propertyTooltip": "Specifies the number of inserted tuples needed to trigger a VACUUM in any one table. ",
+                "minValue": -1,
+                "step": 1
+              },
+              {
+                "propertyName": "Insert scale factor",
+                "propertyKeyword": "autovacuum_vacuum_insert_scale_factor",
+                "propertyType": "numeric",
+                "valueType": "number",
+                "propertyTooltip": "Specifies a fraction of the table size to add to autovacuum_vacuum_insert_threshold when deciding whether to trigger a VACUUM.",
+                "minValue": 0
+              },
+              {
+                "propertyName": "Analyze threshold",
+                "propertyKeyword": "autovacuum_analyze_threshold",
+                "propertyType": "numeric",
+                "valueType": "number",
+                "propertyTooltip": "Specifies the minimum number of inserted, updated or deleted tuples needed to trigger an ANALYZE in any one table. ",
+                "minValue": 0,
+                "step": 1
+              },
+              {
+                "propertyName": "Analyze scale factor",
+                "propertyKeyword": "autovacuum_analyze_scale_factor",
+                "propertyType": "numeric",
+                "valueType": "number",
+                "propertyTooltip": "Specifies a fraction of the table size to add to autovacuum_analyze_threshold when deciding whether to trigger an ANALYZE. ",
+                "minValue": 0
+              },
+              {
+                "propertyName": "Vacuum cost delay",
+                "propertyKeyword": "autovacuum_vacuum_cost_delay",
+                "propertyType": "numeric",
+                "valueType": "number",
+                "propertyTooltip": "Specifies the cost delay value that will be used in automatic VACUUM operations. If -1 is specified, the regular vacuum_cost_delay value will be used. The value is specified as milliseconds.",
+                "minValue": -1
+              },
+              {
+                "propertyName": "Vacuum cost limit",
+                "propertyKeyword": "autovacuum_vacuum_cost_limit",
+                "propertyType": "numeric",
+                "valueType": "number",
+                "propertyTooltip": "Specifies the cost limit value that will be used in automatic VACUUM operations. If -1 is specified (which is the default), the regular vacuum_cost_limit value will be used.",
+                "minValue": -1,
+                "step": 1
+              },
+              {
+                "propertyName": "Freeze min age",
+                "propertyKeyword": "autovacuum_freeze_min_age",
+                "propertyType": "numeric",
+                "valueType": "number",
+                "propertyTooltip": "Specifies the cutoff age (in transactions) that VACUUM should use to decide whether to freeze row versions while scanning a table.",
+                "minValue": 0,
+                "step": 1
+              },
+              {
+                "propertyName": "Freeze max age",
+                "propertyKeyword": "autovacuum_freeze_max_age",
+                "propertyType": "numeric",
+                "valueType": "number",
+                "propertyTooltip": "Specifies the maximum age (in transactions) that a table's pg_class.relfrozenxid field can attain before a VACUUM operation is forced to prevent transaction ID wraparound within the table.",
+                "minValue": 0,
+                "step": 1
+              },
+              {
+                "propertyName": "Freeze table age",
+                "propertyKeyword": "autovacuum_freeze_table_age",
+                "propertyType": "numeric",
+                "valueType": "number",
+                "propertyTooltip": "Although users can set this value anywhere from zero to two billion, VACUUM will silently limit the effective value to 95% of autovacuum_freeze_max_age.",
+                "minValue": 0,
+                "maxValue": 2000000000,
+                "step": 1
+              },
+              {
+                "propertyName": "Multixact freeze min age",
+                "propertyKeyword": "autovacuum_multixact_freeze_min_age",
+                "propertyType": "numeric",
+                "valueType": "number",
+                "propertyTooltip": "Specifies the cutoff age (in multixacts) that VACUUM should use to decide whether to replace multixact IDs with a newer transaction ID or multixact ID while scanning a table.",
+                "minValue": 0,
+                "step": 1
+              },
+              {
+                "propertyName": "Multixact freeze max age",
+                "propertyKeyword": "autovacuum_multixact_freeze_max_age",
+                "propertyType": "numeric",
+                "valueType": "number",
+                "propertyTooltip": "Specifies the maximum age (in multixacts) that a table's pg_class.relminmxid field can attain before a VACUUM operation is forced to prevent multixact ID wraparound within the table.",
+                "minValue": 0,
+                "maxValue": 4000000000,
+                "step": 1
+              },
+              {
+                "propertyName": "Multixact freeze table age",
+                "propertyKeyword": "autovacuum_multixact_freeze_table_age",
+                "propertyType": "numeric",
+                "valueType": "number",
+                "propertyTooltip": "Although users can set this value anywhere from zero to two billion, VACUUM will silently limit the effective value to 95% of autovacuum_multixact_freeze_max_age, so that a periodic manual VACUUM has a chance to run before an anti-wraparound is launched for the table.",
+                "minValue": 0
+              },
+              {
+                "propertyName": "Log min duration",
+                "propertyKeyword": "log_autovacuum_min_duration",
+                "propertyType": "numeric",
+                "valueType": "number",
+                "propertyTooltip": "It is taken as milliseconds. Causes each action executed by autovacuum to be logged if it ran for at least the specified amount of time. Setting this to zero logs all autovacuum actions. -1 (the default) disables logging autovacuum actions.",
+                "minValue": -1,
+                "step": 1
+              }
+            ]
+          },
+          {
+            "propertyName": "Enable TOAST autovacuum",
+            "propertyKeyword": "toast_autovacuum_enabled",
+            "propertyType": "checkbox",
+            "propertyTooltip": "If true, the autovacuum daemon will perform automatic VACUUM and/or ANALYZE operations on this table.",
+            "defaultValue": false
+          },
+          {
+            "propertyName": "TOAST parameters",
+            "propertyKeyword": "toast",
+            "propertyType": "block",
+            "propertyTooltip": "Toast parameters",
+            "dependency": {
+              "key": "toast_autovacuum_enabled",
+              "value": true
+            },
+            "structure": [
+              {
+                "propertyName": "Toast tuple target",
+                "propertyKeyword": "toast_tuple_target",
+                "propertyType": "numeric",
+                "valueType": "number",
+                "propertyTooltip": "The toast_tuple_target specifies the minimum tuple length required before we try to compress and/or move long column values into TOAST tables, and is also the target length we try to reduce the length below once toasting begins.",
+                "minValue": 0,
+                "step": 1
+              },
+              {
+                "propertyName": "Vacuum index cleanup",
+                "propertyKeyword": "toast_vacuum_index_cleanup",
+                "propertyType": "checkbox",
+                "propertyTooltip": "Disabling index cleanup can speed up VACUUM very significantly, but may also lead to severely bloated indexes if table modifications are frequent."
+              },
+              {
+                "propertyName": "Vacuum truncate",
+                "propertyKeyword": "toast_vacuum_truncate",
+                "propertyType": "checkbox",
+                "propertyTooltip": "If true, VACUUM and autovacuum do the truncation and the disk space for the truncated pages is returned to the operating system."
+              },
+              {
+                "propertyName": "Vacuum threshold",
+                "propertyKeyword": "toast_autovacuum_vacuum_threshold",
+                "propertyType": "numeric",
+                "valueType": "number",
+                "propertyTooltip": "Specifies the minimum number of updated or deleted tuples needed to trigger a VACUUM in any one table.",
+                "minValue": 0,
+                "step": 1
+              },
+              {
+                "propertyName": "Vacuum scale factor",
+                "propertyKeyword": "toast_autovacuum_vacuum_scale_factor",
+                "propertyType": "numeric",
+                "valueType": "number",
+                "propertyTooltip": "Specifies a fraction of the table size to add to autovacuum_vacuum_threshold when deciding whether to trigger a VACUUM.",
+                "minValue": 0
+              },
+              {
+                "propertyName": "Insert threshold",
+                "propertyKeyword": "toast_autovacuum_vacuum_insert_threshold",
+                "propertyType": "numeric",
+                "valueType": "number",
+                "propertyTooltip": "Specifies the number of inserted tuples needed to trigger a VACUUM in any one table. ",
+                "minValue": -1,
+                "step": 1
+              },
+              {
+                "propertyName": "Insert scale factor",
+                "propertyKeyword": "toast_autovacuum_vacuum_insert_scale_factor",
+                "propertyType": "numeric",
+                "valueType": "number",
+                "propertyTooltip": "Specifies a fraction of the table size to add to autovacuum_vacuum_insert_threshold when deciding whether to trigger a VACUUM.",
+                "minValue": 0
+              },
+              {
+                "propertyName": "Vacuum cost delay",
+                "propertyKeyword": "toast_autovacuum_vacuum_cost_delay",
+                "propertyType": "numeric",
+                "valueType": "number",
+                "propertyTooltip": "Specifies the cost delay value that will be used in automatic VACUUM operations. If -1 is specified, the regular vacuum_cost_delay value will be used. The value is specified as milliseconds.",
+                "minValue": -1
+              },
+              {
+                "propertyName": "Vacuum cost limit",
+                "propertyKeyword": "toast_autovacuum_vacuum_cost_limit",
+                "propertyType": "numeric",
+                "valueType": "number",
+                "propertyTooltip": "Specifies the cost limit value that will be used in automatic VACUUM operations. If -1 is specified (which is the default), the regular vacuum_cost_limit value will be used.",
+                "minValue": -1,
+                "step": 1
+              },
+              {
+                "propertyName": "Freeze min age",
+                "propertyKeyword": "toast_autovacuum_freeze_min_age",
+                "propertyType": "numeric",
+                "valueType": "number",
+                "propertyTooltip": "Specifies the cutoff age (in transactions) that VACUUM should use to decide whether to freeze row versions while scanning a table.",
+                "minValue": 0,
+                "step": 1
+              },
+              {
+                "propertyName": "Freeze max age",
+                "propertyKeyword": "toast_autovacuum_freeze_max_age",
+                "propertyType": "numeric",
+                "valueType": "number",
+                "propertyTooltip": "Specifies the maximum age (in transactions) that a table's pg_class.relfrozenxid field can attain before a VACUUM operation is forced to prevent transaction ID wraparound within the table.",
+                "minValue": 0,
+                "step": 1
+              },
+              {
+                "propertyName": "Freeze table age",
+                "propertyKeyword": "toast_autovacuum_freeze_table_age",
+                "propertyType": "numeric",
+                "valueType": "number",
+                "propertyTooltip": "Although users can set this value anywhere from zero to two billion, VACUUM will silently limit the effective value to 95% of autovacuum_freeze_max_age.",
+                "minValue": 0,
+                "maxValue": 2000000000,
+                "step": 1
+              },
+              {
+                "propertyName": "Multixact freeze min age",
+                "propertyKeyword": "toast_autovacuum_multixact_freeze_min_age",
+                "propertyType": "numeric",
+                "valueType": "number",
+                "propertyTooltip": "Specifies the cutoff age (in multixacts) that VACUUM should use to decide whether to replace multixact IDs with a newer transaction ID or multixact ID while scanning a table.",
+                "minValue": 0,
+                "step": 1
+              },
+              {
+                "propertyName": "Multixact freeze max age",
+                "propertyKeyword": "toast_autovacuum_multixact_freeze_max_age",
+                "propertyType": "numeric",
+                "valueType": "number",
+                "propertyTooltip": "Specifies the maximum age (in multixacts) that a table's pg_class.relminmxid field can attain before a VACUUM operation is forced to prevent multixact ID wraparound within the table.",
+                "minValue": 0,
+                "maxValue": 4000000000,
+                "step": 1
+              },
+              {
+                "propertyName": "Multixact freeze table age",
+                "propertyKeyword": "toast_autovacuum_multixact_freeze_table_age",
+                "propertyType": "numeric",
+                "valueType": "number",
+                "propertyTooltip": "Although users can set this value anywhere from zero to two billion, VACUUM will silently limit the effective value to 95% of autovacuum_multixact_freeze_max_age, so that a periodic manual VACUUM has a chance to run before an anti-wraparound is launched for the table.",
+                "minValue": 0,
+                "maxValue": 2000000000,
+                "step": 1
+              },
+              {
+                "propertyName": "Log min duration",
+                "propertyKeyword": "toast_log_autovacuum_min_duration",
+                "propertyType": "numeric",
+                "valueType": "number",
+                "propertyTooltip": "It is taken as milliseconds. Causes each action executed by autovacuum to be logged if it ran for at least the specified amount of time. Setting this to zero logs all autovacuum actions. -1 (the default) disables logging autovacuum actions.",
+                "minValue": -1,
+                "step": 1
+              }
+            ]
+          },
+          {
+            "propertyName": "User catalog table",
+            "propertyKeyword": "user_catalog_table",
+            "propertyType": "checkbox",
+            "propertyTooltip": "Declare the table as an additional catalog table for purposes of logical replication."
+          }
+        ]
+      },
+      {
+        "propertyName": "Tablespace",
+        "propertyKeyword": "view_tablespace_name",
+        "propertyTooltip": "Enter the name of an existing tablespace location for the database, or pg_default",
+        "propertyType": "text",
+        "dependency": {
+          "key": "materialized",
+          "value": true
+        }
+      },
+      {
+        "propertyName": "Or replace",
+        "propertyKeyword": "orReplace",
+        "defaultValue": false,
+        "propertyType": "checkbox",
+        "dependency": {
+          "type": "not",
+          "values": [
+            {
+              "key": "materialized",
+              "value": true
+            }
+          ]
+        }
+      },
+      {
+        "propertyName": "Temporary",
+        "propertyKeyword": "temporary",
+        "propertyType": "checkbox",
+        "dependency": {
+          "type": "not",
+          "values": [
+            {
+              "key": "materialized",
+              "value": true
+            }
+          ]
+        }
+      },
+      {
+        "propertyName": "Recursive",
+        "propertyKeyword": "recursive",
+        "propertyType": "checkbox",
+        "dependency": {
+          "type": "not",
+          "values": [
+            {
+              "key": "materialized",
+              "value": true
+            }
+          ]
+        }
+      },
+      {
+        "propertyName": "View option",
+        "propertyKeyword": "viewOptions",
+        "propertyType": "block",
+        "propertyTooltip": "This clause specifies optional parameters for a view",
+        "dependency": {
+          "type": "not",
+          "values": [
+            {
+              "key": "materialized",
+              "value": true
+            }
+          ]
+        },
+        "structure": [
+          {
+            "propertyName": "Check testing scope",
+            "propertyKeyword": "check_option",
+            "propertyTooltip": "This option controls the behavior of automatically updatable views. When this option is specified, INSERT and UPDATE commands on the view will be checked to ensure that new rows satisfy the view-defining condition (that is, the new rows are checked to ensure that they are visible through the view). If they are not, the update will be rejected.",
+            "propertyType": "select",
+            "options": ["", "local", "cascaded"]
+          },
+          {
+            "propertyName": "Security barrier",
+            "propertyKeyword": "security_barrier",
+            "propertyType": "checkbox",
+            "propertyTooltip": "This should be used if the view is intended to provide row-level security."
+          },
+          {
+            "propertyName": "Security invoker",
+            "propertyKeyword": "security_invoker",
+            "propertyType": "checkbox",
+            "propertyTooltip": "This option causes the underlying base relations to be checked against the privileges of the user of the view rather than the view owner."
+          }
+        ]
+      },
+      {
+        "propertyName": "As query",
+        "propertyKeyword": "selectStatement",
+        "propertyType": "details",
+        "propertyTooltip": "A SELECT or VALUES command which will provide the columns and rows of the view.",
+        "template": "textarea",
+        "markdown": false
+      },
+      {
+        "propertyName": "Populated with data at creation",
+        "propertyKeyword": "withDataOption",
+        "propertyType": "checkbox",
+        "propertyTooltip": "This clause specifies whether or not the materialized view should be populated at creation time. If not, the materialized view will be flagged as unscannable and cannot be queried until REFRESH MATERIALIZED VIEW is used.",
+        "dependency": {
+          "key": "materialized",
+          "value": true
+        }
+      },
+      {
+        "propertyName": "With check option",
+        "propertyKeyword": "withCheckOption",
+        "propertyTooltip": "This clause specifies optional parameters for a view; the following parameters are supported",
+        "propertyType": "checkbox",
+        "dependency": {
+          "type": "not",
+          "values": [
+            {
+              "key": "materialized",
+              "value": true
+            }
+          ]
+        }
+      },
+      {
+        "propertyName": "Check testing scope",
+        "propertyKeyword": "checkTestingScope",
+        "propertyTooltip": "This option controls the behavior of automatically updatable views. When this option is specified, INSERT and UPDATE commands on the view will be checked to ensure that new rows satisfy the view-defining condition (that is, the new rows are checked to ensure that they are visible through the view). If they are not, the update will be rejected.",
+        "propertyType": "select",
+        "options": ["", "LOCAL", "CASCADED"],
+        "dependency": {
+          "type": "and",
+          "values": [
+            {
+              "key": "withCheckOption",
+              "value": true
+            },
+            {
+              "type": "not",
+              "values": [
+                {
+                  "key": "materialized",
+                  "value": true
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "propertyName": "Custom scripts",
+        "propertyType": "block",
+        "propertyKeyword": "customScripts",
+        "propertyTooltip": "",
+        "structure": [
+          {
+            "propertyName": "Before CREATE VIEW",
+            "propertyKeyword": "beforeCreateView",
+            "propertyType": "block",
+            "propertyTooltip": "",
+            "structure": [
+              {
+                "propertyName": "Script",
+                "propertyKeyword": "script",
+                "propertyType": "details",
+                "markdown": false,
+                "template": "codeEditor",
+                "templateOptions": {
+                  "editorDialect": "sql",
+                  "customScriptVariables": true
+                }
+              }
+            ]
+          },
+          {
+            "propertyName": "After CREATE VIEW",
+            "propertyKeyword": "afterCreateView",
+            "propertyType": "block",
+            "propertyTooltip": "",
+            "structure": [
+              {
+                "propertyName": "Script",
+                "propertyKeyword": "script",
+                "propertyType": "details",
+                "markdown": false,
+                "template": "codeEditor",
+                "templateOptions": {
+                  "editorDialect": "sql",
+                  "customScriptVariables": true
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "propertyName": "Remarks",
+        "propertyKeyword": "comments",
+        "propertyTooltip": "remarks",
+        "propertyType": "details",
+        "addTimestampButton": true,
+        "markdown": true,
+        "template": "textarea"
+      },
+      {
+        "propertyKeyword": "pipeline",
+        "hidden": true
+      },
+      {
+        "propertyKeyword": "viewOn",
+        "hidden": true
+      }
+    ]
+  },
+  {
+    "lowerTab": "Triggers",
+    "structure": [
+      {
+        "propertyName": "Triggers",
+        "propertyType": "group",
+        "propertyKeyword": "triggers",
+        "propertyTooltip": "",
+        "dependency": {
+          "type": "not",
+          "values": [
+            {
+              "key": "materialized",
+              "value": true
+            }
+          ]
+        },
+        "structure": [
+          {
+            "propertyName": "Name",
+            "propertyKeyword": "name",
+            "propertyTooltip": "",
+            "propertyType": "text"
+          },
+          {
+            "propertyName": "Description",
+            "propertyKeyword": "triggerDescription",
+            "propertyTooltip": "description",
+            "propertyType": "details",
+            "template": "textarea"
+          },
+          {
+            "propertyName": "Or replace",
+            "propertyKeyword": "triggerOrReplace",
+            "propertyType": "checkbox",
+            "propertyTooltip": ""
+          },
+          {
+            "propertyName": "Constraint",
+            "propertyKeyword": "triggerConstraint",
+            "propertyType": "checkbox",
+            "propertyTooltip": "When the CONSTRAINT option is specified, this command creates a constraint trigger."
+          },
+          {
+            "propertyName": "Referenced table name",
+            "propertyKeyword": "triggerReferencedTable",
+            "propertyTooltip": "The (possibly schema-qualified) name of another table referenced by the constraint. This option is used for foreign-key constraints and is not recommended for general use.",
+            "propertyType": "selecthashed",
+            "template": "entities",
+            "withEmptyOption": true,
+            "excludeCurrent": false,
+            "dependency": {
+              "key": "triggerConstraint",
+              "value": true
+            }
+          },
+          {
+            "propertyName": "Trigger type",
+            "propertyKeyword": "triggerType",
+            "propertyTooltip": "Determines whether the function is called before, after, or instead of the event.",
+            "propertyType": "select",
+            "options": ["BEFORE", "AFTER", "INSTEAD OF"],
+            "defaultValue": "AFTER"
+          },
+          {
+            "propertyName": "Trigger events",
+            "propertyKeyword": "triggerEvents",
+            "propertyType": "group",
+            "structure": [
+              {
+                "propertyName": "Event",
+                "propertyKeyword": "triggerEvent",
+                "propertyTooltip": "This specifies the event that will fire the trigger",
+                "propertyType": "select",
+                "options": ["INSERT", "UPDATE", "DELETE", "TRUNCATE"]
+              }
+            ]
+          },
+          {
+            "propertyName": "Update columns",
+            "propertyKeyword": "triggerUpdateColumns",
+            "propertyType": "fieldList",
+            "template": "orderedList",
+            "disabledItemStrategy": "default",
+            "isCompositeKey": true,
+            "setPrimaryKey": false,
+            "abbr": "",
+            "dependency": {
+              "key": "triggerEvents.*.triggerEvent",
+              "value": "UPDATE"
+            }
+          },
+          {
+            "propertyName": "Deferrable",
+            "propertyKeyword": "triggerDeferrable",
+            "propertyType": "checkbox",
+            "propertyTooltip": "This controls whether the constraint can be deferred. A constraint that is not deferrable will be checked immediately after every command.",
+            "dependency": {
+              "key": "triggerConstraint",
+              "value": true
+            }
+          },
+          {
+            "propertyName": "Deferrable",
+            "propertyKeyword": "triggerTimeConstraintCheck",
+            "propertyType": "select",
+            "options": ["", "INITIALLY IMMEDIATE", "INITIALLY DEFERRED"],
+            "propertyTooltip": "If a constraint is deferrable, this clause specifies the default time to check the constraint. If the constraint is INITIALLY IMMEDIATE, it is checked after each statement. This is the default. If the constraint is INITIALLY DEFERRED, it is checked only at the end of the transaction.",
+            "dependency": {
+              "type": "and",
+              "values": [
+                {
+                  "key": "triggerConstraint",
+                  "value": true
+                },
+                {
+                  "key": "triggerDeferrable",
+                  "value": true
+                }
+              ]
+            }
+          },
+          {
+            "propertyName": "Referencing",
+            "propertyKeyword": "triggerReferencing",
+            "propertyType": "checkbox",
+            "propertyTooltip": "This keyword immediately precedes the declaration of one or two relation names that provide access to the transition relations of the triggering statement."
+          },
+          {
+            "propertyName": "Before-image transition relation",
+            "propertyKeyword": "triggerBeforeImageTransitionRelation",
+            "propertyType": "text",
+            "propertyTooltip": "Before-image transition relation name (OLD TABLE)",
+            "dependency": {
+              "key": "triggerReferencing",
+              "value": true
+            }
+          },
+          {
+            "propertyName": "After-image transition relation",
+            "propertyKeyword": "triggerAfterImageTransitionRelation",
+            "propertyType": "text",
+            "propertyTooltip": "After-image transition relation name (NEW TABLE)",
+            "dependency": {
+              "key": "triggerReferencing",
+              "value": true
+            }
+          },
+          {
+            "propertyName": "Trigger for each row/statement",
+            "propertyKeyword": "triggerEachRowStatement",
+            "propertyType": "select",
+            "propertyTooltip": "This specifies whether the trigger function should be fired once for every row affected by the trigger event, or just once per SQL statement.",
+            "options": ["FOR EACH STATEMENT", "FOR EACH ROW"],
+            "dependency": {
+              "type": "not",
+              "values": {
+                "type": "or",
+                "values": [
+                  {
+                    "key": "triggerConstraint",
+                    "value": true
+                  },
+                  {
+                    "key": "triggerType",
+                    "value": "INSTEAD OF"
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "propertyName": "Trigger WHEN condition",
+            "propertyKeyword": "triggerCondition",
+            "propertyTooltip": "A Boolean expression that determines whether the trigger function will actually be executed.",
+            "propertyType": "details",
+            "template": "textarea",
+            "markdown": false
+          },
+          {
+            "propertyName": "Function",
+            "propertyKeyword": "triggerFunction",
+            "propertyTooltip": "description",
+            "propertyType": "details",
+            "template": "textarea",
+            "markdown": false
+          },
+          {
+            "propertyName": "Remarks",
+            "propertyKeyword": "triggerComments",
+            "propertyTooltip": "comments",
+            "propertyType": "details",
+            "template": "textarea"
+          }
+        ]
+      }
+    ]
+  }
 ]
