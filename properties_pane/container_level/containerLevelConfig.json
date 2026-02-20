@@ -104,543 +104,543 @@ making sure that you maintain a proper JSON format.
 
 */
 [
-	{
-		"lowerTab": "Details",
-		"structure": [
-			{
-				"propertyName": "Comments",
-				"propertyKeyword": "description",
-				"shouldValidate": false,
-				"propertyTooltip": "comments",
-				"addTimestampButton": false,
-				"propertyType": "details",
-				"template": "textarea"
-			},
-			{
-				"propertyName": "If not exist",
-				"propertyKeyword": "ifNotExist",
-				"defaultValue": true,
-				"propertyType": "checkbox"
-			},
-			{
-				"propertyName": "Remarks",
-				"propertyKeyword": "comments",
-				"propertyTooltip": "remarks",
-				"addTimestampButton": true,
-				"propertyType": "details",
-				"template": "textarea"
-			},
-			{
-				"propertyName": "Custom scripts",
-				"propertyType": "block",
-				"propertyKeyword": "customScripts",
-				"propertyTooltip": "",
-				"structure": [
-					{
-						"propertyName": "Before CREATE SCHEMA",
-						"propertyKeyword": "beforeCreateContainer",
-						"propertyType": "block",
-						"propertyTooltip": "",
-						"structure": [
-							{
-								"propertyName": "Script",
-								"propertyKeyword": "script",
-								"propertyType": "details",
-								"markdown": false,
-								"template": "codeEditor",
-								"templateOptions": {
-									"editorDialect": "sql",
-									"customScriptVariables": true
-								}
-							}
-						]
-					},
-					{
-						"propertyName": "After CREATE SCHEMA",
-						"propertyKeyword": "afterCreateContainer",
-						"propertyType": "block",
-						"propertyTooltip": "",
-						"structure": [
-							{
-								"propertyName": "Script",
-								"propertyKeyword": "script",
-								"propertyType": "details",
-								"markdown": false,
-								"template": "codeEditor",
-								"templateOptions": {
-									"editorDialect": "sql",
-									"customScriptVariables": true
-								}
-							}
-						]
-					},
-					{
-						"propertyName": "Before each CREATE TABLE",
-						"propertyKeyword": "beforeCreateEntity",
-						"propertyType": "block",
-						"propertyTooltip": "",
-						"structure": [
-							{
-								"propertyName": "Script",
-								"propertyKeyword": "script",
-								"propertyType": "details",
-								"markdown": false,
-								"template": "codeEditor",
-								"templateOptions": {
-									"editorDialect": "sql",
-									"customScriptVariables": true
-								}
-							}
-						]
-					},
-					{
-						"propertyName": "After each CREATE TABLE",
-						"propertyKeyword": "afterCreateEntity",
-						"propertyType": "block",
-						"propertyTooltip": "",
-						"structure": [
-							{
-								"propertyName": "Script",
-								"propertyKeyword": "script",
-								"propertyType": "details",
-								"markdown": false,
-								"template": "codeEditor",
-								"templateOptions": {
-									"editorDialect": "sql",
-									"customScriptVariables": true
-								}
-							}
-						]
-					},
-					{
-						"propertyName": "Before each CREATE VIEW",
-						"propertyKeyword": "beforeCreateView",
-						"propertyType": "block",
-						"propertyTooltip": "",
-						"structure": [
-							{
-								"propertyName": "Script",
-								"propertyKeyword": "script",
-								"propertyType": "details",
-								"markdown": false,
-								"template": "codeEditor",
-								"templateOptions": {
-									"editorDialect": "sql",
-									"customScriptVariables": true
-								}
-							}
-						]
-					},
-					{
-						"propertyName": "After each CREATE VIEW",
-						"propertyKeyword": "afterCreateView",
-						"propertyType": "block",
-						"propertyTooltip": "",
-						"structure": [
-							{
-								"propertyName": "Script",
-								"propertyKeyword": "script",
-								"propertyType": "details",
-								"markdown": false,
-								"template": "codeEditor",
-								"templateOptions": {
-									"editorDialect": "sql",
-									"customScriptVariables": true
-								}
-							}
-						]
-					}
-				]
-			}
-		],
-		"containerLevelKeys": []
-	},
-	{
-		"lowerTab": "Sequences",
-		"structure": [
-			{
-				"propertyName": "Sequences",
-				"propertyType": "group",
-				"propertyKeyword": "sequences",
-				"propertyTooltip": "",
-				"structure": [
-					{
-						"propertyName": "Sequence name",
-						"propertyKeyword": "sequenceName",
-						"propertyTooltip": "",
-						"propertyType": "text"
-					},
-					{
-						"propertyName": "If not exists",
-						"propertyKeyword": "ifNotExist",
-						"propertyTooltip": "Do not throw an error if a relation with the same name already exists. A notice is issued in this case. Note that there is no guarantee that the existing relation is anything like the sequence that would have been created — it might not even be a sequence.",
-						"propertyType": "checkbox"
-					},
-					{
-						"propertyName": "Temporary",
-						"propertyKeyword": "temporary",
-						"propertyTooltip": "If specified, the sequence object is created only for this session, and is automatically dropped on session exit. Existing permanent sequences with the same name are not visible (in this session) while the temporary sequence exists, unless they are referenced with schema-qualified names.",
-						"defaultValue": false,
-						"propertyType": "checkbox"
-					},
-					{
-						"propertyName": "Unlogged",
-						"propertyKeyword": "unlogged",
-						"propertyTooltip": "If specified, the sequence is created as an unlogged sequence. Changes to unlogged sequences are not written to the write-ahead log. They are not crash-safe: an unlogged sequence is automatically reset to its initial state after a crash or unclean shutdown. Unlogged sequences are also not replicated to standby servers.",
-						"defaultValue": false,
-						"propertyType": "checkbox"
-					},
-					{
-						"propertyName": "Data type",
-						"propertyKeyword": "dataType",
-						"propertyTooltip": "The data type determines the default minimum and maximum values of the sequence.",
-						"propertyType": "select",
-						"defaultValue": "bigint",
-						"options": ["bigint", "integer", "smallint"]
-					},
-					{
-						"propertyName": "Start",
-						"propertyKeyword": "start",
-						"propertyType": "numeric",
-						"valueType": "number",
-						"propertyTooltip": "Allows the sequence to begin anywhere. The default starting value is minvalue for ascending sequences and maxvalue for descending ones.",
-						"maxValue": 9223372036854775807
-					},
-					{
-						"propertyName": "Increment",
-						"propertyKeyword": "increment",
-						"propertyType": "numeric",
-						"valueType": "number",
-						"propertyTooltip": "The data type determines the default minimum and maximum values of the sequence.",
-						"maxValue": 9223372036854775807
-					},
-					{
-						"propertyName": "Min value",
-						"propertyKeyword": "minValue",
-						"propertyType": "numeric",
-						"valueType": "number",
-						"propertyTooltip": "Determines the minimum value a sequence can generate. If this clause is not supplied is specified, then defaults will be used. The default for an ascending sequence is 1. The default for a descending sequence is the minimum value of the data type.",
-						"maxValue": 9223372036854775807
-					},
-					{
-						"propertyName": "Max value",
-						"propertyKeyword": "maxValue",
-						"propertyType": "numeric",
-						"valueType": "number",
-						"propertyTooltip": "Determines the maximum value for the sequence. If this clause is not supplied is specified, then default values will be used. The default for an ascending sequence is the maximum value of the data type. The default for a descending sequence is -1.",
-						"maxValue": 9223372036854775807
-					},
-					{
-						"propertyName": "Cache",
-						"propertyKeyword": "cache",
-						"propertyType": "numeric",
-						"valueType": "number",
-						"propertyTooltip": "specifies how many sequence numbers are to be preallocated and stored in memory for faster access. The minimum value is 1 (only one value can be generated at a time, i.e., no cache), and this is also the default",
-						"minValue": 1,
-						"maxValue": 9223372036854775807
-					},
-					{
-						"propertyName": "Cycle",
-						"propertyKeyword": "cycle",
-						"propertyTooltip": "Allows the sequence to wrap around when the maxvalue or minvalue has been reached by an ascending or descending sequence respectively. If the limit is reached, the next number generated will be the minvalue or maxvalue, respectively.",
-						"defaultValue": false,
-						"propertyType": "checkbox"
-					},
-					{
-						"propertyName": "Owned by none",
-						"propertyKeyword": "ownedByNone",
-						"propertyTooltip": "Specifies that there is no  association with a specific table column, such that if that column (or its whole table) is dropped, the sequence will be automatically dropped as well. ",
-						"defaultValue": true,
-						"propertyType": "checkbox"
-					},
-					{
-						"propertyName": "Owned by column",
-						"propertyKeyword": "ownedByColumn",
-						"propertyType": "fieldList",
-						"template": "orderedList",
-						"propertyTooltip": "Causes the sequence to be associated with a specific table column, such that if that column (or its whole table) is dropped, the sequence will be automatically dropped as well. The specified table must have the same owner and be in the same schema as the sequence.",
-						"templateOptions": {
-							"maxField": 1
-						},
-						"dependency": {
-							"key": "ownedByNone",
-							"value": false
-						}
-					}
-				]
-			}
-		]
-	},
-	{
-		"lowerTab": "Functions",
-		"structure": [
-			{
-				"propertyName": "Functions",
-				"propertyType": "group",
-				"propertyKeyword": "UDFs",
-				"propertyTooltip": "Creates a new scalar user-defined function (UDF) using either a SQL SELECT clause or a Python program.",
-				"structure": [
-					{
-						"propertyName": "Name",
-						"propertyKeyword": "name",
-						"propertyTooltip": "The name of the function.",
-						"propertyType": "text"
-					},
-					{
-						"propertyName": "Comments",
-						"propertyKeyword": "functionDescription",
-						"propertyTooltip": "description",
-						"propertyType": "details",
-						"template": "textarea"
-					},
-					{
-						"propertyName": "Or replace",
-						"propertyKeyword": "functionOrReplace",
-						"propertyType": "checkbox",
-						"propertyTooltip": "Specifies that if a function with the same name and input argument data types, or signature, as this one already exists, the existing function is replaced. You can only replace a function with a new function that defines an identical set of data types."
-					},
-					{
-						"propertyName": "Arguments",
-						"propertyKeyword": "functionArguments",
-						"propertyType": "group",
-						"propertyTooltip": "",
-						"structure": [
-							{
-								"propertyName": "Arg mode",
-								"propertyKeyword": "argumentMode",
-								"propertyTooltip": "The mode of an argument: IN, INOUT, or VARIADIC.",
-								"propertyType": "select",
-								"defaultValue": "IN",
-								"options": ["IN", "OUT", "INOUT", "VARIADIC"]
-							},
-							{
-								"propertyName": "Argument name",
-								"propertyKeyword": "argumentName",
-								"propertyTooltip": "The name of the argument.",
-								"propertyType": "text"
-							},
-							{
-								"propertyName": "Argument type",
-								"propertyKeyword": "argumentType",
-								"propertyTooltip": "The type of argument.",
-								"propertyType": "text"
-							},
-							{
-								"propertyName": "Default expression",
-								"propertyKeyword": "defaultExpression",
-								"propertyTooltip": "The argument types can be base, composite, or domain types, or can reference the type of a table column.",
-								"propertyType": "text"
-							}
-						]
-					},
-					{
-						"propertyName": "Returns set of",
-						"propertyKeyword": "functionReturnsSetOf",
-						"propertyType": "checkbox",
-						"propertyTooltip": "Indicates that the function will return a set of items, rather than a single item."
-					},
-					{
-						"propertyName": "Returns data type",
-						"propertyKeyword": "functionReturnType",
-						"propertyTooltip": "Any valid PostgreSQL data type",
-						"propertyType": "text"
-					},
-					{
-						"propertyName": "Language",
-						"propertyKeyword": "functionLanguage",
-						"propertyTooltip": "The name of the language that the procedure is implemented in.",
-						"propertyType": "select",
-						"defaultValue": "sql",
-						"options": ["sql", "plpgsql", "c", "internal"]
-					},
-					{
-						"propertyName": "Definition",
-						"propertyKeyword": "functionBody",
-						"propertyTooltip": "A string constant defining the function; the meaning depends on the language. It can be an internal function name, the path to an object file, an SQL command, or text in a procedural language.",
-						"propertyType": "details",
-						"template": "textarea",
-						"markdown": false
-					},
-					{
-						"propertyName": "Window",
-						"propertyKeyword": "functionWindow",
-						"propertyType": "checkbox",
-						"propertyTooltip": "Indicates that the function is a window function rather than a plain function. This is currently only useful for functions written in C.",
-						"dependency": {
-							"key": "functionLanguage",
-							"value": "c"
-						}
-					},
-					{
-						"propertyName": "Volatility",
-						"propertyKeyword": "functionVolatility",
-						"propertyType": "select",
-						"propertyTooltip": "These attributes inform the query optimizer about the behavior of the function.",
-						"defaultValue": "VOLATILE",
-						"options": ["IMMUTABLE", "STABLE", "VOLATILE"]
-					},
-					{
-						"propertyName": "Leak proof",
-						"propertyKeyword": "functionLeakProof",
-						"propertyType": "checkbox",
-						"propertyTooltip": "Indicates that the function has no side effects. It reveals no information about its arguments other than by its return value."
-					},
-					{
-						"propertyName": "When NULL args",
-						"propertyKeyword": "functionNullArgs",
-						"propertyType": "select",
-						"propertyTooltip": "Indicates whether the function will be called normally when some of its arguments are null, or the function always returns null  ",
-						"defaultValue": "CALLED ON NULL INPUT",
-						"options": ["CALLED ON NULL INPUT", "RETURNS NULL ON NULL INPUT", "STRICT"]
-					},
-					{
-						"propertyName": "SQL Security",
-						"propertyKeyword": "functionSqlSecurity",
-						"propertyTooltip": "Clause specifying what privileges are used when a procedure is called. If SQL SECURITY is INVOKER, the procedure body will be evaluated using the privileges of the user calling the procedure. If SQL SECURITY is DEFINER, the procedure body is always evaluated using the privileges of the definer account. DEFINER is the default.",
-						"propertyType": "select",
-						"defaultValue": "DEFINER",
-						"options": ["", "DEFINER", "INVOKER"]
-					},
-					{
-						"propertyName": "Parallel",
-						"propertyKeyword": "functionParallel",
-						"propertyTooltip": "Indicates whether the function can be executed in parallel mode and whether the presence of such a function in an SQL statement forces a serial execution plan.",
-						"propertyType": "select",
-						"defaultValue": "UNSAFE",
-						"options": ["", "UNSAFE", "RESTICTED", "SAFE"]
-					},
-					{
-						"propertyName": "Estimated cost",
-						"propertyKeyword": "functionExecutionCost",
-						"propertyType": "numeric",
-						"valueType": "number",
-						"propertyTooltip": "A positive number giving the estimated execution cost for the function, in units of cpu_operator_cost."
-					},
-					{
-						"propertyName": "Estimated rows",
-						"propertyKeyword": "functionExecutionRows",
-						"propertyType": "numeric",
-						"valueType": "number",
-						"minValue": 0,
-						"step": 1,
-						"propertyTooltip": "A positive number giving the estimated number of rows that the planner should expect the function to return."
-					},
-					{
-						"propertyName": "Support function",
-						"propertyKeyword": "functionSupportFunction",
-						"propertyTooltip": "The name of a planner support function to use for this function.",
-						"propertyType": "details",
-						"template": "textarea",
-						"markdown": false
-					},
-					{
-						"propertyName": "Config parameters",
-						"propertyKeyword": "functionConfigurationParameters",
-						"propertyTooltip": "The SET clause causes the specified configuration parameter to be set to the specified value when the function is entered, and then restored to its prior value when the function exits.",
-						"propertyType": "details",
-						"template": "textarea",
-						"markdown": false
-					},
-					{
-						"propertyName": "Remarks",
-						"propertyKeyword": "functionComments",
-						"propertyTooltip": "comments",
-						"addTimestampButton": false,
-						"propertyType": "details",
-						"template": "textarea"
-					}
-				]
-			}
-		]
-	},
-	{
-		"lowerTab": "Procedures",
-		"structure": [
-			{
-				"propertyName": "Procedures",
-				"propertyType": "group",
-				"propertyKeyword": "Procedures",
-				"propertyTooltip": "Creates a new stored procedure or replaces an existing procedure for the current database.",
-				"structure": [
-					{
-						"propertyName": "Name",
-						"propertyKeyword": "name",
-						"propertyTooltip": "The name of the procedure.",
-						"propertyType": "text"
-					},
-					{
-						"propertyName": "Comments",
-						"propertyKeyword": "description",
-						"propertyTooltip": "description",
-						"propertyType": "details",
-						"template": "textarea"
-					},
-					{
-						"propertyName": "Or replace",
-						"propertyKeyword": "orReplace",
-						"propertyType": "checkbox",
-						"propertyTooltip": "Specifies that if a procedure with the same name and input argument data types, or signature, as this one already exists, the existing function is replaced. You can only replace a function with a new function that defines an identical set of data types."
-					},
-					{
-						"propertyName": "Language",
-						"propertyKeyword": "language",
-						"propertyTooltip": "The name of the language that the procedure is implemented in.",
-						"propertyType": "select",
-						"defaultValue": "sql",
-						"options": ["sql", "plpgsql", "c", "internal"]
-					},
-					{
-						"propertyName": "Arguments",
-						"propertyKeyword": "inputArgs",
-						"propertyType": "group",
-						"propertyTooltip": "",
-						"structure": [
-							{
-								"propertyName": "Arg mode",
-								"propertyKeyword": "argumentMode",
-								"propertyTooltip": "The mode of an argument: IN, INOUT, or VARIADIC.",
-								"propertyType": "select",
-								"defaultValue": "IN",
-								"options": ["IN", "OUT", "INOUT", "VARIADIC"]
-							},
-							{
-								"propertyName": "Argument name",
-								"propertyKeyword": "argumentName",
-								"propertyTooltip": "The name of the argument.",
-								"propertyType": "text"
-							},
-							{
-								"propertyName": "Argument type",
-								"propertyKeyword": "argumentType",
-								"propertyTooltip": "The type of argument.",
-								"propertyType": "text"
-							},
-							{
-								"propertyName": "Arg type expression",
-								"propertyKeyword": "defaultExpression",
-								"propertyTooltip": "The argument types can be base, composite, or domain types, or can reference the type of a table column.",
-								"propertyType": "text"
-							}
-						]
-					},
-					{
-						"propertyName": "Procedure body",
-						"propertyKeyword": "body",
-						"propertyTooltip": "Valid procedure statement.",
-						"propertyType": "details",
-						"template": "textarea",
-						"markdown": false
-					},
-					{
-						"propertyName": "Remarks",
-						"propertyKeyword": "comments",
-						"propertyTooltip": "comments",
-						"addTimestampButton": false,
-						"propertyType": "details",
-						"template": "textarea"
-					}
-				]
-			}
-		]
-	}
+  {
+    "lowerTab": "Details",
+    "structure": [
+      {
+        "propertyName": "Comments",
+        "propertyKeyword": "description",
+        "shouldValidate": false,
+        "propertyTooltip": "comments",
+        "addTimestampButton": false,
+        "propertyType": "details",
+        "template": "textarea"
+      },
+      {
+        "propertyName": "If not exist",
+        "propertyKeyword": "ifNotExist",
+        "defaultValue": true,
+        "propertyType": "checkbox"
+      },
+      {
+        "propertyName": "Custom scripts",
+        "propertyType": "block",
+        "propertyKeyword": "customScripts",
+        "propertyTooltip": "",
+        "structure": [
+          {
+            "propertyName": "Before CREATE SCHEMA",
+            "propertyKeyword": "beforeCreateContainer",
+            "propertyType": "block",
+            "propertyTooltip": "",
+            "structure": [
+              {
+                "propertyName": "Script",
+                "propertyKeyword": "script",
+                "propertyType": "details",
+                "markdown": false,
+                "template": "codeEditor",
+                "templateOptions": {
+                  "editorDialect": "sql",
+                  "customScriptVariables": true
+                }
+              }
+            ]
+          },
+          {
+            "propertyName": "After CREATE SCHEMA",
+            "propertyKeyword": "afterCreateContainer",
+            "propertyType": "block",
+            "propertyTooltip": "",
+            "structure": [
+              {
+                "propertyName": "Script",
+                "propertyKeyword": "script",
+                "propertyType": "details",
+                "markdown": false,
+                "template": "codeEditor",
+                "templateOptions": {
+                  "editorDialect": "sql",
+                  "customScriptVariables": true
+                }
+              }
+            ]
+          },
+          {
+            "propertyName": "Before each CREATE TABLE",
+            "propertyKeyword": "beforeCreateEntity",
+            "propertyType": "block",
+            "propertyTooltip": "",
+            "structure": [
+              {
+                "propertyName": "Script",
+                "propertyKeyword": "script",
+                "propertyType": "details",
+                "markdown": false,
+                "template": "codeEditor",
+                "templateOptions": {
+                  "editorDialect": "sql",
+                  "customScriptVariables": true
+                }
+              }
+            ]
+          },
+          {
+            "propertyName": "After each CREATE TABLE",
+            "propertyKeyword": "afterCreateEntity",
+            "propertyType": "block",
+            "propertyTooltip": "",
+            "structure": [
+              {
+                "propertyName": "Script",
+                "propertyKeyword": "script",
+                "propertyType": "details",
+                "markdown": false,
+                "template": "codeEditor",
+                "templateOptions": {
+                  "editorDialect": "sql",
+                  "customScriptVariables": true
+                }
+              }
+            ]
+          },
+          {
+            "propertyName": "Before each CREATE VIEW",
+            "propertyKeyword": "beforeCreateView",
+            "propertyType": "block",
+            "propertyTooltip": "",
+            "structure": [
+              {
+                "propertyName": "Script",
+                "propertyKeyword": "script",
+                "propertyType": "details",
+                "markdown": false,
+                "template": "codeEditor",
+                "templateOptions": {
+                  "editorDialect": "sql",
+                  "customScriptVariables": true
+                }
+              }
+            ]
+          },
+          {
+            "propertyName": "After each CREATE VIEW",
+            "propertyKeyword": "afterCreateView",
+            "propertyType": "block",
+            "propertyTooltip": "",
+            "structure": [
+              {
+                "propertyName": "Script",
+                "propertyKeyword": "script",
+                "propertyType": "details",
+                "markdown": false,
+                "template": "codeEditor",
+                "templateOptions": {
+                  "editorDialect": "sql",
+                  "customScriptVariables": true
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "propertyName": "Remarks",
+        "propertyKeyword": "comments",
+        "propertyTooltip": "remarks",
+        "addTimestampButton": true,
+        "propertyType": "details",
+        "template": "textarea"
+      }
+    ],
+    "containerLevelKeys": []
+  },
+  {
+    "lowerTab": "Sequences",
+    "structure": [
+      {
+        "propertyName": "Sequences",
+        "propertyType": "group",
+        "propertyKeyword": "sequences",
+        "propertyTooltip": "",
+        "structure": [
+          {
+            "propertyName": "Sequence name",
+            "propertyKeyword": "sequenceName",
+            "propertyTooltip": "",
+            "propertyType": "text"
+          },
+          {
+            "propertyName": "If not exists",
+            "propertyKeyword": "ifNotExist",
+            "propertyTooltip": "Do not throw an error if a relation with the same name already exists. A notice is issued in this case. Note that there is no guarantee that the existing relation is anything like the sequence that would have been created — it might not even be a sequence.",
+            "propertyType": "checkbox"
+          },
+          {
+            "propertyName": "Temporary",
+            "propertyKeyword": "temporary",
+            "propertyTooltip": "If specified, the sequence object is created only for this session, and is automatically dropped on session exit. Existing permanent sequences with the same name are not visible (in this session) while the temporary sequence exists, unless they are referenced with schema-qualified names.",
+            "defaultValue": false,
+            "propertyType": "checkbox"
+          },
+          {
+            "propertyName": "Unlogged",
+            "propertyKeyword": "unlogged",
+            "propertyTooltip": "If specified, the sequence is created as an unlogged sequence. Changes to unlogged sequences are not written to the write-ahead log. They are not crash-safe: an unlogged sequence is automatically reset to its initial state after a crash or unclean shutdown. Unlogged sequences are also not replicated to standby servers.",
+            "defaultValue": false,
+            "propertyType": "checkbox"
+          },
+          {
+            "propertyName": "Data type",
+            "propertyKeyword": "dataType",
+            "propertyTooltip": "The data type determines the default minimum and maximum values of the sequence.",
+            "propertyType": "select",
+            "defaultValue": "bigint",
+            "options": ["bigint", "integer", "smallint"]
+          },
+          {
+            "propertyName": "Start",
+            "propertyKeyword": "start",
+            "propertyType": "numeric",
+            "valueType": "number",
+            "propertyTooltip": "Allows the sequence to begin anywhere. The default starting value is minvalue for ascending sequences and maxvalue for descending ones.",
+            "maxValue": 9223372036854775807
+          },
+          {
+            "propertyName": "Increment",
+            "propertyKeyword": "increment",
+            "propertyType": "numeric",
+            "valueType": "number",
+            "propertyTooltip": "The data type determines the default minimum and maximum values of the sequence.",
+            "maxValue": 9223372036854775807
+          },
+          {
+            "propertyName": "Min value",
+            "propertyKeyword": "minValue",
+            "propertyType": "numeric",
+            "valueType": "number",
+            "propertyTooltip": "Determines the minimum value a sequence can generate. If this clause is not supplied is specified, then defaults will be used. The default for an ascending sequence is 1. The default for a descending sequence is the minimum value of the data type.",
+            "maxValue": 9223372036854775807
+          },
+          {
+            "propertyName": "Max value",
+            "propertyKeyword": "maxValue",
+            "propertyType": "numeric",
+            "valueType": "number",
+            "propertyTooltip": "Determines the maximum value for the sequence. If this clause is not supplied is specified, then default values will be used. The default for an ascending sequence is the maximum value of the data type. The default for a descending sequence is -1.",
+            "maxValue": 9223372036854775807
+          },
+          {
+            "propertyName": "Cache",
+            "propertyKeyword": "cache",
+            "propertyType": "numeric",
+            "valueType": "number",
+            "propertyTooltip": "specifies how many sequence numbers are to be preallocated and stored in memory for faster access. The minimum value is 1 (only one value can be generated at a time, i.e., no cache), and this is also the default",
+            "minValue": 1,
+            "maxValue": 9223372036854775807
+          },
+          {
+            "propertyName": "Cycle",
+            "propertyKeyword": "cycle",
+            "propertyTooltip": "Allows the sequence to wrap around when the maxvalue or minvalue has been reached by an ascending or descending sequence respectively. If the limit is reached, the next number generated will be the minvalue or maxvalue, respectively.",
+            "defaultValue": false,
+            "propertyType": "checkbox"
+          },
+          {
+            "propertyName": "Owned by none",
+            "propertyKeyword": "ownedByNone",
+            "propertyTooltip": "Specifies that there is no  association with a specific table column, such that if that column (or its whole table) is dropped, the sequence will be automatically dropped as well. ",
+            "defaultValue": true,
+            "propertyType": "checkbox"
+          },
+          {
+            "propertyName": "Owned by column",
+            "propertyKeyword": "ownedByColumn",
+            "propertyType": "fieldList",
+            "template": "orderedList",
+            "propertyTooltip": "Causes the sequence to be associated with a specific table column, such that if that column (or its whole table) is dropped, the sequence will be automatically dropped as well. The specified table must have the same owner and be in the same schema as the sequence.",
+            "templateOptions": {
+              "maxField": 1
+            },
+            "dependency": {
+              "key": "ownedByNone",
+              "value": false
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "lowerTab": "Functions",
+    "structure": [
+      {
+        "propertyName": "Functions",
+        "propertyType": "group",
+        "propertyKeyword": "UDFs",
+        "propertyTooltip": "Creates a new scalar user-defined function (UDF) using either a SQL SELECT clause or a Python program.",
+        "structure": [
+          {
+            "propertyName": "Name",
+            "propertyKeyword": "name",
+            "propertyTooltip": "The name of the function.",
+            "propertyType": "text"
+          },
+          {
+            "propertyName": "Comments",
+            "propertyKeyword": "functionDescription",
+            "propertyTooltip": "description",
+            "propertyType": "details",
+            "template": "textarea"
+          },
+          {
+            "propertyName": "Or replace",
+            "propertyKeyword": "functionOrReplace",
+            "propertyType": "checkbox",
+            "propertyTooltip": "Specifies that if a function with the same name and input argument data types, or signature, as this one already exists, the existing function is replaced. You can only replace a function with a new function that defines an identical set of data types."
+          },
+          {
+            "propertyName": "Arguments",
+            "propertyKeyword": "functionArguments",
+            "propertyType": "group",
+            "propertyTooltip": "",
+            "structure": [
+              {
+                "propertyName": "Arg mode",
+                "propertyKeyword": "argumentMode",
+                "propertyTooltip": "The mode of an argument: IN, INOUT, or VARIADIC.",
+                "propertyType": "select",
+                "defaultValue": "IN",
+                "options": ["IN", "OUT", "INOUT", "VARIADIC"]
+              },
+              {
+                "propertyName": "Argument name",
+                "propertyKeyword": "argumentName",
+                "propertyTooltip": "The name of the argument.",
+                "propertyType": "text"
+              },
+              {
+                "propertyName": "Argument type",
+                "propertyKeyword": "argumentType",
+                "propertyTooltip": "The type of argument.",
+                "propertyType": "text"
+              },
+              {
+                "propertyName": "Default expression",
+                "propertyKeyword": "defaultExpression",
+                "propertyTooltip": "The argument types can be base, composite, or domain types, or can reference the type of a table column.",
+                "propertyType": "text"
+              }
+            ]
+          },
+          {
+            "propertyName": "Returns set of",
+            "propertyKeyword": "functionReturnsSetOf",
+            "propertyType": "checkbox",
+            "propertyTooltip": "Indicates that the function will return a set of items, rather than a single item."
+          },
+          {
+            "propertyName": "Returns data type",
+            "propertyKeyword": "functionReturnType",
+            "propertyTooltip": "Any valid PostgreSQL data type",
+            "propertyType": "text"
+          },
+          {
+            "propertyName": "Language",
+            "propertyKeyword": "functionLanguage",
+            "propertyTooltip": "The name of the language that the procedure is implemented in.",
+            "propertyType": "select",
+            "defaultValue": "sql",
+            "options": ["sql", "plpgsql", "c", "internal"]
+          },
+          {
+            "propertyName": "Definition",
+            "propertyKeyword": "functionBody",
+            "propertyTooltip": "A string constant defining the function; the meaning depends on the language. It can be an internal function name, the path to an object file, an SQL command, or text in a procedural language.",
+            "propertyType": "details",
+            "template": "textarea",
+            "markdown": false
+          },
+          {
+            "propertyName": "Window",
+            "propertyKeyword": "functionWindow",
+            "propertyType": "checkbox",
+            "propertyTooltip": "Indicates that the function is a window function rather than a plain function. This is currently only useful for functions written in C.",
+            "dependency": {
+              "key": "functionLanguage",
+              "value": "c"
+            }
+          },
+          {
+            "propertyName": "Volatility",
+            "propertyKeyword": "functionVolatility",
+            "propertyType": "select",
+            "propertyTooltip": "These attributes inform the query optimizer about the behavior of the function.",
+            "defaultValue": "VOLATILE",
+            "options": ["IMMUTABLE", "STABLE", "VOLATILE"]
+          },
+          {
+            "propertyName": "Leak proof",
+            "propertyKeyword": "functionLeakProof",
+            "propertyType": "checkbox",
+            "propertyTooltip": "Indicates that the function has no side effects. It reveals no information about its arguments other than by its return value."
+          },
+          {
+            "propertyName": "When NULL args",
+            "propertyKeyword": "functionNullArgs",
+            "propertyType": "select",
+            "propertyTooltip": "Indicates whether the function will be called normally when some of its arguments are null, or the function always returns null  ",
+            "defaultValue": "CALLED ON NULL INPUT",
+            "options": ["CALLED ON NULL INPUT", "RETURNS NULL ON NULL INPUT", "STRICT"]
+          },
+          {
+            "propertyName": "SQL Security",
+            "propertyKeyword": "functionSqlSecurity",
+            "propertyTooltip": "Clause specifying what privileges are used when a procedure is called. If SQL SECURITY is INVOKER, the procedure body will be evaluated using the privileges of the user calling the procedure. If SQL SECURITY is DEFINER, the procedure body is always evaluated using the privileges of the definer account. DEFINER is the default.",
+            "propertyType": "select",
+            "defaultValue": "DEFINER",
+            "options": ["", "DEFINER", "INVOKER"]
+          },
+          {
+            "propertyName": "Parallel",
+            "propertyKeyword": "functionParallel",
+            "propertyTooltip": "Indicates whether the function can be executed in parallel mode and whether the presence of such a function in an SQL statement forces a serial execution plan.",
+            "propertyType": "select",
+            "defaultValue": "UNSAFE",
+            "options": ["", "UNSAFE", "RESTICTED", "SAFE"]
+          },
+          {
+            "propertyName": "Estimated cost",
+            "propertyKeyword": "functionExecutionCost",
+            "propertyType": "numeric",
+            "valueType": "number",
+            "propertyTooltip": "A positive number giving the estimated execution cost for the function, in units of cpu_operator_cost."
+          },
+          {
+            "propertyName": "Estimated rows",
+            "propertyKeyword": "functionExecutionRows",
+            "propertyType": "numeric",
+            "valueType": "number",
+            "minValue": 0,
+            "step": 1,
+            "propertyTooltip": "A positive number giving the estimated number of rows that the planner should expect the function to return."
+          },
+          {
+            "propertyName": "Support function",
+            "propertyKeyword": "functionSupportFunction",
+            "propertyTooltip": "The name of a planner support function to use for this function.",
+            "propertyType": "details",
+            "template": "textarea",
+            "markdown": false
+          },
+          {
+            "propertyName": "Config parameters",
+            "propertyKeyword": "functionConfigurationParameters",
+            "propertyTooltip": "The SET clause causes the specified configuration parameter to be set to the specified value when the function is entered, and then restored to its prior value when the function exits.",
+            "propertyType": "details",
+            "template": "textarea",
+            "markdown": false
+          },
+          {
+            "propertyName": "Remarks",
+            "propertyKeyword": "functionComments",
+            "propertyTooltip": "comments",
+            "addTimestampButton": false,
+            "propertyType": "details",
+            "template": "textarea"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "lowerTab": "Procedures",
+    "structure": [
+      {
+        "propertyName": "Procedures",
+        "propertyType": "group",
+        "propertyKeyword": "Procedures",
+        "propertyTooltip": "Creates a new stored procedure or replaces an existing procedure for the current database.",
+        "structure": [
+          {
+            "propertyName": "Name",
+            "propertyKeyword": "name",
+            "propertyTooltip": "The name of the procedure.",
+            "propertyType": "text"
+          },
+          {
+            "propertyName": "Comments",
+            "propertyKeyword": "description",
+            "propertyTooltip": "description",
+            "propertyType": "details",
+            "template": "textarea"
+          },
+          {
+            "propertyName": "Or replace",
+            "propertyKeyword": "orReplace",
+            "propertyType": "checkbox",
+            "propertyTooltip": "Specifies that if a procedure with the same name and input argument data types, or signature, as this one already exists, the existing function is replaced. You can only replace a function with a new function that defines an identical set of data types."
+          },
+          {
+            "propertyName": "Language",
+            "propertyKeyword": "language",
+            "propertyTooltip": "The name of the language that the procedure is implemented in.",
+            "propertyType": "select",
+            "defaultValue": "sql",
+            "options": ["sql", "plpgsql", "c", "internal"]
+          },
+          {
+            "propertyName": "Arguments",
+            "propertyKeyword": "inputArgs",
+            "propertyType": "group",
+            "propertyTooltip": "",
+            "structure": [
+              {
+                "propertyName": "Arg mode",
+                "propertyKeyword": "argumentMode",
+                "propertyTooltip": "The mode of an argument: IN, INOUT, or VARIADIC.",
+                "propertyType": "select",
+                "defaultValue": "IN",
+                "options": ["IN", "OUT", "INOUT", "VARIADIC"]
+              },
+              {
+                "propertyName": "Argument name",
+                "propertyKeyword": "argumentName",
+                "propertyTooltip": "The name of the argument.",
+                "propertyType": "text"
+              },
+              {
+                "propertyName": "Argument type",
+                "propertyKeyword": "argumentType",
+                "propertyTooltip": "The type of argument.",
+                "propertyType": "text"
+              },
+              {
+                "propertyName": "Arg type expression",
+                "propertyKeyword": "defaultExpression",
+                "propertyTooltip": "The argument types can be base, composite, or domain types, or can reference the type of a table column.",
+                "propertyType": "text"
+              }
+            ]
+          },
+          {
+            "propertyName": "Procedure body",
+            "propertyKeyword": "body",
+            "propertyTooltip": "Valid procedure statement.",
+            "propertyType": "details",
+            "template": "textarea",
+            "markdown": false
+          },
+          {
+            "propertyName": "Remarks",
+            "propertyKeyword": "comments",
+            "propertyTooltip": "comments",
+            "addTimestampButton": false,
+            "propertyType": "details",
+            "template": "textarea"
+          }
+        ]
+      }
+    ]
+  }
 ]
