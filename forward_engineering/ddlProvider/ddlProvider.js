@@ -262,27 +262,27 @@ module.exports = (baseProvider, options, app) => {
 		/**
 		 * @param tableName {string}
 		 * @param dbData {{
-		 *	 dbVersion: string,
+		 *     dbVersion: string,
 		 * }}
 		 * @param isParentActivated {boolean}
 		 * @param index {{
-		 *	 unique?: boolean,
-		 *	 index_method?: string,
-		 *	 indxName?: string,
-		 *	 schemaName?: string,
-		 *	 concurrently?: boolean,
-		 *	 ifNotExist?: boolean,
-		 *	 only?: boolean,
-		 *	 nullsDistinct?: string,
-		 *	 columns?: Array<{
-		 *		 sortOrder?: any,
-		 *		 nullsOrder?: any,
-		 *		 isActivated?: boolean,
-		 *		 name: string,
-		 *		 collation?: string,
-		 *		 opclass?: string,
-		 *	 }>,
-		 *	 isActivated?: boolean,
+		 *     unique?: boolean,
+		 *     index_method?: string,
+		 *     indxName?: string,
+		 *     schemaName?: string,
+		 *     concurrently?: boolean,
+		 *     ifNotExist?: boolean,
+		 *     only?: boolean,
+		 *     nullsDistinct?: string,
+		 *     columns?: Array<{
+		 *         sortOrder?: any,
+		 *         nullsOrder?: any,
+		 *         isActivated?: boolean,
+		 *         name: string,
+		 *         collation?: string,
+		 *         opclass?: string,
+		 *     }>,
+		 *     isActivated?: boolean,
 		 * }}
 		 *
 		 * @return {string}
@@ -307,11 +307,11 @@ module.exports = (baseProvider, options, app) => {
 		 * @param name {string}
 		 * @param isActivated {boolean}
 		 * @param customProperties {{
-		 *	 relationshipOnDelete?: string,
-		 *	 relationshipOnUpdate?: string,
-		 *	 relationshipMatch?: string,
-		 *	 deferrable?: "" | "DEFERRABLE" | "NOT DEFERRABLE",
-		 *	 deferrableConstraintCheckTime?: "" | "INITIALLY IMMEDIATE" | "INITIALLY DEFERRED",
+		 *     relationshipOnDelete?: string,
+		 *     relationshipOnUpdate?: string,
+		 *     relationshipMatch?: string,
+		 *     deferrable?: "" | "DEFERRABLE" | "NOT DEFERRABLE",
+		 *     deferrableConstraintCheckTime?: "" | "INITIALLY IMMEDIATE" | "INITIALLY DEFERRED",
 		 * }}
 		 * @param primaryTableActivated {boolean}
 		 * @param foreignTableActivated {boolean}
@@ -319,20 +319,20 @@ module.exports = (baseProvider, options, app) => {
 		 * @param primarySchemaName {string}
 		 * @param primaryTable {string}
 		 * @param primaryKey {Array<{
-		 *	 isActivated: boolean,
-		 *	 name: string,
+		 *     isActivated: boolean,
+		 *     name: string,
 		 * }>}
 		 * @param foreignKey {Array<{
-		 *	 isActivated: boolean,
-		 *	 name: string,
+		 *     isActivated: boolean,
+		 *     name: string,
 		 * }>}
 		 * @param schemaData {{
-		 *	 schemaName: string
+		 *     schemaName: string
 		 * }}
 		 * @param dbData {any}
 		 * @return {{
-		 *	 statement: string,
-		 *	 isActivated: boolean,
+		 *     statement: string,
+		 *     isActivated: boolean,
 		 * }}
 		 * */
 		createForeignKeyConstraint(
@@ -387,9 +387,9 @@ module.exports = (baseProvider, options, app) => {
 		 * @param name {string}
 		 * @param isActivated {boolean}
 		 * @param customProperties {{
-		 *	 relationshipOnDelete?: string,
-		 *	 relationshipOnUpdate?: string,
-		 *	 relationshipMatch?: string,
+		 *     relationshipOnDelete?: string,
+		 *     relationshipOnUpdate?: string,
+		 *     relationshipMatch?: string,
 		 * }}
 		 * @param primaryTableActivated {boolean}
 		 * @param foreignTableActivated {boolean}
@@ -398,20 +398,20 @@ module.exports = (baseProvider, options, app) => {
 		 * @param primarySchemaName {string}
 		 * @param primaryTable {string}
 		 * @param primaryKey {Array<{
-		 *	 isActivated: boolean,
-		 *	 name: string,
+		 *     isActivated: boolean,
+		 *     name: string,
 		 * }>}
 		 * @param foreignKey {Array<{
-		 *	 isActivated: boolean,
-		 *	 name: string,
+		 *     isActivated: boolean,
+		 *     name: string,
 		 * }>}
 		 * @param schemaData {{
-		 *	 schemaName: string
+		 *     schemaName: string
 		 * }}
 		 * @param dbData {any}
 		 * @return {{
-		 *	 statement: string,
-		 *	 isActivated: boolean,
+		 *     statement: string,
+		 *     isActivated: boolean,
 		 * }}
 		 * */
 		createForeignKey(
