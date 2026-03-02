@@ -1,9 +1,10 @@
 const _ = require('lodash');
 const { getModifySchemaCommentsScriptDtos } = require('./containerHelpers/commentsHelper');
-const { AlterScriptDto } = require('../types/AlterScriptDto');
+const { AlterScriptDto, SCRIPT_TYPE } = require('../types/AlterScriptDto');
 const assignTemplates = require('../../utils/assignTemplates');
 const templates = require('../../ddlProvider/templates');
-const { wrapInQuotes } = require('../../utils/general');
+const { wrapInQuotes, getId } = require('../../utils/general');
+const { isObjectInDeltaModelActivated } = require('../../utils/general');
 
 /**
  * @param {string} schemaName
@@ -32,9 +33,10 @@ const dropSchema = schemaName => {
  * @param {boolean} isActivated
  * @return {AlterScriptDto | undefined}
  * */
-const getAddContainerScriptDto = (containerName, isActivated = true) => {
+const getAddContainerScriptDto = (containerName, jsonSchema) => {
+	const isActivated = isObjectInDeltaModelActivated(jsonSchema) ?? true;
 	const script = createSchemaOnly(wrapInQuotes(containerName));
-	return AlterScriptDto.getInstance([script], isActivated, false);
+	return AlterScriptDto.getInstance(script, isActivated, false, SCRIPT_TYPE.createContainer, getId(jsonSchema));
 };
 
 /**
@@ -42,9 +44,10 @@ const getAddContainerScriptDto = (containerName, isActivated = true) => {
  * @param {boolean} isActivated
  * @return {AlterScriptDto | undefined}
  * */
-const getDeleteContainerScriptDto = (containerName, isActivated = true) => {
+const getDeleteContainerScriptDto = (containerName, jsonSchema) => {
+	const isActivated = isObjectInDeltaModelActivated(jsonSchema) ?? true;
 	const script = dropSchema(wrapInQuotes(containerName));
-	return AlterScriptDto.getInstance([script], isActivated, true);
+	return AlterScriptDto.getInstance(script, isActivated, true, SCRIPT_TYPE.dropContainer, getId(jsonSchema));
 };
 
 /**

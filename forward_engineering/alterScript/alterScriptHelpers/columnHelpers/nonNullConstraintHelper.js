@@ -1,10 +1,11 @@
 const _ = require('lodash');
-const { AlterScriptDto } = require('../../types/AlterScriptDto');
+const { AlterScriptDto, SCRIPT_TYPE } = require('../../types/AlterScriptDto');
 const {
 	getFullTableName,
 	wrapInQuotes,
 	isObjectInDeltaModelActivated,
 	isParentContainerActivated,
+	getId,
 } = require('../../../utils/general');
 const assignTemplates = require('../../../utils/assignTemplates');
 const templates = require('../../../ddlProvider/templates');
@@ -58,9 +59,9 @@ const getModifyNonNullColumnsScriptDtos = collection => {
 		})
 		.map(([columnName, jsonSchema]) => {
 			const isActivated = isContainerActivated && isCollectionActivated && jsonSchema.isActivated;
-			return { script: setNotNullConstraint(fullTableName, wrapInQuotes(columnName)), isActivated };
-		})
-		.map(({ script, isActivated }) => AlterScriptDto.getInstance([script], isActivated, false));
+			const script = setNotNullConstraint(fullTableName, wrapInQuotes(columnName));
+			return AlterScriptDto.getInstance(script, isActivated, false, SCRIPT_TYPE.alterEntity, getId(collection));
+		});
 
 	const removeNotNullConstraint = _.toPairs(collection.properties)
 		.filter(([name, jsonSchema]) => {
@@ -71,9 +72,9 @@ const getModifyNonNullColumnsScriptDtos = collection => {
 		})
 		.map(([name, jsonSchema]) => {
 			const isActivated = isContainerActivated && isCollectionActivated && jsonSchema.isActivated;
-			return { script: dropNotNullConstraint(fullTableName, wrapInQuotes(name)), isActivated };
-		})
-		.map(({ script, isActivated }) => AlterScriptDto.getInstance([script], isActivated, true));
+			const script = dropNotNullConstraint(fullTableName, wrapInQuotes(name));
+			return AlterScriptDto.getInstance(script, isActivated, true, SCRIPT_TYPE.alterEntity, getId(collection));
+		});
 
 	return [...addNotNullConstraintsScript, ...removeNotNullConstraint];
 };

@@ -1,6 +1,6 @@
 const _ = require('lodash');
 const { AlterCollectionDto } = require('../../types/AlterCollectionDto');
-const { AlterScriptDto } = require('../../types/AlterScriptDto');
+const { AlterScriptDto, SCRIPT_TYPE } = require('../../types/AlterScriptDto');
 const {
 	getFullTableName,
 	wrapInQuotes,
@@ -71,9 +71,9 @@ const getDropCheckConstraintScriptDtos = (constraintHistory, fullTableName) => {
 		.filter(historyEntry => historyEntry.old?.constrExpression && !historyEntry.new?.constrExpression)
 		.map(historyEntry => {
 			const wrappedConstraintName = wrapInQuotes(historyEntry.old.chkConstrName);
-			return dropConstraint(fullTableName, wrappedConstraintName);
-		})
-		.map(script => AlterScriptDto.getInstance([script], true, true));
+			const script = dropConstraint(fullTableName, wrappedConstraintName);
+			return AlterScriptDto.getInstance(script, true, true, SCRIPT_TYPE.alterEntity);
+		});
 };
 
 /**
@@ -103,9 +103,9 @@ const getAddCheckConstraintScriptDtos = (constraintHistory, fullTableName) => {
 		.filter(historyEntry => historyEntry.new?.constrExpression && !historyEntry.old?.constrExpression)
 		.map(historyEntry => {
 			const { chkConstrName, constrExpression, noInherit } = historyEntry.new;
-			return addCheckConstraint(fullTableName, wrapInQuotes(chkConstrName), constrExpression, noInherit);
-		})
-		.map(script => AlterScriptDto.getInstance([script], true, false));
+			const script = addCheckConstraint(fullTableName, wrapInQuotes(chkConstrName), constrExpression, noInherit);
+			return AlterScriptDto.getInstance(script, true, false, SCRIPT_TYPE.alterEntity);
+		});
 };
 
 /**
@@ -125,7 +125,7 @@ const getUpdateCheckConstraintScriptDtos = (constraintHistory, fullTableName) =>
 			}
 			return false;
 		})
-		.map(historyEntry => {
+		.flatMap(historyEntry => {
 			const { chkConstrName: oldConstrainName } = historyEntry.old;
 			const dropConstraintScript = dropConstraint(fullTableName, wrapInQuotes(oldConstrainName));
 
@@ -142,11 +142,10 @@ const getUpdateCheckConstraintScriptDtos = (constraintHistory, fullTableName) =>
 			);
 
 			return [
-				AlterScriptDto.getInstance([dropConstraintScript], true, true),
-				AlterScriptDto.getInstance([addConstraintScript], true, false),
+				AlterScriptDto.getInstance(dropConstraintScript, true, true, SCRIPT_TYPE.alterEntity),
+				AlterScriptDto.getInstance(addConstraintScript, true, false, SCRIPT_TYPE.alterEntity),
 			];
-		})
-		.flat();
+		});
 };
 
 /**

@@ -1,5 +1,5 @@
 const _ = require('lodash');
-const { AlterScriptDto } = require('../../types/AlterScriptDto');
+const { AlterScriptDto, SCRIPT_TYPE } = require('../../types/AlterScriptDto');
 const {
 	AlterCollectionDto,
 	AlterCollectionColumnDto,
@@ -15,6 +15,7 @@ const {
 	wrapInQuotes,
 	isParentContainerActivated,
 	isObjectInDeltaModelActivated,
+	getId,
 } = require('../../../utils/general');
 const { alterKeyConstraint, dropKeyConstraint } = require('../../../ddlProvider/ddlHelpers/constraintsHelper');
 const { areConstraintOptionsEqual } = require('./areConstraintOptionsEqual');
@@ -677,7 +678,13 @@ const getModifyPkConstraintsScriptDtos = collection => {
 
 	return sortedAllDtos
 		.map(dto => {
-			return AlterScriptDto.getInstance([dto.script], dto.isActivated, dto.isDropScript);
+			return AlterScriptDto.getInstance(
+				dto.script,
+				dto.isActivated,
+				dto.isDropScript,
+				SCRIPT_TYPE.alterEntity,
+				getId(collection),
+			);
 		})
 		.filter(Boolean);
 };

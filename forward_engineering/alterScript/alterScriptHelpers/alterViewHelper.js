@@ -1,7 +1,7 @@
 const _ = require('lodash');
 const { getModifyViewCommentsScriptDtos } = require('./viewHelpers/commentsHelper');
-const { AlterScriptDto } = require('../types/AlterScriptDto');
-const { wrapInQuotes } = require('../../utils/general');
+const { AlterScriptDto, SCRIPT_TYPE } = require('../types/AlterScriptDto');
+const { wrapInQuotes, getId } = require('../../utils/general');
 
 const getKeys = ({ view, collectionRefsDefinitionsMap, ddlProvider, app }) => {
 	const { mapProperties } = app.require('@hackolade/ddl-fe-utils');
@@ -61,7 +61,7 @@ const getAddViewScriptDto = app => view => {
 	const hydratedView = ddlProvider.hydrateView({ viewData, entityData: [view] });
 
 	const script = ddlProvider.createView(hydratedView, {}, view.isActivated);
-	return AlterScriptDto.getInstance([script], true, false);
+	return AlterScriptDto.getInstance(script, true, false, SCRIPT_TYPE.createView, getId(view));
 };
 
 /**
@@ -72,7 +72,7 @@ const getDeleteViewScriptDto = app => view => {
 	const viewName = wrapInQuotes(view.code || view.name);
 
 	const script = ddlProvider.dropView(viewName);
-	return AlterScriptDto.getInstance([script], true, true);
+	return AlterScriptDto.getInstance(script, true, true, SCRIPT_TYPE.dropView, getId(view));
 };
 
 /**

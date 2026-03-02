@@ -1,9 +1,10 @@
-const { AlterScriptDto } = require('../../types/AlterScriptDto');
+const { AlterScriptDto, SCRIPT_TYPE } = require('../../types/AlterScriptDto');
 const {
 	getFullViewName,
 	wrapComment,
 	isObjectInDeltaModelActivated,
 	isParentContainerActivated,
+	getId,
 } = require('../../../utils/general');
 const assignTemplates = require('../../../utils/assignTemplates');
 const templates = require('../../../ddlProvider/templates');
@@ -51,7 +52,7 @@ const getUpsertCommentsScriptDto = view => {
 		const isViewActivated = isContainerActivated && isObjectInDeltaModelActivated(view);
 
 		const script = updateViewComment(viewName, wrappedComment);
-		return AlterScriptDto.getInstance([script], isViewActivated, false);
+		return AlterScriptDto.getInstance(script, isViewActivated, false, SCRIPT_TYPE.alterView, getId(view));
 	}
 	return undefined;
 };
@@ -70,7 +71,7 @@ const getDropCommentsScriptDto = view => {
 		const isViewActivated = isContainerActivated && isObjectInDeltaModelActivated(view);
 
 		const script = dropViewComment(viewName);
-		return AlterScriptDto.getInstance([script], isViewActivated, true);
+		return AlterScriptDto.getInstance(script, isViewActivated, true, SCRIPT_TYPE.alterView, getId(view));
 	}
 	return undefined;
 };

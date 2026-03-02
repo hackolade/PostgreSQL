@@ -1,10 +1,11 @@
 const { toPairs } = require('lodash');
-const { AlterScriptDto } = require('../../types/AlterScriptDto');
+const { AlterScriptDto, SCRIPT_TYPE } = require('../../types/AlterScriptDto');
 const {
 	getFullTableName,
 	wrapInQuotes,
 	isObjectInDeltaModelActivated,
 	isParentContainerActivated,
+	getId,
 } = require('../../../utils/general');
 const { decorateDefault } = require('../../../ddlProvider/ddlHelpers/columnDefinitionHelper');
 const assignTemplates = require('../../../utils/assignTemplates');
@@ -52,9 +53,9 @@ const getUpdatedDefaultColumnValueScriptDtos = ({ collection }) => {
 				defaultValue: decorateDefault(type, newDefaultValue, isArrayType),
 			};
 			const isActivated = isContainerActivated && isCollectionActivated && jsonSchema.isActivated;
-			return { script: updateColumnDefaultValue(scriptGenerationConfig), isActivated };
+			const script = updateColumnDefaultValue(scriptGenerationConfig);
+			return AlterScriptDto.getInstance(script, isActivated, false, SCRIPT_TYPE.alterEntity, getId(collection));
 		})
-		.map(({ script, isActivated }) => AlterScriptDto.getInstance([script], isActivated, false))
 		.filter(Boolean);
 };
 
@@ -96,9 +97,9 @@ const getDeletedDefaultColumnValueScriptDtos = ({ collection }) => {
 				columnName: wrapInQuotes(columnName),
 			};
 			const isActivated = isContainerActivated && isCollectionActivated && jsonSchema.isActivated;
-			return { script: dropColumnDefaultValue(scriptGenerationConfig), isActivated };
+			const script = dropColumnDefaultValue(scriptGenerationConfig);
+			return AlterScriptDto.getInstance(script, isActivated, true, SCRIPT_TYPE.alterEntity, getId(collection));
 		})
-		.map(({ script, isActivated }) => AlterScriptDto.getInstance([script], isActivated, true))
 		.filter(Boolean);
 };
 

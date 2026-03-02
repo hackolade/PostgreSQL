@@ -3,36 +3,49 @@ const { AlterScriptDto } = require('./types/AlterScriptDto');
 const { commentIfDeactivated } = require('../utils/general');
 
 /**
+ * @param {AlterScriptDto} dtos
+ * @param {boolean} shouldApplyDropStatements
+ * @return {AlterScriptDto}
+ * */
+const commentDto = (dto, shouldApplyDropStatements) => {
+	let script = dto.script;
+	const shouldDeactivate = dto.isActivated === false || (!shouldApplyDropStatements && dto.isDropScript);
+	if (shouldDeactivate) {
+		script = commentIfDeactivated(script, {
+			isActivated: false,
+			isPartOfLine: false,
+		});
+	}
+	return { ...dto, script };
+};
+
+/**
+ * @param {AlterScriptDto[]} dtos
+ * @param {boolean} shouldApplyDropStatements
+ * @return {AlterScriptDto[]}
+ * */
+const commentDtosIfRequired = (dtos, shouldApplyDropStatements) => {
+	return dtos.reduce((finalDtos, dto) => {
+		if (!dto) {
+			return finalDtos;
+		}
+		return [...finalDtos, commentDto(dto, shouldApplyDropStatements)];
+	}, []);
+};
+
+/**
  * @param {AlterScriptDto[]} dtos
  * @param {boolean} shouldApplyDropStatements
  * @return {string}
  * */
 const joinAlterScriptDtosIntoScript = (dtos, shouldApplyDropStatements) => {
-	return dtos
-		.map(dto => {
-			if (dto.isActivated === false) {
-				return dto.scripts.map(scriptDto =>
-					commentIfDeactivated(scriptDto.script, {
-						isActivated: false,
-						isPartOfLine: false,
-					}),
-				);
-			}
-			if (!shouldApplyDropStatements) {
-				return dto.scripts.map(scriptDto =>
-					commentIfDeactivated(scriptDto.script, {
-						isActivated: !scriptDto.isDropScript,
-						isPartOfLine: false,
-					}),
-				);
-			}
-			return dto.scripts.map(scriptDto => scriptDto.script);
-		})
-		.flat()
-		.filter(Boolean)
-		.map(scriptLine => scriptLine.trim())
-		.filter(Boolean)
-		.join('\n\n');
+	return dtos.reduce((finalScript, dto) => {
+		if (!dto) {
+			return finalScript;
+		}
+		const { script } = commentDto(dto, shouldApplyDropStatements);
+		return `${finalScript}\n\n${script}`;
+	}, '');
 };
 
 /**
@@ -46,7 +59,9 @@ const buildEntityLevelAlterScript = (data, app) => {
 		option => option.id === 'applyDropStatements' && option.value,
 	);
 
-	return joinAlterScriptDtosIntoScript(alterScriptDtos, shouldApplyDropStatements);
+	return data.options?.keepDtos
+		? commentDtosIfRequired(alterScriptDtos, shouldApplyDropStatements)
+		: joinAlterScriptDtosIntoScript(alterScriptDtos, shouldApplyDropStatements);
 };
 
 /**
@@ -56,11 +71,7 @@ const buildEntityLevelAlterScript = (data, app) => {
  * */
 const doesEntityLevelAlterScriptContainDropStatements = (data, app) => {
 	const alterScriptDtos = getAlterScriptDtos(data, app);
-	return alterScriptDtos.some(
-		alterScriptDto =>
-			alterScriptDto.isActivated &&
-			alterScriptDto.scripts.some(scriptModificationDto => scriptModificationDto.isDropScript),
-	);
+	return alterScriptDtos.some(alterScriptDto => alterScriptDto?.isActivated && alterScriptDto.isDropScript);
 };
 
 const mapCoreDataForContainerLevelScripts = data => {
@@ -83,7 +94,9 @@ const buildContainerLevelAlterScript = (data, app) => {
 		option => option.id === 'applyDropStatements' && option.value,
 	);
 
-	return joinAlterScriptDtosIntoScript(alterScriptDtos, shouldApplyDropStatements);
+	return preparedData.options?.keepDtos
+		? commentDtosIfRequired(alterScriptDtos, shouldApplyDropStatements)
+		: joinAlterScriptDtosIntoScript(alterScriptDtos, shouldApplyDropStatements);
 };
 
 /**
@@ -94,11 +107,7 @@ const buildContainerLevelAlterScript = (data, app) => {
 const doesContainerLevelAlterScriptContainDropStatements = (data, app) => {
 	const preparedData = mapCoreDataForContainerLevelScripts(data);
 	const alterScriptDtos = getAlterScriptDtos(preparedData, app);
-	return alterScriptDtos.some(
-		alterScriptDto =>
-			alterScriptDto.isActivated &&
-			alterScriptDto.scripts.some(scriptModificationDto => scriptModificationDto.isDropScript),
-	);
+	return alterScriptDtos.some(alterScriptDto => alterScriptDto?.isActivated && alterScriptDto.isDropScript);
 };
 
 module.exports = {

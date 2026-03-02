@@ -1,8 +1,13 @@
 const _ = require('lodash');
 const { AlterCollectionDto } = require('../../types/AlterCollectionDto');
 const { AlterIndexDto } = require('../../types/AlterIndexDto');
-const { AlterScriptDto } = require('../../types/AlterScriptDto');
-const { getSchemaNameFromCollection, getNamePrefixedWithSchemaName, wrapInQuotes } = require('../../../utils/general');
+const { AlterScriptDto, SCRIPT_TYPE } = require('../../types/AlterScriptDto');
+const {
+	getSchemaNameFromCollection,
+	getNamePrefixedWithSchemaName,
+	wrapInQuotes,
+	getId,
+} = require('../../../utils/general');
 const { dropIndex, createIndex, getWithOptions } = require('../../../ddlProvider/ddlHelpers/indexHelper');
 const assignTemplates = require('../../../utils/assignTemplates');
 const templates = require('../../../ddlProvider/templates');
@@ -201,7 +206,13 @@ const getCreateIndexScriptDto = ({ index, collection, additionalDataForDdlProvid
 
 	const script = createIndex(tableName, indexForFeScript, dbData, isParentActivated);
 	const isIndexActivated = indexForFeScript.isActivated && isParentActivated;
-	return AlterScriptDto.getInstance([script], isIndexActivated, false);
+	return AlterScriptDto.getInstance(
+		script,
+		isIndexActivated,
+		false,
+		SCRIPT_TYPE.createEntityIndex,
+		getId(collection),
+	);
 };
 
 /**
@@ -238,13 +249,13 @@ const getAddedIndexesScriptDtos = ({ collection, additionalDataForDdlProvider })
  * @param {Object} additionalDataForDdlProvider
  * @return {AlterScriptDto | undefined}
  * */
-const getDeleteIndexScriptDto = ({ index, additionalDataForDdlProvider }) => {
+const getDeleteIndexScriptDto = ({ index, additionalDataForDdlProvider, collection }) => {
 	const { isParentActivated, schemaName } = additionalDataForDdlProvider;
 
 	const fullIndexName = getNamePrefixedWithSchemaName(index.indxName, schemaName);
 	const script = dropIndex({ indexName: fullIndexName });
 	const isIndexActivated = index.isActivated && isParentActivated;
-	return AlterScriptDto.getInstance([script], isIndexActivated, true);
+	return AlterScriptDto.getInstance(script, isIndexActivated, true, SCRIPT_TYPE.dropEntityIndex, getId(collection));
 };
 
 /**
@@ -267,7 +278,7 @@ const getDeletedIndexesScriptDtos = ({ collection, additionalDataForDdlProvider 
 			return !correspondingNewIndex;
 		})
 		.map(oldIndex => {
-			return getDeleteIndexScriptDto({ index: oldIndex, additionalDataForDdlProvider });
+			return getDeleteIndexScriptDto({ index: oldIndex, additionalDataForDdlProvider, collection });
 		})
 		.filter(Boolean);
 };
@@ -278,7 +289,7 @@ const getDeletedIndexesScriptDtos = ({ collection, additionalDataForDdlProvider 
  * @param {AlterIndexDto} oldIndex
  * @return {Array<AlterScriptDto>}
  * */
-const getAlterIndexScriptDtos = ({ newIndex, oldIndex, additionalDataForDdlProvider }) => {
+const getAlterIndexScriptDtos = ({ newIndex, oldIndex, additionalDataForDdlProvider, collection }) => {
 	const alterIndexScriptDtos = [];
 
 	const { isParentActivated, schemaName } = additionalDataForDdlProvider;
@@ -291,7 +302,13 @@ const getAlterIndexScriptDtos = ({ newIndex, oldIndex, additionalDataForDdlProvi
 			oldIndexName: oldIndex.indxName,
 			newIndexName: newIndex.indxName,
 		});
-		const renameScriptDto = AlterScriptDto.getInstance([script], isNewIndexActivated, false);
+		const renameScriptDto = AlterScriptDto.getInstance(
+			script,
+			isNewIndexActivated,
+			false,
+			SCRIPT_TYPE.alterEntityIndex,
+			getId(collection),
+		);
 		alterIndexScriptDtos.push(renameScriptDto);
 	}
 
@@ -302,7 +319,13 @@ const getAlterIndexScriptDtos = ({ newIndex, oldIndex, additionalDataForDdlProvi
 			indexName: newIndex.indxName,
 			tablespaceName: newIndex.index_tablespace_name,
 		});
-		const changeTablespaceScriptDto = AlterScriptDto.getInstance([script], isNewIndexActivated, false);
+		const changeTablespaceScriptDto = AlterScriptDto.getInstance(
+			script,
+			isNewIndexActivated,
+			false,
+			SCRIPT_TYPE.alterEntityIndex,
+			getId(collection),
+		);
 		alterIndexScriptDtos.push(changeTablespaceScriptDto);
 	}
 
@@ -314,9 +337,11 @@ const getAlterIndexScriptDtos = ({ newIndex, oldIndex, additionalDataForDdlProvi
 			index: newIndex,
 		});
 		const updateStorageParamsScriptDto = AlterScriptDto.getInstance(
-			[updateStorageParamsScript],
+			updateStorageParamsScript,
 			isNewIndexActivated,
 			false,
+			SCRIPT_TYPE.alterEntityIndex,
+			getId(collection),
 		);
 		alterIndexScriptDtos.push(updateStorageParamsScriptDto);
 
@@ -324,7 +349,13 @@ const getAlterIndexScriptDtos = ({ newIndex, oldIndex, additionalDataForDdlProvi
 			schemaName,
 			indexName: newIndex.indxName,
 		});
-		const reindexScriptDto = AlterScriptDto.getInstance([reindexScript], isNewIndexActivated, false);
+		const reindexScriptDto = AlterScriptDto.getInstance(
+			reindexScript,
+			isNewIndexActivated,
+			false,
+			SCRIPT_TYPE.alterEntityIndex,
+			getId(collection),
+		);
 		alterIndexScriptDtos.push(reindexScriptDto);
 	}
 
@@ -362,6 +393,7 @@ const getModifiedIndexesScriptDtos = ({ collection, additionalDataForDdlProvider
 			if (shouldDropAndRecreate) {
 				const deleteIndexScriptDto = getDeleteIndexScriptDto({
 					index: oldIndex,
+					collection,
 					additionalDataForDdlProvider,
 				});
 				const createIndexScriptDto = getCreateIndexScriptDto({
@@ -377,6 +409,7 @@ const getModifiedIndexesScriptDtos = ({ collection, additionalDataForDdlProvider
 				return getAlterIndexScriptDtos({
 					oldIndex,
 					newIndex,
+					collection,
 					additionalDataForDdlProvider,
 				});
 			}
