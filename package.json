@@ -93,6 +93,6 @@
         "pg": "8.12.0"
     },
     "overrides": {
-        "minimatch": "10.2.1"
+        "minimatch": "10.2.4"
     }
 }
