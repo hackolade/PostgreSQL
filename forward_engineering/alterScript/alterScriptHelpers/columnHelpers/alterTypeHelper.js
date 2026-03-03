@@ -1,11 +1,12 @@
 const _ = require('lodash');
-const { AlterScriptDto } = require('../../types/AlterScriptDto');
+const { AlterScriptDto, SCRIPT_TYPE } = require('../../types/AlterScriptDto');
 const {
 	checkFieldPropertiesChanged,
 	getFullTableName,
 	wrapInQuotes,
 	isObjectInDeltaModelActivated,
 	isParentContainerActivated,
+	getId,
 } = require('../../../utils/general');
 const assignTemplates = require('../../../utils/assignTemplates');
 const templates = require('../../../ddlProvider/templates');
@@ -88,9 +89,9 @@ const getUpdateTypesScriptDtos = collection => {
 			const columnName = wrapInQuotes(name);
 			const typeConfig = _.pick(jsonSchema, ['length', 'precision', 'scale']);
 			const isActivated = isContainerActivated && isCollectionActivated && jsonSchema.isActivated;
-			return { script: alterColumnType(fullTableName, columnName, typeName, typeConfig), isActivated };
-		})
-		.map(({ script, isActivated }) => AlterScriptDto.getInstance([script], isActivated, false));
+			const script = alterColumnType(fullTableName, columnName, typeName, typeConfig);
+			return AlterScriptDto.getInstance(script, isActivated, false, SCRIPT_TYPE.alterEntity, getId(collection));
+		});
 };
 
 module.exports = {

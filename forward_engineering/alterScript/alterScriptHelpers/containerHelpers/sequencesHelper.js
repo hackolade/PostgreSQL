@@ -1,7 +1,7 @@
 const _ = require('lodash');
-const { AlterScriptDto } = require('../../types/AlterScriptDto');
+const { AlterScriptDto, SCRIPT_TYPE } = require('../../types/AlterScriptDto');
 const { App } = require('../../../types/coreApplicationTypes');
-const { getDbName, getGroupItemsByCompMode, isObjectInDeltaModelActivated } = require('../../../utils/general');
+const { getDbName, getGroupItemsByCompMode, isObjectInDeltaModelActivated, getId } = require('../../../utils/general');
 const {
 	createSequenceScript,
 	dropSequenceScript,
@@ -20,8 +20,16 @@ const getAddContainerSequencesScriptDtos = ({ container }) => {
 	const isContainerActivated = isObjectInDeltaModelActivated(container);
 
 	return (container.role?.sequences || [])
-		.map(sequence => createSequenceScript({ schemaName, sequence }))
-		.map(script => AlterScriptDto.getInstance([script], isContainerActivated, false))
+		.map(sequence => {
+			const script = createSequenceScript({ schemaName, sequence });
+			return AlterScriptDto.getInstance(
+				script,
+				isContainerActivated,
+				false,
+				SCRIPT_TYPE.alterContainer,
+				getId(container),
+			);
+		})
 		.filter(Boolean);
 };
 
@@ -41,23 +49,43 @@ const getModifyContainerSequencesScriptDtos = ({ container }) => {
 		oldItems,
 	});
 
-	const removedScriptDtos = removed
-		.map(sequence => dropSequenceScript({ schemaName, sequence }))
-		.map(script => AlterScriptDto.getInstance([script], isContainerActivated, true));
-	const addedScriptDtos = added
-		.map(sequence => createSequenceScript({ schemaName, sequence }))
-		.map(script => AlterScriptDto.getInstance([script], isContainerActivated, false));
+	const removedScriptDtos = removed.map(sequence => {
+		const script = dropSequenceScript({ schemaName, sequence });
+		return AlterScriptDto.getInstance(
+			script,
+			isContainerActivated,
+			true,
+			SCRIPT_TYPE.alterContainer,
+			getId(container),
+		);
+	});
 
-	const modifiedScriptDtos = modified
-		.map(sequence => {
-			const oldSequence = _.find(oldItems, { id: sequence.id }) || {};
-			return alterSequenceScript({
-				schemaName,
-				sequence,
-				oldSequence,
-			});
-		})
-		.map(script => AlterScriptDto.getInstance([script], isContainerActivated, false));
+	const addedScriptDtos = added.map(sequence => {
+		const script = createSequenceScript({ schemaName, sequence });
+		return AlterScriptDto.getInstance(
+			script,
+			isContainerActivated,
+			false,
+			SCRIPT_TYPE.alterContainer,
+			getId(container),
+		);
+	});
+
+	const modifiedScriptDtos = modified.map(sequence => {
+		const oldSequence = _.find(oldItems, { id: sequence.id }) || {};
+		const script = alterSequenceScript({
+			schemaName,
+			sequence,
+			oldSequence,
+		});
+		return AlterScriptDto.getInstance(
+			script,
+			isContainerActivated,
+			false,
+			SCRIPT_TYPE.alterContainer,
+			getId(container),
+		);
+	});
 
 	return [...modifiedScriptDtos, ...removedScriptDtos, ...addedScriptDtos].filter(Boolean);
 };
@@ -72,8 +100,16 @@ const getDeleteContainerSequencesScriptDtos = ({ container }) => {
 	const isContainerActivated = isObjectInDeltaModelActivated(container);
 
 	return (container.role?.sequences || [])
-		.map(sequence => dropSequenceScript({ schemaName, sequence }))
-		.map(script => AlterScriptDto.getInstance([script], isContainerActivated, true))
+		.map(sequence => {
+			const script = dropSequenceScript({ schemaName, sequence });
+			return AlterScriptDto.getInstance(
+				script,
+				isContainerActivated,
+				true,
+				SCRIPT_TYPE.alterContainer,
+				getId(container),
+			);
+		})
 		.filter(Boolean);
 };
 

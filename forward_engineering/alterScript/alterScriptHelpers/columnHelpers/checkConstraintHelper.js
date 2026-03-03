@@ -1,5 +1,5 @@
 const _ = require('lodash');
-const { AlterScriptDto } = require('../../types/AlterScriptDto');
+const { AlterScriptDto, SCRIPT_TYPE } = require('../../types/AlterScriptDto');
 const {
 	getFullTableName,
 	wrapInQuotes,
@@ -74,14 +74,14 @@ const mapColumnCheckConstraintsToChangeHistory = collection => {
 
 	_.toPairs(collection.properties).forEach(([columnName, jsonSchema]) => {
 		const oldColumnName = jsonSchema.compMod?.oldField?.name || columnName;
-		const newCheckConstraint = !_.isEmpty(jsonSchema.checkConstraint)
-			? _.omit(_.first(jsonSchema.checkConstraint), 'id')
-			: undefined;
+		const newCheckConstraint = _.isEmpty(jsonSchema.checkConstraint)
+			? undefined
+			: _.omit(_.first(jsonSchema.checkConstraint), 'id');
 
 		const oldCheckConstraintValue = collection.role.properties?.[oldColumnName]?.checkConstraint;
-		const oldCheckConstraint = !_.isEmpty(oldCheckConstraintValue)
-			? _.omit(_.first(oldCheckConstraintValue), 'id')
-			: undefined;
+		const oldCheckConstraint = _.isEmpty(oldCheckConstraintValue)
+			? undefined
+			: _.omit(_.first(oldCheckConstraintValue), 'id');
 
 		if (!newCheckConstraint && !oldCheckConstraint) {
 			return;
@@ -113,7 +113,7 @@ const getDropColumnCheckConstraintScriptDtos = (constraintHistory, fullTableName
 				fullTableName,
 			);
 			const script = dropConstraint(fullTableName, wrappedConstraintName);
-			return AlterScriptDto.getInstance([script], historyEntry.isActivated, true);
+			return AlterScriptDto.getInstance(script, historyEntry.isActivated, true, SCRIPT_TYPE.alterEntity);
 		});
 };
 
@@ -130,7 +130,7 @@ const getAddColumnCheckConstraintScriptDtos = (constraintHistory, fullTableName)
 			const constraintName = getConstraintName(name, historyEntry.columnName, fullTableName);
 
 			const script = addCheckConstraint(fullTableName, constraintName, expression, noInherit);
-			return AlterScriptDto.getInstance([script], historyEntry.isActivated);
+			return AlterScriptDto.getInstance(script, historyEntry.isActivated, false, SCRIPT_TYPE.alterEntity);
 		});
 };
 
@@ -153,7 +153,7 @@ const getUpdateColumnCheckConstraintScriptDtos = (constraintHistory, fullTableNa
 			}
 			return false;
 		})
-		.map(historyEntry => {
+		.flatMap(historyEntry => {
 			const { name: oldConstrainName } = historyEntry.old;
 			const wrappedOldConstraintName = getConstraintName(
 				oldConstrainName,
@@ -175,11 +175,20 @@ const getUpdateColumnCheckConstraintScriptDtos = (constraintHistory, fullTableNa
 			);
 
 			return [
-				AlterScriptDto.getInstance([dropConstraintScript], historyEntry.isActivated, true),
-				AlterScriptDto.getInstance([addConstraintScript], historyEntry.isActivated, false),
+				AlterScriptDto.getInstance(
+					dropConstraintScript,
+					historyEntry.isActivated,
+					true,
+					SCRIPT_TYPE.alterEntity,
+				),
+				AlterScriptDto.getInstance(
+					addConstraintScript,
+					historyEntry.isActivated,
+					false,
+					SCRIPT_TYPE.alterEntity,
+				),
 			];
-		})
-		.flat();
+		});
 };
 
 /**

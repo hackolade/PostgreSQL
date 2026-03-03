@@ -6,7 +6,7 @@ const { getModifyNonNullColumnsScriptDtos } = require('./columnHelpers/nonNullCo
 const { getModifiedCommentOnColumnScriptDtos } = require('./columnHelpers/commentsHelper');
 const { getRenameColumnScriptDtos } = require('./columnHelpers/renameColumnHelper');
 const { getModifyColumnCheckConstraintScriptDtos } = require('./columnHelpers/checkConstraintHelper');
-const { AlterScriptDto } = require('../types/AlterScriptDto');
+const { AlterScriptDto, SCRIPT_TYPE } = require('../types/AlterScriptDto');
 const { AlterCollectionDto } = require('../types/AlterCollectionDto');
 const { getModifyPkConstraintsScriptDtos } = require('./entityHelpers/primaryKeyHelper');
 const { getModifyUniqueKeyConstraintsScriptDtos } = require('./entityHelpers/uniqueKeyHelper');
@@ -23,13 +23,14 @@ const {
 	wrapInQuotes,
 	isParentContainerActivated,
 	isObjectInDeltaModelActivated,
+	getId,
 } = require('../../utils/general');
 const { getRelationshipName } = require('./alterRelationshipsHelper');
 
 /**
  * @return {(collection: AlterCollectionDto) => AlterScriptDto | undefined}
  * */
-const getAddCollectionScriptDto =
+const getAddCollectionScriptDtos =
 	({ app, dbVersion, modelDefinitions, internalDefinitions, externalDefinitions, inlineDeltaRelationships = [] }) =>
 	collection => {
 		const ddlProvider = require('../../ddlProvider/ddlProvider')(null, null, app);
@@ -94,9 +95,12 @@ const getAddCollectionScriptDto =
 			ddlProvider,
 			collection,
 			dbVersion,
-		}).flatMap(({ scripts }) => scripts.map(({ script }) => script));
+		});
 		const script = ddlProvider.createTable(hydratedTable, jsonSchema.isActivated);
-		return AlterScriptDto.getInstance([script, ...indexesOnNewlyCreatedColumnsScripts], true, false);
+		return [
+			AlterScriptDto.getInstance(script, true, false, SCRIPT_TYPE.createEntity, getId(jsonSchema)),
+			...indexesOnNewlyCreatedColumnsScripts,
+		];
 	};
 
 /**
@@ -106,7 +110,7 @@ const getDeleteCollectionScriptDto = app => collection => {
 	const ddlProvider = require('../../ddlProvider/ddlProvider')(null, null, app);
 	const fullName = getFullTableName(collection);
 	const script = ddlProvider.dropTable(fullName);
-	return AlterScriptDto.getInstance([script], true, true);
+	return AlterScriptDto.getInstance(script, true, true, SCRIPT_TYPE.dropEntity, getId(collection));
 };
 
 /**
@@ -175,15 +179,19 @@ const getAddColumnsByConditionScriptDtos =
 					definitionJsonSchema,
 				});
 				const isActivated = isContainerActivated && isCollectionActivated && jsonSchema.isActivated;
-				return { columnDefinition, isActivated };
-			})
-			.map(({ columnDefinition, isActivated }) => ({
-				script: ddlProvider.addColumn(fullName, ddlProvider.convertColumnDefinition(columnDefinition)),
-				isActivated,
-			}))
-			.map(({ script, isActivated }) => AlterScriptDto.getInstance([script], isActivated, false));
 
-		return scripts.filter(Boolean);
+				const script = ddlProvider.addColumn(fullName, ddlProvider.convertColumnDefinition(columnDefinition));
+				return AlterScriptDto.getInstance(
+					script,
+					isActivated,
+					false,
+					SCRIPT_TYPE.alterEntity,
+					getId(collectionSchema),
+				);
+			})
+			.filter(Boolean);
+
+		return scripts;
 	};
 
 /**
@@ -248,9 +256,15 @@ const getDeleteColumnsByConditionScriptDtos = app => (collection, predicate) => 
 		.map(([name, jsonSchema]) => {
 			const columnNameForDDL = wrapInQuotes(name);
 			const isActivated = isContainerActivated && isCollectionActivated && jsonSchema.isActivated;
-			return { script: ddlProvider.dropColumn(fullTableName, columnNameForDDL), isActivated };
+			const script = ddlProvider.dropColumn(fullTableName, columnNameForDDL);
+			return AlterScriptDto.getInstance(
+				script,
+				isActivated,
+				true,
+				SCRIPT_TYPE.alterEntity,
+				getId(collectionSchema),
+			);
 		})
-		.map(({ script, isActivated }) => AlterScriptDto.getInstance([script], isActivated, true))
 		.filter(Boolean);
 };
 
@@ -338,7 +352,7 @@ const getModifyColumnScriptDtos =
 	};
 
 module.exports = {
-	getAddCollectionScriptDto,
+	getAddCollectionScriptDtos,
 	getDeleteCollectionScriptDto,
 	getModifyCollectionScriptDtos,
 	getAddColumnScriptDtos,

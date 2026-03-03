@@ -1,11 +1,12 @@
 const _ = require('lodash');
-const { AlterScriptDto } = require('../../types/AlterScriptDto');
+const { AlterScriptDto, SCRIPT_TYPE } = require('../../types/AlterScriptDto');
 const {
 	checkFieldPropertiesChanged,
 	getFullTableName,
 	wrapInQuotes,
 	isParentContainerActivated,
 	isObjectInDeltaModelActivated,
+	getId,
 } = require('../../../utils/general');
 const assignTemplates = require('../../../utils/assignTemplates');
 const templates = require('../../../ddlProvider/templates');
@@ -40,9 +41,9 @@ const getRenameColumnScriptDtos = collection => {
 			const oldColumnName = wrapInQuotes(jsonSchema.compMod.oldField.name);
 			const newColumnName = wrapInQuotes(jsonSchema.compMod.newField.name);
 			const isActivated = isContainerActivated && isCollectionActivated && jsonSchema.isActivated;
-			return { script: renameColumn(fullTableName, oldColumnName, newColumnName), isActivated };
-		})
-		.map(({ script, isActivated }) => AlterScriptDto.getInstance([script], isActivated, false));
+			const script = renameColumn(fullTableName, oldColumnName, newColumnName);
+			return AlterScriptDto.getInstance(script, isActivated, false, SCRIPT_TYPE.alterEntity, getId(collection));
+		});
 };
 
 module.exports = {

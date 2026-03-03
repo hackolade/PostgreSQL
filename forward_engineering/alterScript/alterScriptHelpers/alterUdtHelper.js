@@ -1,5 +1,5 @@
 const _ = require('lodash');
-const { AlterScriptDto } = require('../types/AlterScriptDto');
+const { AlterScriptDto, SCRIPT_TYPE } = require('../types/AlterScriptDto');
 const {
 	getUdtName,
 	wrapInQuotes,
@@ -49,7 +49,7 @@ const getCreateUdtScriptDto =
 		const udt = { ...updatedUdt, properties: columnDefinitions };
 
 		const script = ddlProvider.createUdt(udt);
-		return AlterScriptDto.getInstance([script], jsonSchema.isActivated, false);
+		return AlterScriptDto.getInstance(script, jsonSchema.isActivated, false, SCRIPT_TYPE.createUDT);
 	};
 
 /**
@@ -61,10 +61,10 @@ const getDeleteUdtScriptDto = app => udt => {
 	const ddlUdtName = wrapInQuotes(getUdtName(udt));
 	if (udt.type === 'domain') {
 		const script = ddlProvider.dropDomain(ddlUdtName);
-		return AlterScriptDto.getInstance([script], udt.isActivated, true);
+		return AlterScriptDto.getInstance(script, udt.isActivated, true, SCRIPT_TYPE.dropUDT);
 	} else {
 		const script = ddlProvider.dropType(ddlUdtName);
-		return AlterScriptDto.getInstance([script], udt.isActivated, true);
+		return AlterScriptDto.getInstance(script, udt.isActivated, true, SCRIPT_TYPE.dropUDT);
 	}
 };
 
@@ -91,7 +91,7 @@ const getAddColumnToTypeScriptDtos =
 					externalDefinitions,
 				});
 
-				return createColumnDefinitionBySchema({
+				const def = createColumnDefinitionBySchema({
 					name,
 					jsonSchema,
 					parentJsonSchema: { required: [] },
@@ -99,10 +99,10 @@ const getAddColumnToTypeScriptDtos =
 					schemaData,
 					definitionJsonSchema,
 				});
+				const columnDefinition = ddlProvider.convertColumnDefinition(def);
+				const script = ddlProvider.alterTypeAddAttribute(fullName, columnDefinition);
+				return AlterScriptDto.getInstance(script, udt.isActivated, false, SCRIPT_TYPE.alterUDT);
 			})
-			.map(def => ddlProvider.convertColumnDefinition(def))
-			.map(columnDefinition => ddlProvider.alterTypeAddAttribute(fullName, columnDefinition))
-			.map(script => AlterScriptDto.getInstance([script], udt.isActivated, false))
 			.filter(Boolean);
 	};
 
@@ -117,8 +117,10 @@ const getDeleteColumnFromTypeScriptDtos = app => udt => {
 
 	return _.toPairs(udt.properties)
 		.filter(([name, jsonSchema]) => !jsonSchema.compMod)
-		.map(([name]) => ddlProvider.alterTypeDropAttribute(fullName, wrapInQuotes(name)))
-		.map(script => AlterScriptDto.getInstance([script], isActivated, true))
+		.map(([name]) => {
+			const script = ddlProvider.alterTypeDropAttribute(fullName, wrapInQuotes(name));
+			return AlterScriptDto.getInstance(script, isActivated, true, SCRIPT_TYPE.alterUDT);
+		})
 		.filter(Boolean);
 };
 
@@ -136,18 +138,18 @@ const getModifyColumnOfTypeScriptDtos = app => udt => {
 		.map(jsonSchema => {
 			const oldAttributeDDLName = wrapInQuotes(jsonSchema.compMod.oldField.name);
 			const newAttributeDDLName = wrapInQuotes(jsonSchema.compMod.newField.name);
-			return ddlProvider.alterTypeRenameAttribute(fullName, oldAttributeDDLName, newAttributeDDLName);
-		})
-		.map(script => AlterScriptDto.getInstance([script], isActivated, false));
+			const script = ddlProvider.alterTypeRenameAttribute(fullName, oldAttributeDDLName, newAttributeDDLName);
+			return AlterScriptDto.getInstance(script, isActivated, false, SCRIPT_TYPE.alterUDT);
+		});
 
 	const changeTypeScripts = _.toPairs(udt.properties)
 		.filter(([name, jsonSchema]) => checkFieldPropertiesChanged(jsonSchema.compMod, ['type', 'mode']))
 		.map(([name, jsonSchema]) => {
 			const attributeDDLName = wrapInQuotes(name);
 			const newDataType = jsonSchema.compMod.newField.mode || jsonSchema.compMod.newField.type;
-			return ddlProvider.alterTypeChangeAttributeType(fullName, attributeDDLName, newDataType);
-		})
-		.map(script => AlterScriptDto.getInstance([script], isActivated, false));
+			const script = ddlProvider.alterTypeChangeAttributeType(fullName, attributeDDLName, newDataType);
+			return AlterScriptDto.getInstance(script, isActivated, false, SCRIPT_TYPE.alterUDT);
+		});
 
 	return [...renameColumnScripts, ...changeTypeScripts].filter(Boolean);
 };

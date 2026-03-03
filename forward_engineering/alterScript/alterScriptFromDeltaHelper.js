@@ -5,7 +5,7 @@ const {
 	getModifyContainerScriptDtos,
 } = require('./alterScriptHelpers/alterContainerHelper');
 const {
-	getAddCollectionScriptDto,
+	getAddCollectionScriptDtos,
 	getDeleteCollectionScriptDto,
 	getAddColumnScriptDtos,
 	getDeleteColumnScriptDtos,
@@ -38,7 +38,6 @@ const {
 	getDeleteContainerSequencesScriptDtos,
 	getAddContainerSequencesScriptDtos,
 } = require('./alterScriptHelpers/containerHelpers/sequencesHelper');
-const { isObjectInDeltaModelActivated } = require('../utils/general');
 const { getModifiedCommentOnColumnScriptDtos } = require('./alterScriptHelpers/columnHelpers/commentsHelper');
 
 const getItems = data => [data?.items].flat().filter(Boolean);
@@ -58,14 +57,12 @@ const getAlterContainersScriptDtos = ({ collection }) => {
 
 	const addContainersScriptDtos = addedContainers.map(container => {
 		const [containerName, containerData] = Object.entries(container.properties)[0];
-		const isActivated = isObjectInDeltaModelActivated(containerData);
-		return getAddContainerScriptDto(containerName, isActivated);
+		return getAddContainerScriptDto(containerName, containerData);
 	});
 
 	const deleteContainersScriptDtos = deletedContainers.map(container => {
 		const [containerName, containerData] = Object.entries(container.properties)[0];
-		const isActivated = isObjectInDeltaModelActivated(containerData);
-		return getDeleteContainerScriptDto(containerName, isActivated);
+		return getDeleteContainerScriptDto(containerName, containerData);
 	});
 
 	const modifyContainersScriptDtos = modifiedContainers
@@ -154,8 +151,8 @@ const getAlterCollectionsScriptDtos = ({
 	const createCollectionsScriptDtos = sortCollectionsByRelationships(
 		createScriptsData.filter(collection => collection.compMod?.created),
 		inlineDeltaRelationships,
-	).map(
-		getAddCollectionScriptDto({
+	).flatMap(
+		getAddCollectionScriptDtos({
 			app,
 			dbVersion,
 			modelDefinitions,
@@ -322,32 +319,6 @@ const getAlterRelationshipsScriptDtos = ({ collection, app, ignoreRelationshipID
 };
 
 /**
- * @param dto {AlterScriptDto}
- * @return {AlterScriptDto | undefined}
- */
-const prettifyAlterScriptDto = dto => {
-	if (!dto) {
-		return undefined;
-	}
-	/**
-	 * @type {Array<ModificationScript>}
-	 * */
-	const nonEmptyScriptModificationDtos = dto.scripts
-		.map(scriptDto => ({
-			...scriptDto,
-			script: (scriptDto.script || '').trim(),
-		}))
-		.filter(scriptDto => Boolean(scriptDto.script));
-	if (!nonEmptyScriptModificationDtos.length) {
-		return undefined;
-	}
-	return {
-		...dto,
-		scripts: nonEmptyScriptModificationDtos,
-	};
-};
-
-/**
  * @param {{
  * collection: Object,
  * app: App,
@@ -444,10 +415,7 @@ const getAlterScriptDtos = (data, app) => {
 		...containersSequencesScriptDtos,
 		...viewScriptDtos,
 		...relationshipScriptDtos,
-	]
-		.filter(Boolean)
-		.map(dto => prettifyAlterScriptDto(dto))
-		.filter(Boolean);
+	].filter(Boolean);
 };
 
 module.exports = {

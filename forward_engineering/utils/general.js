@@ -290,6 +290,8 @@ const isParentContainerActivated = collection => {
 	);
 };
 
+const getId = entity => entity.id || entity.role.id;
+
 module.exports = {
 	getDbName,
 	getDbData,
@@ -324,4 +326,5 @@ module.exports = {
 	addCommaPrefix,
 	isObjectInDeltaModelActivated,
 	isParentContainerActivated,
+	getId,
 };

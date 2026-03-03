@@ -1,10 +1,11 @@
 const _ = require('lodash');
-const { AlterScriptDto } = require('../../types/AlterScriptDto');
+const { AlterScriptDto, SCRIPT_TYPE } = require('../../types/AlterScriptDto');
 const {
 	getFullColumnName,
 	wrapComment,
 	isObjectInDeltaModelActivated,
 	isParentContainerActivated,
+	getId,
 } = require('../../../utils/general');
 const assignTemplates = require('../../../utils/assignTemplates');
 const templates = require('../../../ddlProvider/templates');
@@ -41,9 +42,9 @@ const getUpdatedCommentOnColumnScriptDtos = collection => {
 			const ddlComment = wrapComment(newComment);
 			const columnName = getFullColumnName(collection, name);
 			const isActivated = isContainerActivated && isCollectionActivated && jsonSchema.isActivated;
-			return { script: updateColumnComment(columnName, ddlComment), isActivated };
-		})
-		.map(({ script, isActivated }) => AlterScriptDto.getInstance([script], isActivated, false));
+			const script = updateColumnComment(columnName, ddlComment);
+			return AlterScriptDto.getInstance(script, isActivated, false, SCRIPT_TYPE.alterEntity, getId(collection));
+		});
 };
 
 /**
@@ -75,9 +76,9 @@ const getDeletedCommentOnColumnScriptDtos = collection => {
 		.map(([name, jsonSchema]) => {
 			const columnName = getFullColumnName(collection, name);
 			const isActivated = isContainerActivated && isCollectionActivated && jsonSchema.isActivated;
-			return { script: dropColumnComment(columnName), isActivated };
-		})
-		.map(({ script, isActivated }) => AlterScriptDto.getInstance([script], isActivated, true));
+			const script = dropColumnComment(columnName);
+			return AlterScriptDto.getInstance(script, isActivated, true, SCRIPT_TYPE.alterEntity, getId(collection));
+		});
 };
 
 /**
