@@ -87,7 +87,7 @@ const wasCompositeUniqueKeyChangedInTransitionFromCompositeToRegular = collectio
 		return UniqueKeyTransitionDto.noTransition();
 	}
 	const idOfUniqueKeyColumn = idsOfColumns[0];
-	const newColumnJsonSchema = Object.values(collection.role.properties).find(
+	const newColumnJsonSchema = Object.values(collection.properties || {}).find(
 		columnJsonSchema => columnJsonSchema.GUID === idOfUniqueKeyColumn,
 	);
 	if (!newColumnJsonSchema) {
