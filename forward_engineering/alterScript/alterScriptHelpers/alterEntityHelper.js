@@ -3,7 +3,10 @@ const { getModifyCheckConstraintScriptDtos } = require('./entityHelpers/checkCon
 const { getModifyEntityCommentsScriptDtos } = require('./entityHelpers/commentsHelper');
 const { getUpdateTypesScriptDtos } = require('./columnHelpers/alterTypeHelper');
 const { getModifyNonNullColumnsScriptDtos } = require('./columnHelpers/nonNullConstraintHelper');
-const { getModifiedCommentOnColumnScriptDtos } = require('./columnHelpers/commentsHelper');
+const {
+	getModifiedCommentOnColumnScriptDtos,
+	getAddedCommentOnColumnScriptDto,
+} = require('./columnHelpers/commentsHelper');
 const { getRenameColumnScriptDtos } = require('./columnHelpers/renameColumnHelper');
 const { getModifyColumnCheckConstraintScriptDtos } = require('./columnHelpers/checkConstraintHelper');
 const { AlterScriptDto, SCRIPT_TYPE } = require('../types/AlterScriptDto');
@@ -145,7 +148,14 @@ const getModifyCollectionKeysScriptDtos =
  * @return {(collection: Object, predicate: ([name: string, jsonSchema: Object]) => boolean) => AlterScriptDto[]}
  * */
 const getAddColumnsByConditionScriptDtos =
-	({ app, dbVersion, modelDefinitions, internalDefinitions, externalDefinitions }) =>
+	({
+		app,
+		dbVersion,
+		modelDefinitions,
+		internalDefinitions,
+		externalDefinitions,
+		shouldIgnoreColumnComments = false,
+	}) =>
 	(collection, predicate) => {
 		const { createColumnDefinitionBySchema } = require('./createColumnDefinition')(app);
 		const ddlProvider = require('../../ddlProvider/ddlProvider')(null, null, app);
@@ -162,7 +172,7 @@ const getAddColumnsByConditionScriptDtos =
 
 		const scripts = _.toPairs(collection.properties)
 			.filter(([name, jsonSchema]) => predicate([name, jsonSchema]))
-			.map(([name, jsonSchema]) => {
+			.flatMap(([name, jsonSchema]) => {
 				const definitionJsonSchema = getDefinitionByReference({
 					propertySchema: jsonSchema,
 					modelDefinitions,
@@ -181,13 +191,21 @@ const getAddColumnsByConditionScriptDtos =
 				const isActivated = isContainerActivated && isCollectionActivated && jsonSchema.isActivated;
 
 				const script = ddlProvider.addColumn(fullName, ddlProvider.convertColumnDefinition(columnDefinition));
-				return AlterScriptDto.getInstance(
+				const addColumnScriptDto = AlterScriptDto.getInstance(
 					script,
 					isActivated,
 					false,
 					SCRIPT_TYPE.alterEntity,
 					getId(collectionSchema),
 				);
+				const commentScriptDto = getAddedCommentOnColumnScriptDto({
+					collection,
+					name,
+					jsonSchema,
+					shouldIgnoreColumnComments,
+				});
+
+				return [addColumnScriptDto, commentScriptDto];
 			})
 			.filter(Boolean);
 
@@ -227,7 +245,14 @@ const getNewlyCreatedIndexesScripts = ({ dbVersion, collection }) => {
  * @return {(collection: Object) => AlterScriptDto[]}
  * */
 const getAddColumnScriptDtos =
-	({ app, dbVersion, modelDefinitions, internalDefinitions, externalDefinitions }) =>
+	({
+		app,
+		dbVersion,
+		modelDefinitions,
+		internalDefinitions,
+		externalDefinitions,
+		shouldIgnoreColumnComments = false,
+	}) =>
 	collection => {
 		return getAddColumnsByConditionScriptDtos({
 			app,
@@ -235,6 +260,7 @@ const getAddColumnScriptDtos =
 			modelDefinitions,
 			internalDefinitions,
 			externalDefinitions,
+			shouldIgnoreColumnComments,
 		})(collection, ([name, jsonSchema]) => !jsonSchema.compMod);
 	};
 
@@ -279,7 +305,14 @@ const getDeleteColumnScriptDtos = app => collection => {
  * @return {(collection: Object) => Array<AlterScriptDto>}
  * */
 const getDropAndRecreateColumnsScriptDtos =
-	({ app, dbVersion, modelDefinitions, internalDefinitions, externalDefinitions }) =>
+	({
+		app,
+		dbVersion,
+		modelDefinitions,
+		internalDefinitions,
+		externalDefinitions,
+		shouldIgnoreColumnComments = false,
+	}) =>
 	collection => {
 		return _.toPairs(collection.properties)
 			.filter(([name, jsonSchema]) => {
@@ -307,6 +340,7 @@ const getDropAndRecreateColumnsScriptDtos =
 					modelDefinitions,
 					internalDefinitions,
 					externalDefinitions,
+					shouldIgnoreColumnComments,
 				})(collectionWithJustThisProperty, () => true);
 
 				return [...deleteColumnsScriptDtos, ...addColumnsScriptDtos];
@@ -318,7 +352,14 @@ const getDropAndRecreateColumnsScriptDtos =
  * @return {(collection: Object) => AlterScriptDto[]}
  * */
 const getModifyColumnScriptDtos =
-	({ app, dbVersion, modelDefinitions, internalDefinitions, externalDefinitions }) =>
+	({
+		app,
+		dbVersion,
+		modelDefinitions,
+		internalDefinitions,
+		externalDefinitions,
+		shouldIgnoreColumnComments = false,
+	}) =>
 	collection => {
 		const renameColumnScriptDtos = getRenameColumnScriptDtos(collection);
 
@@ -328,6 +369,7 @@ const getModifyColumnScriptDtos =
 			modelDefinitions,
 			internalDefinitions,
 			externalDefinitions,
+			shouldIgnoreColumnComments,
 		})(collection);
 		if (dropAndRecreateScriptDtos.length) {
 			return [...renameColumnScriptDtos, ...dropAndRecreateScriptDtos].filter(Boolean);
