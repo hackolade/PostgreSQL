@@ -120,10 +120,13 @@ const getDeleteCollectionScriptDto = app => collection => {
  * @return {(collection: AlterCollectionDto) => AlterScriptDto[]}
  * */
 const getModifyCollectionScriptDtos =
-	({ dbVersion }) =>
+	({ dbVersion, shouldIgnoreTableComments = false }) =>
 	collection => {
 		const modifyCheckConstraintScriptDtos = getModifyCheckConstraintScriptDtos(collection);
-		const modifyCommentScriptDtos = getModifyEntityCommentsScriptDtos(collection);
+		const modifyCommentScriptDtos = getModifyEntityCommentsScriptDtos({
+			collection,
+			shouldIgnoreTableComments,
+		});
 		return [...modifyCheckConstraintScriptDtos, ...modifyCommentScriptDtos].filter(Boolean);
 	};
 
