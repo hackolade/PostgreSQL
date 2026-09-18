@@ -131,6 +131,7 @@ const sortCollectionsByRelationships = (collections, relationships) => {
  *     modelDefinitions: ModelDefinitions,
  *     internalDefinitions: InternalDefinitions,
  *     externalDefinitions: ExternalDefinitions,
+ *     shouldIgnoreColumnComments?: boolean,
  * }}
  * @return {AlterScriptDto[]}
  * */
@@ -142,6 +143,7 @@ const getAlterCollectionsScriptDtos = ({
 	internalDefinitions,
 	externalDefinitions,
 	inlineDeltaRelationships,
+	shouldIgnoreColumnComments = false,
 }) => {
 	const entitiesData = collection.properties?.entities?.properties;
 	const createScriptsData = getItemProperties(entitiesData?.added);
@@ -172,7 +174,14 @@ const getAlterCollectionsScriptDtos = ({
 	const addColumnScriptDtos = createScriptsData
 		.filter(item => !item?.compMod?.created)
 		.flatMap(
-			getAddColumnScriptDtos({ app, dbVersion, modelDefinitions, internalDefinitions, externalDefinitions }),
+			getAddColumnScriptDtos({
+				app,
+				dbVersion,
+				modelDefinitions,
+				internalDefinitions,
+				externalDefinitions,
+				shouldIgnoreColumnComments,
+			}),
 		);
 
 	const deleteColumnScriptDtos = deleteScriptsData
@@ -180,7 +189,14 @@ const getAlterCollectionsScriptDtos = ({
 		.flatMap(getDeleteColumnScriptDtos(app));
 
 	const modifyColumnScriptDtos = modifyScriptsData.flatMap(
-		getModifyColumnScriptDtos({ app, dbVersion, modelDefinitions, internalDefinitions, externalDefinitions }),
+		getModifyColumnScriptDtos({
+			app,
+			dbVersion,
+			modelDefinitions,
+			internalDefinitions,
+			externalDefinitions,
+			shouldIgnoreColumnComments,
+		}),
 	);
 
 	return [
@@ -382,6 +398,8 @@ const getAlterScriptDtos = (data, app) => {
 	const externalDefinitions = JSON.parse(data.externalDefinitions);
 	const dbVersion = data.modelData[0]?.dbVersion;
 	const inlineDeltaRelationships = getInlineRelationships({ collection, options: data.options });
+	const shouldIgnoreColumnComments =
+		data.options?.scriptGenerationOptions?.feActiveOptions?.columnComments === 'ignore';
 	const containersScriptDtos = getAlterContainersScriptDtos({ collection });
 	const collectionsScriptDtos = getAlterCollectionsScriptDtos({
 		collection,
@@ -391,6 +409,7 @@ const getAlterScriptDtos = (data, app) => {
 		internalDefinitions,
 		externalDefinitions,
 		inlineDeltaRelationships,
+		shouldIgnoreColumnComments,
 	});
 	const viewScriptDtos = getAlterViewScriptDtos(collection, app);
 	const modelDefinitionsScriptDtos = getAlterModelDefinitionsScriptDtos({
