@@ -25,16 +25,26 @@ const updateTableComment = (tableName, comment) => {
 };
 
 /**
- * @param {AlterCollectionDto} collection
+ * @param {{ collection: AlterCollectionDto, shouldIgnoreTableComments?: boolean }} dto
  * @return {AlterScriptDto}
  */
-const getUpdatedCommentOnCollectionScriptDto = collection => {
-	const descriptionInfo = collection?.role.compMod?.description;
-	if (!descriptionInfo) {
+const getUpdatedCommentOnCollectionScriptDto = ({ collection, shouldIgnoreTableComments = false } = {}) => {
+	if (shouldIgnoreTableComments) {
 		return undefined;
 	}
 
-	const { old: oldComment, new: newComment } = descriptionInfo;
+	const outerDescription = collection?.role.compMod?.description;
+	if (!outerDescription) {
+		return undefined;
+	}
+
+	const firstCompareDescription = collection?.role.role?.compMod?.description;
+	if (collection?.role.role && firstCompareDescription == null) {
+		return undefined;
+	}
+
+	const oldComment = firstCompareDescription?.old ?? outerDescription.old;
+	const newComment = outerDescription.new ?? firstCompareDescription?.new;
 	if (!newComment || newComment === oldComment) {
 		return undefined;
 	}
@@ -62,10 +72,14 @@ const dropTableComment = tableName => {
 };
 
 /**
- * @param {AlterCollectionDto} collection
+ * @param {{ collection: AlterCollectionDto, shouldIgnoreTableComments?: boolean }} dto
  * @return {AlterScriptDto}
  */
-const getDeletedCommentOnCollectionScriptDto = collection => {
+const getDeletedCommentOnCollectionScriptDto = ({ collection, shouldIgnoreTableComments = false } = {}) => {
+	if (shouldIgnoreTableComments) {
+		return undefined;
+	}
+
 	const descriptionInfo = collection?.role.compMod?.description;
 	if (!descriptionInfo) {
 		return undefined;
@@ -86,12 +100,18 @@ const getDeletedCommentOnCollectionScriptDto = collection => {
 };
 
 /**
- * @param {AlterCollectionDto} collection
+ * @param {{ collection: AlterCollectionDto, shouldIgnoreTableComments?: boolean }} dto
  * @return {Array<AlterScriptDto>}
- * */
-const getModifyEntityCommentsScriptDtos = collection => {
-	const updatedCommentScript = getUpdatedCommentOnCollectionScriptDto(collection);
-	const deletedCommentScript = getDeletedCommentOnCollectionScriptDto(collection);
+ */
+const getModifyEntityCommentsScriptDtos = ({ collection, shouldIgnoreTableComments = false } = {}) => {
+	const updatedCommentScript = getUpdatedCommentOnCollectionScriptDto({
+		collection,
+		shouldIgnoreTableComments,
+	});
+	const deletedCommentScript = getDeletedCommentOnCollectionScriptDto({
+		collection,
+		shouldIgnoreTableComments,
+	});
 
 	return [updatedCommentScript, deletedCommentScript].filter(Boolean);
 };

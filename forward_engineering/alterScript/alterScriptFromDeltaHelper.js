@@ -132,6 +132,7 @@ const sortCollectionsByRelationships = (collections, relationships) => {
  *     internalDefinitions: InternalDefinitions,
  *     externalDefinitions: ExternalDefinitions,
  *     shouldIgnoreColumnComments?: boolean,
+ *     shouldIgnoreTableComments?: boolean,
  * }}
  * @return {AlterScriptDto[]}
  * */
@@ -144,6 +145,7 @@ const getAlterCollectionsScriptDtos = ({
 	externalDefinitions,
 	inlineDeltaRelationships,
 	shouldIgnoreColumnComments = false,
+	shouldIgnoreTableComments = false,
 }) => {
 	const entitiesData = collection.properties?.entities?.properties;
 	const createScriptsData = getItemProperties(entitiesData?.added);
@@ -168,7 +170,9 @@ const getAlterCollectionsScriptDtos = ({
 		.filter(collection => collection.compMod?.deleted)
 		.map(getDeleteCollectionScriptDto(app));
 
-	const modifyCollectionScriptDtos = modifyScriptsData.flatMap(getModifyCollectionScriptDtos({ dbVersion }));
+	const modifyCollectionScriptDtos = modifyScriptsData.flatMap(
+		getModifyCollectionScriptDtos({ dbVersion, shouldIgnoreTableComments }),
+	);
 	const modifyCollectionKeysScriptDtos = modifyScriptsData.flatMap(getModifyCollectionKeysScriptDtos({ dbVersion }));
 
 	const addColumnScriptDtos = createScriptsData
@@ -400,6 +404,8 @@ const getAlterScriptDtos = (data, app) => {
 	const inlineDeltaRelationships = getInlineRelationships({ collection, options: data.options });
 	const shouldIgnoreColumnComments =
 		data.options?.scriptGenerationOptions?.feActiveOptions?.columnComments === 'ignore';
+	const shouldIgnoreTableComments =
+		data.options?.scriptGenerationOptions?.feActiveOptions?.tableComments === 'ignore';
 	const containersScriptDtos = getAlterContainersScriptDtos({ collection });
 	const collectionsScriptDtos = getAlterCollectionsScriptDtos({
 		collection,
@@ -410,6 +416,7 @@ const getAlterScriptDtos = (data, app) => {
 		externalDefinitions,
 		inlineDeltaRelationships,
 		shouldIgnoreColumnComments,
+		shouldIgnoreTableComments,
 	});
 	const viewScriptDtos = getAlterViewScriptDtos(collection, app);
 	const modelDefinitionsScriptDtos = getAlterModelDefinitionsScriptDtos({
