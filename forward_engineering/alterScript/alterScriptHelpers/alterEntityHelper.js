@@ -1,6 +1,7 @@
 const _ = require('lodash');
 const { getModifyCheckConstraintScriptDtos } = require('./entityHelpers/checkConstraintHelper');
 const { getModifyEntityCommentsScriptDtos } = require('./entityHelpers/commentsHelper');
+const { getRenameCollectionScriptDtos } = require('./entityHelpers/nameHelper');
 const { getUpdateTypesScriptDtos } = require('./columnHelpers/alterTypeHelper');
 const { getModifyNonNullColumnsScriptDtos } = require('./columnHelpers/nonNullConstraintHelper');
 const {
@@ -122,12 +123,15 @@ const getDeleteCollectionScriptDto = app => collection => {
 const getModifyCollectionScriptDtos =
 	({ dbVersion, shouldIgnoreTableComments = false }) =>
 	collection => {
+		const renameCollectionScriptDtos = getRenameCollectionScriptDtos(collection);
 		const modifyCheckConstraintScriptDtos = getModifyCheckConstraintScriptDtos(collection);
 		const modifyCommentScriptDtos = getModifyEntityCommentsScriptDtos({
 			collection,
 			shouldIgnoreTableComments,
 		});
-		return [...modifyCheckConstraintScriptDtos, ...modifyCommentScriptDtos].filter(Boolean);
+		return [...renameCollectionScriptDtos, ...modifyCheckConstraintScriptDtos, ...modifyCommentScriptDtos].filter(
+			Boolean,
+		);
 	};
 
 /**

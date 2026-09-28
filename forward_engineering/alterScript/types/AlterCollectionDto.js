@@ -220,6 +220,14 @@ class AlterCollectionRoleCompModDto {
 
 	/**
 	 * @type {{
+	 *     new: string,
+	 *     old: string,
+	 * }}
+	 */
+	code;
+
+	/**
+	 * @type {{
 	 *     new: boolean,
 	 *     old: boolean,
 	 * }}
@@ -294,6 +302,11 @@ class AlterCollectionRoleDto {
 	 * @type {string}
 	 */
 	collectionName;
+
+	/**
+	 * @type {string}
+	 */
+	code;
 
 	/**
 	 * @type {{
