@@ -37,6 +37,8 @@ module.exports = {
 
 	renameColumn: 'ALTER TABLE IF EXISTS ${tableName} RENAME COLUMN ${oldColumnName} TO ${newColumnName};',
 
+	renameTable: 'ALTER TABLE IF EXISTS ${tableName} RENAME TO ${newName};',
+
 	addCheckConstraint:
 		'ALTER TABLE IF EXISTS ${tableName} ADD CONSTRAINT ${constraintName} CHECK (${expression})${noInherit};',
 
