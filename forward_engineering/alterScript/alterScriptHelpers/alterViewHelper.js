@@ -1,5 +1,6 @@
 const _ = require('lodash');
 const { getModifyViewCommentsScriptDtos } = require('./viewHelpers/commentsHelper');
+const { getRenameViewScriptDtos } = require('./viewHelpers/nameHelper');
 const { AlterScriptDto, SCRIPT_TYPE } = require('../types/AlterScriptDto');
 const { wrapInQuotes, getId } = require('../../utils/general');
 
@@ -80,9 +81,13 @@ const getDeleteViewScriptDto = app => view => {
  * @return {AlterScriptDto[]}
  * */
 const getModifyViewScriptDtos = view => {
+	const renameViewScriptDtos = getRenameViewScriptDtos(view);
 	const modifyCommentsScriptDtos = getModifyViewCommentsScriptDtos(view);
 
-	return [...modifyCommentsScriptDtos].filter(Boolean);
+	return {
+		renameViewScripts: renameViewScriptDtos.filter(Boolean),
+		restViewScripts: modifyCommentsScriptDtos.filter(Boolean),
+	};
 };
 
 module.exports = {

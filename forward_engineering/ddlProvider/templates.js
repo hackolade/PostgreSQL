@@ -39,6 +39,8 @@ module.exports = {
 
 	renameTable: 'ALTER TABLE IF EXISTS ${tableName} RENAME TO ${newName};',
 
+	renameView: 'ALTER VIEW IF EXISTS ${viewName} RENAME TO ${newName};',
+
 	addCheckConstraint:
 		'ALTER TABLE IF EXISTS ${tableName} ADD CONSTRAINT ${constraintName} CHECK (${expression})${noInherit};',
 
