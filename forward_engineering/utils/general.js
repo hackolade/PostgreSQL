@@ -25,9 +25,14 @@ const getDbName = containerData => {
 	return _.get(containerData, '[0].code') || _.get(containerData, '[0].name', '');
 };
 
-const getEntityName = entityData => {
-	return (entityData && (entityData.code || entityData.collectionName || entityData.name)) || '';
-};
+const getEntityName = entityData =>
+	entityData?.compMod?.code?.new ||
+	entityData?.code ||
+	entityData?.compMod?.collectionName?.new ||
+	entityData?.collectionName ||
+	entityData?.compMod?.name?.new ||
+	entityData?.name ||
+	'';
 
 const getViewName = view => {
 	return (view && (view.code || view.name)) || '';
