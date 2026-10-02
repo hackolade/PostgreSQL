@@ -232,18 +232,35 @@ const getAlterViewScriptDtos = (collection, app) => {
 		.map(view => ({ ...view, ...view.role }))
 		.map(getDeleteViewScriptDto(app));
 
-	const modifyViewsScriptDtos = modifyScriptsData
+	const preparedModifyViewsScriptDtos = modifyScriptsData
 		.map(view => ({ ...view, ..._.omit(view.role, 'properties') }))
-		.flatMap(getModifyViewScriptDtos);
+		.reduce(
+			(scripts, view) => {
+				const { restViewScripts, renameViewScripts } = getModifyViewScriptDtos(view);
+
+				if (restViewScripts.length) {
+					scripts.restViewScripts.push(...restViewScripts);
+				}
+				if (renameViewScripts.length) {
+					scripts.renameViewScripts.push(...renameViewScripts);
+				}
+
+				return scripts;
+			},
+			{ restViewScripts: [], renameViewScripts: [] },
+		);
 
 	const modifyCommentScriptDtos = modifyScriptsData.flatMap(getModifiedCommentOnColumnScriptDtos);
 
-	return [
-		...deleteViewsScriptDtos,
-		...createViewsScriptDtos,
-		...modifyViewsScriptDtos,
-		...modifyCommentScriptDtos,
-	].filter(Boolean);
+	return {
+		renameViewScripts: preparedModifyViewsScriptDtos.renameViewScripts,
+		restViewScripts: [
+			...deleteViewsScriptDtos,
+			...createViewsScriptDtos,
+			...preparedModifyViewsScriptDtos.restViewScripts,
+			...modifyCommentScriptDtos,
+		].filter(Boolean),
+	};
 };
 
 /**
@@ -437,9 +454,10 @@ const getAlterScriptDtos = (data, app) => {
 	return [
 		...containersScriptDtos,
 		...modelDefinitionsScriptDtos,
+		...viewScriptDtos.renameViewScripts,
 		...collectionsScriptDtos,
 		...containersSequencesScriptDtos,
-		...viewScriptDtos,
+		...viewScriptDtos.restViewScripts,
 		...relationshipScriptDtos,
 	].filter(Boolean);
 };
