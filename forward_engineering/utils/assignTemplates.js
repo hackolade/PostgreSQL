@@ -16,7 +16,11 @@ const assignTemplates = (str, templates) => {
 		const templateName = parseTemplate(item);
 
 		return result.replace(item, () => {
-			return templates[templateName] || templates[templateName] === 0 ? templates[templateName] : '';
+			const value = templates[templateName];
+			if (value === undefined || value === null) {
+				return '';
+			}
+			return value;
 		});
 	}, str);
 };
