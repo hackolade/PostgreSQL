@@ -41,7 +41,7 @@
             "disableDenormalization": true,
             "enableComplexTypesNormalization": true,
             "generateAssociativeEntitiesForManyToManyRelationships": true,
-            "createForeignKeysForConceptualRelationships": true,
+            "generateForeignKeysForConceptualRelationships": true,
             "views": {
                 "enabled": true,
                 "viewLevel": "model",
