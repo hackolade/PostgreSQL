@@ -8,7 +8,12 @@ const {
 	wrapInQuotes,
 	getId,
 } = require('../../../utils/general');
-const { dropIndex, createIndex, getWithOptions } = require('../../../ddlProvider/ddlHelpers/indexHelper');
+const {
+	dropIndex,
+	createIndex,
+	getWithOptions,
+	getCommentOnIndexStatement,
+} = require('../../../ddlProvider/ddlHelpers/indexHelper');
 const assignTemplates = require('../../../utils/assignTemplates');
 const templates = require('../../../ddlProvider/templates');
 
@@ -363,6 +368,41 @@ const getAlterIndexScriptDtos = ({ newIndex, oldIndex, additionalDataForDdlProvi
 };
 
 /**
+ * Comment changes stay on the existing index. A comment-only change must not drop and recreate it.
+ *
+ * @param {AlterIndexDto} newIndex
+ * @param {AlterIndexDto} oldIndex
+ * @param {Object} additionalDataForDdlProvider
+ * @param {AlterCollectionDto} collection
+ * @return {AlterScriptDto | undefined}
+ */
+const getModifyIndexCommentScriptDto = ({ newIndex, oldIndex, additionalDataForDdlProvider, collection }) => {
+	const oldComment = oldIndex?.indexComment || '';
+	const newComment = newIndex?.indexComment || '';
+
+	if (newComment === oldComment || !newIndex?.indxName) {
+		return undefined;
+	}
+
+	const { isParentActivated, schemaName } = additionalDataForDdlProvider;
+	const isRemoval = Boolean(oldComment) && !newComment;
+	const script = getCommentOnIndexStatement({
+		indexName: newIndex.indxName,
+		schemaName,
+		comment: newComment,
+		isRemoved: isRemoval,
+	});
+
+	return AlterScriptDto.getInstance(
+		script,
+		newIndex.isActivated && isParentActivated,
+		isRemoval,
+		SCRIPT_TYPE.alterEntityIndex,
+		getId(collection),
+	);
+};
+
+/**
  * @param {AlterCollectionDto} collection
  * @param {Object} additionalDataForDdlProvider
  * @return {Array<AlterScriptDto>}
@@ -404,17 +444,22 @@ const getModifiedIndexesScriptDtos = ({ collection, additionalDataForDdlProvider
 				return [deleteIndexScriptDto, createIndexScriptDto];
 			}
 
-			const shouldAlter = shouldAlterIndex({ oldIndex, newIndex });
-			if (shouldAlter) {
-				return getAlterIndexScriptDtos({
-					oldIndex,
-					newIndex,
-					collection,
-					additionalDataForDdlProvider,
-				});
-			}
+			const alterScriptDtos = shouldAlterIndex({ oldIndex, newIndex })
+				? getAlterIndexScriptDtos({
+						oldIndex,
+						newIndex,
+						collection,
+						additionalDataForDdlProvider,
+					})
+				: [];
+			const commentScriptDto = getModifyIndexCommentScriptDto({
+				newIndex,
+				oldIndex,
+				collection,
+				additionalDataForDdlProvider,
+			});
 
-			return [];
+			return [...alterScriptDtos, commentScriptDto];
 		})
 		.filter(Boolean);
 };
