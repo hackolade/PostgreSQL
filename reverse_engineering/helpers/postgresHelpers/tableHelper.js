@@ -232,6 +232,7 @@ const prepareTableIndexes = tableIndexesResult => {
 					? columns
 					: _.map(columns, column => _.omit(column, 'sortOrder', 'nullsOrder')),
 			...(nullsDistinct && { nullsDistinct }),
+			...(indexData.index_comment && { indexComment: indexData.index_comment }),
 		};
 
 		return clearEmptyPropertiesInObject(index);
