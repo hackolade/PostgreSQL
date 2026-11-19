@@ -374,18 +374,18 @@ const getAlterIndexScriptDtos = ({ newIndex, oldIndex, additionalDataForDdlProvi
  * @param {AlterIndexDto} oldIndex
  * @param {Object} additionalDataForDdlProvider
  * @param {AlterCollectionDto} collection
- * @return {AlterScriptDto | undefined}
+ * @return {AlterScriptDto | null}
  */
 const getModifyIndexCommentScriptDto = ({ newIndex, oldIndex, additionalDataForDdlProvider, collection }) => {
-	const oldComment = oldIndex?.indexComment || '';
-	const newComment = newIndex?.indexComment || '';
+	const oldComment = oldIndex.indexComment || '';
+	const newComment = newIndex.indexComment || '';
 
-	if (newComment === oldComment || !newIndex?.indxName) {
-		return undefined;
+	if (newComment === oldComment) {
+		return null;
 	}
 
 	const { isParentActivated, schemaName } = additionalDataForDdlProvider;
-	const isRemoval = Boolean(oldComment) && !newComment;
+	const isRemoval = !newComment;
 	const script = getCommentOnIndexStatement({
 		indexName: newIndex.indxName,
 		schemaName,
@@ -459,7 +459,7 @@ const getModifiedIndexesScriptDtos = ({ collection, additionalDataForDdlProvider
 				additionalDataForDdlProvider,
 			});
 
-			return [...alterScriptDtos, commentScriptDto];
+			return alterScriptDtos.concat(commentScriptDto);
 		})
 		.filter(Boolean);
 };
