@@ -19,7 +19,8 @@ const getGET_TABLE_INDEXES = postgresVersion => {
                array_agg(nulls_first
                          ORDER BY ord) AS nulls_first,
                 reloptions AS storage_parameters,
-                tablespace_name
+                tablespace_name,
+                index_comment
         FROM
             (SELECT ct.oid AS table_oid,
                     c.relname AS indexname,
@@ -30,6 +31,7 @@ const getGET_TABLE_INDEXES = postgresVersion => {
                     attribute.attname,
                      c.reloptions,
                      tablespace_t.spcname AS tablespace_name,
+                    pg_catalog.obj_description(c.oid, 'pg_class') AS index_comment,
                     indexes.${postgresVersion === 10 ? 'indnatts' : 'indnkeyatts'} AS number_of_keys,
                     pg_catalog.pg_get_expr(indpred, indrelid) AS where_expression,
                     CASE
@@ -71,7 +73,8 @@ const getGET_TABLE_INDEXES = postgresVersion => {
                  reloptions,
                  number_of_keys,
                  where_expression,
-                 tablespace_name;
+                 tablespace_name,
+                 index_comment;
         `;
 };
 

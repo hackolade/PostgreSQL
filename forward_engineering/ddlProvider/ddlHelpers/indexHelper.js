@@ -6,6 +6,7 @@ const {
 	getNamePrefixedWithSchemaName,
 	getDbVersion,
 	commentIfDeactivated,
+	wrapComment,
 } = require('../../utils/general');
 const assignTemplates = require('../../utils/assignTemplates');
 const templates = require('../templates');
@@ -102,6 +103,22 @@ const getValue = value => {
 	return value;
 };
 
+/**
+ * @param {{ indexName?: string, schemaName?: string, comment?: string, isRemoved?: boolean }} params
+ * @returns {string}
+ */
+const getCommentOnIndexStatement = ({ indexName, schemaName, comment, isRemoved = false }) => {
+	if (!indexName || (!comment && !isRemoved)) {
+		return '';
+	}
+
+	return assignTemplates(templates.comment, {
+		object: 'INDEX',
+		objectName: getNamePrefixedWithSchemaName(indexName, schemaName),
+		comment: isRemoved ? 'NULL' : wrapComment(comment),
+	});
+};
+
 const createIndex = (tableName, index, dbData, isParentActivated = true) => {
 	const isNameEmpty = !index.indxName && index.ifNotExist;
 	const indexExpressions = getIndexExpressions({ index });
@@ -134,24 +151,28 @@ const createIndex = (tableName, index, dbData, isParentActivated = true) => {
 		isAllColumnsDeactivated,
 	});
 	const options = getIndexOptions(index, isParentActivated);
+	const createIndexStatement = assignTemplates(templates.index, {
+		unique,
+		concurrently,
+		ifNotExist,
+		name,
+		only,
+		using,
+		keys,
+		options,
+		nullsDistinct,
+		tableName: getNamePrefixedWithSchemaName(tableName, index.schemaName),
+	});
+	const commentStatement = getCommentOnIndexStatement({
+		indexName: index.indxName,
+		schemaName: index.schemaName,
+		comment: index.indexComment,
+	});
+	const statement = commentStatement ? `${createIndexStatement}\n${commentStatement}` : createIndexStatement;
 
-	return commentIfDeactivated(
-		assignTemplates(templates.index, {
-			unique,
-			concurrently,
-			ifNotExist,
-			name,
-			only,
-			using,
-			keys,
-			options,
-			nullsDistinct,
-			tableName: getNamePrefixedWithSchemaName(tableName, index.schemaName),
-		}),
-		{
-			isActivated: index.isActivated && isParentActivated && !isAllColumnsDeactivated,
-		},
-	);
+	return commentIfDeactivated(statement, {
+		isActivated: index.isActivated && isParentActivated && !isAllColumnsDeactivated,
+	});
 };
 
 /**
@@ -168,6 +189,7 @@ const dropIndex = ({ indexName }) => {
 module.exports = {
 	createIndex,
 	dropIndex,
+	getCommentOnIndexStatement,
 	getIndexKeys,
 	getIndexOptions,
 	getWithOptions,
