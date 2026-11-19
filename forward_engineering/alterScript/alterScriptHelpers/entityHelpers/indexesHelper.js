@@ -103,8 +103,7 @@ const areIndexesDifferent = ({ oldIndex, newIndex, indexPropertiesToCompare }) =
  * @return {string}
  * */
 const alterIndexRename = ({ schemaName, oldIndexName, newIndexName }) => {
-	const ddlSchemaName = wrapInQuotes(schemaName);
-	const ddlOldIndexName = getNamePrefixedWithSchemaName(wrapInQuotes(oldIndexName), ddlSchemaName);
+	const ddlOldIndexName = getNamePrefixedWithSchemaName(oldIndexName, schemaName);
 	const ddlNewIndexName = wrapInQuotes(newIndexName);
 
 	const templatesConfig = {
@@ -121,8 +120,7 @@ const alterIndexRename = ({ schemaName, oldIndexName, newIndexName }) => {
  * @return {string}
  * */
 const alterIndexTablespace = ({ schemaName, indexName, tablespaceName }) => {
-	const ddlSchemaName = wrapInQuotes(schemaName);
-	const ddlIndexName = getNamePrefixedWithSchemaName(wrapInQuotes(indexName), ddlSchemaName);
+	const ddlIndexName = getNamePrefixedWithSchemaName(indexName, schemaName);
 
 	const templatesConfig = {
 		indexName: ddlIndexName,
@@ -138,8 +136,7 @@ const alterIndexTablespace = ({ schemaName, indexName, tablespaceName }) => {
  * @return {string}
  * */
 const alterIndexStorageParams = ({ schemaName, indexName, index }) => {
-	const ddlSchemaName = wrapInQuotes(schemaName);
-	const ddlIndexName = getNamePrefixedWithSchemaName(wrapInQuotes(indexName), ddlSchemaName);
+	const ddlIndexName = getNamePrefixedWithSchemaName(indexName, schemaName);
 
 	const ddlIndexStorageParameters = getWithOptions(index);
 	const templatesConfig = {
@@ -155,8 +152,7 @@ const alterIndexStorageParams = ({ schemaName, indexName, index }) => {
  * @return {string}
  * */
 const reindexIndex = ({ schemaName, indexName }) => {
-	const ddlSchemaName = wrapInQuotes(schemaName);
-	const ddlIndexName = getNamePrefixedWithSchemaName(wrapInQuotes(indexName), ddlSchemaName);
+	const ddlIndexName = getNamePrefixedWithSchemaName(indexName, schemaName);
 
 	const templatesConfig = {
 		indexName: ddlIndexName,
@@ -295,7 +291,8 @@ const getAlterIndexScriptDtos = ({ newIndex, oldIndex, additionalDataForDdlProvi
 	const { isParentActivated, schemaName } = additionalDataForDdlProvider;
 	const isNewIndexActivated = newIndex.isActivated && isParentActivated;
 
-	const shouldRename = !_.isEqual(newIndex.indxName, oldIndex.indxName);
+	const shouldRename =
+		Boolean(oldIndex.indxName && newIndex.indxName) && !_.isEqual(newIndex.indxName, oldIndex.indxName);
 	if (shouldRename) {
 		const script = alterIndexRename({
 			schemaName,
