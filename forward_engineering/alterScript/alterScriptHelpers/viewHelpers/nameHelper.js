@@ -3,8 +3,7 @@ const {
 	getViewName,
 	getNamePrefixedWithSchemaName,
 	wrapInQuotes,
-	isParentContainerActivated,
-	isObjectInDeltaModelActivated,
+	isViewActivated,
 	getId,
 } = require('../../../utils/general');
 const assignTemplates = require('../../../utils/assignTemplates');
@@ -42,10 +41,8 @@ const getRenameViewScriptDto = view => {
 		viewName: getNamePrefixedWithSchemaName(oldName, compMod.keyspaceName),
 		newName: wrapInQuotes(newName),
 	});
-	const isContainerActivated = isParentContainerActivated(view);
-	const isViewActivated = isContainerActivated && isObjectInDeltaModelActivated(view);
 
-	return AlterScriptDto.getInstance(script, isViewActivated, false, SCRIPT_TYPE.alterView, getId(view));
+	return AlterScriptDto.getInstance(script, isViewActivated(view), false, SCRIPT_TYPE.alterView, getId(view));
 };
 
 /**

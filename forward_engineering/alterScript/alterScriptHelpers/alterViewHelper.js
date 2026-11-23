@@ -2,7 +2,7 @@ const _ = require('lodash');
 const { getModifyViewCommentsScriptDtos } = require('./viewHelpers/commentsHelper');
 const { getRenameViewScriptDtos } = require('./viewHelpers/nameHelper');
 const { AlterScriptDto, SCRIPT_TYPE } = require('../types/AlterScriptDto');
-const { wrapInQuotes, getId } = require('../../utils/general');
+const { wrapInQuotes, getId, isViewActivated } = require('../../utils/general');
 
 const getKeys = ({ view, collectionRefsDefinitionsMap, ddlProvider, app }) => {
 	const { mapProperties } = app.require('@hackolade/ddl-fe-utils');
@@ -26,6 +26,9 @@ const getKeys = ({ view, collectionRefsDefinitionsMap, ddlProvider, app }) => {
 
 		if (name === propertyName) {
 			return ddlProvider.hydrateViewColumn({
+				containerData: definition.bucket,
+				entityData: definition.collection,
+				definition: definition.definition,
 				name,
 				dbName,
 				entityName,
@@ -34,6 +37,9 @@ const getKeys = ({ view, collectionRefsDefinitionsMap, ddlProvider, app }) => {
 		}
 
 		return ddlProvider.hydrateViewColumn({
+			containerData: definition.bucket,
+			entityData: definition.collection,
+			definition: definition.definition,
 			name,
 			dbName,
 			entityName,
@@ -61,8 +67,9 @@ const getAddViewScriptDto = app => view => {
 	};
 	const hydratedView = ddlProvider.hydrateView({ viewData, entityData: [view] });
 
-	const script = ddlProvider.createView(hydratedView, {}, view.isActivated);
-	return AlterScriptDto.getInstance(script, true, false, SCRIPT_TYPE.createView, getId(view));
+	const viewActivated = isViewActivated(view);
+	const script = ddlProvider.createView(hydratedView, {}, viewActivated);
+	return AlterScriptDto.getInstance(script, viewActivated, false, SCRIPT_TYPE.createView, getId(view));
 };
 
 /**
@@ -73,7 +80,7 @@ const getDeleteViewScriptDto = app => view => {
 	const viewName = wrapInQuotes(view.code || view.name);
 
 	const script = ddlProvider.dropView(viewName);
-	return AlterScriptDto.getInstance(script, true, true, SCRIPT_TYPE.dropView, getId(view));
+	return AlterScriptDto.getInstance(script, isViewActivated(view), true, SCRIPT_TYPE.dropView, getId(view));
 };
 
 /**
