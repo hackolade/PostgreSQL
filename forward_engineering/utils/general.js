@@ -295,6 +295,109 @@ const isParentContainerActivated = collection => {
 	);
 };
 
+/**
+ * @param {Object} view
+ * @returns {Record<string, Object>}
+ */
+const getCollectionRefsDefinitionsMap = view =>
+	view.compMod?.collectionData?.collectionRefsDefinitionsMap ||
+	view.role?.compMod?.collectionData?.collectionRefsDefinitionsMap ||
+	{};
+
+/**
+ * Resolve source table/schema/field refs for a view column.
+ *
+ * @param {Object} column
+ * @param {Record<string, Object>} [collectionRefsDefinitionsMap]
+ * @returns {Object}
+ */
+const getViewColumnSource = (column, collectionRefsDefinitionsMap = {}) =>
+	collectionRefsDefinitionsMap[column?.refId] ||
+	Object.values(collectionRefsDefinitionsMap).find(
+		item => item.definitionId === column?.GUID || item.definitionId === column?.ref,
+	) ||
+	{};
+
+/**
+ * Shared source activation for CREATE VIEW (hydrateViewColumn) and view activation.
+ * Accepts either map source `{ collection, bucket, definition }` or hydrate payload
+ * `{ entityData, containerData, definition }`.
+ *
+ * @param {Object} [source]
+ * @returns {boolean}
+ */
+const isViewColumnSourceActivated = (source = {}) => {
+	const sourceCollection = source.collection?.[0] ?? source.entityData?.[0] ?? {};
+	const sourceBucket = source.bucket?.[0] ?? source.containerData?.[0] ?? {};
+	const sourceDefinition = source.definition ?? {};
+
+	return (
+		sourceCollection.isActivated !== false &&
+		sourceBucket.isActivated !== false &&
+		sourceDefinition.isActivated !== false
+	);
+};
+
+/**
+ * A view column is active only when it, its source table/schema, and its source field are active.
+ *
+ * @param {Object} column
+ * @param {Record<string, Object>} [collectionRefsDefinitionsMap]
+ * @returns {boolean}
+ */
+const isViewColumnActivated = (column, collectionRefsDefinitionsMap = {}) => {
+	if (column?.isActivated === false) {
+		return false;
+	}
+
+	return isViewColumnSourceActivated(getViewColumnSource(column, collectionRefsDefinitionsMap));
+};
+
+/**
+ * Whether view DDL (CREATE VIEW, COMMENT ON VIEW, other ALTER VIEW) should stay uncommented.
+ * Checks: parent container, view, and custom SELECT or at least one active view column
+ * (including source collection/schema/field). Also accepts hydrated `keys` from CREATE VIEW.
+ *
+ * @param {Object} [view]
+ * @param {Object} [options]
+ * @param {boolean} [options.isActivated] Explicit view-level flag (CREATE FE third arg)
+ * @param {boolean} [options.isContainerActivated] Explicit container flag
+ * @param {Record<string, Object>} [options.collectionRefsDefinitionsMap] Explicit source map (CREATE FE)
+ * @returns {boolean}
+ */
+const isViewActivated = (
+	view = {},
+	{ isActivated, isContainerActivated, collectionRefsDefinitionsMap: refsMap } = {},
+) => {
+	const containerActivated = isContainerActivated ?? isParentContainerActivated(view);
+	if (containerActivated === false) {
+		return false;
+	}
+
+	const viewActivated =
+		isActivated ?? view.compMod?.isActivated?.new ?? view.role?.isActivated ?? view.isActivated ?? true;
+	if (viewActivated === false) {
+		return false;
+	}
+
+	const selectStatement = view.selectStatement ?? view.role?.selectStatement ?? '';
+	if (_.trim(selectStatement)) {
+		return true;
+	}
+
+	const collectionRefsDefinitionsMap = refsMap || getCollectionRefsDefinitionsMap(view);
+	const columns = Object.values(view.properties || view.role?.properties || {});
+	if (columns.length) {
+		return columns.some(column => isViewColumnActivated(column, collectionRefsDefinitionsMap));
+	}
+
+	if (Array.isArray(view.keys) && view.keys.length) {
+		return view.keys.some(key => key.isActivated !== false);
+	}
+
+	return true;
+};
+
 const getId = entity => entity.id || entity.role.id;
 
 module.exports = {
@@ -331,5 +434,10 @@ module.exports = {
 	addCommaPrefix,
 	isObjectInDeltaModelActivated,
 	isParentContainerActivated,
+	getCollectionRefsDefinitionsMap,
+	getViewColumnSource,
+	isViewColumnSourceActivated,
+	isViewColumnActivated,
+	isViewActivated,
 	getId,
 };
