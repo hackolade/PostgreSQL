@@ -87,6 +87,11 @@ class AlterIndexDto {
 	 * @type {Object}
 	 * */
 	index_storage_parameter;
+
+	/**
+	 * @type {string | undefined}
+	 */
+	indexComment;
 }
 
 module.exports = {

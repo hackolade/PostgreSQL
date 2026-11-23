@@ -276,6 +276,7 @@ module.exports = (baseProvider, options, app) => {
 		 *     ifNotExist?: boolean,
 		 *     only?: boolean,
 		 *     nullsDistinct?: string,
+		 *     indexComment?: string,
 		 *     columns?: Array<{
 		 *         sortOrder?: any,
 		 *         nullsOrder?: any,
