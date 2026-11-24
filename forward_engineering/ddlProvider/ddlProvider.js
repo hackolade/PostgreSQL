@@ -525,7 +525,7 @@ module.exports = (baseProvider, options, app) => {
 			};
 
 			if (viewData.materialized) {
-				const createViewScript = commentIfDeactivated(
+				const createViewScript =
 					assignTemplates(templates.createMaterializedView, {
 						name: viewName,
 						ifNotExist: viewData.ifNotExist ? ' IF NOT EXISTS' : '',
@@ -533,9 +533,13 @@ module.exports = (baseProvider, options, app) => {
 						comment: viewData.comment ? comment : '',
 						withDataClause: materializedViewHelper.getWithDataClause({ viewData }),
 						selectStatement,
-					}),
-					{ isActivated: !deactivatedWholeStatement },
-				);
+					}) + '\n';
+
+				// Only self-comment when the caller thinks the view is active but columns/sources
+				// make it inactive. When viewIsActivated is false, the caller comments the statement.
+				if (viewIsActivated && deactivatedWholeStatement) {
+					return commentIfDeactivated(_.trim(createViewScript) + '\n', { isActivated: false });
+				}
 
 				return _.trim(createViewScript) + '\n';
 			}
@@ -556,12 +560,15 @@ module.exports = (baseProvider, options, app) => {
 				triggers: viewData.triggers,
 			});
 
-			return commentIfDeactivated(
-				[createViewScript, createTriggersStatements].map(_.trim).join('\n\n').trim() + '\n',
-				{
-					isActivated: !deactivatedWholeStatement,
-				},
-			);
+			const statement = [createViewScript, createTriggersStatements].map(_.trim).join('\n\n').trim() + '\n';
+
+			// Only self-comment when the caller thinks the view is active but columns/sources
+			// make it inactive. When viewIsActivated is false, the caller comments the statement.
+			if (viewIsActivated && deactivatedWholeStatement) {
+				return commentIfDeactivated(statement, { isActivated: false });
+			}
+
+			return statement;
 		},
 
 		/**
